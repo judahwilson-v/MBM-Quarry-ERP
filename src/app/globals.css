@@ -1,0 +1,88 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  --background: 210 40% 98%;
+  --foreground: 222 47% 11%;
+  --card: 0 0% 100%;
+  --card-foreground: 222 47% 11%;
+  --popover: 0 0% 100%;
+  --popover-foreground: 222 47% 11%;
+  --primary: 214 84% 45%;
+  --primary-foreground: 0 0% 100%;
+  --success: 142 70% 35%;
+  --success-foreground: 0 0% 100%;
+  --warning: 38 92% 50%;
+  --warning-foreground: 24 90% 10%;
+  --destructive: 0 72% 51%;
+  --destructive-foreground: 0 0% 100%;
+  --muted: 214 32% 92%;
+  --muted-foreground: 215 20% 40%;
+  --accent: 214 95% 93%;
+  --accent-foreground: 214 84% 22%;
+  --border: 214 32% 86%;
+  --input: 214 32% 86%;
+  --ring: 214 84% 45%;
+  --radius: 0.5rem;
+}
+
+.dark {
+  --background: 222 47% 8%;
+  --foreground: 210 40% 98%;
+  --card: 222 47% 11%;
+  --card-foreground: 210 40% 98%;
+  --popover: 222 47% 11%;
+  --popover-foreground: 210 40% 98%;
+  --primary: 213 94% 68%;
+  --primary-foreground: 222 47% 8%;
+  --success: 142 69% 45%;
+  --success-foreground: 222 47% 8%;
+  --warning: 38 92% 55%;
+  --warning-foreground: 24 90% 10%;
+  --destructive: 0 72% 55%;
+  --destructive-foreground: 0 0% 100%;
+  --muted: 217 33% 17%;
+  --muted-foreground: 215 20% 75%;
+  --accent: 217 33% 18%;
+  --accent-foreground: 210 40% 98%;
+  --border: 217 33% 20%;
+  --input: 217 33% 20%;
+  --ring: 213 94% 68%;
+}
+
+* {
+  border-color: hsl(var(--border));
+}
+
+html {
+  background: hsl(var(--background));
+}
+
+body {
+  min-height: 100vh;
+  color: hsl(var(--foreground));
+  background: hsl(var(--background));
+}
+
+@layer utilities {
+  .text-balance {
+    text-wrap: balance;
+  }
+
+  .number-cell {
+    font-variant-numeric: tabular-nums;
+    text-align: right;
+  }
+}
+
+@media print {
+  .no-print {
+    display: none !important;
+  }
+
+  .print-card {
+    box-shadow: none !important;
+    border: 0 !important;
+  }
+}

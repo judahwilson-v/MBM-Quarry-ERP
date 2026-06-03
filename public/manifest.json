@@ -1,0 +1,8 @@
+{
+  "name": "MBM Quarry ERP",
+  "short_name": "MBM ERP",
+  "start_url": "/",
+  "display": "standalone",
+  "background_color": "#f8fafc",
+  "theme_color": "#1d64d8"
+}
