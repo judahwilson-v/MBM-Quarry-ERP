@@ -17,7 +17,6 @@ import {
   Menu,
   RefreshCcw,
   Scale,
-  Settings,
   Truck,
   Wifi,
   WifiOff,
@@ -66,7 +65,7 @@ export function AppShell({ children }: { children: React.ReactNode }) {
     <div className="min-h-screen bg-background text-foreground">
       {!isOnline ? (
         <div className="sticky top-0 z-50 bg-warning px-4 py-2 text-center text-sm font-medium text-warning-foreground">
-          You are offline - entries will sync when connected
+          You are offline - entries require connection to the production database
         </div>
       ) : null}
       <aside className="fixed inset-y-0 left-0 z-40 hidden w-64 border-r bg-card lg:block">
@@ -106,7 +105,7 @@ export function AppShell({ children }: { children: React.ReactNode }) {
             </Badge>
             <Button variant="outline" size="sm" onClick={() => void syncNow()} disabled={isSyncing}>
               <RefreshCcw className={cn("h-4 w-4", isSyncing && "animate-spin")} />
-              <span className="hidden sm:inline">{pendingCount ? `${pendingCount} pending` : "Synced"}</span>
+              <span className="hidden sm:inline">{pendingCount ? `${pendingCount} pending` : "Cloud DB"}</span>
             </Button>
             <Button variant="ghost" size="icon" aria-label="Logout" onClick={() => void signOut({ callbackUrl: "/login" })}>
               <LogOut className="h-4 w-4" />

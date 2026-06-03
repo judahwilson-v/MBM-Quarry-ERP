@@ -4,12 +4,14 @@ import bcrypt from "bcryptjs";
 const prisma = new PrismaClient();
 
 const materials: Array<{ name: string; code: string; currentRate: string; reorderLevel: string }> = [
-  { name: "M Sand", code: "MSAND", currentRate: "45", reorderLevel: "500" },
-  { name: "P Sand", code: "PSAND", currentRate: "42", reorderLevel: "500" },
   { name: "6mm", code: "6MM", currentRate: "40", reorderLevel: "400" },
-  { name: "12mm", code: "12MM", currentRate: "38", reorderLevel: "400" },
   { name: "20mm", code: "20MM", currentRate: "36", reorderLevel: "400" },
+  { name: "40mm", code: "40MM", currentRate: "34", reorderLevel: "400" },
+  { name: "M-Sand", code: "MSAND", currentRate: "45", reorderLevel: "500" },
+  { name: "P-Sand", code: "PSAND", currentRate: "42", reorderLevel: "500" },
   { name: "Dust", code: "DUST", currentRate: "30", reorderLevel: "300" },
+  { name: "GSB", code: "GSB", currentRate: "32", reorderLevel: "300" },
+  { name: "PS", code: "PS", currentRate: "30", reorderLevel: "300" },
 ];
 
 async function main() {

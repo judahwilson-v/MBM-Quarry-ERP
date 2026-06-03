@@ -12,16 +12,53 @@ import { downloadCsv, downloadExcel } from "@/lib/export-utils";
 import { cn, formatCurrency, formatDate, formatQty, todayInputValue } from "@/lib/utils";
 
 type SaleRow = Record<string, any>;
+type FilterMode = "today" | "week" | "month" | "custom";
+const materialOrder = ["6mm", "20mm", "40mm", "M-Sand", "P-Sand", "Dust"] as const;
+
+function addDays(date: Date, days: number) {
+  const next = new Date(date);
+  next.setDate(next.getDate() + days);
+  return next;
+}
+
+function inputDate(date: Date) {
+  const tz = date.getTimezoneOffset() * 60000;
+  return new Date(date.getTime() - tz).toISOString().slice(0, 10);
+}
+
+function weekRange() {
+  const now = new Date();
+  const day = now.getDay();
+  const mondayOffset = day === 0 ? -6 : 1 - day;
+  const start = addDays(now, mondayOffset);
+  return { from: inputDate(start), to: inputDate(addDays(start, 6)) };
+}
+
+function monthRange() {
+  const now = new Date();
+  return {
+    from: inputDate(new Date(now.getFullYear(), now.getMonth(), 1)),
+    to: inputDate(new Date(now.getFullYear(), now.getMonth() + 1, 0)),
+  };
+}
 
 export function SalesPage() {
-  const [date, setDate] = useState(todayInputValue());
+  const [filterMode, setFilterMode] = useState<FilterMode>("today");
+  const [from, setFrom] = useState(todayInputValue());
+  const [to, setTo] = useState(todayInputValue());
   const [sales, setSales] = useState<SaleRow[]>([]);
   const [summary, setSummary] = useState<Record<string, any>>({});
   const [selected, setSelected] = useState<string[]>([]);
   const [error, setError] = useState("");
 
   const loadSales = useCallback(async () => {
-    const response = await fetch(`/api/v1/sales?date=${date}&pageSize=100`);
+    const params = new URLSearchParams({ pageSize: "300" });
+    if (filterMode === "today") params.set("date", from);
+    else {
+      params.set("from", from);
+      params.set("to", to);
+    }
+    const response = await fetch(`/api/v1/sales?${params.toString()}`);
     const body = await response.json();
     if (!response.ok) {
       setError(body.error ?? "Failed to load sales.");
@@ -29,7 +66,7 @@ export function SalesPage() {
     }
     setSales(body.data ?? []);
     setSummary(body.summary ?? {});
-  }, [date]);
+  }, [filterMode, from, to]);
 
   useEffect(() => {
     void loadSales();
@@ -47,6 +84,28 @@ export function SalesPage() {
   }
 
   const selectedRows = sales.filter((row) => selected.includes(row.id));
+  const weeklyTitle = filterMode === "week" ? "Weekly Summary" : filterMode === "month" ? "Monthly Summary" : "Selected Range Summary";
+
+  function setToday() {
+    const today = todayInputValue();
+    setFilterMode("today");
+    setFrom(today);
+    setTo(today);
+  }
+
+  function setWeek() {
+    const range = weekRange();
+    setFilterMode("week");
+    setFrom(range.from);
+    setTo(range.to);
+  }
+
+  function setMonth() {
+    const range = monthRange();
+    setFilterMode("month");
+    setFrom(range.from);
+    setTo(range.to);
+  }
 
   return (
     <div className="space-y-5 p-4 lg:p-6">
@@ -56,13 +115,21 @@ export function SalesPage() {
           <p className="text-sm text-muted-foreground">Daily sales rows, CFT totals, split payments, and dispatch slips.</p>
         </div>
         <div className="flex flex-wrap gap-2">
-          <Input className="w-40" type="date" value={date} onChange={(event) => setDate(event.target.value)} />
-          <Button asChild>
+          <Button asChild size="sm">
             <Link href="/sales/new">
               <Plus className="h-4 w-4" />
-              New Sale
+              Sale
             </Link>
           </Button>
+          <Button asChild size="sm" variant="outline">
+            <Link href="/purchases/boulder">
+              <Plus className="h-4 w-4" />
+              Boulder Purchase
+            </Link>
+          </Button>
+          <Button size="sm" variant={filterMode === "today" ? "default" : "outline"} onClick={setToday}>Today</Button>
+          <Button size="sm" variant={filterMode === "week" ? "default" : "outline"} onClick={setWeek}>This Week</Button>
+          <Button size="sm" variant={filterMode === "month" ? "default" : "outline"} onClick={setMonth}>This Month</Button>
         </div>
       </div>
 
@@ -72,6 +139,8 @@ export function SalesPage() {
         <CardHeader className="flex-row items-center justify-between">
           <CardTitle>Daily Sales</CardTitle>
           <div className="flex gap-2">
+            <Input className="w-36" type="date" value={from} onChange={(event) => { setFilterMode("custom"); setFrom(event.target.value); }} />
+            <Input className="w-36" type="date" value={to} onChange={(event) => { setFilterMode("custom"); setTo(event.target.value); }} />
             <Button variant="outline" size="sm" onClick={() => void downloadExcel(selectedRows.length ? selectedRows : sales, "sales.xlsx")}>
               <FileSpreadsheet className="h-4 w-4" />
               Excel
@@ -104,7 +173,7 @@ export function SalesPage() {
             </TableHeader>
             <TableBody>
               {sales.map((row) => (
-                <TableRow key={row.id} className={cn(Number(row.creditAmount ?? 0) > 0 && "bg-red-50 text-red-700")}>
+                <TableRow key={row.id} className="border-l-4 border-l-blue-300 bg-blue-50/60 text-slate-900">
                   <TableCell>
                     <input
                       type="checkbox"
@@ -154,12 +223,24 @@ export function SalesPage() {
               ) : null}
             </TableBody>
           </Table>
+          <div className="mt-4 grid gap-4 border-t pt-4 lg:grid-cols-[1fr_320px]">
+            <div className="grid gap-2 sm:grid-cols-2 lg:grid-cols-3">
+              {materialOrder.map((material) => (
+                <RegisterLine key={material} label={material} value={formatQty(summary.materialBreakdown?.[material] ?? 0)} />
+              ))}
+            </div>
+            <div className="grid gap-2">
+              <RegisterLine label="Cash Sales" value={formatCurrency(summary.cashSales ?? 0)} />
+              <RegisterLine label="Credit Sales" value={formatCurrency(summary.creditSales ?? 0)} />
+              <RegisterLine label="Total Sales" value={formatCurrency(summary.totalAmount ?? 0)} strong />
+            </div>
+          </div>
         </CardContent>
       </Card>
 
       <Card>
         <CardHeader>
-          <CardTitle>Daily Summary</CardTitle>
+          <CardTitle>{filterMode === "today" ? "Daily Summary" : weeklyTitle}</CardTitle>
         </CardHeader>
         <CardContent className="grid gap-4">
           <div className="grid gap-3 md:grid-cols-6">
@@ -170,16 +251,25 @@ export function SalesPage() {
             <Summary label="Credit" value={formatCurrency(summary.credit ?? 0)} />
             <Summary label="Total" value={formatCurrency(summary.totalAmount ?? 0)} />
           </div>
-          <div className="grid gap-2 sm:grid-cols-2 lg:grid-cols-4">
-            {Object.entries(summary.materialBreakdown ?? {}).map(([code, qty]) => (
-              <div key={code} className="rounded-md border bg-background p-3 text-sm">
-                <div className="text-muted-foreground">{code}</div>
-                <div className="mt-1 text-lg font-semibold">{formatQty(qty)}</div>
+          <div className="grid gap-2 sm:grid-cols-2 lg:grid-cols-3">
+            {materialOrder.map((material) => (
+              <div key={material} className="rounded-md border bg-background p-3 text-sm">
+                <div className="text-muted-foreground">{material}</div>
+                <div className="mt-1 text-lg font-semibold">{formatQty(summary.materialBreakdown?.[material] ?? 0)}</div>
               </div>
             ))}
           </div>
         </CardContent>
       </Card>
+    </div>
+  );
+}
+
+function RegisterLine({ label, value, strong = false }: { label: string; value: string; strong?: boolean }) {
+  return (
+    <div className={cn("flex items-center justify-between gap-3 rounded-md border bg-background px-3 py-2 text-sm", strong && "font-semibold")}>
+      <span className="text-muted-foreground">{label}</span>
+      <span className="tabular-nums">{value}</span>
     </div>
   );
 }

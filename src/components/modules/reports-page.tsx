@@ -12,7 +12,13 @@ import { cn, todayInputValue } from "@/lib/utils";
 
 const reportTypes = [
   ["daily-sales", "Daily Sales"],
-  ["daily-purchases", "Daily Purchases"],
+  ["weekly-sales", "Weekly Sales"],
+  ["monthly-sales", "Monthly Sales"],
+  ["boulder-purchase-report", "Boulder Purchase"],
+  ["material-wise-report", "Material-wise Report"],
+  ["customer-ledger", "Customer Ledger"],
+  ["supplier-ledger", "Supplier Ledger"],
+  ["daily-purchases", "Expense Purchases"],
   ["outstanding-report", "Outstanding Report"],
   ["vehicle-report", "Vehicle Report"],
   ["material-report", "Material Report"],
@@ -110,7 +116,8 @@ export function ReportsPage() {
                 <TableRow
                   key={index}
                   className={cn(
-                    reportType === "daily-purchases" && "bg-blue-50 text-blue-700",
+                    reportType === "boulder-purchase-report" && "border-l-4 border-l-red-300 bg-red-50/60 text-slate-900",
+                    reportType === "daily-purchases" && "bg-slate-50 text-slate-800",
                     (Number(rows[index]?.debitAmount ?? 0) > 0 || (rows[index]?.paymentType === "CREDIT" && Number(rows[index]?.creditAmount ?? 0) > 0)) &&
                       "bg-red-50 text-red-700",
                     Number(rows[index]?.creditAmount ?? 0) > 0 && rows[index]?.entryType === "PAYMENT_RECEIVED" && "bg-green-50 text-green-700",

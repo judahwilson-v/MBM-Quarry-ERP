@@ -16,7 +16,7 @@ const geistMono = localFont({
 
 export const metadata: Metadata = {
   title: "MBM Quarry ERP",
-  description: "Offline-first ERP and dispatch management for MBM Quarry",
+  description: "Cloud ERP and dispatch management for MBM Quarry",
 };
 
 export default function RootLayout({

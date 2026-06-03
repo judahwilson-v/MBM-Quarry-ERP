@@ -20,6 +20,7 @@ export function PurchasesPage() {
     date: todayInputValue(),
     category: "MATERIAL",
     supplierId: "",
+    supplierName: "",
     materialId: "",
     description: "",
     qty: "",
@@ -42,6 +43,11 @@ export function PurchasesPage() {
     const rate = Number(form.rate || 0);
     return qty > 0 && rate > 0 ? (qty * rate).toFixed(2) : form.amount;
   }, [form.qty, form.rate, form.amount]);
+
+  function selectSupplier(supplierId: string) {
+    const supplier = suppliers.find((row) => row.id === supplierId);
+    setForm((current) => ({ ...current, supplierId, supplierName: supplier?.name ?? current.supplierName }));
+  }
 
   const load = useCallback(async () => {
     const [purchases, supplierRows, materialRows] = await Promise.all([
@@ -117,7 +123,17 @@ export function PurchasesPage() {
               </select>
             </Field>
             <Field label="Supplier">
-              <SearchableSelect value={form.supplierId} placeholder="Search supplier" options={suppliers.map((supplier) => ({ value: supplier.id, label: supplier.name, description: supplier.phone }))} onChange={(value) => setForm((f) => ({ ...f, supplierId: value }))} />
+              <SearchableSelect
+                value={form.supplierId}
+                customValue={form.supplierName}
+                allowCustom
+                placeholder="Search supplier"
+                options={suppliers.map((supplier) => ({ value: supplier.id, label: supplier.name, description: supplier.phone }))}
+                onChange={selectSupplier}
+                onCustomValueChange={(supplierName) =>
+                  setForm((current) => ({ ...current, supplierName, supplierId: supplierName === current.supplierName ? current.supplierId : "" }))
+                }
+              />
             </Field>
             {form.category === "MATERIAL" ? (
               <Field label="Material">
