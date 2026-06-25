@@ -82,3 +82,37 @@ It is the source of truth for table relationships, field semantics, and migratio
 - Use `created_at` for record creation.
 - Use `updated_at` for mutable entities.
 - Do not mix business dates with system timestamps.
+
+## Derived Fields Policy
+
+For every derived field stored in the database, document:
+
+- Formula
+- Source-of-truth fields
+- Why it is stored instead of calculated
+- When it must be recalculated
+- Whether it may ever be edited directly
+
+### `paid_total`
+
+- Formula: `cash_paid + bank_paid + gpay_paid`
+- Source of truth: `cash_paid`, `bank_paid`, `gpay_paid`
+- Stored because: reporting performance, historical reconciliation
+- Recalculate when: any payment component changes
+- Directly editable: No
+
+### `remaining_credit`
+
+- Formula: `final_amount - paid_total`
+- Source of truth: `final_amount`, `paid_total`
+- Stored because: reporting performance, collections views, reconciliation
+- Recalculate when: `final_amount` or any payment component changes
+- Directly editable: No
+
+### `trip_count`
+
+- Formula: count of committed sales trip deltas for a vehicle
+- Source of truth: committed sales rows and their `trip_delta`
+- Stored because: quick operational lookup and vehicle-level summaries
+- Recalculate when: sale create, update, delete, or rollback affects trip deltas
+- Directly editable: No

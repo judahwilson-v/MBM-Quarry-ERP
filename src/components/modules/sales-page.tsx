@@ -8,6 +8,7 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { deleteSale, listSales } from "@/lib/offline-actions";
+import { verifyEditPassword } from "@/lib/domain";
 import { cn, formatCurrency, formatDate, formatQty } from "@/lib/utils";
 
 type SaleRow = EditableSale & {
@@ -99,6 +100,11 @@ export function SalesPage() {
 
   async function remove(id: string) {
     if (!window.confirm("Delete this sale?")) return;
+    const password = window.prompt("Enter delete password:");
+    if (!password || !verifyEditPassword(password)) {
+      setError("Delete password is invalid.");
+      return;
+    }
     setError("");
     try {
       await deleteSale(id);
@@ -172,7 +178,19 @@ export function SalesPage() {
                   <TableCell className="max-w-44 truncate">{row.remarks}</TableCell>
                   <TableCell className="text-right">
                     <div className="inline-flex gap-1">
-                      <Button variant="ghost" size="icon" onClick={() => setEditingSale(row)} aria-label="Edit sale">
+                      <Button
+                        variant="ghost"
+                        size="icon"
+                        onClick={() => {
+                          const password = window.prompt("Enter edit password:");
+                          if (!password || !verifyEditPassword(password)) {
+                            setError("Edit password is invalid.");
+                            return;
+                          }
+                          setEditingSale(row);
+                        }}
+                        aria-label="Edit sale"
+                      >
                         <Pencil className="h-4 w-4" />
                       </Button>
                       <Button variant="ghost" size="icon" onClick={() => void remove(row.id)} aria-label="Delete sale">

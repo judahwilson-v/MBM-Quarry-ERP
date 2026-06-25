@@ -65,3 +65,19 @@ It is separate from the business spec:
 - Freeze a phase before starting the next one.
 - Use docs and tests to approve a phase before code changes begin.
 - Prefer small, reviewable increments over large rewrites.
+
+## Decision 010: Derived Fields Policy
+
+- If a derived value is stored, document its formula, source-of-truth fields, storage reason, recalculation trigger, and direct edit policy.
+- Stored derived fields are convenience caches, not authoritative business inputs.
+- Direct editing of derived fields is never allowed.
+- Cached fields must be recalculated whenever their source fields change.
+
+## Decision 011: Phase 1.1B Scope
+
+- Phase 1.1B is limited to authorization and accountability controls.
+- Priority order:
+  - password `1177` protection for edit/delete
+  - persistent audit log entries
+  - role enforcement for Owner / Manager / Salesman
+- Day Book, Dashboard, Reports, Purchases changes, Sync, and Electron remain out of scope.

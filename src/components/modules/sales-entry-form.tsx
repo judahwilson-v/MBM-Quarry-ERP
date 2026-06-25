@@ -10,6 +10,7 @@ import { SearchableSelect } from "@/components/ui/searchable-select";
 import { Textarea } from "@/components/ui/textarea";
 import { listMaterials, listVehicles, saveSale } from "@/lib/offline-actions";
 import { deriveSalesEngine } from "@/lib/sales-engine";
+import { verifyEditPassword } from "@/lib/domain";
 import { formatCurrency, todayInputValue } from "@/lib/utils";
 
 type VehicleRow = {
@@ -200,6 +201,12 @@ export function SalesEntryForm({
     setError("");
     setMessage("");
     try {
+      if (form.id) {
+        const password = window.prompt("Enter edit password:");
+        if (!password || !verifyEditPassword(password)) {
+          throw new Error("Edit password is invalid.");
+        }
+      }
       await saveSale({
         id: form.id,
         saleDate: form.saleDate,

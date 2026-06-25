@@ -15,6 +15,13 @@
 - Existing sales UI remains visually close to the current version.
 - Build verified successfully after implementation.
 
+## Phase 1.1B - Authorization and Accountability
+
+- Authorization helper added for the temporary Phase 1 password gate.
+- Audit service added and wired into sales, master data, boulder, and employee-credit mutations.
+- Role helper scaffold added for Owner / Manager / Salesman checks.
+- Build verified successfully after implementation.
+
 ## Future Phases
 
 - Phase 1.1B - Sales UI

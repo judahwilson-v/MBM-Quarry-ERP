@@ -14,7 +14,7 @@ This document tracks the implementation roadmap and completion checklist for MBM
 
 ## Planned
 
-- Phase 1.1 - Sales rewrite.
+- Phase 1.1B - Authorization and audit controls.
 - Phase 1.2 - Purchases.
 - Phase 1.3 - Day Book.
 - Phase 1.4 - Credit and collections.
@@ -25,10 +25,8 @@ This document tracks the implementation roadmap and completion checklist for MBM
 ## Phase 1.1 Breakdown
 
 - Phase 1.1A - Sales database and business logic.
-- Phase 1.1B - Sales UI.
-- Phase 1.1C - Edit/delete protection and audit logging.
-- Phase 1.1D - Vehicle trip counting and automatic credit updates.
-- Phase 1.1E - Final testing and documentation.
+- Phase 1.1B - Password protection, audit persistence, and role enforcement.
+- Phase 1.1C - Final testing and documentation.
 
 ## Completion Checklist
 

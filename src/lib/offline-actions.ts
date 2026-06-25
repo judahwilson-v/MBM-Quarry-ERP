@@ -2,6 +2,7 @@
 
 import { getDb } from "@/lib/prisma";
 import { deriveSalesEngine, type SalesDraft } from "@/lib/sales-engine";
+import { calculateRemainingCredit, decrementVehicleTrips, incrementVehicleTrips, writeAuditEvent } from "@/lib/domain";
 
 type VehicleInput = {
   id?: string;
@@ -131,14 +132,27 @@ export async function saveVehicle(input: VehicleInput) {
 
   const data = { vehicleNumber, partyName, companyBodyQty, extraBodyQty };
   if (input.id) {
-    return serialize(await db.vehicle.update({ where: { id: input.id }, data }));
+    return serialize(await db.$transaction(async (tx) => {
+      const before = await tx.vehicle.findUnique({ where: { id: input.id } });
+      const row = await tx.vehicle.update({ where: { id: input.id }, data });
+      await writeAuditEvent(tx, { entityName: "Vehicle", entityId: row.id, action: "update", role: "system", before, after: row });
+      return row;
+    }));
   }
-  return serialize(await db.vehicle.create({ data }));
+  return serialize(await db.$transaction(async (tx) => {
+    const row = await tx.vehicle.create({ data });
+    await writeAuditEvent(tx, { entityName: "Vehicle", entityId: row.id, action: "create", role: "system", after: row });
+    return row;
+  }));
 }
 
 export async function deleteVehicle(id: string) {
   const db = await getDb();
-  await db.vehicle.delete({ where: { id } });
+  await db.$transaction(async (tx) => {
+    const before = await tx.vehicle.findUnique({ where: { id } });
+    await tx.vehicle.delete({ where: { id } });
+    if (before) await writeAuditEvent(tx, { entityName: "Vehicle", entityId: id, action: "delete", role: "system", before });
+  });
 }
 
 export async function listParties(search = "") {
@@ -155,14 +169,27 @@ export async function saveParty(input: PartyInput) {
     address: cleanText(input.address),
   };
   if (input.id) {
-    return serialize(await db.party.update({ where: { id: input.id }, data }));
+    return serialize(await db.$transaction(async (tx) => {
+      const before = await tx.party.findUnique({ where: { id: input.id } });
+      const row = await tx.party.update({ where: { id: input.id }, data });
+      await writeAuditEvent(tx, { entityName: "Party", entityId: row.id, action: "update", role: "system", before, after: row });
+      return row;
+    }));
   }
-  return serialize(await db.party.create({ data }));
+  return serialize(await db.$transaction(async (tx) => {
+    const row = await tx.party.create({ data });
+    await writeAuditEvent(tx, { entityName: "Party", entityId: row.id, action: "create", role: "system", after: row });
+    return row;
+  }));
 }
 
 export async function deleteParty(id: string) {
   const db = await getDb();
-  await db.party.delete({ where: { id } });
+  await db.$transaction(async (tx) => {
+    const before = await tx.party.findUnique({ where: { id } });
+    await tx.party.delete({ where: { id } });
+    if (before) await writeAuditEvent(tx, { entityName: "Party", entityId: id, action: "delete", role: "system", before });
+  });
 }
 
 export async function listMaterials(search = "") {
@@ -175,7 +202,12 @@ export async function updateMaterialRate(id: string, ratePerCft: string | number
   const db = await getDb();
   const rate = parseNumber(ratePerCft, "Rate");
   if (rate === null || rate < 0) throw new Error("Rate must be zero or greater.");
-  return serialize(await db.material.update({ where: { id }, data: { ratePerCft: rate } }));
+  return serialize(await db.$transaction(async (tx) => {
+    const before = await tx.material.findUnique({ where: { id } });
+    const row = await tx.material.update({ where: { id }, data: { ratePerCft: rate } });
+    await writeAuditEvent(tx, { entityName: "Material", entityId: row.id, action: "update", role: "system", before, after: row });
+    return row;
+  }));
 }
 
 export async function listSales() {
@@ -208,10 +240,7 @@ export async function saveSale(input: SaleInput) {
 
       if (existing) {
         if (existing.vehicleId) {
-          await tx.vehicle.update({
-            where: { id: existing.vehicleId },
-            data: { tripCount: { decrement: existing.tripDelta ?? 1 } },
-          });
+          await decrementVehicleTrips(tx, existing.vehicleId, existing.tripDelta ?? 1);
         }
         const sale = await tx.outgoingSale.update({
           where: { id: input.id },
@@ -235,20 +264,26 @@ export async function saveSale(input: SaleInput) {
             bankPaid: engine.bankPaid,
             gPayPaid: engine.gPayPaid,
             paidTotal: engine.paidTotal,
-            remainingCredit: engine.remainingCredit,
+            remainingCredit: calculateRemainingCredit(engine.finalAmount, engine.paidTotal),
             tripDelta: engine.tripDelta,
             remarks: engine.remarks,
           },
         });
         if (vehicle?.id) {
-          await tx.vehicle.update({
-            where: { id: vehicle.id },
-            data: { tripCount: { increment: engine.tripDelta } },
-          });
+          await incrementVehicleTrips(tx, vehicle.id, engine.tripDelta);
         }
         await tx.partyCredit.deleteMany({ where: { saleId: sale.id } });
         await tx.partyCredit.create({
-          data: { partyName: engine.partyName, saleId: sale.id, amount: engine.remainingCredit, status: "pending" },
+          data: { partyName: engine.partyName, saleId: sale.id, amount: calculateRemainingCredit(engine.finalAmount, engine.paidTotal), status: "pending" },
+        });
+        await writeAuditEvent(tx, {
+          entityName: "Sale",
+          entityId: sale.id,
+          action: "update",
+          role: "system",
+          before: existing,
+          after: sale,
+          reason: engine.qtyChanged ? engine.quantityReason : null,
         });
         return sale;
       }
@@ -278,18 +313,23 @@ export async function saveSale(input: SaleInput) {
           bankPaid: engine.bankPaid,
           gPayPaid: engine.gPayPaid,
           paidTotal: engine.paidTotal,
-          remainingCredit: engine.remainingCredit,
+          remainingCredit: calculateRemainingCredit(engine.finalAmount, engine.paidTotal),
           remarks: engine.remarks,
         },
       });
       if (vehicle?.id) {
-        await tx.vehicle.update({
-          where: { id: vehicle.id },
-          data: { tripCount: { increment: engine.tripDelta } },
-        });
+        await incrementVehicleTrips(tx, vehicle.id, engine.tripDelta);
       }
       await tx.partyCredit.create({
-        data: { partyName: engine.partyName, saleId: sale.id, amount: engine.remainingCredit, status: "pending" },
+        data: { partyName: engine.partyName, saleId: sale.id, amount: calculateRemainingCredit(engine.finalAmount, engine.paidTotal), status: "pending" },
+      });
+      await writeAuditEvent(tx, {
+        entityName: "Sale",
+        entityId: sale.id,
+        action: "create",
+        role: "system",
+        after: sale,
+        reason: engine.qtyChanged ? engine.quantityReason : null,
       });
       return sale;
     }),
@@ -303,9 +343,15 @@ export async function deleteSale(id: string) {
     await tx.partyCredit.deleteMany({ where: { saleId: id } });
     await tx.outgoingSale.delete({ where: { id } });
     if (existing?.vehicleId) {
-      await tx.vehicle.update({
-        where: { id: existing.vehicleId },
-        data: { tripCount: { decrement: existing.tripDelta ?? 1 } },
+      await decrementVehicleTrips(tx, existing.vehicleId, existing.tripDelta ?? 1);
+    }
+    if (existing) {
+      await writeAuditEvent(tx, {
+        entityName: "Sale",
+        entityId: id,
+        action: "delete",
+        role: "system",
+        before: existing,
       });
     }
   });
@@ -330,14 +376,27 @@ export async function saveIncomingBoulder(input: IncomingBoulderInput) {
   if (data.qty <= 0) throw new Error("Qty must be greater than 0.");
   await upsertPartyByName(data.partyName);
   if (input.id) {
-    return serialize(await db.incomingBoulder.update({ where: { id: input.id }, data }));
+    return serialize(await db.$transaction(async (tx) => {
+      const before = await tx.incomingBoulder.findUnique({ where: { id: input.id } });
+      const row = await tx.incomingBoulder.update({ where: { id: input.id }, data });
+      await writeAuditEvent(tx, { entityName: "IncomingBoulder", entityId: row.id, action: "update", role: "system", before, after: row });
+      return row;
+    }));
   }
-  return serialize(await db.incomingBoulder.create({ data }));
+  return serialize(await db.$transaction(async (tx) => {
+    const row = await tx.incomingBoulder.create({ data });
+    await writeAuditEvent(tx, { entityName: "IncomingBoulder", entityId: row.id, action: "create", role: "system", after: row });
+    return row;
+  }));
 }
 
 export async function deleteIncomingBoulder(id: string) {
   const db = await getDb();
-  await db.incomingBoulder.delete({ where: { id } });
+  await db.$transaction(async (tx) => {
+    const before = await tx.incomingBoulder.findUnique({ where: { id } });
+    await tx.incomingBoulder.delete({ where: { id } });
+    if (before) await writeAuditEvent(tx, { entityName: "IncomingBoulder", entityId: id, action: "delete", role: "system", before });
+  });
 }
 
 export async function listPartyCreditSummary() {
@@ -385,14 +444,27 @@ export async function saveEmployeeCredit(input: EmployeeCreditInput) {
   };
   if (data.amount <= 0) throw new Error("Amount must be greater than 0.");
   if (input.id) {
-    return serialize(await db.employeeCredit.update({ where: { id: input.id }, data }));
+    return serialize(await db.$transaction(async (tx) => {
+      const before = await tx.employeeCredit.findUnique({ where: { id: input.id } });
+      const row = await tx.employeeCredit.update({ where: { id: input.id }, data });
+      await writeAuditEvent(tx, { entityName: "EmployeeCredit", entityId: row.id, action: "update", role: "system", before, after: row });
+      return row;
+    }));
   }
-  return serialize(await db.employeeCredit.create({ data }));
+  return serialize(await db.$transaction(async (tx) => {
+    const row = await tx.employeeCredit.create({ data });
+    await writeAuditEvent(tx, { entityName: "EmployeeCredit", entityId: row.id, action: "create", role: "system", after: row });
+    return row;
+  }));
 }
 
 export async function deleteEmployeeCredit(id: string) {
   const db = await getDb();
-  await db.employeeCredit.delete({ where: { id } });
+  await db.$transaction(async (tx) => {
+    const before = await tx.employeeCredit.findUnique({ where: { id } });
+    await tx.employeeCredit.delete({ where: { id } });
+    if (before) await writeAuditEvent(tx, { entityName: "EmployeeCredit", entityId: id, action: "delete", role: "system", before });
+  });
 }
 
 export async function getTodayForInput() {
