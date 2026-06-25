@@ -9,6 +9,7 @@ import { Input } from "@/components/ui/input";
 import { SearchableSelect } from "@/components/ui/searchable-select";
 import { Textarea } from "@/components/ui/textarea";
 import { listMaterials, listVehicles, saveSale } from "@/lib/offline-actions";
+import { deriveSalesEngine } from "@/lib/sales-engine";
 import { formatCurrency, todayInputValue } from "@/lib/utils";
 
 type VehicleRow = {
@@ -37,6 +38,8 @@ export type EditableSale = {
   discountValue: number;
   cashPaid?: number | null;
   bankPaid?: number | null;
+  gPayPaid?: number | null;
+  remainingCredit?: number | null;
   remarks?: string | null;
 };
 
@@ -50,10 +53,12 @@ type SaleForm = {
   materialName: string;
   ratePerCft: string;
   qty: string;
+  quantityReason: string;
   discountType: "percentage" | "fixed";
   discountValue: string;
   cashPaid: string;
   bankPaid: string;
+  gPayPaid: string;
   remarks: string;
 };
 
@@ -67,10 +72,12 @@ function blankSale(): SaleForm {
     materialName: "",
     ratePerCft: "",
     qty: "",
+    quantityReason: "",
     discountType: "fixed",
     discountValue: "0",
     cashPaid: "0",
     bankPaid: "0",
+    gPayPaid: "0",
     remarks: "",
   };
 }
@@ -127,10 +134,12 @@ export function SalesEntryForm({
       materialName: editingSale.materialName,
       ratePerCft: String(editingSale.ratePerCft),
       qty: String(editingSale.qty),
+      quantityReason: "",
       discountType: editingSale.discountType,
       discountValue: String(editingSale.discountValue),
       cashPaid: String(editingSale.cashPaid ?? 0),
       bankPaid: String(editingSale.bankPaid ?? 0),
+      gPayPaid: String(editingSale.gPayPaid ?? 0),
       remarks: editingSale.remarks ?? "",
     });
     setMessage("");
@@ -138,20 +147,27 @@ export function SalesEntryForm({
   }, [editingSale, materials, vehicles]);
 
   const totals = useMemo(() => {
-    const qty = Number(form.qty || 0);
-    const rate = Number(form.ratePerCft || 0);
-    const discountValue = Number(form.discountValue || 0);
-    const amount = Number.isFinite(qty * rate) ? qty * rate : 0;
-    const discount =
-      form.discountType === "percentage"
-        ? (amount * (Number.isFinite(discountValue) ? discountValue : 0)) / 100
-        : discountValue;
-    return {
-      amount,
-      discount: Number.isFinite(discount) ? discount : 0,
-      finalAmount: Math.max(0, amount - (Number.isFinite(discount) ? discount : 0)),
-    };
-  }, [form.discountType, form.discountValue, form.qty, form.ratePerCft]);
+    const material = materials.find((row) => row.id === form.materialId);
+    if (!material) return { amount: 0, discount: 0, finalAmount: 0, remainingCredit: 0 };
+    const vehicle = vehicles.find((row) => row.id === form.vehicleId) ?? null;
+    try {
+      const engine = deriveSalesEngine(
+        {
+          ...form,
+          gPayPaid: form.gPayPaid,
+        },
+        { vehicle, material },
+      );
+      return {
+        amount: engine.amount,
+        discount: engine.discountAmount,
+        finalAmount: engine.finalAmount,
+        remainingCredit: engine.remainingCredit,
+      };
+    } catch {
+      return { amount: 0, discount: 0, finalAmount: 0, remainingCredit: 0 };
+    }
+  }, [form, materials, vehicles]);
 
   function updateForm<K extends keyof SaleForm>(key: K, value: SaleForm[K]) {
     setForm((current) => ({ ...current, [key]: value }));
@@ -159,12 +175,14 @@ export function SalesEntryForm({
 
   function selectVehicle(vehicleId: string) {
     const vehicle = vehicles.find((row) => row.id === vehicleId);
+    const defaultQty = vehicle?.companyBodyQty ?? vehicle?.extraBodyQty ?? null;
     setForm((current) => ({
       ...current,
       vehicleId,
       vehicleNumber: vehicle?.vehicleNumber ?? current.vehicleNumber,
       partyName: vehicle?.partyName ?? current.partyName,
-      qty: vehicle?.companyBodyQty ? String(vehicle.companyBodyQty) : current.qty,
+      qty: defaultQty !== null ? String(defaultQty) : current.qty,
+      quantityReason: "",
     }));
   }
 
@@ -190,10 +208,12 @@ export function SalesEntryForm({
         materialId: form.materialId,
         ratePerCft: form.ratePerCft,
         qty: form.qty,
+        quantityReason: form.quantityReason,
         discountType: form.discountType,
         discountValue: form.discountValue,
         cashPaid: form.cashPaid,
         bankPaid: form.bankPaid,
+        gPayPaid: form.gPayPaid,
         remarks: form.remarks,
       });
       setMessage(form.id ? "Sale updated." : "Sale saved.");
@@ -238,6 +258,7 @@ export function SalesEntryForm({
                   ...current,
                   vehicleNumber,
                   vehicleId: vehicleNumber === current.vehicleNumber ? current.vehicleId : "",
+                  quantityReason: current.quantityReason,
                 }))
               }
             />
@@ -276,6 +297,13 @@ export function SalesEntryForm({
               onChange={(e) => updateForm("qty", e.target.value)}
             />
           </Field>
+          <Field label="Quantity Reason" className="md:col-span-2">
+            <Input
+              value={form.quantityReason}
+              onChange={(e) => updateForm("quantityReason", e.target.value)}
+              placeholder="Required only if qty differs from vehicle default"
+            />
+          </Field>
           <Field label="Discount Type">
             <select
               className="h-10 w-full rounded-md border bg-background px-3 text-sm"
@@ -306,7 +334,7 @@ export function SalesEntryForm({
               placeholder="0"
             />
           </Field>
-          <Field label="Bank / GPay Paid (₹)">
+          <Field label="Bank Paid (₹)">
             <Input
               className="text-right tabular-nums"
               type="number"
@@ -317,12 +345,26 @@ export function SalesEntryForm({
               placeholder="0"
             />
           </Field>
+          <Field label="GPay Paid (₹)">
+            <Input
+              className="text-right tabular-nums"
+              type="number"
+              step="0.01"
+              min="0"
+              value={form.gPayPaid}
+              onChange={(e) => updateForm("gPayPaid", e.target.value)}
+              placeholder="0"
+            />
+          </Field>
           <Field label="Final Amount (₹)" className="md:col-span-2">
             <Input
               className="text-right tabular-nums font-semibold text-lg"
               readOnly
               value={formatCurrency(totals.finalAmount)}
             />
+          </Field>
+          <Field label="Remaining Credit (₹)" className="md:col-span-2">
+            <Input className="text-right tabular-nums font-semibold" readOnly value={formatCurrency(totals.remainingCredit)} />
           </Field>
           <Field label="Remarks" className="md:col-span-2 xl:col-span-4">
             <Textarea value={form.remarks} onChange={(e) => updateForm("remarks", e.target.value)} />

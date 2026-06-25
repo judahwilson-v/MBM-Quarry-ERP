@@ -14,6 +14,7 @@ model Vehicle {
   partyName       String?  @map("party_name")
   companyBodyQty  Float?   @map("company_body_qty")
   extraBodyQty    Float?   @map("extra_body_qty")
+  tripCount       Int      @default(0) @map("trip_count")
   createdAt       DateTime @default(now()) @map("created_at")
   updatedAt       DateTime @updatedAt @map("updated_at")
 
@@ -66,12 +67,18 @@ model OutgoingSale {
   materialName  String   @map("material_name")
   ratePerCft    Float    @map("rate_per_cft")
   qty           Float
+  originalQty   Float?   @map("original_qty")
+  quantityReason String? @map("quantity_reason")
+  tripDelta     Int      @default(1) @map("trip_delta")
   discountType  String   @default("fixed") @map("discount_type")
   discountValue Float    @default(0) @map("discount_value")
   amount        Float
   finalAmount   Float    @map("final_amount")
   cashPaid      Float    @default(0) @map("cash_paid")
   bankPaid      Float    @default(0) @map("bank_paid")
+  gPayPaid      Float    @default(0) @map("gpay_paid")
+  paidTotal     Float    @default(0) @map("paid_total")
+  remainingCredit Float  @default(0) @map("remaining_credit")
   remarks       String?
   createdAt     DateTime @default(now()) @map("created_at")
   updatedAt     DateTime @updatedAt @map("updated_at")

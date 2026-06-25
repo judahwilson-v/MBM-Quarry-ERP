@@ -1,5 +1,6 @@
 -- Add normalized columns to existing tables without dropping legacy text fields.
 ALTER TABLE "vehicles" ADD COLUMN "party_id" TEXT;
+ALTER TABLE "vehicles" ADD COLUMN "trip_count" INTEGER NOT NULL DEFAULT 0;
 ALTER TABLE "vehicles" ADD COLUMN "updated_at" DATETIME;
 
 ALTER TABLE "parties" ADD COLUMN "updated_at" DATETIME;
@@ -7,6 +8,12 @@ ALTER TABLE "parties" ADD COLUMN "updated_at" DATETIME;
 ALTER TABLE "outgoing_sales" ADD COLUMN "vehicle_id" TEXT;
 ALTER TABLE "outgoing_sales" ADD COLUMN "party_id" TEXT;
 ALTER TABLE "outgoing_sales" ADD COLUMN "material_id" TEXT;
+ALTER TABLE "outgoing_sales" ADD COLUMN "original_qty" REAL;
+ALTER TABLE "outgoing_sales" ADD COLUMN "quantity_reason" TEXT;
+ALTER TABLE "outgoing_sales" ADD COLUMN "trip_delta" INTEGER NOT NULL DEFAULT 1;
+ALTER TABLE "outgoing_sales" ADD COLUMN "gpay_paid" REAL NOT NULL DEFAULT 0;
+ALTER TABLE "outgoing_sales" ADD COLUMN "paid_total" REAL NOT NULL DEFAULT 0;
+ALTER TABLE "outgoing_sales" ADD COLUMN "remaining_credit" REAL NOT NULL DEFAULT 0;
 ALTER TABLE "outgoing_sales" ADD COLUMN "updated_at" DATETIME;
 
 ALTER TABLE "incoming_boulder" ADD COLUMN "vehicle_id" TEXT;

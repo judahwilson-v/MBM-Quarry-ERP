@@ -14,6 +14,7 @@ type SaleRow = EditableSale & {
   serialNumber: number;
   amount: number;
   finalAmount: number;
+  remainingCredit?: number;
   createdAt: string;
 };
 

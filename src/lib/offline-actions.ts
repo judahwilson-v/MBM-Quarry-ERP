@@ -1,8 +1,7 @@
 "use server";
 
 import { getDb } from "@/lib/prisma";
-
-type DiscountType = "percentage" | "fixed";
+import { deriveSalesEngine, type SalesDraft } from "@/lib/sales-engine";
 
 type VehicleInput = {
   id?: string;
@@ -19,19 +18,9 @@ type PartyInput = {
   address?: string | null;
 };
 
-type SaleInput = {
+type SaleInput = SalesDraft & {
   id?: string;
-  saleDate?: string;
-  vehicleNumber: string;
-  partyName: string;
-  materialId: string;
-  ratePerCft?: string | number | null;
-  qty: string | number;
-  discountType: DiscountType;
-  discountValue: string | number;
-  cashPaid?: string | number | null;
-  bankPaid?: string | number | null;
-  remarks?: string | null;
+  vehicleId?: string;
 };
 
 type IncomingBoulderInput = {
@@ -197,63 +186,69 @@ export async function listSales() {
 
 export async function saveSale(input: SaleInput) {
   const db = await getDb();
-  const vehicleNumber = normalizeVehicleNumber(requiredText(input.vehicleNumber, "Vehicle number"));
-  const partyName = requiredText(input.partyName, "Party name");
-  const qty = parseNumber(input.qty, "Qty") ?? 0;
-  const discountValue = parseNumber(input.discountValue, "Discount", false) ?? 0;
-  const cashPaid = parseNumber(input.cashPaid, "Cash Paid", false) ?? 0;
-  const bankPaid = parseNumber(input.bankPaid, "Bank/GPay Paid", false) ?? 0;
-  if (qty <= 0) throw new Error("Qty must be greater than 0.");
-  if (discountValue < 0) throw new Error("Discount cannot be negative.");
-  if (cashPaid < 0) throw new Error("Cash Paid cannot be negative.");
-  if (bankPaid < 0) throw new Error("Bank/GPay Paid cannot be negative.");
-  if (!["percentage", "fixed"].includes(input.discountType)) throw new Error("Discount type is invalid.");
-
   const material = await db.material.findUnique({ where: { id: input.materialId } });
   if (!material) throw new Error("Material is required.");
-
-  await upsertPartyByName(partyName);
+  const normalizedVehicleNumber = normalizeVehicleNumber(input.vehicleNumber);
+  const vehicle = await db.vehicle.findFirst({
+    where: input.vehicleId
+      ? { id: input.vehicleId }
+      : { vehicleNumber: normalizedVehicleNumber },
+  });
+  if (input.vehicleNumber && !vehicle) {
+    await upsertPartyByName(input.partyName);
+  }
 
   return serialize(
     await db.$transaction(async (tx) => {
       const existing = input.id ? await tx.outgoingSale.findUnique({ where: { id: input.id } }) : null;
-
-      // Use user-supplied rate if provided, otherwise fall back to material default
-      const formRate =
-        input.ratePerCft !== undefined && input.ratePerCft !== null && input.ratePerCft !== ""
-          ? (parseNumber(input.ratePerCft, "Rate") ?? material.ratePerCft)
-          : material.ratePerCft;
-      const ratePerCft = formRate;
-
-      const amount = roundMoney(qty * ratePerCft);
-      const discountAmount =
-        input.discountType === "percentage" ? roundMoney((amount * discountValue) / 100) : roundMoney(discountValue);
-      if (discountAmount > amount) throw new Error("Discount cannot be greater than amount.");
-      const finalAmount = roundMoney(amount - discountAmount);
-      const saleDate = parseDateInput(input.saleDate);
+      const engine = deriveSalesEngine(
+        input as unknown as SalesDraft,
+        { vehicle, material },
+      );
 
       if (existing) {
+        if (existing.vehicleId) {
+          await tx.vehicle.update({
+            where: { id: existing.vehicleId },
+            data: { tripCount: { decrement: existing.tripDelta ?? 1 } },
+          });
+        }
         const sale = await tx.outgoingSale.update({
           where: { id: input.id },
           data: {
-            saleDate,
-            vehicleNumber,
-            partyName,
-            materialName: material.materialName,
-            ratePerCft,
-            qty,
-            discountType: input.discountType,
-            discountValue,
-            amount,
-            finalAmount,
-            cashPaid,
-            bankPaid,
-            remarks: cleanText(input.remarks),
+            saleDate: engine.saleDate,
+            vehicleId: vehicle?.id ?? null,
+            partyId: vehicle?.partyId ?? null,
+            vehicleNumber: engine.vehicleNumber,
+            partyName: engine.partyName,
+            materialId: engine.materialId,
+            materialName: engine.materialName,
+            ratePerCft: engine.ratePerCft,
+            qty: engine.qty,
+            originalQty: engine.originalQty,
+            quantityReason: engine.quantityReason,
+            discountType: engine.discountType,
+            discountValue: engine.discountValue,
+            amount: engine.amount,
+            finalAmount: engine.finalAmount,
+            cashPaid: engine.cashPaid,
+            bankPaid: engine.bankPaid,
+            gPayPaid: engine.gPayPaid,
+            paidTotal: engine.paidTotal,
+            remainingCredit: engine.remainingCredit,
+            tripDelta: engine.tripDelta,
+            remarks: engine.remarks,
           },
         });
+        if (vehicle?.id) {
+          await tx.vehicle.update({
+            where: { id: vehicle.id },
+            data: { tripCount: { increment: engine.tripDelta } },
+          });
+        }
         await tx.partyCredit.deleteMany({ where: { saleId: sale.id } });
         await tx.partyCredit.create({
-          data: { partyName, saleId: sale.id, amount: finalAmount, status: "pending" },
+          data: { partyName: engine.partyName, saleId: sale.id, amount: engine.remainingCredit, status: "pending" },
         });
         return sale;
       }
@@ -262,24 +257,39 @@ export async function saveSale(input: SaleInput) {
       const serialNumber = (max._max.serialNumber ?? 0) + 1;
       const sale = await tx.outgoingSale.create({
         data: {
-          saleDate,
+          saleDate: engine.saleDate,
           serialNumber,
-          vehicleNumber,
-          partyName,
-          materialName: material.materialName,
-          ratePerCft,
-          qty,
-          discountType: input.discountType,
-          discountValue,
-          amount,
-          finalAmount,
-          cashPaid,
-          bankPaid,
-          remarks: cleanText(input.remarks),
+          vehicleId: vehicle?.id ?? null,
+          partyId: vehicle?.partyId ?? null,
+          materialId: engine.materialId,
+          vehicleNumber: engine.vehicleNumber,
+          partyName: engine.partyName,
+          materialName: engine.materialName,
+          ratePerCft: engine.ratePerCft,
+          qty: engine.qty,
+          originalQty: engine.originalQty,
+          quantityReason: engine.quantityReason,
+          tripDelta: engine.tripDelta,
+          discountType: engine.discountType,
+          discountValue: engine.discountValue,
+          amount: engine.amount,
+          finalAmount: engine.finalAmount,
+          cashPaid: engine.cashPaid,
+          bankPaid: engine.bankPaid,
+          gPayPaid: engine.gPayPaid,
+          paidTotal: engine.paidTotal,
+          remainingCredit: engine.remainingCredit,
+          remarks: engine.remarks,
         },
       });
+      if (vehicle?.id) {
+        await tx.vehicle.update({
+          where: { id: vehicle.id },
+          data: { tripCount: { increment: engine.tripDelta } },
+        });
+      }
       await tx.partyCredit.create({
-        data: { partyName, saleId: sale.id, amount: finalAmount, status: "pending" },
+        data: { partyName: engine.partyName, saleId: sale.id, amount: engine.remainingCredit, status: "pending" },
       });
       return sale;
     }),
@@ -289,8 +299,15 @@ export async function saveSale(input: SaleInput) {
 export async function deleteSale(id: string) {
   const db = await getDb();
   await db.$transaction(async (tx) => {
+    const existing = await tx.outgoingSale.findUnique({ where: { id } });
     await tx.partyCredit.deleteMany({ where: { saleId: id } });
     await tx.outgoingSale.delete({ where: { id } });
+    if (existing?.vehicleId) {
+      await tx.vehicle.update({
+        where: { id: existing.vehicleId },
+        data: { tripCount: { decrement: existing.tripDelta ?? 1 } },
+      });
+    }
   });
 }
 
