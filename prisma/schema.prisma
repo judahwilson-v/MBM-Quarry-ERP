@@ -95,6 +95,23 @@ model OutgoingSale {
   @@map("outgoing_sales")
 }
 
+model FinancialEvent {
+  id             String   @id @default(cuid())
+  eventId        String   @unique @default(uuid()) @map("event_id")
+  correlationId  String   @map("correlation_id")
+  eventType      String   @map("event_type")
+  entityType     String   @map("entity_type")
+  entityId       String   @map("entity_id")
+  schemaVersion  Int      @default(1) @map("schema_version")
+  payload        Json
+  createdAt      DateTime @default(now()) @map("created_at")
+
+  @@index([correlationId])
+  @@index([entityType, entityId])
+  @@index([eventType])
+  @@map("financial_events")
+}
+
 model IncomingBoulder {
   id            String   @id @default(cuid())
   date          DateTime @default(now())

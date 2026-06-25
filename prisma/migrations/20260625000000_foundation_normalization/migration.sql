@@ -49,6 +49,22 @@ CREATE TABLE IF NOT EXISTS "day_book_entries" (
 );
 CREATE INDEX IF NOT EXISTS "day_book_entries_entry_date_idx" ON "day_book_entries"("entry_date");
 
+CREATE TABLE IF NOT EXISTS "financial_events" (
+  "id" TEXT NOT NULL PRIMARY KEY,
+  "event_id" TEXT NOT NULL,
+  "correlation_id" TEXT NOT NULL,
+  "event_type" TEXT NOT NULL,
+  "entity_type" TEXT NOT NULL,
+  "entity_id" TEXT NOT NULL,
+  "schema_version" INTEGER NOT NULL DEFAULT 1,
+  "payload" JSON NOT NULL,
+  "created_at" DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP
+);
+CREATE UNIQUE INDEX IF NOT EXISTS "financial_events_event_id_key" ON "financial_events"("event_id");
+CREATE INDEX IF NOT EXISTS "financial_events_correlation_id_idx" ON "financial_events"("correlation_id");
+CREATE INDEX IF NOT EXISTS "financial_events_entity_type_entity_id_idx" ON "financial_events"("entity_type", "entity_id");
+CREATE INDEX IF NOT EXISTS "financial_events_event_type_idx" ON "financial_events"("event_type");
+
 CREATE TABLE IF NOT EXISTS "audit_logs" (
   "id" TEXT NOT NULL PRIMARY KEY,
   "entity_name" TEXT NOT NULL,

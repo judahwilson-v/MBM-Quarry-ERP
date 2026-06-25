@@ -159,6 +159,20 @@ async function initializeDatabase(prisma: PrismaClient) {
       created_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
       updated_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP
     )`,
+    `CREATE TABLE IF NOT EXISTS financial_events (
+      id TEXT PRIMARY KEY NOT NULL,
+      event_id TEXT NOT NULL UNIQUE,
+      correlation_id TEXT NOT NULL,
+      event_type TEXT NOT NULL,
+      entity_type TEXT NOT NULL,
+      entity_id TEXT NOT NULL,
+      schema_version INTEGER NOT NULL DEFAULT 1,
+      payload JSON NOT NULL,
+      created_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP
+    )`,
+    `CREATE INDEX IF NOT EXISTS financial_events_correlation_id_idx ON financial_events (correlation_id)`,
+    `CREATE INDEX IF NOT EXISTS financial_events_entity_type_entity_id_idx ON financial_events (entity_type, entity_id)`,
+    `CREATE INDEX IF NOT EXISTS financial_events_event_type_idx ON financial_events (event_type)`,
     `CREATE TABLE IF NOT EXISTS audit_logs (
       id TEXT PRIMARY KEY NOT NULL,
       entity_name TEXT NOT NULL,

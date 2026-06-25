@@ -22,6 +22,13 @@
 - Role helper scaffold added for Owner / Manager / Salesman checks.
 - Build verified successfully after implementation.
 
+## Phase 1.2 - Financial Event Foundation
+
+- Financial Event infrastructure introduced beneath the existing application.
+- Sales now emits `SALE_CREATED` financial events inside the same transaction.
+- Financial event domain service and emitter pattern added.
+- Build to be verified after milestone validation.
+
 ## Future Phases
 
 - Phase 1.1B - Sales UI

@@ -3,6 +3,7 @@
 import { getDb } from "@/lib/prisma";
 import { deriveSalesEngine, type SalesDraft } from "@/lib/sales-engine";
 import { calculateRemainingCredit, decrementVehicleTrips, incrementVehicleTrips, writeAuditEvent } from "@/lib/domain";
+import { emitFinancialEvent } from "@/lib/domain/financial-events";
 
 type VehicleInput = {
   id?: string;
@@ -315,6 +316,38 @@ export async function saveSale(input: SaleInput) {
           paidTotal: engine.paidTotal,
           remainingCredit: calculateRemainingCredit(engine.finalAmount, engine.paidTotal),
           remarks: engine.remarks,
+        },
+      });
+      await emitFinancialEvent(tx, {
+        correlationId: sale.id,
+        eventType: "SALE_CREATED",
+        entityType: "Sale",
+        entityId: sale.id,
+        payload: {
+          saleId: sale.id,
+          serialNumber: sale.serialNumber,
+          saleDate: sale.saleDate.toISOString(),
+          vehicleId: sale.vehicleId,
+          partyId: sale.partyId,
+          materialId: sale.materialId,
+          vehicleNumber: sale.vehicleNumber,
+          partyName: sale.partyName,
+          materialName: sale.materialName,
+          qty: sale.qty,
+          originalQty: sale.originalQty ?? sale.qty,
+          quantityReason: sale.quantityReason,
+          ratePerCft: sale.ratePerCft,
+          amount: sale.amount,
+          discountType: sale.discountType as "percentage" | "fixed",
+          discountValue: sale.discountValue,
+          finalAmount: sale.finalAmount,
+          cashPaid: sale.cashPaid,
+          bankPaid: sale.bankPaid,
+          gPayPaid: sale.gPayPaid,
+          paidTotal: sale.paidTotal,
+          remainingCredit: calculateRemainingCredit(sale.finalAmount, sale.paidTotal),
+          tripDelta: sale.tripDelta,
+          remarks: sale.remarks,
         },
       });
       if (vehicle?.id) {
