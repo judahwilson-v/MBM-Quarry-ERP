@@ -1,5 +1,5 @@
-import { SalesEntryPage } from "@/components/modules/sales-entry-page";
+import { redirect } from "next/navigation";
 
 export default function NewSalePage() {
-  return <SalesEntryPage />;
+  redirect("/sales");
 }

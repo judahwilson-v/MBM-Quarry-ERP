@@ -1,0 +1,349 @@
+"use client";
+
+import { useCallback, useEffect, useMemo, useState } from "react";
+import { Save, X } from "lucide-react";
+import { Button } from "@/components/ui/button";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Field } from "@/components/ui/field";
+import { Input } from "@/components/ui/input";
+import { SearchableSelect } from "@/components/ui/searchable-select";
+import { Textarea } from "@/components/ui/textarea";
+import { listMaterials, listVehicles, saveSale } from "@/lib/offline-actions";
+import { formatCurrency, todayInputValue } from "@/lib/utils";
+
+type VehicleRow = {
+  id: string;
+  vehicleNumber: string;
+  partyName?: string | null;
+  companyBodyQty?: number | null;
+  extraBodyQty?: number | null;
+};
+
+type MaterialRow = {
+  id: string;
+  materialName: string;
+  ratePerCft: number;
+};
+
+export type EditableSale = {
+  id: string;
+  saleDate: string;
+  vehicleNumber: string;
+  partyName: string;
+  materialName: string;
+  ratePerCft: number;
+  qty: number;
+  discountType: "percentage" | "fixed";
+  discountValue: number;
+  cashPaid?: number | null;
+  bankPaid?: number | null;
+  remarks?: string | null;
+};
+
+type SaleForm = {
+  id?: string;
+  saleDate: string;
+  vehicleId: string;
+  vehicleNumber: string;
+  partyName: string;
+  materialId: string;
+  materialName: string;
+  ratePerCft: string;
+  qty: string;
+  discountType: "percentage" | "fixed";
+  discountValue: string;
+  cashPaid: string;
+  bankPaid: string;
+  remarks: string;
+};
+
+function blankSale(): SaleForm {
+  return {
+    saleDate: todayInputValue(),
+    vehicleId: "",
+    vehicleNumber: "",
+    partyName: "",
+    materialId: "",
+    materialName: "",
+    ratePerCft: "",
+    qty: "",
+    discountType: "fixed",
+    discountValue: "0",
+    cashPaid: "0",
+    bankPaid: "0",
+    remarks: "",
+  };
+}
+
+function dateInput(value: string) {
+  const date = new Date(value);
+  const offset = date.getTimezoneOffset() * 60000;
+  return new Date(date.getTime() - offset).toISOString().slice(0, 10);
+}
+
+export function SalesEntryForm({
+  editingSale,
+  onSaved,
+  onCancelEdit,
+}: {
+  editingSale?: EditableSale | null;
+  onSaved?: () => void;
+  onCancelEdit?: () => void;
+}) {
+  const [form, setForm] = useState<SaleForm>(() => blankSale());
+  const [vehicles, setVehicles] = useState<VehicleRow[]>([]);
+  const [materials, setMaterials] = useState<MaterialRow[]>([]);
+  const [message, setMessage] = useState("");
+  const [error, setError] = useState("");
+
+  const loadMasters = useCallback(async () => {
+    try {
+      const [vehicleRows, materialRows] = await Promise.all([listVehicles(), listMaterials()]);
+      setVehicles(vehicleRows as unknown as VehicleRow[]);
+      setMaterials(materialRows as unknown as MaterialRow[]);
+    } catch (err) {
+      setError(err instanceof Error ? err.message : "Failed to load materials/vehicles.");
+    }
+  }, []);
+
+  useEffect(() => {
+    void loadMasters();
+  }, [loadMasters]);
+
+  useEffect(() => {
+    if (!editingSale) {
+      setForm(blankSale());
+      return;
+    }
+    const matchedMaterial = materials.find((material) => material.materialName === editingSale.materialName);
+    const matchedVehicle = vehicles.find((vehicle) => vehicle.vehicleNumber === editingSale.vehicleNumber);
+    setForm({
+      id: editingSale.id,
+      saleDate: dateInput(editingSale.saleDate),
+      vehicleId: matchedVehicle?.id ?? "",
+      vehicleNumber: editingSale.vehicleNumber,
+      partyName: editingSale.partyName,
+      materialId: matchedMaterial?.id ?? "",
+      materialName: editingSale.materialName,
+      ratePerCft: String(editingSale.ratePerCft),
+      qty: String(editingSale.qty),
+      discountType: editingSale.discountType,
+      discountValue: String(editingSale.discountValue),
+      cashPaid: String(editingSale.cashPaid ?? 0),
+      bankPaid: String(editingSale.bankPaid ?? 0),
+      remarks: editingSale.remarks ?? "",
+    });
+    setMessage("");
+    setError("");
+  }, [editingSale, materials, vehicles]);
+
+  const totals = useMemo(() => {
+    const qty = Number(form.qty || 0);
+    const rate = Number(form.ratePerCft || 0);
+    const discountValue = Number(form.discountValue || 0);
+    const amount = Number.isFinite(qty * rate) ? qty * rate : 0;
+    const discount =
+      form.discountType === "percentage"
+        ? (amount * (Number.isFinite(discountValue) ? discountValue : 0)) / 100
+        : discountValue;
+    return {
+      amount,
+      discount: Number.isFinite(discount) ? discount : 0,
+      finalAmount: Math.max(0, amount - (Number.isFinite(discount) ? discount : 0)),
+    };
+  }, [form.discountType, form.discountValue, form.qty, form.ratePerCft]);
+
+  function updateForm<K extends keyof SaleForm>(key: K, value: SaleForm[K]) {
+    setForm((current) => ({ ...current, [key]: value }));
+  }
+
+  function selectVehicle(vehicleId: string) {
+    const vehicle = vehicles.find((row) => row.id === vehicleId);
+    setForm((current) => ({
+      ...current,
+      vehicleId,
+      vehicleNumber: vehicle?.vehicleNumber ?? current.vehicleNumber,
+      partyName: vehicle?.partyName ?? current.partyName,
+      qty: vehicle?.companyBodyQty ? String(vehicle.companyBodyQty) : current.qty,
+    }));
+  }
+
+  function selectMaterial(materialId: string) {
+    const material = materials.find((row) => row.id === materialId);
+    setForm((current) => ({
+      ...current,
+      materialId,
+      materialName: material?.materialName ?? current.materialName,
+      ratePerCft: material ? String(material.ratePerCft) : current.ratePerCft,
+    }));
+  }
+
+  async function submit() {
+    setError("");
+    setMessage("");
+    try {
+      await saveSale({
+        id: form.id,
+        saleDate: form.saleDate,
+        vehicleNumber: form.vehicleNumber,
+        partyName: form.partyName,
+        materialId: form.materialId,
+        ratePerCft: form.ratePerCft,
+        qty: form.qty,
+        discountType: form.discountType,
+        discountValue: form.discountValue,
+        cashPaid: form.cashPaid,
+        bankPaid: form.bankPaid,
+        remarks: form.remarks,
+      });
+      setMessage(form.id ? "Sale updated." : "Sale saved.");
+      setForm(blankSale());
+      onSaved?.();
+    } catch (err) {
+      setError(err instanceof Error ? err.message : "Could not save sale.");
+    }
+  }
+
+  return (
+    <Card>
+      <CardHeader className="flex-row items-center justify-between">
+        <CardTitle>{form.id ? "Edit Sale" : "Sales Entry"}</CardTitle>
+        {form.id && onCancelEdit ? (
+          <Button variant="ghost" size="icon" onClick={onCancelEdit} aria-label="Cancel edit">
+            <X className="h-4 w-4" />
+          </Button>
+        ) : null}
+      </CardHeader>
+      <CardContent className="grid gap-4">
+        <div className="grid gap-3 md:grid-cols-2 xl:grid-cols-4">
+          <Field label="Date">
+            <Input type="date" value={form.saleDate} onChange={(e) => updateForm("saleDate", e.target.value)} />
+          </Field>
+          <Field label="Vehicle Number">
+            <SearchableSelect
+              value={form.vehicleId}
+              customValue={form.vehicleNumber}
+              allowCustom
+              placeholder="Search or type vehicle"
+              options={vehicles.map((vehicle) => ({
+                value: vehicle.id,
+                label: vehicle.vehicleNumber,
+                description: [vehicle.partyName, vehicle.companyBodyQty ? `${vehicle.companyBodyQty} CFT` : ""]
+                  .filter(Boolean)
+                  .join(" • "),
+              }))}
+              onChange={selectVehicle}
+              onCustomValueChange={(vehicleNumber) =>
+                setForm((current) => ({
+                  ...current,
+                  vehicleNumber,
+                  vehicleId: vehicleNumber === current.vehicleNumber ? current.vehicleId : "",
+                }))
+              }
+            />
+          </Field>
+          <Field label="Party Name">
+            <Input value={form.partyName} onChange={(e) => updateForm("partyName", e.target.value)} />
+          </Field>
+          <Field label="Material">
+            <SearchableSelect
+              value={form.materialId}
+              placeholder="Select material"
+              options={materials.map((material) => ({
+                value: material.id,
+                label: material.materialName,
+                description: `₹${material.ratePerCft}/CFT`,
+              }))}
+              onChange={selectMaterial}
+            />
+          </Field>
+          <Field label="Rate (₹/CFT)">
+            <Input
+              className="text-right tabular-nums"
+              type="number"
+              step="0.01"
+              value={form.ratePerCft}
+              onChange={(e) => updateForm("ratePerCft", e.target.value)}
+              placeholder="0"
+            />
+          </Field>
+          <Field label="Qty (CFT)">
+            <Input
+              className="text-right tabular-nums"
+              type="number"
+              step="0.001"
+              value={form.qty}
+              onChange={(e) => updateForm("qty", e.target.value)}
+            />
+          </Field>
+          <Field label="Discount Type">
+            <select
+              className="h-10 w-full rounded-md border bg-background px-3 text-sm"
+              value={form.discountType}
+              onChange={(event) => updateForm("discountType", event.target.value as "percentage" | "fixed")}
+            >
+              <option value="fixed">Fixed Amount</option>
+              <option value="percentage">Percentage</option>
+            </select>
+          </Field>
+          <Field label={form.discountType === "percentage" ? "Discount (%)" : "Discount Amount"}>
+            <Input
+              className="text-right tabular-nums"
+              type="number"
+              step="0.01"
+              value={form.discountValue}
+              onChange={(e) => updateForm("discountValue", e.target.value)}
+            />
+          </Field>
+          <Field label="Cash Paid (₹)">
+            <Input
+              className="text-right tabular-nums"
+              type="number"
+              step="0.01"
+              min="0"
+              value={form.cashPaid}
+              onChange={(e) => updateForm("cashPaid", e.target.value)}
+              placeholder="0"
+            />
+          </Field>
+          <Field label="Bank / GPay Paid (₹)">
+            <Input
+              className="text-right tabular-nums"
+              type="number"
+              step="0.01"
+              min="0"
+              value={form.bankPaid}
+              onChange={(e) => updateForm("bankPaid", e.target.value)}
+              placeholder="0"
+            />
+          </Field>
+          <Field label="Final Amount (₹)" className="md:col-span-2">
+            <Input
+              className="text-right tabular-nums font-semibold text-lg"
+              readOnly
+              value={formatCurrency(totals.finalAmount)}
+            />
+          </Field>
+          <Field label="Remarks" className="md:col-span-2 xl:col-span-4">
+            <Textarea value={form.remarks} onChange={(e) => updateForm("remarks", e.target.value)} />
+          </Field>
+        </div>
+
+        {error ? <p className="text-sm text-destructive">{error}</p> : null}
+        {message ? <p className="text-sm text-success">{message}</p> : null}
+
+        <div className="flex flex-wrap gap-2">
+          <Button onClick={() => void submit()}>
+            <Save className="h-4 w-4" />
+            {form.id ? "Save Changes" : "Save Sale"}
+          </Button>
+          {form.id && onCancelEdit ? (
+            <Button variant="outline" onClick={onCancelEdit}>
+              Cancel
+            </Button>
+          ) : null}
+        </div>
+      </CardContent>
+    </Card>
+  );
+}

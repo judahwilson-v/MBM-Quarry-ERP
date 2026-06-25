@@ -3,469 +3,191 @@ generator client {
 }
 
 datasource db {
-  provider = "postgresql"
+  provider = "sqlite"
   url      = env("DATABASE_URL")
 }
 
-enum Role {
-  OWNER
-  MANAGER
-  ACCOUNTANT
-  SUPERVISOR
-  OPERATOR
-  STORE_MANAGER
-}
+model Vehicle {
+  id             String   @id @default(cuid())
+  vehicleNumber   String   @unique @map("vehicle_number")
+  partyId         String?  @map("party_id")
+  partyName       String?  @map("party_name")
+  companyBodyQty  Float?   @map("company_body_qty")
+  extraBodyQty    Float?   @map("extra_body_qty")
+  createdAt       DateTime @default(now()) @map("created_at")
+  updatedAt       DateTime @updatedAt @map("updated_at")
 
-enum PaymentType {
-  CASH
-  BANK
-  GPAY
-  CREDIT
-  MIXED
-}
+  party           Party?   @relation(fields: [partyId], references: [id], onDelete: SetNull)
+  outgoingSales   OutgoingSale[]
+  incomingBoulder IncomingBoulder[]
 
-enum MaterialUnit {
-  CFT
-}
-
-enum PurchaseCategory {
-  MATERIAL
-  DIESEL
-  SPARE_PARTS
-  MAINTENANCE
-  SALARY
-  OTHER
-}
-
-enum DiscountType {
-  PERCENTAGE
-  FIXED_AMOUNT
-}
-
-enum TransactionType {
-  OPENING_BALANCE
-  CASH_SALE
-  BANK_SALE
-  GPAY_SALE
-  CREDIT_SALE
-  PAYMENT_RECEIVED
-  SALARY
-  GENERATOR_EXPENSE
-  DIESEL_EXPENSE
-  OXYGEN_EXPENSE
-  MAINTENANCE
-  PURCHASE
-  MISCELLANEOUS
-  CLOSING_BALANCE
-}
-
-enum SyncStatus {
-  SYNCED
-  PENDING
-  FAILED
+  @@index([partyId])
+  @@map("vehicles")
 }
 
 model Party {
-  id             String    @id @default(cuid())
-  name           String
-  address        String?
-  phone          String?
-  gstNumber      String?
-  currentBalance Decimal   @default(0) @db.Decimal(18, 2)
-  isActive       Boolean   @default(true)
-  deletedAt      DateTime?
-  createdAt      DateTime  @default(now())
-  updatedAt      DateTime  @updatedAt
+  id            String         @id @default(cuid())
+  partyName     String         @unique @map("party_name")
+  phone         String?
+  address       String?
+  createdAt     DateTime       @default(now()) @map("created_at")
+  updatedAt     DateTime       @updatedAt @map("updated_at")
 
-  sales                Sale[]
-  ledgerEntries        LedgerEntry[]
-  vehicles             Vehicle[]
-  reconciliationGroups ReconciliationGroup[]
+  vehicles      Vehicle[]
+  outgoingSales OutgoingSale[]
+  incomingBoulder IncomingBoulder[]
+  partyCredits  PartyCredit[]
 
-  @@index([name])
-  @@index([deletedAt])
-}
-
-model Vehicle {
-  id            String    @id @default(cuid())
-  vehicleNumber String    @unique
-  ownerName     String?
-  companyBody   Boolean   @default(false)
-  extraBody     Boolean   @default(false)
-  isPickup      Boolean   @default(false)
-  bodyRemarks   String?
-  partyId       String?
-  capacity      Decimal?  @db.Decimal(18, 3)
-  defaultQty    Decimal?  @db.Decimal(18, 3)
-  remarks       String?
-  deletedAt     DateTime?
-  createdAt     DateTime  @default(now())
-  updatedAt     DateTime  @updatedAt
-
-  party   Party?   @relation(fields: [partyId], references: [id])
-  sales   Sale[]
-  drivers Driver[]
-  purchaseEntries PurchaseEntry[]
-
-  @@index([partyId])
-  @@index([deletedAt])
+  @@map("parties")
 }
 
 model Material {
-  id           String       @id @default(cuid())
-  name         String
-  code         String       @unique
-  unit         MaterialUnit @default(CFT)
-  currentRate  Decimal      @default(0) @db.Decimal(18, 2)
-  currentStock Decimal      @default(0) @db.Decimal(18, 3)
-  reorderLevel Decimal      @default(0) @db.Decimal(18, 3)
-  isActive     Boolean      @default(true)
-  deletedAt    DateTime?
-  createdAt    DateTime     @default(now())
-  updatedAt    DateTime     @updatedAt
+  id              String         @id @default(cuid())
+  materialName    String         @unique @map("material_name")
+  ratePerCft      Float          @default(0) @map("rate_per_cft")
+  createdAt       DateTime       @default(now()) @map("created_at")
+  updatedAt       DateTime       @updatedAt @map("updated_at")
 
-  sales              Sale[]
-  purchases          Purchase[]
-  inventoryMovements InventoryMovement[]
-  priceHistory       MaterialPriceHistory[]
+  outgoingSales   OutgoingSale[]
+  incomingBoulder IncomingBoulder[]
 
-  @@index([deletedAt])
-  @@index([isActive])
+  @@map("materials")
 }
 
-model MaterialPriceHistory {
-  id         String   @id @default(cuid())
-  materialId String
-  oldRate    Decimal  @db.Decimal(18, 2)
-  newRate    Decimal  @db.Decimal(18, 2)
-  changedAt  DateTime @default(now())
-  changedBy  String
-
-  material Material @relation(fields: [materialId], references: [id])
-
-  @@index([materialId, changedAt])
-}
-
-model Driver {
-  id        String    @id @default(cuid())
-  name      String
-  mobile    String?
-  vehicleId String?
-  deletedAt DateTime?
-  createdAt DateTime  @default(now())
-  updatedAt DateTime  @updatedAt
-
-  vehicle       Vehicle?       @relation(fields: [vehicleId], references: [id])
-  sales         Sale[]
-  dispatchSlips DispatchSlip[]
-
-  @@index([vehicleId])
-  @@index([deletedAt])
-}
-
-model Sale {
-  id             String        @id @default(cuid())
-  clientId       String        @unique @default(cuid())
-  slNo           Int?
-  date           DateTime      @default(now())
-  time           String?
-  vehicleId      String?
-  partyId        String
-  materialId     String
-  driverId       String?
-  qty            Decimal       @db.Decimal(18, 3)
-  rate           Decimal       @db.Decimal(18, 2)
-  grossAmount    Decimal       @db.Decimal(18, 2)
-  discountType   DiscountType?
-  discountValue  Decimal?      @db.Decimal(18, 2)
-  discountAmount Decimal       @default(0) @db.Decimal(18, 2)
-  netAmount      Decimal       @db.Decimal(18, 2)
-  paymentType    PaymentType
-  cashAmount     Decimal       @default(0) @db.Decimal(18, 2)
-  bankAmount     Decimal       @default(0) @db.Decimal(18, 2)
-  gpayAmount     Decimal       @default(0) @db.Decimal(18, 2)
-  creditAmount   Decimal       @default(0) @db.Decimal(18, 2)
-  bankRef        String?
-  remarks        String?
-  operatorName   String?
-  printCount     Int           @default(0)
-  syncStatus     SyncStatus    @default(SYNCED)
-  deletedAt      DateTime?
-  createdAt      DateTime      @default(now())
-  updatedAt      DateTime      @updatedAt
-
-  vehicle      Vehicle?      @relation(fields: [vehicleId], references: [id])
-  party        Party         @relation(fields: [partyId], references: [id])
-  material     Material      @relation(fields: [materialId], references: [id])
-  driver       Driver?       @relation(fields: [driverId], references: [id])
-  ledgerEntry  LedgerEntry?
-  dispatchSlip DispatchSlip?
-  auditLogs    AuditLog[]
-
-  @@index([date])
-  @@index([partyId])
-  @@index([vehicleId])
-  @@index([materialId])
-  @@index([paymentType])
-  @@index([deletedAt])
-}
-
-model DailySummary {
-  id             String   @id @default(cuid())
-  date           DateTime @unique
-  materialTotals Json
-  cashSales      Decimal  @default(0) @db.Decimal(18, 2)
-  creditSales    Decimal  @default(0) @db.Decimal(18, 2)
-  totalSales     Decimal  @default(0) @db.Decimal(18, 2)
-  createdAt      DateTime @default(now())
-  updatedAt      DateTime @updatedAt
-
-  @@map("daily_summary")
-}
-
-model WeeklySummary {
-  id             String   @id @default(cuid())
-  weekStart      DateTime
-  weekEnd        DateTime
-  materialTotals Json
-  cashSales      Decimal  @default(0) @db.Decimal(18, 2)
-  creditSales    Decimal  @default(0) @db.Decimal(18, 2)
-  totalSales     Decimal  @default(0) @db.Decimal(18, 2)
-  createdAt      DateTime @default(now())
-  updatedAt      DateTime @updatedAt
-
-  @@unique([weekStart, weekEnd])
-  @@map("weekly_summary")
-}
-
-model LedgerEntry {
-  id             String   @id @default(cuid())
-  date           DateTime @default(now())
-  partyId        String
-  saleId         String?  @unique
-  purchaseId     String?
-  description    String
-  debitAmount    Decimal  @default(0) @db.Decimal(18, 2)
-  creditAmount   Decimal  @default(0) @db.Decimal(18, 2)
-  runningBalance Decimal  @db.Decimal(18, 2)
-  entryType      String
-  createdAt      DateTime @default(now())
-
-  party Party @relation(fields: [partyId], references: [id])
-  sale  Sale? @relation(fields: [saleId], references: [id])
-
-  @@index([partyId, date])
-}
-
-model DispatchSlip {
-  id         String   @id @default(cuid())
-  slipNumber String   @unique
-  saleId     String   @unique
-  driverId   String?
-  issuedAt   DateTime @default(now())
-  printCount Int      @default(0)
-
-  sale   Sale    @relation(fields: [saleId], references: [id])
-  driver Driver? @relation(fields: [driverId], references: [id])
-}
-
-model Purchase {
-  id          String           @id @default(cuid())
-  date        DateTime         @default(now())
-  category    PurchaseCategory
-  supplierId  String?
-  materialId  String?
-  description String
-  qty         Decimal?         @db.Decimal(18, 3)
-  unit        String?
-  rate        Decimal?         @db.Decimal(18, 2)
-  amount      Decimal          @db.Decimal(18, 2)
-  paymentType PaymentType
-  invoiceRef  String?
-  remarks     String?
-  deletedAt   DateTime?
-  createdAt   DateTime         @default(now())
-
-  supplier Supplier? @relation(fields: [supplierId], references: [id])
-  material Material? @relation(fields: [materialId], references: [id])
-
-  @@index([date])
-  @@index([category])
-  @@index([supplierId])
-  @@index([materialId])
-  @@index([deletedAt])
-}
-
-model PurchaseEntry {
-  id            String    @id @default(cuid())
-  date          DateTime  @default(now())
-  time          String?
-  vehicleId     String?
-  vehicleNumber String
-  supplierId    String?
-  supplierName  String
-  material      String
-  qty           Decimal   @db.Decimal(18, 3)
-  rate          Decimal   @db.Decimal(18, 2)
-  amount        Decimal   @db.Decimal(18, 2)
+model OutgoingSale {
+  id            String   @id @default(cuid())
+  saleDate      DateTime @map("sale_date")
+  serialNumber  Int      @unique @map("serial_number")
+  vehicleId     String?  @map("vehicle_id")
+  partyId       String?  @map("party_id")
+  materialId    String?  @map("material_id")
+  vehicleNumber String   @map("vehicle_number")
+  partyName     String   @map("party_name")
+  materialName  String   @map("material_name")
+  ratePerCft    Float    @map("rate_per_cft")
+  qty           Float
+  discountType  String   @default("fixed") @map("discount_type")
+  discountValue Float    @default(0) @map("discount_value")
+  amount        Float
+  finalAmount   Float    @map("final_amount")
+  cashPaid      Float    @default(0) @map("cash_paid")
+  bankPaid      Float    @default(0) @map("bank_paid")
   remarks       String?
-  deletedAt     DateTime?
-  createdAt     DateTime  @default(now())
-  updatedAt     DateTime  @updatedAt
+  createdAt     DateTime @default(now()) @map("created_at")
+  updatedAt     DateTime @updatedAt @map("updated_at")
 
-  vehicle  Vehicle?  @relation(fields: [vehicleId], references: [id])
-  supplier Supplier? @relation(fields: [supplierId], references: [id])
+  vehicle       Vehicle? @relation(fields: [vehicleId], references: [id], onDelete: SetNull)
+  party         Party?   @relation(fields: [partyId], references: [id], onDelete: SetNull)
+  material      Material? @relation(fields: [materialId], references: [id], onDelete: SetNull)
+  partyCredits  PartyCredit[]
+
+  @@index([saleDate])
+  @@index([vehicleId])
+  @@index([partyId])
+  @@index([materialId])
+  @@map("outgoing_sales")
+}
+
+model IncomingBoulder {
+  id            String   @id @default(cuid())
+  date          DateTime @default(now())
+  vehicleId     String?  @map("vehicle_id")
+  partyId       String?  @map("party_id")
+  materialId    String?  @map("material_id")
+  vehicleNumber String   @map("vehicle_number")
+  partyName     String   @map("party_name")
+  materialName  String   @default("ROCK") @map("material_name")
+  qty           Float
+  remarks       String?
+  createdAt     DateTime @default(now()) @map("created_at")
+  updatedAt     DateTime @updatedAt @map("updated_at")
+
+  vehicle       Vehicle?  @relation(fields: [vehicleId], references: [id], onDelete: SetNull)
+  party         Party?    @relation(fields: [partyId], references: [id], onDelete: SetNull)
+  material      Material? @relation(fields: [materialId], references: [id], onDelete: SetNull)
 
   @@index([date])
   @@index([vehicleId])
-  @@index([supplierId])
-  @@index([deletedAt])
-  @@map("purchase_entries")
+  @@index([partyId])
+  @@index([materialId])
+  @@map("incoming_boulder")
+}
+
+model PartyCredit {
+  id         String       @id @default(cuid())
+  partyId    String?      @map("party_id")
+  partyName  String       @map("party_name")
+  saleId     String       @map("sale_id")
+  amount     Float
+  status     String       @default("pending")
+  createdAt  DateTime     @default(now()) @map("created_at")
+  updatedAt  DateTime     @updatedAt @map("updated_at")
+
+  party      Party?       @relation(fields: [partyId], references: [id], onDelete: SetNull)
+  sale       OutgoingSale @relation(fields: [saleId], references: [id], onDelete: Cascade)
+
+  @@index([partyId])
+  @@index([partyName])
+  @@index([saleId])
+  @@map("party_credit")
+}
+
+model EmployeeCredit {
+  id              String    @id @default(cuid())
+  employeeName    String    @map("employee_name")
+  amount          Float
+  reason          String?
+  expectedDueDate DateTime? @map("expected_due_date")
+  status          String    @default("pending")
+  createdAt       DateTime  @default(now()) @map("created_at")
+  updatedAt       DateTime  @updatedAt @map("updated_at")
+
+  @@map("employee_credit")
 }
 
 model Supplier {
-  id        String    @id @default(cuid())
-  name      String
-  phone     String?
-  address   String?
-  gstNumber String?
-  isActive  Boolean   @default(true)
-  deletedAt DateTime?
-  createdAt DateTime  @default(now())
-
-  purchases       Purchase[]
-  purchaseEntries PurchaseEntry[]
-
-  @@index([name])
-  @@index([deletedAt])
-}
-
-model Employee {
-  id         String    @id @default(cuid())
-  name       String
-  role       String
-  baseSalary Decimal   @db.Decimal(18, 2)
-  phone      String?
-  joinDate   DateTime?
-  isActive   Boolean   @default(true)
-  deletedAt  DateTime?
-  createdAt  DateTime  @default(now())
-
-  pendingBook PendingBook[]
-
-  @@index([name])
-  @@index([deletedAt])
-}
-
-model PendingBook {
-  id         String    @id @default(cuid())
-  employeeId String
-  date       DateTime  @default(now())
-  amount     Decimal   @db.Decimal(18, 2)
-  reason     String
-  notes      String?
-  isDeducted Boolean   @default(false)
-  deductedOn DateTime?
-  createdAt  DateTime  @default(now())
-
-  employee Employee @relation(fields: [employeeId], references: [id])
-
-  @@index([employeeId, date])
-  @@index([isDeducted])
-}
-
-model AccountsEntry {
-  id              String          @id @default(cuid())
-  date            DateTime        @default(now())
-  transactionType TransactionType
-  refId           String?
-  details         String
-  debit           Decimal         @default(0) @db.Decimal(18, 2)
-  credit          Decimal         @default(0) @db.Decimal(18, 2)
-  isCash          Boolean         @default(false)
-  isBank          Boolean         @default(false)
-  isGpay          Boolean         @default(false)
-  createdAt       DateTime        @default(now())
-  createdBy       String
-
-  user User @relation(fields: [createdBy], references: [id])
-
-  @@index([date])
-  @@index([transactionType])
-  @@index([isCash])
-  @@index([isBank])
-  @@index([refId])
-}
-
-model ReconciliationGroup {
-  id        String   @id @default(cuid())
-  partyId   String
-  name      String
-  date      DateTime @default(now())
-  createdAt DateTime @default(now())
-
-  party Party               @relation(fields: [partyId], references: [id])
-  rows  ReconciliationRow[]
-
-  @@index([partyId, date])
-}
-
-model ReconciliationRow {
-  id          String  @id @default(cuid())
-  groupId     String
-  description String
-  rateQty     Decimal @db.Decimal(18, 3)
-  multiplier  Int
-  totalQty    Decimal @db.Decimal(18, 3)
-
-  group ReconciliationGroup @relation(fields: [groupId], references: [id], onDelete: Cascade)
-}
-
-model InventoryMovement {
   id         String   @id @default(cuid())
-  materialId String
-  type       String
-  qty        Decimal  @db.Decimal(18, 3)
-  refId      String?
-  notes      String?
-  createdAt  DateTime @default(now())
+  supplierName String @unique @map("supplier_name")
+  phone      String?
+  address    String?
+  createdAt  DateTime @default(now()) @map("created_at")
+  updatedAt  DateTime @updatedAt @map("updated_at")
 
-  material Material @relation(fields: [materialId], references: [id])
+  @@map("suppliers")
+}
 
-  @@index([materialId, type])
-  @@index([createdAt])
-  @@index([refId])
+model DayBookEntry {
+  id         String   @id @default(cuid())
+  entryDate  DateTime @map("entry_date")
+  entryType  String   @map("entry_type")
+  reference  String?
+  description String?
+  debit      Float    @default(0)
+  credit     Float    @default(0)
+  createdAt  DateTime @default(now()) @map("created_at")
+  updatedAt  DateTime @updatedAt @map("updated_at")
+
+  @@index([entryDate])
+  @@map("day_book_entries")
 }
 
 model AuditLog {
-  id        String   @id @default(cuid())
-  tableName String
-  recordId  String
-  action    String
-  before    Json?
-  after     Json?
-  userId    String
-  saleId    String?
-  createdAt DateTime @default(now())
+  id         String   @id @default(cuid())
+  entityName String   @map("entity_name")
+  entityId   String   @map("entity_id")
+  action     String
+  payload    String?
+  createdAt  DateTime @default(now()) @map("created_at")
 
-  sale Sale? @relation(fields: [saleId], references: [id])
-  user User  @relation(fields: [userId], references: [id])
-
-  @@index([tableName, recordId])
-  @@index([userId])
-  @@index([createdAt])
+  @@index([entityName, entityId])
+  @@map("audit_logs")
 }
 
-model User {
-  id                 String   @id @default(cuid())
-  name               String
-  email              String   @unique
-  password           String
-  role               Role
-  isActive           Boolean  @default(true)
-  mustChangePassword Boolean  @default(false)
-  createdAt          DateTime @default(now())
+model Role {
+  id         String   @id @default(cuid())
+  roleName   String   @unique @map("role_name")
+  createdAt  DateTime @default(now()) @map("created_at")
+  updatedAt  DateTime @updatedAt @map("updated_at")
 
-  accountsEntries AccountsEntry[]
-  auditLogs       AuditLog[]
+  @@map("roles")
 }

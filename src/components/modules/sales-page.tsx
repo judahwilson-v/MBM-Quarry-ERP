@@ -1,212 +1,179 @@
 "use client";
 
-import Link from "next/link";
-import { useCallback, useEffect, useState } from "react";
-import { Download, Eye, FileSpreadsheet, Plus, Trash2 } from "lucide-react";
+import { useCallback, useEffect, useMemo, useState } from "react";
+import { ArrowUpDown, Pencil, Search, Trash2 } from "lucide-react";
+import { SalesEntryForm, type EditableSale } from "@/components/modules/sales-entry-form";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
-import { Badge } from "@/components/ui/badge";
-import { downloadCsv, downloadExcel } from "@/lib/export-utils";
-import { cn, formatCurrency, formatDate, formatQty, todayInputValue } from "@/lib/utils";
+import { deleteSale, listSales } from "@/lib/offline-actions";
+import { cn, formatCurrency, formatDate, formatQty } from "@/lib/utils";
 
-type SaleRow = Record<string, any>;
-type FilterMode = "today" | "week" | "month" | "custom";
-const materialOrder = ["6mm", "20mm", "40mm", "M-Sand", "P-Sand", "Dust"] as const;
+type SaleRow = EditableSale & {
+  serialNumber: number;
+  amount: number;
+  finalAmount: number;
+  createdAt: string;
+};
 
-function addDays(date: Date, days: number) {
-  const next = new Date(date);
-  next.setDate(next.getDate() + days);
-  return next;
-}
+type SortKey =
+  | "serialNumber"
+  | "saleDate"
+  | "vehicleNumber"
+  | "partyName"
+  | "materialName"
+  | "qty"
+  | "finalAmount";
 
-function inputDate(date: Date) {
-  const tz = date.getTimezoneOffset() * 60000;
-  return new Date(date.getTime() - tz).toISOString().slice(0, 10);
-}
-
-function weekRange() {
-  const now = new Date();
-  const day = now.getDay();
-  const mondayOffset = day === 0 ? -6 : 1 - day;
-  const start = addDays(now, mondayOffset);
-  return { from: inputDate(start), to: inputDate(addDays(start, 6)) };
-}
-
-function monthRange() {
-  const now = new Date();
-  return {
-    from: inputDate(new Date(now.getFullYear(), now.getMonth(), 1)),
-    to: inputDate(new Date(now.getFullYear(), now.getMonth() + 1, 0)),
-  };
-}
+const materialTotals = ["MSAND", "6 MM", "12 MM", "20 MM", "40 MM", "DUST", "GSB"];
 
 export function SalesPage() {
-  const [filterMode, setFilterMode] = useState<FilterMode>("today");
-  const [from, setFrom] = useState(todayInputValue());
-  const [to, setTo] = useState(todayInputValue());
   const [sales, setSales] = useState<SaleRow[]>([]);
-  const [summary, setSummary] = useState<Record<string, any>>({});
-  const [selected, setSelected] = useState<string[]>([]);
+  const [editingSale, setEditingSale] = useState<SaleRow | null>(null);
+  const [search, setSearch] = useState("");
+  const [sortKey, setSortKey] = useState<SortKey>("serialNumber");
+  const [sortDirection, setSortDirection] = useState<"asc" | "desc">("desc");
   const [error, setError] = useState("");
 
   const loadSales = useCallback(async () => {
-    const params = new URLSearchParams({ pageSize: "300" });
-    if (filterMode === "today") params.set("date", from);
-    else {
-      params.set("from", from);
-      params.set("to", to);
-    }
-    const response = await fetch(`/api/v1/sales?${params.toString()}`);
-    const body = await response.json();
-    if (!response.ok) {
-      setError(body.error ?? "Failed to load sales.");
-      return;
-    }
-    setSales(body.data ?? []);
-    setSummary(body.summary ?? {});
-  }, [filterMode, from, to]);
+    const rows = (await listSales()) as unknown as SaleRow[];
+    setSales(rows);
+  }, []);
 
   useEffect(() => {
     void loadSales();
   }, [loadSales]);
 
-  async function remove(id: string) {
-    if (!window.confirm("Soft-delete this sale and reverse stock/accounts effects?")) return;
-    const response = await fetch(`/api/v1/sales/${id}`, { method: "DELETE" });
-    if (!response.ok) {
-      const body = await response.json();
-      setError(body.error ?? "Delete failed.");
-      return;
+  const visibleRows = useMemo(() => {
+    const query = search.trim().toLowerCase();
+    const filtered = query
+      ? sales.filter((row) =>
+          [
+            row.serialNumber,
+            row.saleDate,
+            row.vehicleNumber,
+            row.partyName,
+            row.materialName,
+            row.qty,
+            row.ratePerCft,
+            row.finalAmount,
+            row.remarks,
+          ]
+            .join(" ")
+            .toLowerCase()
+            .includes(query),
+        )
+      : sales;
+
+    return [...filtered].sort((a, b) => {
+      const left = a[sortKey];
+      const right = b[sortKey];
+      const result =
+        typeof left === "number" && typeof right === "number"
+          ? left - right
+          : String(left ?? "").localeCompare(String(right ?? ""));
+      return sortDirection === "asc" ? result : -result;
+    });
+  }, [sales, search, sortDirection, sortKey]);
+
+  const summary = useMemo(() => {
+    const result: Record<string, number> = { totalRevenue: 0 };
+    for (const material of materialTotals) result[material] = 0;
+    for (const row of visibleRows) {
+      result.totalRevenue += Number(row.finalAmount ?? 0);
+      if (row.materialName in result) result[row.materialName] += Number(row.qty ?? 0);
     }
-    await loadSales();
+    return result;
+  }, [visibleRows]);
+
+  function sortBy(key: SortKey) {
+    if (sortKey === key) {
+      setSortDirection((current) => (current === "asc" ? "desc" : "asc"));
+    } else {
+      setSortKey(key);
+      setSortDirection("asc");
+    }
   }
 
-  const selectedRows = sales.filter((row) => selected.includes(row.id));
-  const weeklyTitle = filterMode === "week" ? "Weekly Summary" : filterMode === "month" ? "Monthly Summary" : "Selected Range Summary";
-
-  function setToday() {
-    const today = todayInputValue();
-    setFilterMode("today");
-    setFrom(today);
-    setTo(today);
-  }
-
-  function setWeek() {
-    const range = weekRange();
-    setFilterMode("week");
-    setFrom(range.from);
-    setTo(range.to);
-  }
-
-  function setMonth() {
-    const range = monthRange();
-    setFilterMode("month");
-    setFrom(range.from);
-    setTo(range.to);
+  async function remove(id: string) {
+    if (!window.confirm("Delete this sale?")) return;
+    setError("");
+    try {
+      await deleteSale(id);
+      if (editingSale?.id === id) setEditingSale(null);
+      await loadSales();
+    } catch (err) {
+      setError(err instanceof Error ? err.message : "Delete failed.");
+    }
   }
 
   return (
     <div className="space-y-5 p-4 lg:p-6">
-      <div className="flex flex-col gap-3 sm:flex-row sm:items-end sm:justify-between">
-        <div>
-          <h1 className="text-2xl font-semibold tracking-normal">Sales Table</h1>
-          <p className="text-sm text-muted-foreground">Daily sales rows, CFT totals, split payments, and dispatch slips.</p>
-        </div>
-        <div className="flex flex-wrap gap-2">
-          <Button asChild size="sm">
-            <Link href="/sales/new">
-              <Plus className="h-4 w-4" />
-              Sale
-            </Link>
-          </Button>
-          <Button asChild size="sm" variant="outline">
-            <Link href="/purchases/boulder">
-              <Plus className="h-4 w-4" />
-              Boulder Purchase
-            </Link>
-          </Button>
-          <Button size="sm" variant={filterMode === "today" ? "default" : "outline"} onClick={setToday}>Today</Button>
-          <Button size="sm" variant={filterMode === "week" ? "default" : "outline"} onClick={setWeek}>This Week</Button>
-          <Button size="sm" variant={filterMode === "month" ? "default" : "outline"} onClick={setMonth}>This Month</Button>
-        </div>
+      <div>
+        <h1 className="text-2xl font-semibold tracking-normal">Outgoing Sales</h1>
+        <p className="text-sm text-muted-foreground">Local sales entry, serial register, and material totals.</p>
       </div>
 
-      {error ? <p className="text-sm text-destructive">{error}</p> : null}
+      <SalesEntryForm
+        editingSale={editingSale}
+        onSaved={() => {
+          setEditingSale(null);
+          void loadSales();
+        }}
+        onCancelEdit={() => setEditingSale(null)}
+      />
 
       <Card>
-        <CardHeader className="flex-row items-center justify-between">
-          <CardTitle>Daily Sales</CardTitle>
-          <div className="flex gap-2">
-            <Input className="w-36" type="date" value={from} onChange={(event) => { setFilterMode("custom"); setFrom(event.target.value); }} />
-            <Input className="w-36" type="date" value={to} onChange={(event) => { setFilterMode("custom"); setTo(event.target.value); }} />
-            <Button variant="outline" size="sm" onClick={() => void downloadExcel(selectedRows.length ? selectedRows : sales, "sales.xlsx")}>
-              <FileSpreadsheet className="h-4 w-4" />
-              Excel
-            </Button>
-            <Button variant="outline" size="sm" onClick={() => downloadCsv(selectedRows.length ? selectedRows : sales, "sales.csv")}>
-              <Download className="h-4 w-4" />
-              CSV
-            </Button>
+        <CardHeader className="flex-row flex-wrap items-center justify-between gap-3">
+          <CardTitle>Sales Table</CardTitle>
+          <div className="relative w-full sm:w-80">
+            <Search className="pointer-events-none absolute left-3 top-3 h-4 w-4 text-muted-foreground" />
+            <Input className="pl-9" placeholder="Search sales..." value={search} onChange={(e) => setSearch(e.target.value)} />
           </div>
         </CardHeader>
-        <CardContent>
+        <CardContent className="grid gap-4">
+          {error ? <p className="text-sm text-destructive">{error}</p> : null}
           <Table>
             <TableHeader>
               <TableRow>
-                <TableHead className="w-10">
-                  <input
-                    type="checkbox"
-                    checked={sales.length > 0 && selected.length === sales.length}
-                    onChange={(event) => setSelected(event.target.checked ? sales.map((row) => row.id) : [])}
-                  />
-                </TableHead>
-                {["Sl", "Date", "Time", "Vehicle", "Party", "Material", "Qty (CFT)", "Rate", "Net Amount", "Payment", "Remarks", "Actions"].map(
-                  (head) => (
-                    <TableHead key={head} className={["Qty (CFT)", "Rate", "Net Amount"].includes(head) ? "text-right" : undefined}>
-                      {head}
-                    </TableHead>
-                  ),
-                )}
+                <SortableHead label="Serial" active={sortKey === "serialNumber"} onClick={() => sortBy("serialNumber")} />
+                <SortableHead label="Date" active={sortKey === "saleDate"} onClick={() => sortBy("saleDate")} />
+                <TableHead>Time</TableHead>
+                <SortableHead label="Vehicle" active={sortKey === "vehicleNumber"} onClick={() => sortBy("vehicleNumber")} />
+                <SortableHead label="Party" active={sortKey === "partyName"} onClick={() => sortBy("partyName")} />
+                <SortableHead label="Material" active={sortKey === "materialName"} onClick={() => sortBy("materialName")} />
+                <SortableHead label="Qty" active={sortKey === "qty"} alignRight onClick={() => sortBy("qty")} />
+                <TableHead className="text-right">Rate</TableHead>
+                <TableHead className="text-right">Amount</TableHead>
+                <TableHead className="text-right">Discount</TableHead>
+                <SortableHead label="Final" active={sortKey === "finalAmount"} alignRight onClick={() => sortBy("finalAmount")} />
+                <TableHead>Remarks</TableHead>
+                <TableHead className="w-24 text-right">Actions</TableHead>
               </TableRow>
             </TableHeader>
             <TableBody>
-              {sales.map((row) => (
-                <TableRow key={row.id} className="border-l-4 border-l-blue-300 bg-blue-50/60 text-slate-900">
-                  <TableCell>
-                    <input
-                      type="checkbox"
-                      checked={selected.includes(row.id)}
-                      onChange={(event) =>
-                        setSelected((current) =>
-                          event.target.checked ? [...current, row.id] : current.filter((id) => id !== row.id),
-                        )
-                      }
-                    />
-                  </TableCell>
-                  <TableCell>{row.slNo ?? "-"}</TableCell>
-                  <TableCell>{formatDate(row.date)}</TableCell>
-                  <TableCell>{row.time ?? new Date(row.date).toLocaleTimeString("en-IN", { hour: "2-digit", minute: "2-digit" })}</TableCell>
-                  <TableCell>{row.vehicle?.vehicleNumber ?? "-"}</TableCell>
-                  <TableCell>{row.party?.name}</TableCell>
-                  <TableCell>{row.material?.name}</TableCell>
+              {visibleRows.map((row) => (
+                <TableRow key={row.id} className={cn(editingSale?.id === row.id && "bg-accent/70")}>
+                  <TableCell>{row.serialNumber}</TableCell>
+                  <TableCell>{formatDate(row.saleDate)}</TableCell>
+                  <TableCell>{new Date(row.createdAt).toLocaleTimeString("en-IN", { hour: "2-digit", minute: "2-digit" })}</TableCell>
+                  <TableCell>{row.vehicleNumber}</TableCell>
+                  <TableCell>{row.partyName}</TableCell>
+                  <TableCell>{row.materialName}</TableCell>
                   <TableCell className="number-cell">{formatQty(row.qty, "")}</TableCell>
-                  <TableCell className="number-cell">{formatCurrency(row.rate)}</TableCell>
-                  <TableCell className="number-cell font-medium">{formatCurrency(row.netAmount)}</TableCell>
-                  <TableCell>
-                    <PaymentBadges row={row} />
+                  <TableCell className="number-cell">{formatCurrency(row.ratePerCft)}</TableCell>
+                  <TableCell className="number-cell">{formatCurrency(row.amount)}</TableCell>
+                  <TableCell className="number-cell">
+                    {row.discountType === "percentage" ? `${row.discountValue}%` : formatCurrency(row.discountValue)}
                   </TableCell>
+                  <TableCell className="number-cell font-medium">{formatCurrency(row.finalAmount)}</TableCell>
                   <TableCell className="max-w-44 truncate">{row.remarks}</TableCell>
-                  <TableCell>
-                    <div className="flex justify-end gap-1">
-                      {row.dispatchSlip ? (
-                        <Button variant="ghost" size="icon" asChild aria-label="View dispatch slip">
-                          <Link href={`/dispatch/${row.dispatchSlip.id}`}>
-                            <Eye className="h-4 w-4" />
-                          </Link>
-                        </Button>
-                      ) : null}
+                  <TableCell className="text-right">
+                    <div className="inline-flex gap-1">
+                      <Button variant="ghost" size="icon" onClick={() => setEditingSale(row)} aria-label="Edit sale">
+                        <Pencil className="h-4 w-4" />
+                      </Button>
                       <Button variant="ghost" size="icon" onClick={() => void remove(row.id)} aria-label="Delete sale">
                         <Trash2 className="h-4 w-4 text-destructive" />
                       </Button>
@@ -214,49 +181,20 @@ export function SalesPage() {
                   </TableCell>
                 </TableRow>
               ))}
-              {!sales.length ? (
+              {!visibleRows.length ? (
                 <TableRow>
-                  <TableCell colSpan={12} className="h-24 text-center text-muted-foreground">
-                    No sales for selected date.
+                  <TableCell colSpan={13} className="h-24 text-center text-muted-foreground">
+                    No sales found.
                   </TableCell>
                 </TableRow>
               ) : null}
             </TableBody>
           </Table>
-          <div className="mt-4 grid gap-4 border-t pt-4 lg:grid-cols-[1fr_320px]">
-            <div className="grid gap-2 sm:grid-cols-2 lg:grid-cols-3">
-              {materialOrder.map((material) => (
-                <RegisterLine key={material} label={material} value={formatQty(summary.materialBreakdown?.[material] ?? 0)} />
-              ))}
-            </div>
-            <div className="grid gap-2">
-              <RegisterLine label="Cash Sales" value={formatCurrency(summary.cashSales ?? 0)} />
-              <RegisterLine label="Credit Sales" value={formatCurrency(summary.creditSales ?? 0)} />
-              <RegisterLine label="Total Sales" value={formatCurrency(summary.totalAmount ?? 0)} strong />
-            </div>
-          </div>
-        </CardContent>
-      </Card>
 
-      <Card>
-        <CardHeader>
-          <CardTitle>{filterMode === "today" ? "Daily Summary" : weeklyTitle}</CardTitle>
-        </CardHeader>
-        <CardContent className="grid gap-4">
-          <div className="grid gap-3 md:grid-cols-6">
-            <Summary label="Total Qty" value={formatQty(summary.totalQty ?? 0)} />
-            <Summary label="Cash" value={formatCurrency(summary.cash ?? 0)} />
-            <Summary label="Bank" value={formatCurrency(summary.bank ?? 0)} />
-            <Summary label="GPay" value={formatCurrency(summary.gpay ?? 0)} />
-            <Summary label="Credit" value={formatCurrency(summary.credit ?? 0)} />
-            <Summary label="Total" value={formatCurrency(summary.totalAmount ?? 0)} />
-          </div>
-          <div className="grid gap-2 sm:grid-cols-2 lg:grid-cols-3">
-            {materialOrder.map((material) => (
-              <div key={material} className="rounded-md border bg-background p-3 text-sm">
-                <div className="text-muted-foreground">{material}</div>
-                <div className="mt-1 text-lg font-semibold">{formatQty(summary.materialBreakdown?.[material] ?? 0)}</div>
-              </div>
+          <div className="grid gap-2 border-t pt-4 sm:grid-cols-2 lg:grid-cols-4">
+            <SummaryLine label="Total Revenue" value={formatCurrency(summary.totalRevenue)} strong />
+            {materialTotals.map((material) => (
+              <SummaryLine key={material} label={`Total ${material}`} value={formatQty(summary[material] ?? 0)} />
             ))}
           </div>
         </CardContent>
@@ -265,38 +203,36 @@ export function SalesPage() {
   );
 }
 
-function RegisterLine({ label, value, strong = false }: { label: string; value: string; strong?: boolean }) {
+function SortableHead({
+  label,
+  active,
+  alignRight,
+  onClick,
+}: {
+  label: string;
+  active: boolean;
+  alignRight?: boolean;
+  onClick: () => void;
+}) {
+  return (
+    <TableHead className={alignRight ? "text-right" : undefined}>
+      <button
+        type="button"
+        className={cn("inline-flex items-center gap-1", alignRight && "justify-end")}
+        onClick={onClick}
+      >
+        {label}
+        <ArrowUpDown className={cn("h-3.5 w-3.5", active ? "opacity-100" : "opacity-50")} />
+      </button>
+    </TableHead>
+  );
+}
+
+function SummaryLine({ label, value, strong = false }: { label: string; value: string; strong?: boolean }) {
   return (
     <div className={cn("flex items-center justify-between gap-3 rounded-md border bg-background px-3 py-2 text-sm", strong && "font-semibold")}>
       <span className="text-muted-foreground">{label}</span>
       <span className="tabular-nums">{value}</span>
-    </div>
-  );
-}
-
-function PaymentBadges({ row }: { row: SaleRow }) {
-  const parts = [
-    ["Cash", row.cashAmount],
-    ["Bank", row.bankAmount],
-    ["GPay", row.gpayAmount],
-    ["Credit", row.creditAmount],
-  ].filter(([, amount]) => Number(amount ?? 0) > 0);
-  return (
-    <div className="flex flex-wrap gap-1">
-      {parts.map(([label, amount]) => (
-        <Badge key={label} variant={label === "Credit" ? "destructive" : "secondary"}>
-          {label} {formatCurrency(amount)}
-        </Badge>
-      ))}
-    </div>
-  );
-}
-
-function Summary({ label, value }: { label: string; value: string }) {
-  return (
-    <div className="rounded-md border bg-background p-3">
-      <div className="text-xs text-muted-foreground">{label}</div>
-      <div className="mt-1 text-lg font-semibold tabular-nums">{value}</div>
     </div>
   );
 }
