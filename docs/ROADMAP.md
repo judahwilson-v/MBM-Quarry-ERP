@@ -1,28 +1,51 @@
-# Roadmap
+# MBM Quarry ERP — Roadmap
 
-## Completed in Phase 1.0
+## Released: RC1 (v0.1.0-rc1) — 2026-06-27
 
-- Build and type issues are resolved.
-- Prisma schema is normalized without removing legacy data paths.
-- Future database modules are prepared in the schema.
-- Shared server-action code is tightened up.
-- Docs were added for the current architecture and database layout.
+### Completed Features
+- Offline-first SQLite ERP (Sales, Purchases, Ledger, Credit, Expenses, Reports)
+- Double-entry financial event architecture
+- Supabase cloud sync engine
+- Electron desktop packaging (macOS DMG)
+- Backup Manager (Backup / Restore / Export / Import)
+- Global Settings page (Quarry Name, GST, Address, Phone, Printer, Backup Folder)
+- Automated VERSION stamping on build
+- About page with system health indicators
 
-## Next Phases
+---
 
-1. Phase 1.1 - Sales rewrite with business-correct rules.
-2. Phase 1.2 - Purchases expansion and normalization.
-3. Phase 1.3 - Day Book implementation.
-4. Phase 1.4 - Credit and collections refinement.
-5. Phase 1.5 - Reports.
-6. Phase 2 - Supabase sync.
-7. Phase 3 - Electron desktop packaging.
+## Phase: Field Testing (In Progress)
+- Deploy to quarry PC.
+- Monitor real-world usage for 1–2 weeks.
+- Log all bugs and UX issues to `docs/KNOWN_BUGS.md`.
 
-## Deferred on Purpose
+---
 
-- Authentication
-- Roles UI
-- Dashboard
-- Reports UI
-- Sync logic
-- Electron integration
+## Phase 7: Tally Integration (Scheduled — after Field Testing)
+- Generate Tally XML / CSV from sales data for GST filing.
+- Configure automatic ledger matching.
+- Add export workflow accessible from the Sales or Reports modules.
+
+---
+
+## Phase 8: Owner Dashboard (Scheduled — after Phase 7)
+> A **separate** Next.js web app. Do not merge into the Electron ERP.
+
+- Read-only dashboard connecting directly to Supabase.
+- Authentication via Supabase Auth (owner account only).
+- Features: Today's Sales, Monthly P/L, Cash Position, Party Ledger, Top Customers, Vehicle Trips, GST Summary, PDF/Excel exports.
+- Sync Status widget: last sync time, pending changes, DB version.
+- Responsive for desktop, tablet, and mobile.
+- Full PRD at `docs/OWNER_DASHBOARD_PRD.md`.
+
+---
+
+## Phase 9: MBM Mobile (Future — not planned yet)
+- Android / iOS app for on-the-go owner monitoring.
+- Read-only, connected to Supabase.
+- Push notifications for sales milestones.
+
+---
+
+## Ideas (Not Confirmed)
+See `docs/IDEAS.md` for unconfirmed feature suggestions.

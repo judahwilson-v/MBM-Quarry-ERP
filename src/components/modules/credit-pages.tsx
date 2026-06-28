@@ -1,4 +1,5 @@
 "use client";
+import { usePrompt } from "@/components/ui/prompt-provider";
 
 import { useCallback, useEffect, useMemo, useState } from "react";
 import { Pencil, Plus, Save, Search, Trash2, X } from "lucide-react";
@@ -13,9 +14,16 @@ import {
   listEmployeeCredits,
   listPartyCreditEntries,
   listPartyCreditSummary,
+  listPartyCollectionHistory,
+  listPartyCollectionSummary,
   saveEmployeeCredit,
+  savePartyCollection,
+  deleteOtherCredit,
+  listOtherCredits,
+  saveOtherCredit,
 } from "@/lib/offline-actions";
 import { cn, formatCurrency, formatDate } from "@/lib/utils";
+import { verifyEditPassword } from "@/lib/domain";
 
 type PartySummary = {
   partyName: string;
@@ -31,7 +39,8 @@ type PartyCreditEntry = {
   status: string;
   createdAt: string;
   sale?: {
-    serialNumber: number;
+    bookNumber: number | null;
+    pageNumber: number | null;
     saleDate: string;
     vehicleNumber: string;
     materialName: string;
@@ -49,10 +58,50 @@ type EmployeeCreditRow = {
   createdAt: string;
 };
 
+type OtherCreditRow = {
+  id: string;
+  name: string;
+  amount: number;
+  reason?: string | null;
+  expectedDueDate?: string | null;
+  status: string;
+  createdAt: string;
+};
+
+type PartyCollectionSummary = {
+  partyName: string;
+  totalCredit: number;
+  collected: number;
+  outstanding: number;
+};
+
+type PartyCollectionRow = {
+  id: string;
+  partyName: string;
+  collectionDate: string;
+  cashPaid: number;
+  bankPaid: number;
+  gPayPaid: number;
+  totalAmount: number;
+  remarks?: string | null;
+  createdAt: string;
+};
+
 function blankEmployeeForm() {
   return {
     id: "",
     employeeName: "",
+    amount: "",
+    reason: "",
+    expectedDueDate: "",
+    status: "pending",
+  };
+}
+
+function blankOtherForm() {
+  return {
+    id: "",
+    name: "",
     amount: "",
     reason: "",
     expectedDueDate: "",
@@ -73,6 +122,7 @@ export function PartyCreditPage() {
   const [entries, setEntries] = useState<PartyCreditEntry[]>([]);
   const [search, setSearch] = useState("");
   const [error, setError] = useState("");
+  
 
   const loadSummary = useCallback(async () => {
     try {
@@ -155,7 +205,7 @@ export function PartyCreditPage() {
               <TableHeader>
                 <TableRow>
                   <TableHead>Date</TableHead>
-                  <TableHead>Serial</TableHead>
+                  <TableHead>Book/Page</TableHead>
                   <TableHead>Vehicle</TableHead>
                   <TableHead>Material</TableHead>
                   <TableHead className="text-right">Qty</TableHead>
@@ -167,7 +217,7 @@ export function PartyCreditPage() {
                 {entries.map((entry) => (
                   <TableRow key={entry.id}>
                     <TableCell>{formatDate(entry.sale?.saleDate ?? entry.createdAt)}</TableCell>
-                    <TableCell>{entry.sale?.serialNumber ?? "-"}</TableCell>
+                    <TableCell>{entry.sale?.bookNumber && entry.sale?.pageNumber ? `${entry.sale.bookNumber}/${entry.sale.pageNumber}` : "-"}</TableCell>
                     <TableCell>{entry.sale?.vehicleNumber ?? "-"}</TableCell>
                     <TableCell>{entry.sale?.materialName ?? "-"}</TableCell>
                     <TableCell className="number-cell">{entry.sale?.qty ?? "-"}</TableCell>
@@ -185,12 +235,14 @@ export function PartyCreditPage() {
 }
 
 export function EmployeeCreditPage() {
+  const { promptPassword, confirmAction } = usePrompt();
   const [rows, setRows] = useState<EmployeeCreditRow[]>([]);
   const [search, setSearch] = useState("");
   const [form, setForm] = useState(() => blankEmployeeForm());
   const [showForm, setShowForm] = useState(false);
   const [message, setMessage] = useState("");
   const [error, setError] = useState("");
+  
 
   const load = useCallback(async () => {
     setRows((await listEmployeeCredits(search)) as unknown as EmployeeCreditRow[]);
@@ -237,7 +289,12 @@ export function EmployeeCreditPage() {
   }
 
   async function remove(id: string) {
-    if (!window.confirm("Delete this employee credit?")) return;
+    if (!(await confirmAction("Delete this employee credit?"))) return;
+    const password = await promptPassword("Enter delete password:");
+    if (!password || !verifyEditPassword(password)) {
+      setError("Delete password is invalid.");
+      return;
+    }
     setError("");
     try {
       await deleteEmployeeCredit(id);
@@ -368,3 +425,369 @@ export function EmployeeCreditPage() {
     </div>
   );
 }
+
+function blankCollectionForm() {
+  return {
+    partyName: "",
+    collectionDate: "",
+    cashPaid: "",
+    bankPaid: "",
+    gPayPaid: "",
+    remarks: "",
+  };
+}
+
+export function PartyCollectionPage() {
+  const [summary, setSummary] = useState<PartyCollectionSummary[]>([]);
+  const [selectedParty, setSelectedParty] = useState("");
+  const [history, setHistory] = useState<PartyCollectionRow[]>([]);
+  const [search, setSearch] = useState("");
+  const [form, setForm] = useState(() => blankCollectionForm());
+  const [error, setError] = useState("");
+  
+  const [message, setMessage] = useState("");
+
+  const loadSummary = useCallback(async () => {
+    try {
+      setSummary((await listPartyCollectionSummary()) as unknown as PartyCollectionSummary[]);
+    } catch (err) {
+      setError(err instanceof Error ? err.message : "Failed to load collections.");
+    }
+  }, []);
+
+  const loadHistory = useCallback(async (partyName: string) => {
+    setSelectedParty(partyName);
+    setHistory((await listPartyCollectionHistory(partyName)) as unknown as PartyCollectionRow[]);
+    setForm((current) => ({ ...current, partyName }));
+  }, []);
+
+  useEffect(() => {
+    void loadSummary();
+  }, [loadSummary]);
+
+  const visibleSummary = useMemo(() => {
+    const query = search.trim().toLowerCase();
+    return query ? summary.filter((row) => row.partyName.toLowerCase().includes(query)) : summary;
+  }, [search, summary]);
+
+  async function submit() {
+    setError("");
+    setMessage("");
+    try {
+      const savedPartyName = form.partyName;
+      await savePartyCollection(form);
+      setMessage("Collection recorded.");
+      setForm(blankCollectionForm());
+      if (savedPartyName) {
+        await loadHistory(savedPartyName);
+      }
+      await loadSummary();
+    } catch (err) {
+      setError(err instanceof Error ? err.message : "Collection save failed.");
+    }
+  }
+
+  return (
+    <div className="space-y-5 p-4 lg:p-6">
+      <div>
+        <h1 className="text-2xl font-semibold tracking-normal">Credit Collections</h1>
+        <p className="text-sm text-muted-foreground">Record cash, bank, and GPay collections against party outstanding balances.</p>
+      </div>
+
+      <Card>
+        <CardHeader className="flex-row flex-wrap items-center justify-between gap-3">
+          <CardTitle>Party Outstanding</CardTitle>
+          <div className="relative w-full sm:w-80">
+            <Search className="pointer-events-none absolute left-3 top-3 h-4 w-4 text-muted-foreground" />
+            <Input className="pl-9" placeholder="Search party..." value={search} onChange={(event) => setSearch(event.target.value)} />
+          </div>
+        </CardHeader>
+        <CardContent>
+          {error ? <p className="mb-3 text-sm text-destructive">{error}</p> : null}
+          {message ? <p className="mb-3 text-sm text-emerald-600">{message}</p> : null}
+          <Table>
+            <TableHeader>
+              <TableRow>
+                <TableHead>Party Name</TableHead>
+                <TableHead className="text-right">Outstanding</TableHead>
+                <TableHead className="text-right">Collected</TableHead>
+                <TableHead className="text-right">Total Credit</TableHead>
+              </TableRow>
+            </TableHeader>
+            <TableBody>
+              {visibleSummary.map((row) => (
+                <TableRow
+                  key={row.partyName}
+                  className={cn("cursor-pointer", selectedParty === row.partyName && "bg-accent/70")}
+                  onClick={() => void loadHistory(row.partyName)}
+                >
+                  <TableCell className="font-medium">{row.partyName}</TableCell>
+                  <TableCell className="number-cell">{formatCurrency(row.outstanding)}</TableCell>
+                  <TableCell className="number-cell">{formatCurrency(row.collected)}</TableCell>
+                  <TableCell className="number-cell">{formatCurrency(row.totalCredit)}</TableCell>
+                </TableRow>
+              ))}
+            </TableBody>
+          </Table>
+        </CardContent>
+      </Card>
+
+      <Card>
+        <CardHeader>
+          <CardTitle>Record Collection</CardTitle>
+        </CardHeader>
+        <CardContent className="grid gap-4 md:grid-cols-2">
+          <Field label="Party Name">
+            <Input value={form.partyName} onChange={(event) => setForm({ ...form, partyName: event.target.value })} />
+          </Field>
+          <Field label="Collection Date">
+            <Input type="date" value={form.collectionDate} onChange={(event) => setForm({ ...form, collectionDate: event.target.value })} />
+          </Field>
+          <Field label="Cash">
+            <Input value={form.cashPaid} onChange={(event) => setForm({ ...form, cashPaid: event.target.value })} />
+          </Field>
+          <Field label="Bank">
+            <Input value={form.bankPaid} onChange={(event) => setForm({ ...form, bankPaid: event.target.value })} />
+          </Field>
+          <Field label="GPay">
+            <Input value={form.gPayPaid} onChange={(event) => setForm({ ...form, gPayPaid: event.target.value })} />
+          </Field>
+          <Field label="Remarks" className="md:col-span-2">
+            <Textarea value={form.remarks} onChange={(event) => setForm({ ...form, remarks: event.target.value })} />
+          </Field>
+          <div className="md:col-span-2">
+            <Button onClick={() => void submit()}>
+              <Save className="h-4 w-4" />
+              Save Collection
+            </Button>
+          </div>
+        </CardContent>
+      </Card>
+
+      {selectedParty ? (
+        <Card>
+          <CardHeader>
+            <CardTitle>{selectedParty} Collection History</CardTitle>
+          </CardHeader>
+          <CardContent>
+            <Table>
+              <TableHeader>
+                <TableRow>
+                  <TableHead>Date</TableHead>
+                  <TableHead className="text-right">Cash</TableHead>
+                  <TableHead className="text-right">Bank</TableHead>
+                  <TableHead className="text-right">GPay</TableHead>
+                  <TableHead className="text-right">Total</TableHead>
+                </TableRow>
+              </TableHeader>
+              <TableBody>
+                {history.map((row) => (
+                  <TableRow key={row.id}>
+                    <TableCell>{formatDate(row.collectionDate ?? row.createdAt)}</TableCell>
+                    <TableCell className="number-cell">{formatCurrency(row.cashPaid)}</TableCell>
+                    <TableCell className="number-cell">{formatCurrency(row.bankPaid)}</TableCell>
+                    <TableCell className="number-cell">{formatCurrency(row.gPayPaid)}</TableCell>
+                    <TableCell className="number-cell font-medium">{formatCurrency(row.totalAmount)}</TableCell>
+                  </TableRow>
+                ))}
+              </TableBody>
+            </Table>
+          </CardContent>
+        </Card>
+      ) : null}
+    </div>
+  );
+}
+
+export function OtherCreditPage() {
+  const { promptPassword, confirmAction } = usePrompt();
+  const [rows, setRows] = useState<OtherCreditRow[]>([]);
+  const [search, setSearch] = useState("");
+  const [form, setForm] = useState(() => blankOtherForm());
+  const [showForm, setShowForm] = useState(false);
+  const [message, setMessage] = useState("");
+  const [error, setError] = useState("");
+  
+
+  const load = useCallback(async () => {
+    setRows((await listOtherCredits(search)) as unknown as OtherCreditRow[]);
+  }, [search]);
+
+  useEffect(() => {
+    const timer = window.setTimeout(() => void load(), 200);
+    return () => window.clearTimeout(timer);
+  }, [load]);
+
+  function startCreate() {
+    setForm(blankOtherForm());
+    setShowForm(true);
+    setError("");
+    setMessage("");
+  }
+
+  function startEdit(row: OtherCreditRow) {
+    setForm({
+      id: row.id,
+      name: row.name,
+      amount: String(row.amount),
+      reason: row.reason ?? "",
+      expectedDueDate: dateInput(row.expectedDueDate),
+      status: row.status,
+    });
+    setShowForm(true);
+    setError("");
+    setMessage("");
+  }
+
+  async function submit() {
+    setError("");
+    setMessage("");
+    try {
+      await saveOtherCredit(form);
+      setMessage(form.id ? "Other credit updated." : "Other credit added.");
+      setForm(blankOtherForm());
+      setShowForm(false);
+      await load();
+    } catch (err) {
+      setError(err instanceof Error ? err.message : "Save failed.");
+    }
+  }
+
+  async function remove(id: string) {
+    if (!(await confirmAction("Delete this other credit record?"))) return;
+    const password = await promptPassword("Enter delete password:");
+    if (!password || !verifyEditPassword(password)) {
+      setError("Delete password is invalid.");
+      return;
+    }
+    setError("");
+    try {
+      await deleteOtherCredit(id);
+      if (form.id === id) setForm(blankOtherForm());
+      await load();
+    } catch (err) {
+      setError(err instanceof Error ? err.message : "Delete failed.");
+    }
+  }
+
+  return (
+    <div className="space-y-5 p-4 lg:p-6">
+      <div className="flex flex-col gap-3 sm:flex-row sm:items-end sm:justify-between">
+        <div>
+          <h1 className="text-2xl font-semibold tracking-normal">Other Credit</h1>
+          <p className="text-sm text-muted-foreground">General/Other credit records not linked to standard customers.</p>
+        </div>
+        <Button onClick={startCreate}>
+          <Plus className="h-4 w-4" />
+          Add
+        </Button>
+      </div>
+
+      <Card>
+        <CardContent className="grid gap-4 pt-5">
+          <div className="relative">
+            <Search className="pointer-events-none absolute left-3 top-3 h-4 w-4 text-muted-foreground" />
+            <Input className="pl-9" placeholder="Search other credit..." value={search} onChange={(event) => setSearch(event.target.value)} />
+          </div>
+
+          {showForm ? (
+            <div className="rounded-md border bg-muted/30 p-4">
+              <div className="mb-3 flex items-center justify-between">
+                <div className="text-sm font-medium">{form.id ? "Edit Other Credit" : "New Other Credit"}</div>
+                <Button variant="ghost" size="icon" onClick={() => setShowForm(false)} aria-label="Close form">
+                  <X className="h-4 w-4" />
+                </Button>
+              </div>
+              <div className="grid gap-3 md:grid-cols-2 xl:grid-cols-4">
+                <Field label="Name">
+                  <Input value={form.name} onChange={(event) => setForm((current) => ({ ...current, name: event.target.value }))} />
+                </Field>
+                <Field label="Amount">
+                  <Input
+                    className="text-right tabular-nums"
+                    type="number"
+                    step="0.01"
+                    value={form.amount}
+                    onChange={(event) => setForm((current) => ({ ...current, amount: event.target.value }))}
+                  />
+                </Field>
+                <Field label="Expected Due Date">
+                  <Input
+                    type="date"
+                    value={form.expectedDueDate}
+                    onChange={(event) => setForm((current) => ({ ...current, expectedDueDate: event.target.value }))}
+                  />
+                </Field>
+                <Field label="Status">
+                  <select
+                    className="h-10 rounded-md border bg-background px-3 text-sm"
+                    value={form.status}
+                    onChange={(event) => setForm((current) => ({ ...current, status: event.target.value }))}
+                  >
+                    <option value="pending">Pending</option>
+                    <option value="paid">Paid</option>
+                    <option value="cancelled">Cancelled</option>
+                  </select>
+                </Field>
+                <Field label="Reason" className="md:col-span-2 xl:col-span-4">
+                  <Textarea value={form.reason} onChange={(event) => setForm((current) => ({ ...current, reason: event.target.value }))} />
+                </Field>
+              </div>
+              <div className="mt-4">
+                <Button onClick={() => void submit()}>
+                  <Save className="h-4 w-4" />
+                  {form.id ? "Save Changes" : "Create"}
+                </Button>
+              </div>
+            </div>
+          ) : null}
+
+          {error ? <p className="text-sm text-destructive">{error}</p> : null}
+          {message ? <p className="text-sm text-success">{message}</p> : null}
+
+          <Table>
+            <TableHeader>
+              <TableRow>
+                <TableHead>Name</TableHead>
+                <TableHead className="text-right">Amount</TableHead>
+                <TableHead>Reason</TableHead>
+                <TableHead>Expected Due Date</TableHead>
+                <TableHead>Status</TableHead>
+                <TableHead className="w-24 text-right">Actions</TableHead>
+              </TableRow>
+            </TableHeader>
+            <TableBody>
+              {rows.map((row) => (
+                <TableRow key={row.id}>
+                  <TableCell className="font-medium">{row.name}</TableCell>
+                  <TableCell className="number-cell">{formatCurrency(row.amount)}</TableCell>
+                  <TableCell className="max-w-64 truncate">{row.reason}</TableCell>
+                  <TableCell>{row.expectedDueDate ? formatDate(row.expectedDueDate) : "-"}</TableCell>
+                  <TableCell className="capitalize">{row.status}</TableCell>
+                  <TableCell className="text-right">
+                    <div className="inline-flex gap-1">
+                      <Button variant="ghost" size="icon" onClick={() => startEdit(row)} aria-label="Edit other credit">
+                        <Pencil className="h-4 w-4" />
+                      </Button>
+                      <Button variant="ghost" size="icon" onClick={() => void remove(row.id)} aria-label="Delete other credit">
+                        <Trash2 className="h-4 w-4 text-destructive" />
+                      </Button>
+                    </div>
+                  </TableCell>
+                </TableRow>
+              ))}
+              {!rows.length ? (
+                <TableRow>
+                  <TableCell colSpan={6} className="h-24 text-center text-muted-foreground">
+                    No other credit records found.
+                  </TableCell>
+                </TableRow>
+              ) : null}
+            </TableBody>
+          </Table>
+        </CardContent>
+      </Card>
+    </div>
+  );
+}
+

@@ -20,6 +20,7 @@ export type SalesDraft = {
   saleDate?: string;
   vehicleNumber: string;
   partyName: string;
+  partyId?: string | null;
   materialId: string;
   ratePerCft?: string | number | null;
   qty: string | number;
@@ -29,13 +30,17 @@ export type SalesDraft = {
   bankPaid?: string | number | null;
   gPayPaid?: string | number | null;
   remarks?: string | null;
+  bookNumber?: string | null;
+  pageNumber?: string | null;
   quantityReason?: string | null;
+  gstEnabled?: boolean;
 };
 
 export type SalesEngineResult = {
   saleDate: Date;
   vehicleNumber: string;
   partyName: string;
+  partyId?: string | null;
   materialId: string;
   materialName: string;
   ratePerCft: number;
@@ -54,6 +59,11 @@ export type SalesEngineResult = {
   gPayPaid: number;
   paidTotal: number;
   remainingCredit: number;
+  gstEnabled: boolean;
+  gstRate: number;
+  sgst: number;
+  cgst: number;
+  gstAmount: number;
   remarks: string | null;
 };
 
@@ -138,7 +148,25 @@ export function deriveSalesEngine(draft: SalesDraft, deps: SalesEngineDeps) {
     draft.discountType === "percentage" ? roundMoney((amount * discountValue) / 100) : roundMoney(discountValue);
   if (discountAmount > amount) throw new Error("Discount cannot be greater than amount.");
 
-  const finalAmount = roundMoney(amount - discountAmount);
+  const subtotal = roundMoney(amount - discountAmount);
+  
+  const gstEnabled = draft.gstEnabled ?? false;
+  const gstRate = 5; // 5% total
+  let sgst = 0;
+  let cgst = 0;
+  let gstAmount = 0;
+  
+  if (gstEnabled) {
+    gstAmount = roundMoney((subtotal * gstRate) / 100);
+    sgst = roundMoney(gstAmount / 2);
+    cgst = roundMoney(gstAmount / 2);
+    // ensure sgst + cgst strictly equals gstAmount if there are rounding diffs
+    if (sgst + cgst !== gstAmount) {
+        cgst = roundMoney(gstAmount - sgst);
+    }
+  }
+
+  const finalAmount = roundMoney(subtotal + gstAmount);
   const paidTotal = roundMoney(cashPaid + bankPaid + gPayPaid);
   if (paidTotal > finalAmount) throw new Error("Payment cannot exceed final amount.");
   const remainingCredit = roundMoney(finalAmount - paidTotal);
@@ -147,6 +175,7 @@ export function deriveSalesEngine(draft: SalesDraft, deps: SalesEngineDeps) {
     saleDate: parseDateInput(draft.saleDate),
     vehicleNumber,
     partyName,
+    partyId: (draft as any).partyId ?? deps.vehicle?.partyId ?? null,
     materialId: material.id,
     materialName: material.materialName,
     ratePerCft,
@@ -160,6 +189,11 @@ export function deriveSalesEngine(draft: SalesDraft, deps: SalesEngineDeps) {
     amount,
     discountAmount,
     finalAmount,
+    gstEnabled,
+    gstRate,
+    sgst,
+    cgst,
+    gstAmount,
     cashPaid,
     bankPaid,
     gPayPaid,

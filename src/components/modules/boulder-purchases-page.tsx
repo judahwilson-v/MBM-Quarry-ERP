@@ -1,4 +1,5 @@
 "use client";
+import { usePrompt } from "@/components/ui/prompt-provider";
 
 import { useCallback, useEffect, useState } from "react";
 import { Pencil, Save, Search, Trash2, X } from "lucide-react";
@@ -8,27 +9,51 @@ import { Field } from "@/components/ui/field";
 import { Input } from "@/components/ui/input";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { Textarea } from "@/components/ui/textarea";
-import { deleteIncomingBoulder, listIncomingBoulder, saveIncomingBoulder } from "@/lib/offline-actions";
-import { formatDate, formatQty, todayInputValue } from "@/lib/utils";
+import { SearchableSelect } from "@/components/ui/searchable-select";
+import { deleteIncomingBoulder, listIncomingBoulder, saveIncomingBoulder, listVehicles, getLastBookPage } from "@/lib/offline-actions";
+import { formatCurrency, formatDate, formatQty, todayInputValue } from "@/lib/utils";
 
 type BoulderRow = {
   id: string;
   date: string;
+  bookNumber?: number | null;
+  pageNumber?: number | null;
   vehicleNumber: string;
   partyName: string;
   materialName: string;
   qty: number;
   remarks?: string | null;
+  time?: string | null;
+  rockRate: number;
+  amount: number;
+  cashPaid: number;
+  bankPaid: number;
+  gPayPaid: number;
+  paidTotal: number;
+  remainingCredit: number;
+  vehicleRent: number;
+  combinedPayment: boolean;
   createdAt: string;
 };
 
 function blankForm() {
+  const now = new Date();
   return {
     id: "",
     date: todayInputValue(),
+    time: now.toTimeString().slice(0, 5),
+    bookNumber: "",
+    pageNumber: "",
+    vehicleId: "",
     vehicleNumber: "",
     partyName: "",
     qty: "",
+    rockRate: "26",
+    cashPaid: "0",
+    bankPaid: "0",
+    gPayPaid: "0",
+    vehicleRent: "0",
+    combinedPayment: false,
     remarks: "",
   };
 }
@@ -42,9 +67,30 @@ function dateInput(value: string) {
 export function BoulderPurchasesPage() {
   const [form, setForm] = useState(() => blankForm());
   const [rows, setRows] = useState<BoulderRow[]>([]);
+  const [vehicles, setVehicles] = useState<any[]>([]);
   const [search, setSearch] = useState("");
   const [message, setMessage] = useState("");
   const [error, setError] = useState("");
+  const { confirmAction } = usePrompt();
+
+  useEffect(() => {
+    listVehicles("").then((v) => setVehicles(v as any[]));
+    if (!form.id) {
+      getLastBookPage().then(({ bookNumber, pageNumber }) => {
+        let nextBook = bookNumber;
+        let nextPage = pageNumber + 1;
+        if (nextPage > 100) {
+          nextBook = bookNumber + 1;
+          nextPage = 1;
+        }
+        setForm((prev) => ({
+          ...prev,
+          bookNumber: String(nextBook),
+          pageNumber: String(nextPage),
+        }));
+      });
+    }
+  }, []);
 
   const load = useCallback(async () => {
     const data = (await listIncomingBoulder(search)) as unknown as BoulderRow[];
@@ -60,13 +106,34 @@ export function BoulderPurchasesPage() {
     setForm({
       id: row.id,
       date: dateInput(row.date),
+      time: row.time ?? "",
+      bookNumber: row.bookNumber != null ? String(row.bookNumber) : "",
+      pageNumber: row.pageNumber != null ? String(row.pageNumber) : "",
+      vehicleId: "",
       vehicleNumber: row.vehicleNumber,
       partyName: row.partyName,
       qty: String(row.qty),
+      rockRate: String(row.rockRate),
+      cashPaid: String(row.cashPaid),
+      bankPaid: String(row.bankPaid),
+      gPayPaid: String(row.gPayPaid),
+      vehicleRent: String(row.vehicleRent),
+      combinedPayment: row.combinedPayment,
       remarks: row.remarks ?? "",
     });
     setMessage("");
     setError("");
+  }
+
+  function selectVehicle(id: string) {
+    const vehicle = vehicles.find((v) => v.id === id);
+    if (!vehicle) return;
+    setForm((current) => ({
+      ...current,
+      vehicleId: vehicle.id,
+      vehicleNumber: vehicle.vehicleNumber,
+      partyName: vehicle.partyName || current.partyName,
+    }));
   }
 
   async function submit() {
@@ -83,7 +150,7 @@ export function BoulderPurchasesPage() {
   }
 
   async function remove(id: string) {
-    if (!window.confirm("Delete this boulder entry?")) return;
+    if (!(await confirmAction("Delete this boulder entry?"))) return;
     setError("");
     try {
       await deleteIncomingBoulder(id);
@@ -115,14 +182,28 @@ export function BoulderPurchasesPage() {
             <Field label="Date">
               <Input type="date" value={form.date} onChange={(event) => setForm((current) => ({ ...current, date: event.target.value }))} />
             </Field>
+            <Field label="Time">
+              <Input type="time" value={form.time} onChange={(event) => setForm((current) => ({ ...current, time: event.target.value }))} />
+            </Field>
+            <Field label="Book No">
+              <Input type="number" min="1" value={form.bookNumber} onChange={(event) => setForm((current) => ({ ...current, bookNumber: event.target.value }))} />
+            </Field>
+            <Field label="Page No">
+              <Input type="number" min="1" max="100" value={form.pageNumber} onChange={(event) => setForm((current) => ({ ...current, pageNumber: event.target.value }))} />
+            </Field>
             <Field label="Vehicle Number">
-              <Input value={form.vehicleNumber} onChange={(event) => setForm((current) => ({ ...current, vehicleNumber: event.target.value }))} />
+              <SearchableSelect
+                value={form.vehicleId}
+                customValue={form.vehicleNumber}
+                allowCustom
+                placeholder="Search or type vehicle"
+                options={vehicles.map((v) => ({ value: v.id, label: v.vehicleNumber, description: v.partyName }))}
+                onChange={selectVehicle}
+                onCustomValueChange={(vehicleNumber) => setForm((current) => ({ ...current, vehicleNumber, vehicleId: "" }))}
+              />
             </Field>
             <Field label="Party Name">
               <Input value={form.partyName} onChange={(event) => setForm((current) => ({ ...current, partyName: event.target.value }))} />
-            </Field>
-            <Field label="Material">
-              <Input value="ROCK" readOnly />
             </Field>
             <Field label="Qty">
               <Input
@@ -133,9 +214,80 @@ export function BoulderPurchasesPage() {
                 onChange={(event) => setForm((current) => ({ ...current, qty: event.target.value }))}
               />
             </Field>
-            <Field label="Remarks" className="md:col-span-2 xl:col-span-3">
+            <Field label="Rock Rate (₹)">
+              <Input
+                className="text-right tabular-nums"
+                type="number"
+                step="0.01"
+                value={form.rockRate}
+                onChange={(event) => setForm((current) => ({ ...current, rockRate: event.target.value }))}
+              />
+            </Field>
+            <Field label="Cash Paid">
+              <Input
+                className="text-right tabular-nums"
+                type="number"
+                value={form.cashPaid}
+                onChange={(event) => setForm((current) => ({ ...current, cashPaid: event.target.value }))}
+              />
+            </Field>
+            <Field label="Bank Paid">
+              <Input
+                className="text-right tabular-nums"
+                type="number"
+                value={form.bankPaid}
+                onChange={(event) => setForm((current) => ({ ...current, bankPaid: event.target.value }))}
+              />
+            </Field>
+            <Field label="GPay Paid">
+              <Input
+                className="text-right tabular-nums"
+                type="number"
+                value={form.gPayPaid}
+                onChange={(event) => setForm((current) => ({ ...current, gPayPaid: event.target.value }))}
+              />
+            </Field>
+            <Field label="Vehicle Rent">
+              <Input
+                className="text-right tabular-nums"
+                type="number"
+                value={form.vehicleRent}
+                onChange={(event) => setForm((current) => ({ ...current, vehicleRent: event.target.value }))}
+              />
+            </Field>
+            <div className="flex items-center space-x-2 pt-8">
+              <input
+                type="checkbox"
+                id="combinedPayment"
+                className="h-4 w-4 rounded border-gray-300"
+                checked={form.combinedPayment}
+                onChange={(event) => setForm((current) => ({ ...current, combinedPayment: event.target.checked }))}
+              />
+              <label htmlFor="combinedPayment" className="text-sm font-medium leading-none">
+                Rent included in Payment
+              </label>
+            </div>
+            <Field label="Remarks" className="md:col-span-2">
               <Textarea value={form.remarks} onChange={(event) => setForm((current) => ({ ...current, remarks: event.target.value }))} />
             </Field>
+          </div>
+          <div className="flex gap-4 p-3 bg-muted/50 rounded-lg">
+            <div className="text-sm">
+              <span className="text-muted-foreground">Amount: </span>
+              <span className="font-semibold">{formatCurrency((Number(form.qty) || 0) * (Number(form.rockRate) || 0))}</span>
+            </div>
+            <div className="text-sm">
+              <span className="text-muted-foreground">Paid Total: </span>
+              <span className="font-semibold text-emerald-600">
+                {formatCurrency((Number(form.cashPaid) || 0) + (Number(form.bankPaid) || 0) + (Number(form.gPayPaid) || 0))}
+              </span>
+            </div>
+            <div className="text-sm">
+              <span className="text-muted-foreground">Credit Balance: </span>
+              <span className="font-semibold text-destructive">
+                {formatCurrency(((Number(form.qty) || 0) * (Number(form.rockRate) || 0)) - ((Number(form.cashPaid) || 0) + (Number(form.bankPaid) || 0) + (Number(form.gPayPaid) || 0)))}
+              </span>
+            </div>
           </div>
           {error ? <p className="text-sm text-destructive">{error}</p> : null}
           {message ? <p className="text-sm text-success">{message}</p> : null}
@@ -161,10 +313,15 @@ export function BoulderPurchasesPage() {
             <TableHeader>
               <TableRow>
                 <TableHead>Date</TableHead>
-                <TableHead>Vehicle Number</TableHead>
-                <TableHead>Party Name</TableHead>
-                <TableHead>Material</TableHead>
+                <TableHead>Time</TableHead>
+                <TableHead>Book/Page</TableHead>
+                <TableHead>Vehicle</TableHead>
+                <TableHead>Supplier</TableHead>
                 <TableHead className="text-right">Qty</TableHead>
+                <TableHead className="text-right">Rate</TableHead>
+                <TableHead className="text-right">Amount</TableHead>
+                <TableHead className="text-right">Paid</TableHead>
+                <TableHead className="text-right">Credit</TableHead>
                 <TableHead>Remarks</TableHead>
                 <TableHead className="w-24 text-right">Actions</TableHead>
               </TableRow>
@@ -173,11 +330,18 @@ export function BoulderPurchasesPage() {
               {rows.map((row) => (
                 <TableRow key={row.id}>
                   <TableCell>{formatDate(row.date)}</TableCell>
+                  <TableCell>{row.time || "-"}</TableCell>
+                  <TableCell>
+                    {row.bookNumber && row.pageNumber ? `${row.bookNumber}/${row.pageNumber}` : row.bookNumber || row.pageNumber || "-"}
+                  </TableCell>
                   <TableCell>{row.vehicleNumber}</TableCell>
                   <TableCell>{row.partyName}</TableCell>
-                  <TableCell>{row.materialName}</TableCell>
-                  <TableCell className="number-cell">{formatQty(row.qty, "")}</TableCell>
-                  <TableCell className="max-w-56 truncate">{row.remarks}</TableCell>
+                  <TableCell className="number-cell font-medium">{formatQty(row.qty, "")}</TableCell>
+                  <TableCell className="number-cell text-muted-foreground">{formatCurrency(row.rockRate)}</TableCell>
+                  <TableCell className="number-cell font-medium">{formatCurrency(row.amount)}</TableCell>
+                  <TableCell className="number-cell text-emerald-600">{formatCurrency(row.paidTotal)}</TableCell>
+                  <TableCell className="number-cell text-destructive">{formatCurrency(row.remainingCredit)}</TableCell>
+                  <TableCell className="max-w-40 truncate" title={row.remarks || ""}>{row.remarks}</TableCell>
                   <TableCell className="text-right">
                     <div className="inline-flex gap-1">
                       <Button variant="ghost" size="icon" onClick={() => edit(row)} aria-label="Edit boulder entry">
@@ -192,7 +356,7 @@ export function BoulderPurchasesPage() {
               ))}
               {!rows.length ? (
                 <TableRow>
-                  <TableCell colSpan={7} className="h-24 text-center text-muted-foreground">
+                  <TableCell colSpan={12} className="h-24 text-center text-muted-foreground">
                     No boulder entries found.
                   </TableCell>
                 </TableRow>

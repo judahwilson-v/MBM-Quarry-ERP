@@ -1,4 +1,5 @@
 "use client";
+import { usePrompt } from "@/components/ui/prompt-provider";
 
 import { useCallback, useEffect, useState } from "react";
 import { Pencil, Save } from "lucide-react";
@@ -8,6 +9,7 @@ import { Input } from "@/components/ui/input";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { listMaterials, updateMaterialRate } from "@/lib/offline-actions";
 import { formatCurrency, formatDateTime } from "@/lib/utils";
+import { verifyEditPassword } from "@/lib/domain";
 
 type MaterialRow = {
   id: string;
@@ -17,15 +19,20 @@ type MaterialRow = {
   createdAt: string;
 };
 
+const HIDDEN_MATERIALS = new Set(["OPENING BALANCE", "RAW SALE"]);
+
 export function MaterialRatesPage() {
   const [materials, setMaterials] = useState<MaterialRow[]>([]);
   const [editingId, setEditingId] = useState("");
+  const { promptPassword } = usePrompt();
   const [draftRates, setDraftRates] = useState<Record<string, string>>({});
   const [message, setMessage] = useState("");
   const [error, setError] = useState("");
 
   const load = useCallback(async () => {
-    const rows = (await listMaterials()) as unknown as MaterialRow[];
+    const rows = ((await listMaterials()) as unknown as MaterialRow[]).filter(
+      (row) => !HIDDEN_MATERIALS.has(row.materialName)
+    );
     setMaterials(rows);
     setDraftRates(Object.fromEntries(rows.map((row) => [row.id, String(row.ratePerCft)])));
   }, []);
@@ -35,6 +42,11 @@ export function MaterialRatesPage() {
   }, [load]);
 
   async function saveRate(id: string) {
+    const password = await promptPassword("Enter edit password:");
+    if (!password || !verifyEditPassword(password)) {
+      setError("Edit password is invalid.");
+      return;
+    }
     setError("");
     setMessage("");
     try {

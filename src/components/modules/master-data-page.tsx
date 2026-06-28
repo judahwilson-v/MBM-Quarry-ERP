@@ -1,4 +1,5 @@
 "use client";
+import { usePrompt } from "@/components/ui/prompt-provider";
 
 import { useCallback, useEffect, useState } from "react";
 import { Pencil, Plus, Search, Trash2 } from "lucide-react";
@@ -16,6 +17,7 @@ import {
   saveParty,
   saveVehicle,
 } from "@/lib/offline-actions";
+import { verifyEditPassword } from "@/lib/domain";
 
 type FieldConfig = {
   name: string;
@@ -46,6 +48,7 @@ export function MasterDataPage({ resource, title, description, fields, columns }
   const [form, setForm] = useState<Record<string, MasterFormValue>>({});
   const [loading, setLoading] = useState(true);
   const [message, setMessage] = useState("");
+  const { promptPassword, confirmAction } = usePrompt();
   const [error, setError] = useState("");
 
   const load = useCallback(async () => {
@@ -106,7 +109,12 @@ export function MasterDataPage({ resource, title, description, fields, columns }
   }
 
   async function remove(id: string) {
-    if (!window.confirm("Delete this record?")) return;
+    if (!(await confirmAction("Delete this record?"))) return;
+    const password = await promptPassword("Enter delete password:");
+    if (!password || !verifyEditPassword(password)) {
+      setError("Delete password is invalid.");
+      return;
+    }
     setError("");
     try {
       if (resource === "vehicles") {

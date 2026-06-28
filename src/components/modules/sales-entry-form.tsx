@@ -1,4 +1,5 @@
 "use client";
+import { usePrompt } from "@/components/ui/prompt-provider";
 
 import { useCallback, useEffect, useMemo, useState } from "react";
 import { Save, X } from "lucide-react";
@@ -8,7 +9,7 @@ import { Field } from "@/components/ui/field";
 import { Input } from "@/components/ui/input";
 import { SearchableSelect } from "@/components/ui/searchable-select";
 import { Textarea } from "@/components/ui/textarea";
-import { listMaterials, listVehicles, saveSale } from "@/lib/offline-actions";
+import { listMaterials, listVehicles, saveSale, getLastBookPage } from "@/lib/offline-actions";
 import { deriveSalesEngine } from "@/lib/sales-engine";
 import { verifyEditPassword } from "@/lib/domain";
 import { formatCurrency, todayInputValue } from "@/lib/utils";
@@ -37,11 +38,14 @@ export type EditableSale = {
   qty: number;
   discountType: "percentage" | "fixed";
   discountValue: number;
+  gstEnabled?: boolean | null;
   cashPaid?: number | null;
   bankPaid?: number | null;
   gPayPaid?: number | null;
   remainingCredit?: number | null;
   remarks?: string | null;
+  bookNumber?: number | null;
+  pageNumber?: number | null;
 };
 
 type SaleForm = {
@@ -55,12 +59,15 @@ type SaleForm = {
   ratePerCft: string;
   qty: string;
   quantityReason: string;
+  gstEnabled: boolean;
   discountType: "percentage" | "fixed";
   discountValue: string;
   cashPaid: string;
   bankPaid: string;
   gPayPaid: string;
   remarks: string;
+  bookNumber: string;
+  pageNumber: string;
 };
 
 function blankSale(): SaleForm {
@@ -76,10 +83,13 @@ function blankSale(): SaleForm {
     quantityReason: "",
     discountType: "fixed",
     discountValue: "0",
+    gstEnabled: false,
     cashPaid: "0",
     bankPaid: "0",
     gPayPaid: "0",
     remarks: "",
+    bookNumber: "",
+    pageNumber: "",
   };
 }
 
@@ -88,6 +98,8 @@ function dateInput(value: string) {
   const offset = date.getTimezoneOffset() * 60000;
   return new Date(date.getTime() - offset).toISOString().slice(0, 10);
 }
+
+const HIDDEN_MATERIALS = new Set(["OPENING BALANCE", "RAW SALE"]);
 
 export function SalesEntryForm({
   editingSale,
@@ -103,12 +115,15 @@ export function SalesEntryForm({
   const [materials, setMaterials] = useState<MaterialRow[]>([]);
   const [message, setMessage] = useState("");
   const [error, setError] = useState("");
+  const { promptPassword } = usePrompt();
 
   const loadMasters = useCallback(async () => {
     try {
       const [vehicleRows, materialRows] = await Promise.all([listVehicles(), listMaterials()]);
       setVehicles(vehicleRows as unknown as VehicleRow[]);
-      setMaterials(materialRows as unknown as MaterialRow[]);
+      setMaterials((materialRows as unknown as MaterialRow[]).filter(
+        (row) => !HIDDEN_MATERIALS.has(row.materialName)
+      ));
     } catch (err) {
       setError(err instanceof Error ? err.message : "Failed to load materials/vehicles.");
     }
@@ -138,18 +153,39 @@ export function SalesEntryForm({
       quantityReason: "",
       discountType: editingSale.discountType,
       discountValue: String(editingSale.discountValue),
+      gstEnabled: editingSale.gstEnabled ?? false,
       cashPaid: String(editingSale.cashPaid ?? 0),
       bankPaid: String(editingSale.bankPaid ?? 0),
       gPayPaid: String(editingSale.gPayPaid ?? 0),
       remarks: editingSale.remarks ?? "",
+      bookNumber: editingSale.bookNumber != null ? String(editingSale.bookNumber) : "",
+      pageNumber: editingSale.pageNumber != null ? String(editingSale.pageNumber) : "",
     });
     setMessage("");
     setError("");
   }, [editingSale, materials, vehicles]);
 
+  // Auto-populate book/page from last sale when creating new
+  useEffect(() => {
+    if (editingSale) return;
+    getLastBookPage().then(({ bookNumber, pageNumber }) => {
+      let nextBook = bookNumber;
+      let nextPage = pageNumber + 1;
+      if (nextPage > 50) {
+        nextBook = bookNumber + 1;
+        nextPage = 1;
+      }
+      setForm((current) => ({
+        ...current,
+        bookNumber: String(nextBook),
+        pageNumber: String(nextPage),
+      }));
+    }).catch(console.error);
+  }, [editingSale]);
+
   const totals = useMemo(() => {
     const material = materials.find((row) => row.id === form.materialId);
-    if (!material) return { amount: 0, discount: 0, finalAmount: 0, remainingCredit: 0 };
+    if (!material) return { amount: 0, discount: 0, subtotal: 0, sgst: 0, cgst: 0, gstAmount: 0, finalAmount: 0, remainingCredit: 0 };
     const vehicle = vehicles.find((row) => row.id === form.vehicleId) ?? null;
     try {
       const engine = deriveSalesEngine(
@@ -162,11 +198,15 @@ export function SalesEntryForm({
       return {
         amount: engine.amount,
         discount: engine.discountAmount,
+        subtotal: engine.amount - engine.discountAmount,
+        sgst: engine.sgst,
+        cgst: engine.cgst,
+        gstAmount: engine.gstAmount,
         finalAmount: engine.finalAmount,
         remainingCredit: engine.remainingCredit,
       };
     } catch {
-      return { amount: 0, discount: 0, finalAmount: 0, remainingCredit: 0 };
+      return { amount: 0, discount: 0, subtotal: 0, sgst: 0, cgst: 0, gstAmount: 0, finalAmount: 0, remainingCredit: 0 };
     }
   }, [form, materials, vehicles]);
 
@@ -202,7 +242,7 @@ export function SalesEntryForm({
     setMessage("");
     try {
       if (form.id) {
-        const password = window.prompt("Enter edit password:");
+        const password = await promptPassword("Enter edit password:");
         if (!password || !verifyEditPassword(password)) {
           throw new Error("Edit password is invalid.");
         }
@@ -216,12 +256,15 @@ export function SalesEntryForm({
         ratePerCft: form.ratePerCft,
         qty: form.qty,
         quantityReason: form.quantityReason,
+        gstEnabled: form.gstEnabled,
         discountType: form.discountType,
         discountValue: form.discountValue,
         cashPaid: form.cashPaid,
         bankPaid: form.bankPaid,
         gPayPaid: form.gPayPaid,
         remarks: form.remarks,
+        bookNumber: form.bookNumber,
+        pageNumber: form.pageNumber,
       });
       setMessage(form.id ? "Sale updated." : "Sale saved.");
       setForm(blankSale());
@@ -304,13 +347,7 @@ export function SalesEntryForm({
               onChange={(e) => updateForm("qty", e.target.value)}
             />
           </Field>
-          <Field label="Quantity Reason" className="md:col-span-2">
-            <Input
-              value={form.quantityReason}
-              onChange={(e) => updateForm("quantityReason", e.target.value)}
-              placeholder="Required only if qty differs from vehicle default"
-            />
-          </Field>
+
           <Field label="Discount Type">
             <select
               className="h-10 w-full rounded-md border bg-background px-3 text-sm"
@@ -329,6 +366,27 @@ export function SalesEntryForm({
               value={form.discountValue}
               onChange={(e) => updateForm("discountValue", e.target.value)}
             />
+          </Field>
+          <Field label="GST (5%)" className="md:col-span-2">
+            <div className="flex items-center gap-3">
+              <label className="relative inline-flex items-center cursor-pointer">
+                <input
+                  type="checkbox"
+                  className="sr-only peer"
+                  checked={form.gstEnabled}
+                  onChange={(e) => updateForm("gstEnabled", e.target.checked)}
+                />
+                <div className="w-11 h-6 bg-gray-200 peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-red-300 rounded-full peer peer-checked:after:translate-x-full rtl:peer-checked:after:-translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:start-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-red-600"></div>
+                <span className="ms-3 text-sm font-medium">{form.gstEnabled ? "GST Enabled" : "No GST"}</span>
+              </label>
+            </div>
+            {form.gstEnabled && totals.gstAmount > 0 && (
+              <div className="mt-2 flex flex-wrap gap-3 rounded-md border border-red-200 bg-red-50 px-3 py-2 text-sm">
+                <span className="text-red-700">SGST (2.5%): <strong>{formatCurrency(totals.sgst)}</strong></span>
+                <span className="text-red-700">CGST (2.5%): <strong>{formatCurrency(totals.cgst)}</strong></span>
+                <span className="text-red-800 font-bold">GST Total: {formatCurrency(totals.gstAmount)}</span>
+              </div>
+            )}
           </Field>
           <Field label="Cash Paid (₹)">
             <Input
@@ -373,8 +431,31 @@ export function SalesEntryForm({
           <Field label="Remaining Credit (₹)" className="md:col-span-2">
             <Input className="text-right tabular-nums font-semibold" readOnly value={formatCurrency(totals.remainingCredit)} />
           </Field>
-          <Field label="Remarks" className="md:col-span-2 xl:col-span-4">
+          <Field label="Remarks" className="md:col-span-2">
             <Textarea value={form.remarks} onChange={(e) => updateForm("remarks", e.target.value)} />
+          </Field>
+          <Field label="Book #">
+            <Input
+              className="text-right tabular-nums"
+              type="number"
+              min="1"
+              step="1"
+              value={form.bookNumber}
+              onChange={(e) => updateForm("bookNumber", e.target.value)}
+              placeholder="1"
+            />
+          </Field>
+          <Field label="Page # (1–50)">
+            <Input
+              className="text-right tabular-nums"
+              type="number"
+              min="1"
+              max="50"
+              step="1"
+              value={form.pageNumber}
+              onChange={(e) => updateForm("pageNumber", e.target.value)}
+              placeholder="1"
+            />
           </Field>
         </div>
 

@@ -1,26 +1,27 @@
 "use client";
+import { usePrompt } from "@/components/ui/prompt-provider";
 
 import { useCallback, useEffect, useMemo, useState } from "react";
-import { ArrowUpDown, Pencil, Search, Trash2 } from "lucide-react";
+import { ArrowUpDown, Pencil, Search, Shield, Trash2 } from "lucide-react";
 import { SalesEntryForm, type EditableSale } from "@/components/modules/sales-entry-form";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
-import { deleteSale, listSales } from "@/lib/offline-actions";
+import { deleteSale, listSales, purgeNonGstSales } from "@/lib/offline-actions";
 import { verifyEditPassword } from "@/lib/domain";
 import { cn, formatCurrency, formatDate, formatQty } from "@/lib/utils";
 
 type SaleRow = EditableSale & {
-  serialNumber: number;
   amount: number;
   finalAmount: number;
+  gstEnabled?: boolean;
+  gstAmount?: number;
   remainingCredit?: number;
   createdAt: string;
 };
 
 type SortKey =
-  | "serialNumber"
   | "saleDate"
   | "vehicleNumber"
   | "partyName"
@@ -34,9 +35,11 @@ export function SalesPage() {
   const [sales, setSales] = useState<SaleRow[]>([]);
   const [editingSale, setEditingSale] = useState<SaleRow | null>(null);
   const [search, setSearch] = useState("");
-  const [sortKey, setSortKey] = useState<SortKey>("serialNumber");
+  const [gstFilter, setGstFilter] = useState<"ALL" | "GST" | "NON_GST">("ALL");
+  const [sortKey, setSortKey] = useState<SortKey>("saleDate");
   const [sortDirection, setSortDirection] = useState<"asc" | "desc">("desc");
   const [error, setError] = useState("");
+  const { promptPassword, confirmAction } = usePrompt();
 
   const loadSales = useCallback(async () => {
     const rows = (await listSales()) as unknown as SaleRow[];
@@ -48,12 +51,15 @@ export function SalesPage() {
   }, [loadSales]);
 
   const visibleRows = useMemo(() => {
+    let filtered = sales;
+    if (gstFilter === "GST") filtered = filtered.filter(row => row.gstEnabled);
+    if (gstFilter === "NON_GST") filtered = filtered.filter(row => !row.gstEnabled);
+
     const query = search.trim().toLowerCase();
-    const filtered = query
-      ? sales.filter((row) =>
+    filtered = query
+      ? filtered.filter((row) =>
           [
-            row.serialNumber,
-            row.saleDate,
+        row.saleDate,
             row.vehicleNumber,
             row.partyName,
             row.materialName,
@@ -77,7 +83,7 @@ export function SalesPage() {
           : String(left ?? "").localeCompare(String(right ?? ""));
       return sortDirection === "asc" ? result : -result;
     });
-  }, [sales, search, sortDirection, sortKey]);
+  }, [sales, search, gstFilter, sortDirection, sortKey]);
 
   const summary = useMemo(() => {
     const result: Record<string, number> = { totalRevenue: 0 };
@@ -99,8 +105,8 @@ export function SalesPage() {
   }
 
   async function remove(id: string) {
-    if (!window.confirm("Delete this sale?")) return;
-    const password = window.prompt("Enter delete password:");
+    if (!(await confirmAction("Delete this sale?"))) return;
+    const password = await promptPassword("Enter delete password:");
     if (!password || !verifyEditPassword(password)) {
       setError("Delete password is invalid.");
       return;
@@ -114,6 +120,32 @@ export function SalesPage() {
       setError(err instanceof Error ? err.message : "Delete failed.");
     }
   }
+
+  async function raidPurge() {
+    if (!(await confirmAction("\u26a0\ufe0f RAID MODE: Delete ALL non-GST sales? Only GST sales will remain. This cannot be undone."))) return;
+    setError("");
+    try {
+      const count = await purgeNonGstSales();
+      setEditingSale(null);
+      await loadSales();
+      setError("");
+      alert(`Purge complete. ${count} non-GST sale(s) deleted. Only GST sales remain.`);
+    } catch (err) {
+      setError(err instanceof Error ? err.message : "Purge failed.");
+    }
+  }
+
+  // Keyboard shortcut: Ctrl+D for raid purge
+  useEffect(() => {
+    function handleKeyDown(e: KeyboardEvent) {
+      if (e.ctrlKey && e.key.toLowerCase() === "d") {
+        e.preventDefault();
+        void raidPurge();
+      }
+    }
+    window.addEventListener("keydown", handleKeyDown);
+    return () => window.removeEventListener("keydown", handleKeyDown);
+  });
 
   return (
     <div className="space-y-5 p-4 lg:p-6">
@@ -133,10 +165,33 @@ export function SalesPage() {
 
       <Card>
         <CardHeader className="flex-row flex-wrap items-center justify-between gap-3">
-          <CardTitle>Sales Table</CardTitle>
-          <div className="relative w-full sm:w-80">
-            <Search className="pointer-events-none absolute left-3 top-3 h-4 w-4 text-muted-foreground" />
-            <Input className="pl-9" placeholder="Search sales..." value={search} onChange={(e) => setSearch(e.target.value)} />
+          <div className="flex items-center gap-3">
+            <CardTitle>Sales Table</CardTitle>
+            <Button
+              variant="outline"
+              size="sm"
+              className="border-red-300 text-red-700 hover:bg-red-50 hover:text-red-800 text-xs gap-1.5"
+              onClick={() => void raidPurge()}
+              title="Ctrl+D — Delete all non-GST sales"
+            >
+              <Shield className="h-3.5 w-3.5" />
+              Purge Non-GST
+            </Button>
+          </div>
+          <div className="flex w-full sm:w-auto gap-2 items-center">
+            <select
+              className="h-10 rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background"
+              value={gstFilter}
+              onChange={(e) => setGstFilter(e.target.value as any)}
+            >
+              <option value="ALL">All Sales</option>
+              <option value="GST">GST Sales</option>
+              <option value="NON_GST">Non-GST</option>
+            </select>
+            <div className="relative w-full sm:w-80">
+              <Search className="pointer-events-none absolute left-3 top-3 h-4 w-4 text-muted-foreground" />
+              <Input className="pl-9" placeholder="Search sales..." value={search} onChange={(e) => setSearch(e.target.value)} />
+            </div>
           </div>
         </CardHeader>
         <CardContent className="grid gap-4">
@@ -144,7 +199,7 @@ export function SalesPage() {
           <Table>
             <TableHeader>
               <TableRow>
-                <SortableHead label="Serial" active={sortKey === "serialNumber"} onClick={() => sortBy("serialNumber")} />
+                <TableHead>GST</TableHead>
                 <SortableHead label="Date" active={sortKey === "saleDate"} onClick={() => sortBy("saleDate")} />
                 <TableHead>Time</TableHead>
                 <SortableHead label="Vehicle" active={sortKey === "vehicleNumber"} onClick={() => sortBy("vehicleNumber")} />
@@ -156,13 +211,23 @@ export function SalesPage() {
                 <TableHead className="text-right">Discount</TableHead>
                 <SortableHead label="Final" active={sortKey === "finalAmount"} alignRight onClick={() => sortBy("finalAmount")} />
                 <TableHead>Remarks</TableHead>
+                <TableHead>Book/Page</TableHead>
                 <TableHead className="w-24 text-right">Actions</TableHead>
               </TableRow>
             </TableHeader>
             <TableBody>
               {visibleRows.map((row) => (
-                <TableRow key={row.id} className={cn(editingSale?.id === row.id && "bg-accent/70")}>
-                  <TableCell>{row.serialNumber}</TableCell>
+                <TableRow key={row.id} className={cn(editingSale?.id === row.id && "bg-accent/70", row.gstEnabled && "bg-red-50 hover:bg-red-100")}>
+                  <TableCell>
+                    {row.gstEnabled ? (
+                      <span className="inline-flex items-center gap-1 rounded-md bg-red-600 px-2.5 py-1 text-xs font-bold text-white shadow-sm ring-2 ring-red-400/50 animate-pulse">
+                        GST
+                        <span className="text-[10px] font-normal opacity-90">{formatCurrency(row.gstAmount ?? 0)}</span>
+                      </span>
+                    ) : (
+                      <span className="text-muted-foreground text-xs">—</span>
+                    )}
+                  </TableCell>
                   <TableCell>{formatDate(row.saleDate)}</TableCell>
                   <TableCell>{new Date(row.createdAt).toLocaleTimeString("en-IN", { hour: "2-digit", minute: "2-digit" })}</TableCell>
                   <TableCell>{row.vehicleNumber}</TableCell>
@@ -176,13 +241,16 @@ export function SalesPage() {
                   </TableCell>
                   <TableCell className="number-cell font-medium">{formatCurrency(row.finalAmount)}</TableCell>
                   <TableCell className="max-w-44 truncate">{row.remarks}</TableCell>
+                  <TableCell className="tabular-nums text-muted-foreground">
+                    {row.bookNumber && row.pageNumber ? `${row.bookNumber}/${row.pageNumber}` : row.bookNumber || row.pageNumber || "-"}
+                  </TableCell>
                   <TableCell className="text-right">
                     <div className="inline-flex gap-1">
                       <Button
                         variant="ghost"
                         size="icon"
-                        onClick={() => {
-                          const password = window.prompt("Enter edit password:");
+                        onClick={async () => {
+                          const password = await promptPassword("Enter edit password:");
                           if (!password || !verifyEditPassword(password)) {
                             setError("Edit password is invalid.");
                             return;
@@ -202,7 +270,7 @@ export function SalesPage() {
               ))}
               {!visibleRows.length ? (
                 <TableRow>
-                  <TableCell colSpan={13} className="h-24 text-center text-muted-foreground">
+                  <TableCell colSpan={14} className="h-24 text-center text-muted-foreground">
                     No sales found.
                   </TableCell>
                 </TableRow>
