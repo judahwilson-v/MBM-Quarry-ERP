@@ -24,9 +24,21 @@ async function migrate() {
 
   try {
     // 1. Add time column to party_ledger if missing
-    console.log('[Migrate] Checking party_ledger schema...');
+    console.log('[Migrate] Checking party_ledger schema for time column...');
     await prisma.$executeRawUnsafe(`ALTER TABLE "party_ledger" ADD COLUMN "time" TEXT;`);
     console.log('[Migrate] Successfully added time column to party_ledger.');
+  } catch (err) {
+    if (!err.message?.includes('duplicate column name') && !err.message?.includes('duplicate column')) {
+      console.error('[Migrate] Error adding time column:', err.message);
+      process.exit(1);
+    }
+  }
+
+  try {
+    // 2. Add payment_method column to party_ledger if missing
+    console.log('[Migrate] Checking party_ledger schema for payment_method column...');
+    await prisma.$executeRawUnsafe(`ALTER TABLE "party_ledger" ADD COLUMN "payment_method" TEXT;`);
+    console.log('[Migrate] Successfully added payment_method column to party_ledger.');
   } catch (err) {
     if (!err.message?.includes('duplicate column name') && !err.message?.includes('duplicate column')) {
       console.error('[Migrate] Error adding time column:', err.message);
