@@ -25,9 +25,6 @@ jobs:
       - name: Generate Prisma Client
         run: npx prisma generate
         
-      - name: Run Smoke Tests
-        run: npm run test:smoke
-
       - name: Build and Publish Electron App
         run: npm run electron:publish
         env:

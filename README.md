@@ -1,79 +1,53 @@
 # MBM Quarry ERP
 
-Next.js quarry operations system for sales, dispatch, accounts, inventory, reports, and boulder purchases.
+An offline-first desktop ERP system for quarry management, built with Next.js, SQLite (Prisma), and Electron.
 
-## Production Stack
-
-- Website: Vercel
-- Database: PostgreSQL, preferably Neon or Supabase
-- ORM: Prisma
-- Auth: NextAuth credentials provider
-
-## Required Environment Variables
-
-Set these in Vercel Project Settings -> Environment Variables:
+## Quick Start (Development)
 
 ```bash
-DATABASE_URL="postgresql://USER:PASSWORD@HOST:5432/DATABASE?sslmode=require"
-NEXTAUTH_SECRET="long-random-secret"
-NEXTAUTH_URL="https://your-production-domain"
+npm install
+npm run electron:dev    # Electron + Next.js dev server (recommended)
+# or
+npm run dev             # Next.js only (browser)
 ```
 
-For local Docker-only development, `DB_PASSWORD` and `APP_PORT` are also supported.
-
-## Production Deployment
-
-1. Create a PostgreSQL database in Neon or Supabase.
-2. Copy the production connection string into `DATABASE_URL`.
-3. Set `NEXTAUTH_SECRET` to a long random value.
-4. Set `NEXTAUTH_URL` to the final Vercel production URL.
-5. Connect this GitHub repository to Vercel.
-6. In Vercel, use the default Next.js build command:
+## Build & Package
 
 ```bash
-npm run build
+npm run electron:package   # Builds and packages the Electron app
 ```
 
-7. Run database migrations against the production database:
+The build automatically stamps the `VERSION` file with the current date/time.
 
-```bash
-DATABASE_URL="postgresql://USER:PASSWORD@HOST:5432/DATABASE?sslmode=require" npx prisma migrate deploy
-```
+## Documentation
 
-8. Seed the owner user and default materials:
+All documentation is in [`docs/`](./docs/).
 
-```bash
-DATABASE_URL="postgresql://USER:PASSWORD@HOST:5432/DATABASE?sslmode=require" npx prisma db seed
-```
+| Document | Purpose |
+|----------|---------|
+| [`docs/AI_HANDOFF.md`](./docs/AI_HANDOFF.md) | **Start here** — orientation for new developers or AI sessions |
+| [`docs/PROJECT_STATE.md`](./docs/PROJECT_STATE.md) | Current version, phase, and blocking issues |
+| [`docs/ROADMAP.md`](./docs/ROADMAP.md) | Confirmed upcoming phases |
+| [`docs/ARCHITECTURE.md`](./docs/ARCHITECTURE.md) | System design and data flow |
+| [`docs/BUSINESS_RULES.md`](./docs/BUSINESS_RULES.md) | Quarry-specific business logic |
+| [`docs/DECISIONS.md`](./docs/DECISIONS.md) | Why key choices were made |
+| [`docs/DEPLOYMENT.md`](./docs/DEPLOYMENT.md) | How to build, package, and deploy |
+| [`docs/CHANGELOG.md`](./docs/CHANGELOG.md) | What changed in each release |
+| [`docs/KNOWN_BUGS.md`](./docs/KNOWN_BUGS.md) | Active bugs and workarounds |
+| [`docs/IDEAS.md`](./docs/IDEAS.md) | Unconfirmed feature ideas |
+| [`docs/RELEASE_NOTES.md`](./docs/RELEASE_NOTES.md) | RC1 release notes |
+| [`docs/OWNER_DASHBOARD_PRD.md`](./docs/OWNER_DASHBOARD_PRD.md) | Phase 8 owner dashboard specification |
+| [`docs/FINANCIAL_EVENT_ARCHITECTURE.md`](./docs/FINANCIAL_EVENT_ARCHITECTURE.md) | Financial event system reference |
 
-Seeded login:
+## Tech Stack
 
-```text
-admin@mbm.com
-changeme123
-```
+- **Next.js 14** (App Router, React Server Components)
+- **Prisma + SQLite** (offline-first, no network required)
+- **Electron** (desktop packaging)
+- **Supabase** (cloud sync, secondary)
+- **TypeScript**
 
-Change this password after first login.
+## Project Status
 
-## Current Operations Modules
-
-- Sales dashboard with today, week, and month filters
-- Fast sale entry with searchable free-typing party and vehicle comboboxes
-- Automatic master creation for typed party, vehicle, and supplier names
-- Separate `OUR PURCHASE (BOULDER)` register
-- Daily, weekly, monthly, material-wise, customer ledger, supplier ledger, and boulder purchase reports
-- PostgreSQL-backed storage only for operational entries
-
-## Local Development
-
-Local development can still use Docker Postgres:
-
-```bash
-cp .env.example .env.local
-docker compose --env-file .env.local up -d db
-npx prisma migrate deploy
-npx prisma db seed
-npm run dev:4000
-```
-
-Production does not depend on localhost or your Mac staying on.
+**RC1 — v0.1.0-rc1** · Field Testing phase
+See [`docs/PROJECT_STATE.md`](./docs/PROJECT_STATE.md) for full status.

@@ -15,6 +15,14 @@
 
 # production
 /build
+/release
+/release-v2
+
+# legacy backups & specific local db
+/tally soft
+/backup-phase-1.1a
+local.db
+prisma/dev.db
 
 # misc
 .DS_Store
