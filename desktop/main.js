@@ -32,6 +32,7 @@ function loadProductionEnv() {
 let mainWindow;
 let nextProcess = null;
 let serverPort = null;
+let isManualUpdateCheck = false;
 
 // Function to find a free port
 function getFreePort(startingPort) {
@@ -57,10 +58,17 @@ function getFreePort(startingPort) {
 
 // Setup IPC Handlers
 ipcMain.handle('check-updates', async () => {
+  isManualUpdateCheck = true;
   try {
     return await autoUpdater.checkForUpdatesAndNotify();
   } catch (error) {
     console.error("Update check failed:", error);
+    dialog.showMessageBox({
+      type: 'warning',
+      title: 'Update Check Failed',
+      message: 'Could not check for updates. Please ensure you have an active internet connection.'
+    });
+    isManualUpdateCheck = false;
     return null;
   }
 });
@@ -176,7 +184,7 @@ async function createWindow() {
     const userDataPath = app.getPath("userData");
     const dbName = "quarry.db";
     const dbPath = path.join(userDataPath, dbName);
-    const packagedDbPath = path.join(process.resourcesPath, "standalone", "prisma", "dev.db");
+    const packagedDbPath = path.join(process.resourcesPath, "standalone", "prisma", "local.db");
 
     // Copy initial DB if it doesn't exist
     if (!fs.existsSync(dbPath)) {
@@ -272,13 +280,7 @@ async function createWindow() {
       console.log(`Next.js is ready. Loading window.`);
       mainWindow.loadURL(url);
       
-      // 4. Auto-check for updates quietly on startup
-      setTimeout(() => {
-        if (app.isPackaged) {
-          console.log("Checking for updates on startup...");
-          autoUpdater.checkForUpdatesAndNotify().catch(err => console.error("Startup update check failed:", err));
-        }
-      }, 5000);
+      // Startup update check has been moved to app.on("ready") to prevent duplicates
       
     } catch (err) {
       console.error("Fatal error booting Next.js:", err);
@@ -287,10 +289,10 @@ async function createWindow() {
       const response = dialog.showMessageBoxSync({
         type: 'error',
         title: 'Startup Error (Database or Server)',
-        message: `MBM Quarry ERP failed to start. This might be due to a corrupted database or a failed update.\n\nError details:\n${err.message}\n\nNext.js Logs:\n${logSnippet}\n\nWould you like to automatically restore your database from the most recent backup?`,
-        buttons: ['Attempt Automatic Recovery', 'Quit'],
+        message: `MBM Quarry ERP failed to start. This might be due to a corrupted database or a failed update.\n\nError details:\n${err.message}\n\nNext.js Logs:\n${logSnippet}\n\nWould you like to automatically restore your database from the most recent backup, or Factory Reset the local database to the pristine state (you can sync from cloud after)?`,
+        buttons: ['Attempt Automatic Recovery', 'Factory Reset (Wipe & Re-seed)', 'Quit'],
         defaultId: 0,
-        cancelId: 1
+        cancelId: 2
       });
 
       if (response === 0) {
@@ -328,6 +330,32 @@ async function createWindow() {
         } catch (recoveryErr) {
           console.error("Recovery failed:", recoveryErr);
           dialog.showErrorBox("Recovery Failed", `Could not restore database:\n${recoveryErr.message}`);
+        }
+      } else if (response === 1) {
+        // Factory Reset
+        try {
+          console.log("Factory resetting database...");
+          const userDataPath = app.getPath("userData");
+          const dbPath = path.join(userDataPath, "quarry.db");
+          
+          if (fs.existsSync(dbPath)) {
+            fs.unlinkSync(dbPath);
+          }
+          
+          const packagedDbPath = path.join(process.resourcesPath, "standalone", "prisma", "local.db");
+          fs.copyFileSync(packagedDbPath, dbPath);
+          
+          dialog.showMessageBoxSync({
+            type: 'info',
+            title: 'Factory Reset Successful',
+            message: `Successfully reset the local database. The application will now restart. Please use the 'Sync from Cloud' feature to restore your data.`
+          });
+          app.relaunch();
+          app.exit(0);
+          return;
+        } catch (resetErr) {
+          console.error("Factory Reset failed:", resetErr);
+          dialog.showErrorBox("Factory Reset Failed", `Could not reset database:\n${resetErr.message}`);
         }
       }
       
@@ -465,11 +493,12 @@ if (!gotTheLock) {
       
       autoUpdater.on('update-available', (info) => {
         console.log('Update available:', info.version);
+        isManualUpdateCheck = false;
         dialog.showMessageBox({
           type: 'info',
           title: 'Update Available',
-          message: `Version ${info.version} of MBM Quarry ERP is available.\n\nWould you like to download it now?`,
-          buttons: ['Update Now', 'Later'],
+          message: `Version ${info.version} is available.\n\n• New Dashboard\n• Bug Fixes\n\nWould you like to download it now?`,
+          buttons: ['Download', 'Later'],
           defaultId: 0,
           cancelId: 1
         }).then((result) => {
@@ -479,8 +508,19 @@ if (!gotTheLock) {
         });
       });
 
+      autoUpdater.on('update-not-available', (info) => {
+        if (isManualUpdateCheck) {
+          dialog.showMessageBox({
+            type: 'info',
+            title: 'Up to Date',
+            message: 'You are already running the latest version of MBM Quarry ERP.'
+          });
+          isManualUpdateCheck = false;
+        }
+      });
+
       autoUpdater.on('download-progress', (progressObj) => {
-        let log_message = `Download speed: ${progressObj.bytesPerSecond} - Downloaded ${progressObj.percent}%`;
+        let log_message = `Download speed: ${Math.round(progressObj.bytesPerSecond / 1024)} KB/s - Downloaded ${Math.round(progressObj.percent)}%`;
         console.log(log_message);
       });
       
@@ -489,7 +529,7 @@ if (!gotTheLock) {
         dialog.showMessageBox({
           type: 'info',
           title: 'Update Ready',
-          message: `Version ${info.version} has been downloaded.\n\nThe application needs to restart to install the update. A safety backup of your database will be created automatically.`,
+          message: `The update is ready.\n\nPlease finish your current work.\n\n(A safety backup of your database will be created before installing).`,
           buttons: ['Restart & Install', 'Later'],
           defaultId: 0,
           cancelId: 1
@@ -504,6 +544,14 @@ if (!gotTheLock) {
       
       autoUpdater.on('error', (err) => {
         console.error('Error in auto-updater.', err);
+        if (isManualUpdateCheck) {
+          dialog.showMessageBox({
+            type: 'warning',
+            title: 'Update Error',
+            message: 'There was a problem checking for updates. Please verify your internet connection.'
+          });
+          isManualUpdateCheck = false;
+        }
       });
     }
   });

@@ -6,6 +6,7 @@ import { calculateRemainingCredit, decrementVehicleTrips, incrementVehicleTrips,
 import { emitFinancialEvent } from "@/lib/domain/financial-events";
 import { addDayBookExpense, rebuildDayBook, setDayBookOpeningBalances, projectDayBookExpense, recalculateDayBook } from "@/lib/domain/daybook";
 import { recalculatePartyLedger } from "@/lib/domain/ledger/party-ledger-service";
+import { txAdjustInventoryStock } from "@/lib/domain/inventory/service";
 
 type VehicleInput = {
   id?: string;
@@ -372,6 +373,20 @@ export async function saveSale(input: SaleInput) {
           after: sale,
           reason: engine.qtyChanged ? engine.quantityReason : null,
         });
+
+        // Sync inventory
+        if (existing.materialName !== sale.materialName) {
+           // Restore old material
+           await txAdjustInventoryStock(tx, existing.materialName, existing.qty, 'SALE_OUT', sale.id, `Sale Updated (Material Changed): ${sale.vehicleNumber}`);
+           // Deduct new material
+           await txAdjustInventoryStock(tx, sale.materialName, -sale.qty, 'SALE_OUT', sale.id, `Sale Updated (New Material): ${sale.vehicleNumber}`);
+        } else {
+           const qtyDiff = existing.qty - sale.qty; // if old was 10, new is 12, diff is -2
+           if (qtyDiff !== 0) {
+             await txAdjustInventoryStock(tx, sale.materialName, qtyDiff, 'SALE_OUT', sale.id, `Sale Updated: ${sale.vehicleNumber}`);
+           }
+        }
+
         return sale;
       }
 
@@ -455,6 +470,10 @@ export async function saveSale(input: SaleInput) {
         after: sale,
         reason: engine.qtyChanged ? engine.quantityReason : null,
       });
+
+      // Deduct inventory
+      await txAdjustInventoryStock(tx, sale.materialName, -sale.qty, 'SALE_OUT', sale.id, `Sale: ${sale.vehicleNumber}`);
+
       return sale;
     }),
   );
@@ -477,6 +496,9 @@ export async function deleteSale(id: string) {
         before: existing,
       });
       if (existing.partyId) await recalculatePartyLedger(tx, existing.partyId);
+
+      // Restore inventory
+      await txAdjustInventoryStock(tx, existing.materialName, existing.qty, 'SALE_OUT', id, `Sale Deleted: ${existing.vehicleNumber}`);
     }
   });
 }
@@ -593,6 +615,12 @@ export async function saveIncomingBoulder(input: IncomingBoulderInput) {
         });
       }
 
+      // Sync inventory
+      const qtyDiff = row.qty - (before?.qty ?? 0);
+      if (qtyDiff !== 0) {
+        await txAdjustInventoryStock(tx, "ROCK", qtyDiff, 'PRODUCTION_IN', row.id, `Boulder Purchase Updated: ${row.vehicleNumber}`);
+      }
+
       return row;
     }));
   }
@@ -612,6 +640,9 @@ export async function saveIncomingBoulder(input: IncomingBoulderInput) {
       });
     }
 
+    // Add inventory
+    await txAdjustInventoryStock(tx, "ROCK", row.qty, 'PRODUCTION_IN', row.id, `Boulder Purchase: ${row.vehicleNumber}`);
+
     return row;
   }));
 }
@@ -624,6 +655,9 @@ export async function deleteIncomingBoulder(id: string) {
     if (before) {
       await writeAuditEvent(tx, { entityName: "IncomingBoulder", entityId: id, action: "delete", role: "system", before });
       if (before.partyId) await recalculatePartyLedger(tx, before.partyId);
+
+      // Revert inventory
+      await txAdjustInventoryStock(tx, "ROCK", -before.qty, 'PRODUCTION_IN', id, `Boulder Purchase Deleted: ${before.vehicleNumber}`);
     }
   });
 }

@@ -1,6 +1,6 @@
 {
   "name": "mbm-quarry-erp",
-  "version": "0.1.4",
+  "version": "0.1.6",
   "private": true,
   "scripts": {
     "dev": "next dev -p 3005",
@@ -36,11 +36,13 @@
     "date-fns": "^4.4.0",
     "electron-log": "^5.4.4",
     "electron-updater": "^6.8.9",
-    "lucide-react": "^1.17.0",
+    "lucide-react": "^0.378.0",
     "next": "14.2.35",
+    "next-themes": "^0.3.0",
     "react": "^18",
     "react-dom": "^18",
-    "tailwind-merge": "^3.6.0",
+    "recharts": "^2.12.7",
+    "tailwind-merge": "^2.3.0",
     "xlsx": "^0.18.5"
   },
   "devDependencies": {
@@ -93,8 +95,8 @@
         "to": "standalone/.next/static"
       },
       {
-        "from": "prisma/dev.db",
-        "to": "standalone/prisma/dev.db"
+        "from": "prisma/local.db",
+        "to": "standalone/prisma/local.db"
       },
       {
         "from": ".env.production",

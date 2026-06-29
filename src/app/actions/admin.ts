@@ -2,12 +2,13 @@
 
 import { getDb } from "@/lib/prisma";
 import { revalidatePath } from "next/cache";
-import { syncNow } from "@/lib/sync/sync-service";
+import { pushSync, pullSync } from "@/lib/sync/sync-service";
 
 export async function forceSync() {
   try {
-    const result = await syncNow();
-    return { success: true, message: `Sync triggered. Pushed: ${result.pushed}, Pulled: ${result.pulled}` };
+    const pushResult = await pushSync();
+    const pullResult = await pullSync();
+    return { success: true, message: `Sync triggered. Pushed: ${pushResult.pushed}, Pulled: ${pullResult.pulled}` };
   } catch (error: any) {
     return { success: false, message: error.message };
   }

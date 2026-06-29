@@ -13,11 +13,12 @@ import {
   ReceiptText,
   Truck,
   UserCircle,
-  X, Cloud, CloudOff, LayoutDashboard, Info, Settings, BookOpen, Fuel, Wallet, FileJson
+  X, Cloud, CloudOff, LayoutDashboard, Info, Settings, BookOpen, Fuel, Wallet, FileJson, Package
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
 import { AutoUpdater } from "./auto-updater";
+import { ThemeToggle } from "./theme-toggle";
 
 const navItems = [
   { href: "/", label: "Dashboard", icon: LayoutDashboard },
@@ -27,6 +28,7 @@ const navItems = [
   { href: "/expenses/vehicles", label: "Vehicle Expenses", icon: Truck },
   { href: "/purchases/boulder", label: "Incoming Boulder", icon: Pickaxe },
   { href: "/fuel", label: "Fuel Management", icon: Fuel },
+  { href: "/inventory", label: "Inventory Stock", icon: Package },
   { href: "/masters/vehicles", label: "Vehicles", icon: Truck },
   { href: "/masters/parties", label: "Parties", icon: UserCircle },
   { href: "/masters/materials", label: "Material Rates", icon: Boxes },
@@ -102,6 +104,9 @@ export function AppShell({ children }: { children: React.ReactNode }) {
               <div className="truncate text-sm font-semibold sm:text-base">MBM Quarry Management</div>
               <div className="truncate text-xs text-muted-foreground">Offline single-computer SQLite system</div>
             </div>
+          </div>
+          <div className="flex items-center gap-2">
+            <ThemeToggle />
           </div>
         </header>
 
