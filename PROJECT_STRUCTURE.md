@@ -1,4 +1,4 @@
-﻿# PROJECT_STRUCTURE
+# PROJECT_STRUCTURE
 
 ## Folder Layout
 

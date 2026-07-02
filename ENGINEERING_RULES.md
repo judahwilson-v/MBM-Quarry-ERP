@@ -1,4 +1,4 @@
-﻿# Production Safety & Escalation Protocol
+# Production Safety & Escalation Protocol
 
 This project is a production ERP system. Stability is always more important than feature velocity.
 

@@ -1,4 +1,4 @@
-﻿import { getInventoryStock } from "@/lib/domain/inventory/service";
+import { getInventoryStock } from "@/lib/domain/inventory/service";
 import { InventoryPage } from "@/components/modules/inventory-page";
 
 export const dynamic = "force-dynamic";

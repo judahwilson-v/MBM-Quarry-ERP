@@ -1,4 +1,4 @@
-﻿# DATABASE
+# DATABASE
 
 ## Architecture
 The application uses **SQLite** for local, offline-first data storage.

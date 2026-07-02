@@ -1,4 +1,4 @@
-﻿# ARCHITECTURE
+# ARCHITECTURE
 
 ## Overview
 MBM Quarry ERP is an offline-first Windows Desktop application built for quarry management.

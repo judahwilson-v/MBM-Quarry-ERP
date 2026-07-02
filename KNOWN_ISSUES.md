@@ -1,4 +1,4 @@
-﻿# KNOWN_ISSUES
+# KNOWN_ISSUES
 
 ## 1. Electron Startup Timeout (Prisma Schema Mismatch)
 **The Bug:** The packaged Windows .exe crashed on startup before the window even opened, showing a dialog box: "Timeout waiting for Next.js server to boot."

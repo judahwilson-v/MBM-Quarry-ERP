@@ -1,4 +1,4 @@
-﻿# DECISIONS (Architecture Decision Record)
+# DECISIONS (Architecture Decision Record)
 
 ## ADR 1: SQLite for Offline-First
 **Context:** Quarries often operate in remote areas with poor or zero internet connectivity. A pure web-app would fail.
