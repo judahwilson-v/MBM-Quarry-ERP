@@ -81,6 +81,12 @@ export function MasterDataPage({ resource, title, description, fields, columns }
     setError("");
     setMessage("");
     try {
+      for (const field of fields) {
+        if (field.required && !String(form[field.name] ?? "").trim()) {
+          throw new Error(`${field.label} is required.`);
+        }
+      }
+
       if (resource === "vehicles") {
         const companyBodyQty = form["companyBodyQty"];
         const extraBodyQty = form["extraBodyQty"];
