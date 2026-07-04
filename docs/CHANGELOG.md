@@ -1,5 +1,24 @@
 # MBM Quarry ERP — Changelog
 
+## v1.9.6 (2026-07-04)
+- **UI & Validation Fixes**: Fixed manual update UI logic, added sales quantity validation, and corrected offline sync button behavior.
+
+## v1.9.5 (2026-07-04)
+- **Two-Way Sync**: Implemented professional two-way sync with robust deletion tracking via `audit_logs`.
+- **IPC Cleanup**: Returned cleanup function from `ipcRenderer` listeners to prevent React `useEffect` destroy errors.
+- **UI UX Polish**: Globally hid number input spin buttons for a cleaner, professional ERP look.
+- **Relaxed Form Validations**: Relaxed compulsory vehicle and party name validation for forms.
+- **Client-side Validations**: Added robust client-side validation to prevent unhandled Server Action errors.
+
+## v1.9.4 (2026-07-04)
+- **Auto-Updater React UI**: Implemented modern React UI for the auto-updater.
+
+## v1.9.3 (2026-07-04)
+- **Chore**: Stability releases and bug fixes.
+
+## v1.9.1 (2026-07-04)
+- **Chore**: Incremental releases.
+
 ## v1.9.0 (2026-06-27)
 - **Settings Page**: Added `GlobalSettings` Prisma model and Settings UI for Quarry Name, GST Number, Address, Phone, Default Printer, Backup Folder.
 - **Backup Manager**: Full backup/restore/export/import for SQLite database accessible from the About page.

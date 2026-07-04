@@ -1,8 +1,8 @@
 # MBM Quarry ERP — Project State
 
-**Version**: v1.9.0
+**Version**: v1.9.6
 **Phase**: RC1 — Stabilization & Field Testing
-**Last Updated**: 2026-06-27
+**Last Updated**: 2026-07-04
 
 ## Status
 | Area | Status |
@@ -17,12 +17,12 @@
 | Employee Credit | ✅ Complete |
 | Other Credit | ✅ Complete |
 | Reports | ✅ Complete |
-| Sync Engine | ✅ Built — needs interactive validation at quarry |
+| Sync Engine | ✅ Built — two-way sync with deletion tracking |
 | Electron Dev | ✅ Working |
 | Electron Production (.dmg) | ✅ Built (macOS RC1) |
 | Backup Manager | ✅ Complete |
 | Settings Page | ✅ Complete |
-| Auto-Updater | ⏸ Deferred (see D-011) |
+| Auto-Updater | ✅ Complete (React UI with manual/auto support) |
 
 ## Current Task
 Full QA validation pass at the quarry + real-world field testing.
