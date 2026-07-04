@@ -5,17 +5,11 @@ import { revalidatePath } from "next/cache";
 
 export async function getGlobalSettings() {
   const prisma = await getDb();
-  let settings = await prisma.globalSettings.findUnique({
-    where: { id: "default" }
+  const settings = await prisma.globalSettings.upsert({
+    where: { id: "default" },
+    update: {},
+    create: { id: "default" }
   });
-
-  if (!settings) {
-    settings = await prisma.globalSettings.create({
-      data: {
-        id: "default"
-      }
-    });
-  }
 
   return settings;
 }

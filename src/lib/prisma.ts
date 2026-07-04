@@ -97,7 +97,7 @@ async function initializeDatabase(prisma: PrismaClient) {
     `CREATE TABLE IF NOT EXISTS outgoing_sales (
       id TEXT PRIMARY KEY NOT NULL,
       sale_date DATETIME NOT NULL,
-      serial_number INTEGER NOT NULL UNIQUE,
+      serial_number INTEGER UNIQUE,
       vehicle_id TEXT,
       party_id TEXT,
       material_id TEXT,
@@ -273,9 +273,11 @@ async function initializeDatabase(prisma: PrismaClient) {
       party_id TEXT,
       party_name TEXT NOT NULL,
       date DATETIME NOT NULL,
+      time TEXT,
       type TEXT NOT NULL,
       ref_id TEXT NOT NULL,
       description TEXT NOT NULL,
+      payment_method TEXT,
       debit_amount REAL NOT NULL DEFAULT 0,
       credit_amount REAL NOT NULL DEFAULT 0,
       balance REAL NOT NULL DEFAULT 0,
@@ -403,6 +405,25 @@ async function initializeDatabase(prisma: PrismaClient) {
       last_error TEXT,
       updated_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP
     )`,
+    `CREATE TABLE IF NOT EXISTS inventory_stock (
+      id TEXT PRIMARY KEY NOT NULL,
+      material_name TEXT NOT NULL UNIQUE,
+      quantity REAL NOT NULL DEFAULT 0,
+      unit TEXT NOT NULL DEFAULT 'TONS',
+      last_updated DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP
+    )`,
+    `CREATE TABLE IF NOT EXISTS inventory_transactions (
+      id TEXT PRIMARY KEY NOT NULL,
+      stock_id TEXT NOT NULL,
+      date DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
+      type TEXT NOT NULL,
+      quantity_change REAL NOT NULL,
+      reference_id TEXT,
+      description TEXT,
+      created_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP
+    )`,
+    `CREATE INDEX IF NOT EXISTS inventory_transactions_stock_id_idx ON inventory_transactions (stock_id)`,
+    `CREATE INDEX IF NOT EXISTS inventory_transactions_date_idx ON inventory_transactions (date)`
   ];
 
   for (const statement of statements) {

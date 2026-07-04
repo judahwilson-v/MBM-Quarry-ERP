@@ -1,0 +1,17 @@
+<CformOutsideDtlsMainVO>
+	<periodFrom>$periodfrom</periodFrom>
+	<periodTo>$periodto</periodTo>
+<cformOutsideDtls>
+	<cformOutsideDtlsBean>
+		<formNo>$formno</formNo>
+		<formDate>$dateofissue</formDate>
+		<tinNo>$tinno</tinNo>
+		<sellerOrPurchaserName>$nameofseller</sellerOrPurchaserName>
+		<totalTransValue>$transvalue</totalTransValue>
+		<totalTax>$taxamt</totalTax>
+		<totalValue>$totalamt</totalValue>
+		<formName>$formtype</formName>
+		<stateCd>$state</stateCd>
+	</cformOutsideDtlsBean>
+</cformOutsideDtls>
+</CformOutsideDtlsMainVO>

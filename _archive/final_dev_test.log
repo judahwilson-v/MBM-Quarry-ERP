@@ -1,0 +1,34 @@
+
+> mbm-quarry-erp@0.1.0 electron:dev
+> node scripts/electron-dev.js
+
+
+🧹 Clearing stale Next.js cache to prevent chunk loading errors...
+🚀 Starting new Next.js dev server on port 3005...
+Waiting for Next.js server on port 3005 to be ready...[Next.js]   ▲ Next.js 14.2.35
+[Next.js]   - Local:        http://localhost:3005
+[Next.js]   - Environments: .env.local, .env
+[Next.js]  ✓ Starting...
+[Next.js]  ✓ Ready in 1417ms
+[Next.js]  ○ Compiling / ...
+[Next.js]  ✓ Compiled / in 3s (759 modules)
+[Next.js]  ✓ Compiled in 256ms (319 modules)
+ Ready!
+✅ Next.js dev server is running on port 3005!
+
+🖥️  Starting Electron application...
+[Next.js]  GET / 200 in 3432ms
+ Ready!
+[Next.js]  GET / 200 in 2718ms
+ Ready!
+[Next.js]  GET / 200 in 1651ms
+ Ready!
+[Next.js]  GET / 200 in 662ms
+ Ready!
+[Next.js]  GET / 200 in 3459ms
+[Next.js]  GET / 200 in 3462ms
+[Next.js]  GET / 200 in 63ms
+[Next.js]  POST / 200 in 138ms
+[Next.js]  POST / 200 in 26ms
+Electron app closed with code 0.
+Shutting down Next.js dev server...

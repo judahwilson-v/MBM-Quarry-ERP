@@ -25,7 +25,7 @@ export default async function AboutPage() {
     }
   }
 
-  appVersion = appVersion || "0.1.0";
+  appVersion = appVersion || "1.9.0";
   buildDate = buildDate || "Unknown";
   const databasePath = process.env.DATABASE_URL || "Local DB";
   

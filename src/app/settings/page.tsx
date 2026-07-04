@@ -3,6 +3,7 @@ import { SettingsForm } from "./settings-form";
 import { AuditLogManager } from "./audit-log-manager";
 import { SystemDiagnostics } from "./system-diagnostics";
 import { SecuritySettings } from "./security-settings";
+import { ThemeSettings } from "./theme-settings";
 import fs from "fs";
 import path from "path";
 
@@ -24,7 +25,7 @@ export default async function SettingsPage() {
     }
   }
 
-  appVersion = appVersion || "0.1.0";
+  appVersion = appVersion || "1.9.0";
   const databasePath = process.env.DATABASE_URL || "Local DB";
   
   return (
@@ -40,6 +41,7 @@ export default async function SettingsPage() {
         </div>
         
         <div className="space-y-6">
+          <ThemeSettings />
           <SecuritySettings initialSettings={settings} />
           <SystemDiagnostics 
             appVersion={appVersion}

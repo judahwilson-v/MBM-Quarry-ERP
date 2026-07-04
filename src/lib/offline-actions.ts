@@ -4,8 +4,9 @@ import { getDb } from "@/lib/prisma";
 import { deriveSalesEngine, type SalesDraft } from "@/lib/sales-engine";
 import { calculateRemainingCredit, decrementVehicleTrips, incrementVehicleTrips, writeAuditEvent } from "@/lib/domain";
 import { emitFinancialEvent } from "@/lib/domain/financial-events";
-import { addDayBookExpense, rebuildDayBook, setDayBookOpeningBalances, projectDayBookExpense, recalculateDayBook } from "@/lib/domain/daybook";
+import { addDayBookExpense, rebuildDayBook, setDayBookOpeningBalances, projectDayBookExpense, recalculateDayBook, getOrCreateDayBook } from "@/lib/domain/daybook";
 import { recalculatePartyLedger } from "@/lib/domain/ledger/party-ledger-service";
+import { txAdjustInventoryStock } from "@/lib/domain/inventory/service";
 
 type VehicleInput = {
   id?: string;
@@ -372,6 +373,20 @@ export async function saveSale(input: SaleInput) {
           after: sale,
           reason: engine.qtyChanged ? engine.quantityReason : null,
         });
+
+        // Sync inventory
+        if (existing.materialName !== sale.materialName) {
+           // Restore old material
+           await txAdjustInventoryStock(tx, existing.materialName, existing.qty, 'SALE_OUT', sale.id, `Sale Updated (Material Changed): ${sale.vehicleNumber}`);
+           // Deduct new material
+           await txAdjustInventoryStock(tx, sale.materialName, -sale.qty, 'SALE_OUT', sale.id, `Sale Updated (New Material): ${sale.vehicleNumber}`);
+        } else {
+           const qtyDiff = existing.qty - sale.qty; // if old was 10, new is 12, diff is -2
+           if (qtyDiff !== 0) {
+             await txAdjustInventoryStock(tx, sale.materialName, qtyDiff, 'SALE_OUT', sale.id, `Sale Updated: ${sale.vehicleNumber}`);
+           }
+        }
+
         return sale;
       }
 
@@ -455,6 +470,10 @@ export async function saveSale(input: SaleInput) {
         after: sale,
         reason: engine.qtyChanged ? engine.quantityReason : null,
       });
+
+      // Deduct inventory
+      await txAdjustInventoryStock(tx, sale.materialName, -sale.qty, 'SALE_OUT', sale.id, `Sale: ${sale.vehicleNumber}`);
+
       return sale;
     }),
   );
@@ -477,6 +496,21 @@ export async function deleteSale(id: string) {
         before: existing,
       });
       if (existing.partyId) await recalculatePartyLedger(tx, existing.partyId);
+
+      // Restore inventory
+      await txAdjustInventoryStock(tx, existing.materialName, existing.qty, 'SALE_OUT', id, `Sale Deleted: ${existing.vehicleNumber}`);
+      
+      // Cascade delete financial events and ledger entries
+      const events = await tx.financialEvent.findMany({ where: { entityId: id } });
+      const eventIds = events.map(e => e.eventId);
+      if (eventIds.length > 0) {
+        await tx.ledgerEntry.deleteMany({ where: { financialEventId: { in: eventIds } } });
+        await tx.financialEvent.deleteMany({ where: { eventId: { in: eventIds } } });
+      }
+
+      // Recalculate daybook for the sale date
+      const dayBook = await getOrCreateDayBook(tx, existing.saleDate.toISOString());
+      await recalculateDayBook(tx, dayBook);
     }
   });
 }
@@ -490,11 +524,21 @@ export async function purgeNonGstSales(): Promise<number> {
     if (nonGstSales.length === 0) return 0;
 
     const affectedPartyIds = new Set<string>();
+    const affectedDates = new Set<string>();
     for (const sale of nonGstSales) {
       if (sale.vehicleId) {
         await decrementVehicleTrips(tx, sale.vehicleId, sale.tripDelta ?? 1);
       }
       if (sale.partyId) affectedPartyIds.add(sale.partyId);
+      affectedDates.add(sale.saleDate.toISOString());
+    }
+
+    const saleIds = nonGstSales.map(s => s.id);
+    const events = await tx.financialEvent.findMany({ where: { entityId: { in: saleIds } } });
+    const eventIds = events.map(e => e.eventId);
+    if (eventIds.length > 0) {
+      await tx.ledgerEntry.deleteMany({ where: { financialEventId: { in: eventIds } } });
+      await tx.financialEvent.deleteMany({ where: { eventId: { in: eventIds } } });
     }
 
     const deleteResult = await tx.outgoingSale.deleteMany({
@@ -503,6 +547,11 @@ export async function purgeNonGstSales(): Promise<number> {
 
     for (const partyId of Array.from(affectedPartyIds)) {
       await recalculatePartyLedger(tx, partyId);
+    }
+    
+    for (const d of Array.from(affectedDates)) {
+      const dayBook = await getOrCreateDayBook(tx, d);
+      await recalculateDayBook(tx, dayBook);
     }
 
     await writeAuditEvent(tx, {
@@ -593,6 +642,12 @@ export async function saveIncomingBoulder(input: IncomingBoulderInput) {
         });
       }
 
+      // Sync inventory
+      const qtyDiff = row.qty - (before?.qty ?? 0);
+      if (qtyDiff !== 0) {
+        await txAdjustInventoryStock(tx, "ROCK", qtyDiff, 'PRODUCTION_IN', row.id, `Boulder Purchase Updated: ${row.vehicleNumber}`);
+      }
+
       return row;
     }));
   }
@@ -612,6 +667,9 @@ export async function saveIncomingBoulder(input: IncomingBoulderInput) {
       });
     }
 
+    // Add inventory
+    await txAdjustInventoryStock(tx, "ROCK", row.qty, 'PRODUCTION_IN', row.id, `Boulder Purchase: ${row.vehicleNumber}`);
+
     return row;
   }));
 }
@@ -624,6 +682,21 @@ export async function deleteIncomingBoulder(id: string) {
     if (before) {
       await writeAuditEvent(tx, { entityName: "IncomingBoulder", entityId: id, action: "delete", role: "system", before });
       if (before.partyId) await recalculatePartyLedger(tx, before.partyId);
+
+      // Revert inventory
+      await txAdjustInventoryStock(tx, "ROCK", -before.qty, 'PRODUCTION_IN', id, `Boulder Purchase Deleted: ${before.vehicleNumber}`);
+      
+      // Cascade delete associated daybook expense
+      const expenseDesc = `Paid for Boulder Purchase (${before.vehicleNumber}) - ${before.partyName}`;
+      const expenses = await tx.dayBookExpenseEntry.findMany({ where: { description: expenseDesc } });
+      if (expenses.length > 0) {
+        await tx.dayBookExpenseEntry.deleteMany({ where: { description: expenseDesc } });
+        const sourceEventIds = expenses.map(e => e.sourceEventId);
+        await tx.financialEvent.deleteMany({ where: { eventId: { in: sourceEventIds } } });
+      }
+
+      const dayBook = await getOrCreateDayBook(tx, before.date.toISOString());
+      await recalculateDayBook(tx, dayBook);
     }
   });
 }
@@ -775,11 +848,25 @@ export async function savePartyCollection(input: any) {
       const party = await tx.party.findFirst({ where: { partyName: { equals: partyName } } });
       if (!party) throw new Error("Party not found.");
       
+      const collection = await tx.partyCollection.create({
+        data: {
+          partyId: party.id,
+          partyName,
+          collectionDate,
+          cashPaid,
+          bankPaid,
+          gPayPaid,
+          totalAmount,
+          remarks: input.remarks,
+          sourceEventId: "temp-" + Date.now() + "-" + Math.random(),
+        }
+      });
+      
       const financialEvent = await emitFinancialEvent(tx, {
-        correlationId: party.id,
+        correlationId: collection.id,
         eventType: "PARTY_COLLECTION_CREATED",
         entityType: "PartyCollection",
-        entityId: party.id,
+        entityId: collection.id,
         payload: {
           partyId: party.id,
           partyName,
@@ -791,6 +878,12 @@ export async function savePartyCollection(input: any) {
           remarks: input.remarks,
         },
       });
+      
+      await tx.partyCollection.update({
+        where: { id: collection.id },
+        data: { sourceEventId: financialEvent.eventId }
+      });
+      
       await recalculatePartyLedger(tx, party.id);
       return financialEvent;
     }),
@@ -820,11 +913,25 @@ export async function savePartyPayment(input: any) {
       const party = await tx.party.findFirst({ where: { partyName: { equals: partyName } } });
       if (!party) throw new Error("Party not found.");
       
+      const payment = await tx.partyPayment.create({
+        data: {
+          partyId: party.id,
+          partyName,
+          paymentDate,
+          cashPaid,
+          bankPaid,
+          gPayPaid,
+          totalAmount,
+          remarks: input.remarks,
+          sourceEventId: "temp-" + Date.now() + "-" + Math.random(),
+        }
+      });
+      
       const financialEvent = await emitFinancialEvent(tx, {
-        correlationId: party.id,
+        correlationId: payment.id,
         eventType: "PARTY_PAYMENT_CREATED",
         entityType: "PartyPayment",
-        entityId: party.id,
+        entityId: payment.id,
         payload: {
           partyId: party.id,
           partyName,
@@ -836,6 +943,12 @@ export async function savePartyPayment(input: any) {
           remarks: input.remarks,
         },
       });
+      
+      await tx.partyPayment.update({
+        where: { id: payment.id },
+        data: { sourceEventId: financialEvent.eventId }
+      });
+      
       await recalculatePartyLedger(tx, party.id);
       return financialEvent;
     }),
@@ -848,13 +961,10 @@ export async function deletePartyCollection(id: string) {
     const collection = await tx.partyCollection.findUnique({ where: { id } });
     if (!collection) return;
     await tx.partyCollection.delete({ where: { id } });
-    await emitFinancialEvent(tx, {
-      correlationId: collection.partyId,
-      eventType: "PARTY_COLLECTION_DELETED",
-      entityType: "PartyCollection",
-      entityId: id,
-      payload: collection,
-    });
+    
+    // Cascade delete events
+    await tx.financialEvent.deleteMany({ where: { entityId: id } });
+    
     if (collection.partyId) await recalculatePartyLedger(tx, collection.partyId);
   });
 }
@@ -865,13 +975,10 @@ export async function deletePartyPayment(id: string) {
     const payment = await tx.partyPayment.findUnique({ where: { id } });
     if (!payment) return;
     await tx.partyPayment.delete({ where: { id } });
-    await emitFinancialEvent(tx, {
-      correlationId: payment.partyId,
-      eventType: "PARTY_PAYMENT_DELETED",
-      entityType: "PartyPayment",
-      entityId: id,
-      payload: payment,
-    });
+    
+    // Cascade delete events
+    await tx.financialEvent.deleteMany({ where: { entityId: id } });
+    
     if (payment.partyId) await recalculatePartyLedger(tx, payment.partyId);
   });
 }

@@ -1,0 +1,37 @@
+<RtnVatFormLS2MainVO>
+<rtnDlrInfoVO>
+	<masterTin>$dlrtin</masterTin>
+	<prdFromDate>$periodfrom</prdFromDate>
+	<prdToDate>$periodto</prdToDate>
+	<formNo>FORM LS-II</formNo>
+	<versionNo>3</versionNo>
+</rtnDlrInfoVO>
+<valueSalesReturnTotal>$amtbeftax</valueSalesReturnTotal>
+<purcVatTotal>$amttaxchg</purcVatTotal>
+<annxrFValueSalesReturnUrd>$urdamtbeforetax</annxrFValueSalesReturnUrd>
+<annxrFPurcVatUrd>$urdtaxamt</annxrFPurcVatUrd>
+<annxrFValueSalesReturnConsumer>$conamtbeforetax</annxrFValueSalesReturnConsumer>
+<annxrFPurcVatConsumer>$contaxamt</annxrFPurcVatConsumer>
+<annxrFValueSalesReturnTotal>$totalSales</annxrFValueSalesReturnTotal>
+<annxrFPurcVatTotal>$totalvat</annxrFPurcVatTotal>
+<rtnFlag>INET</rtnFlag>
+<vatLS2Dtls>
+	<vatLS2DtlsBean>
+		<purcName>$nameofpurchaser</purcName>
+		<purcTin>$tinno</purcTin>
+		<invoiceNo>$invoiceno</invoiceNo>
+		<invoiceDate>$dateofinvoice</invoiceDate>
+		<goodsReturnChallanNo>$rtrnchallanno</goodsReturnChallanNo>
+		<goodsReturnChallanDate>$challandate</goodsReturnChallanDate>
+		<creditNoteNo>$creditnoteno</creditNoteNo>
+		<creditNoteDate>$creditnotedate</creditNoteDate>
+		<otherCmdty>$others</otherCmdty>
+		<valueSalesReturn>$amtbeforetax</valueSalesReturn>
+		<purcVat>$taxcharged</purcVat>
+		<usedSugamP>$sugampnumber</usedSugamP>
+		<dealerCategory>$dealercategory</dealerCategory>
+		<cmdtyCd>$commodity</cmdtyCd>
+		<rateOfTax>$rateoftax</rateOfTax>
+	</vatLS2DtlsBean>
+</vatLS2Dtls>
+</RtnVatFormLS2MainVO>

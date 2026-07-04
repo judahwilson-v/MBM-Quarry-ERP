@@ -1,6 +1,6 @@
 # MBM Quarry ERP — Project State
 
-**Version**: v0.1.0-rc1
+**Version**: v1.9.0
 **Phase**: RC1 — Stabilization & Field Testing
 **Last Updated**: 2026-06-27
 

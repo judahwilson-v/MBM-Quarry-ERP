@@ -1,8 +1,8 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Button } from "@/components/ui/button";
-import { Download, RefreshCw, HardDrive, FileText } from "lucide-react";
+import { RefreshCw, HardDrive, FileText, Loader2 } from "lucide-react";
 import { useToast } from "@/components/ui/use-toast";
 
 export function SystemDiagnostics({ 
@@ -15,20 +15,98 @@ export function SystemDiagnostics({
   backupPath: string 
 }) {
   const { toast } = useToast();
+  const [isChecking, setIsChecking] = useState(false);
+  const [updateStatus, setUpdateStatus] = useState<string | null>(null);
+
+  useEffect(() => {
+    if (typeof window !== "undefined" && (window as any).electron) {
+      (window as any).electron.onUpdaterEvent((data: any) => {
+        console.log("✓ IPC received updater-event:", data.type);
+        
+        switch(data.type) {
+          case "checking":
+            setUpdateStatus("Searching for updates...");
+            toast({
+              title: "Checking for Updates",
+              description: "Searching for the latest release...",
+            });
+            break;
+            
+          case "available":
+            setIsChecking(false);
+            setUpdateStatus("Update available");
+            toast({
+              title: "Update Found!",
+              description: `A new version is available. It is downloading in the background.`,
+            });
+            break;
+            
+          case "not-available":
+            setIsChecking(false);
+            setUpdateStatus("Up to date");
+            toast({
+              title: "You're up to date",
+              description: "You are already running the latest version of MBM Quarry.",
+            });
+            break;
+            
+          case "progress":
+            setUpdateStatus(`Downloading... ${Math.round(data.progress?.percent || 0)}%`);
+            break;
+            
+          case "downloaded":
+            setIsChecking(false);
+            setUpdateStatus("Ready to install");
+            toast({
+              title: "Update Ready",
+              description: "The update has been downloaded and will be installed on restart.",
+            });
+            break;
+            
+          case "error":
+            setIsChecking(false);
+            setUpdateStatus("Update failed");
+            toast({
+              title: "Update Error",
+              description: data.error || "Failed to check for updates.",
+              variant: "destructive"
+            });
+            break;
+        }
+      });
+    }
+  }, [toast]);
   
   const handleCheckUpdates = async () => {
-    toast({
-      title: "Checking for Updates",
-      description: "If an update is available, you will receive a prompt shortly.",
-    });
+    console.log("✓ Button clicked");
+    setIsChecking(true);
+    setUpdateStatus("Searching for updates...");
     
     // Send IPC message to the Electron main process
     if (typeof window !== "undefined" && (window as any).electron) {
       try {
+        console.log("✓ IPC sent: check-updates");
         await (window as any).electron.checkUpdates();
-      } catch (err) {
+      } catch (err: any) {
         console.error("Failed to check for updates", err);
+        setIsChecking(false);
+        setUpdateStatus("Update failed");
+        toast({
+          title: "Update Error",
+          description: err.message || "Failed to communicate with updater process.",
+          variant: "destructive"
+        });
       }
+    } else {
+      // Fallback if not running in electron
+      setTimeout(() => {
+        setIsChecking(false);
+        setUpdateStatus("Up to date");
+        toast({
+          title: "Up to Date",
+          description: "You are running the web version.",
+        });
+      }, 1500);
     }
   };
 
@@ -69,9 +147,9 @@ export function SystemDiagnostics({
         </div>
         
         <div className="pt-4 flex gap-2 flex-wrap">
-          <Button variant="outline" size="sm" onClick={handleCheckUpdates} className="flex-1">
-            <RefreshCw className="w-4 h-4 mr-2" />
-            Check Updates
+          <Button variant="outline" size="sm" onClick={handleCheckUpdates} className="flex-1" disabled={isChecking}>
+            {isChecking ? <Loader2 className="w-4 h-4 mr-2 animate-spin" /> : <RefreshCw className="w-4 h-4 mr-2" />}
+            {updateStatus ? updateStatus : "Check Updates"}
           </Button>
           <Button variant="outline" size="sm" onClick={handleBackup} className="flex-1">
             <HardDrive className="w-4 h-4 mr-2" />

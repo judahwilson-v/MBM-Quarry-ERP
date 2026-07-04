@@ -16,7 +16,7 @@ export async function exportSalesToTallyXML(
     endOfDay.setHours(23, 59, 59, 999);
 
     const whereClause: any = {
-      date: {
+      saleDate: {
         gte: startDate,
         lte: endOfDay,
       }
@@ -33,7 +33,7 @@ export async function exportSalesToTallyXML(
         material: true,
       },
       orderBy: {
-        date: "asc"
+        saleDate: "asc"
       }
     });
 
@@ -45,16 +45,16 @@ export async function exportSalesToTallyXML(
       // Calculate item amount excluding GST
       const amountBeforeTax = sale.amount; // Base amount without taxes
       
-      const materialName = sale.material?.name || sale.materialName || "Unknown Material";
-      const partyName = sale.party?.name || sale.partyName || "CASH";
-      const partyGst = sale.party?.gstNumber || undefined;
+      const materialName = sale.material?.materialName || sale.materialName || "Unknown Material";
+      const partyName = sale.party?.partyName || sale.partyName || "CASH";
+      const partyGst = (sale.party as any)?.gstNumber || undefined;
       const voucherNum = sale.bookNumber && sale.pageNumber 
         ? `${sale.bookNumber}/${sale.pageNumber}` 
         : `VCH-${sale.id.substring(0, 6)}`;
 
       return {
         id: sale.id,
-        date: sale.date,
+        date: sale.saleDate,
         voucherNumber: voucherNum,
         partyName: partyName,
         partyGstin: partyGst,
@@ -65,7 +65,7 @@ export async function exportSalesToTallyXML(
           {
             materialName: materialName,
             qty: sale.qty,
-            rate: sale.rate,
+            rate: sale.ratePerCft,
             amount: amountBeforeTax
           }
         ]

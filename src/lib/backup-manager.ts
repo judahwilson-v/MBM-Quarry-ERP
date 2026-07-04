@@ -1,7 +1,6 @@
 import fs from 'fs';
 import path from 'path';
 import { getDatabaseFilePath } from './prisma';
-import { app } from 'electron'; // Only safe to call if we check process.type
 
 /**
  * Gets the backup directory for MBM Quarry ERP.
@@ -14,13 +13,14 @@ export function getBackupDirectory(): string {
   try {
     if (typeof process !== 'undefined' && process.versions && process.versions.electron) {
       // We are in the Electron main process
+      // eslint-disable-next-line @typescript-eslint/no-require-imports
       documentsPath = require('electron').app.getPath('documents');
     } else {
       // We might be in Next.js server, which doesn't have direct access to 'app'
       // but we can construct the path from HOME / USERPROFILE
       documentsPath = path.join(process.env.USERPROFILE || process.env.HOME || '', 'Documents');
     }
-  } catch (err) {
+  } catch {
     documentsPath = path.join(process.env.USERPROFILE || process.env.HOME || '', 'Documents');
   }
 

@@ -1,0 +1,500 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model Vehicle {
+  id             String   @id @default(cuid())
+  vehicleNumber   String   @unique @map("vehicle_number")
+  partyId         String?  @map("party_id")
+  partyName       String?  @map("party_name")
+  companyBodyQty  Float?   @map("company_body_qty")
+  extraBodyQty    Float?   @map("extra_body_qty")
+  tripCount       Int      @default(0) @map("trip_count")
+  createdAt       DateTime @default(now()) @map("created_at")
+  updatedAt       DateTime @updatedAt @map("updated_at")
+
+  party           Party?   @relation(fields: [partyId], references: [id], onDelete: SetNull)
+  outgoingSales   OutgoingSale[]
+  incomingBoulder IncomingBoulder[]
+  expenses   Expense[]
+  fuelPurchases FuelPurchase[]
+
+  @@index([partyId])
+  @@map("vehicles")
+}
+
+model Party {
+  id            String         @id @default(cuid())
+  partyName     String         @unique @map("party_name")
+  phone         String?
+  address       String?
+  createdAt     DateTime       @default(now()) @map("created_at")
+  updatedAt     DateTime       @updatedAt @map("updated_at")
+
+  vehicles      Vehicle[]
+  outgoingSales OutgoingSale[]
+  incomingBoulder IncomingBoulder[]
+  partyCredits  PartyCredit[]
+  partyCollections PartyCollection[]
+  partyLedgers     PartyLedger[]
+  partyPayments    PartyPayment[]
+  expenses        Expense[]
+
+  @@map("parties")
+}
+
+model Material {
+  id              String         @id @default(cuid())
+  materialName    String         @unique @map("material_name")
+  ratePerCft      Float          @default(0) @map("rate_per_cft")
+  createdAt       DateTime       @default(now()) @map("created_at")
+  updatedAt       DateTime       @updatedAt @map("updated_at")
+
+  outgoingSales   OutgoingSale[]
+  incomingBoulder IncomingBoulder[]
+
+  @@map("materials")
+}
+
+model OutgoingSale {
+  id            String   @id @default(cuid())
+  saleDate      DateTime @map("sale_date")
+  serialNumber  Int?     @unique @map("serial_number")
+  bookNumber    Int?     @map("book_number")
+  pageNumber    Int?     @map("page_number")
+  vehicleId     String?  @map("vehicle_id")
+  partyId       String?  @map("party_id")
+  materialId    String?  @map("material_id")
+  vehicleNumber String   @map("vehicle_number")
+  partyName     String   @map("party_name")
+  materialName  String   @map("material_name")
+  ratePerCft    Float    @map("rate_per_cft")
+  qty           Float
+  originalQty   Float?   @map("original_qty")
+  quantityReason String? @map("quantity_reason")
+  tripDelta     Int      @default(1) @map("trip_delta")
+  discountType  String   @default("fixed") @map("discount_type")
+  discountValue Float    @default(0) @map("discount_value")
+  amount        Float
+  gstEnabled    Boolean  @default(false) @map("gst_enabled")
+  gstRate       Float    @default(5) @map("gst_rate")
+  sgst          Float    @default(0)
+  cgst          Float    @default(0)
+  gstAmount     Float    @default(0) @map("gst_amount")
+  finalAmount   Float    @map("final_amount")
+  cashPaid      Float    @default(0) @map("cash_paid")
+  bankPaid      Float    @default(0) @map("bank_paid")
+  gPayPaid      Float    @default(0) @map("gpay_paid")
+  paidTotal     Float    @default(0) @map("paid_total")
+  remainingCredit Float  @default(0) @map("remaining_credit")
+  remarks       String?
+  createdAt     DateTime @default(now()) @map("created_at")
+  updatedAt     DateTime @updatedAt @map("updated_at")
+
+  vehicle       Vehicle? @relation(fields: [vehicleId], references: [id], onDelete: SetNull)
+  party         Party?   @relation(fields: [partyId], references: [id], onDelete: SetNull)
+  material      Material? @relation(fields: [materialId], references: [id], onDelete: SetNull)
+  partyCredits  PartyCredit[]
+
+  @@index([saleDate])
+  @@index([vehicleId])
+  @@index([partyId])
+  @@index([materialId])
+  @@map("outgoing_sales")
+}
+
+model FinancialEvent {
+  id             String   @id @default(cuid())
+  eventId        String   @unique @default(uuid()) @map("event_id")
+  correlationId  String   @map("correlation_id")
+  eventType      String   @map("event_type")
+  entityType     String   @map("entity_type")
+  entityId       String   @map("entity_id")
+  schemaVersion  Int      @default(1) @map("schema_version")
+  payload        Json
+  createdAt      DateTime @default(now()) @map("created_at")
+
+  @@index([correlationId])
+  @@index([entityType, entityId])
+  @@index([eventType])
+  @@map("financial_events")
+}
+
+model LedgerEntry {
+  id              String   @id @default(cuid())
+  financialEventId String   @unique @map("financial_event_id")
+  correlationId   String   @map("correlation_id")
+  eventType       String   @map("event_type")
+  entityType      String   @map("entity_type")
+  entityId        String   @map("entity_id")
+  entryDate       DateTime @map("entry_date")
+  cashAmount      Float    @default(0) @map("cash_amount")
+  bankAmount      Float    @default(0) @map("bank_amount")
+  gPayAmount      Float    @default(0) @map("gpay_amount")
+  creditAmount    Float    @default(0) @map("credit_amount")
+  totalAmount     Float    @default(0) @map("total_amount")
+  createdAt       DateTime @default(now()) @map("created_at")
+
+  @@index([correlationId])
+  @@index([entityType, entityId])
+  @@index([eventType])
+  @@map("ledger_entries")
+}
+
+model DayBook {
+  id                 String                @id @default(cuid())
+  businessDate       DateTime              @unique @map("business_date")
+  openingCashBalance Float                 @default(0) @map("opening_cash_balance")
+  openingBankBalance Float                 @default(0) @map("opening_bank_balance")
+  cashSalesTotal     Float                 @default(0) @map("cash_sales_total")
+  bankSalesTotal     Float                 @default(0) @map("bank_sales_total")
+  gPaySalesTotal     Float                 @default(0) @map("gpay_sales_total")
+  expenseTotal       Float                 @default(0) @map("expense_total")
+  closingCashBalance Float                 @default(0) @map("closing_cash_balance")
+  closingBankBalance Float                 @default(0) @map("closing_bank_balance")
+  createdAt          DateTime              @default(now()) @map("created_at")
+  updatedAt          DateTime              @updatedAt @map("updated_at")
+
+  expenses           DayBookExpenseEntry[]
+
+  @@index([businessDate])
+  @@map("day_books")
+}
+
+model DayBookExpenseEntry {
+  id             String   @id @default(cuid())
+  dayBookId      String   @map("day_book_id")
+  sourceEventId  String   @unique @map("source_event_id")
+  expenseType    String   @map("expense_type")
+  entryDate      DateTime @map("entry_date")
+  amount         Float
+  description    String?
+  createdAt      DateTime @default(now()) @map("created_at")
+
+  dayBook        DayBook  @relation(fields: [dayBookId], references: [id], onDelete: Cascade)
+
+  @@index([dayBookId])
+  @@index([entryDate])
+  @@map("day_book_expense_entries")
+}
+
+model IncomingBoulder {
+  id            String   @id @default(cuid())
+  date          DateTime @default(now())
+  bookNumber    Int?     @map("book_number")
+  pageNumber    Int?     @map("page_number")
+  vehicleId     String?  @map("vehicle_id")
+  partyId       String?  @map("party_id")
+  materialId    String?  @map("material_id")
+  vehicleNumber String   @map("vehicle_number")
+  partyName     String   @map("party_name")
+  materialName  String   @default("ROCK") @map("material_name")
+  qty             Float
+  remarks         String?
+  time            String?
+  rockRate        Float    @default(26) @map("rock_rate")
+  amount          Float    @default(0)
+  cashPaid        Float    @default(0) @map("cash_paid")
+  bankPaid        Float    @default(0) @map("bank_paid")
+  gPayPaid        Float    @default(0) @map("gpay_paid")
+  paidTotal       Float    @default(0) @map("paid_total")
+  remainingCredit Float    @default(0) @map("remaining_credit")
+  settled         Boolean  @default(false)
+  vehicleRent     Float    @default(0) @map("vehicle_rent")
+  combinedPayment Boolean  @default(false) @map("combined_payment")
+  createdAt       DateTime @default(now()) @map("created_at")
+  updatedAt       DateTime @updatedAt @map("updated_at")
+
+  vehicle       Vehicle?  @relation(fields: [vehicleId], references: [id], onDelete: SetNull)
+  party         Party?    @relation(fields: [partyId], references: [id], onDelete: SetNull)
+  material      Material? @relation(fields: [materialId], references: [id], onDelete: SetNull)
+
+  @@index([date])
+  @@index([vehicleId])
+  @@index([partyId])
+  @@index([materialId])
+  @@map("incoming_boulder")
+}
+
+model PartyCredit {
+  id         String       @id @default(cuid())
+  partyId    String?      @map("party_id")
+  partyName  String       @map("party_name")
+  saleId     String       @map("sale_id")
+  amount     Float
+  status     String       @default("pending")
+  createdAt  DateTime     @default(now()) @map("created_at")
+  updatedAt  DateTime     @updatedAt @map("updated_at")
+
+  party      Party?       @relation(fields: [partyId], references: [id], onDelete: SetNull)
+  sale       OutgoingSale @relation(fields: [saleId], references: [id], onDelete: Cascade)
+
+  @@index([partyId])
+  @@index([partyName])
+  @@index([saleId])
+  @@map("party_credit")
+}
+
+model PartyCollection {
+  id             String   @id @default(cuid())
+  partyId        String?  @map("party_id")
+  partyName      String   @map("party_name")
+  collectionDate DateTime @map("collection_date")
+  cashPaid       Float    @default(0) @map("cash_paid")
+  bankPaid       Float    @default(0) @map("bank_paid")
+  gPayPaid       Float    @default(0) @map("gpay_paid")
+  totalAmount    Float    @map("total_amount")
+  remarks        String?
+  sourceEventId  String   @unique @map("source_event_id")
+  createdAt      DateTime @default(now()) @map("created_at")
+  updatedAt      DateTime @updatedAt @map("updated_at")
+
+  party          Party?   @relation(fields: [partyId], references: [id], onDelete: SetNull)
+
+  @@index([partyId])
+  @@index([partyName])
+  @@index([collectionDate])
+  @@map("party_collections")
+}
+
+model PartyLedger {
+  id            String   @id @default(cuid())
+  partyId       String?  @map("party_id")
+  partyName     String   @map("party_name")
+  date          DateTime
+  time          String?
+  type          String   // 'SALE', 'PURCHASE', 'PAYMENT_RECEIVED', 'PAYMENT_GIVEN', 'MANUAL_DEBIT', 'MANUAL_CREDIT'
+  refId         String   @map("ref_id")
+  description   String   
+  paymentMethod String?  @map("payment_method")
+  debitAmount   Float    @default(0) @map("debit_amount")  // + Asset (Customer owes MBM) or MBM pays Supplier
+  creditAmount  Float    @default(0) @map("credit_amount") // + Liability (MBM owes Supplier) or Customer pays MBM
+  balance       Float    @default(0)                       // Running balance. Positive = MBM is Owed. Negative = MBM Owes.
+  createdAt     DateTime @default(now()) @map("created_at")
+
+  party         Party?   @relation(fields: [partyId], references: [id], onDelete: SetNull)
+
+  @@index([partyId])
+  @@index([partyName])
+  @@index([date])
+  @@map("party_ledger")
+}
+
+model CashTransfer {
+  id            String   @id @default(cuid())
+  date          DateTime
+  time          String
+  type          String   // 'CASH_TO_BANK', 'BANK_TO_CASH'
+  amount        Float
+  userName      String   @map("user_name")
+  remarks       String?
+  createdAt     DateTime @default(now()) @map("created_at")
+
+  @@index([date])
+  @@map("cash_transfers")
+}
+
+model PartyPayment {
+  id             String   @id @default(cuid())
+  partyId        String?  @map("party_id")
+  partyName      String   @map("party_name")
+  paymentDate    DateTime @map("payment_date")
+  cashPaid       Float    @default(0) @map("cash_paid")
+  bankPaid       Float    @default(0) @map("bank_paid")
+  gPayPaid       Float    @default(0) @map("gpay_paid")
+  totalAmount    Float    @map("total_amount")
+  remarks        String?
+  sourceEventId  String   @unique @map("source_event_id")
+  createdAt      DateTime @default(now()) @map("created_at")
+  updatedAt      DateTime @updatedAt @map("updated_at")
+
+  party          Party?   @relation(fields: [partyId], references: [id], onDelete: SetNull)
+
+  @@index([partyId])
+  @@index([partyName])
+  @@index([paymentDate])
+  @@map("party_payments")
+}
+
+model EmployeeCredit {
+  id              String    @id @default(cuid())
+  employeeName    String    @map("employee_name")
+  amount          Float
+  reason          String?
+  expectedDueDate DateTime? @map("expected_due_date")
+  status          String    @default("pending")
+  createdAt       DateTime  @default(now()) @map("created_at")
+  updatedAt       DateTime  @updatedAt @map("updated_at")
+
+  @@map("employee_credit")
+}
+
+model Supplier {
+  id         String   @id @default(cuid())
+  supplierName String @unique @map("supplier_name")
+  phone      String?
+  address    String?
+  createdAt  DateTime @default(now()) @map("created_at")
+  updatedAt  DateTime @updatedAt @map("updated_at")
+
+  @@map("suppliers")
+}
+
+model DayBookEntry {
+  id         String   @id @default(cuid())
+  entryDate  DateTime @map("entry_date")
+  entryType  String   @map("entry_type")
+  reference  String?
+  description String?
+  debit      Float    @default(0)
+  credit     Float    @default(0)
+  createdAt  DateTime @default(now()) @map("created_at")
+  updatedAt  DateTime @updatedAt @map("updated_at")
+
+  @@index([entryDate])
+  @@map("day_book_entries")
+}
+
+model AuditLog {
+  id         String   @id @default(cuid())
+  entityName String   @map("entity_name")
+  entityId   String   @map("entity_id")
+  action     String
+  payload    String?
+  createdAt  DateTime @default(now()) @map("created_at")
+
+  @@index([entityName, entityId])
+  @@map("audit_logs")
+}
+
+model Role {
+  id         String   @id @default(cuid())
+  roleName   String   @unique @map("role_name")
+  createdAt  DateTime @default(now()) @map("created_at")
+  updatedAt  DateTime @updatedAt @map("updated_at")
+
+  @@map("roles")
+}
+
+model OtherCredit {
+  id              String    @id @default(cuid())
+  name            String    @map("name")
+  amount          Float
+  reason          String?
+  expectedDueDate DateTime? @map("expected_due_date")
+  status          String    @default("pending")
+  createdAt       DateTime  @default(now()) @map("created_at")
+  updatedAt       DateTime  @updatedAt @map("updated_at")
+
+  @@map("other_credits")
+}
+
+
+model Expense {
+  id              String   @id @default(cuid())
+  expenseDate     DateTime @map("expense_date")
+  expenseType     String   @map("expense_type")
+  amount          Float
+  paymentMode     String   @default("CASH") @map("payment_mode")
+  partyId         String?  @map("party_id")
+  partyName       String?  @map("party_name")
+  vehicleId       String?  @map("vehicle_id")
+  vehicleNumber   String?  @map("vehicle_number")
+  description     String?
+  sourceEventId   String   @unique @map("source_event_id")
+  createdAt       DateTime @default(now()) @map("created_at")
+  updatedAt       DateTime @updatedAt @map("updated_at")
+
+  party           Party?   @relation(fields: [partyId], references: [id], onDelete: SetNull)
+  vehicle         Vehicle? @relation(fields: [vehicleId], references: [id], onDelete: SetNull)
+
+  @@index([expenseDate])
+  @@index([partyId])
+  @@index([vehicleId])
+  @@map("expenses")
+}
+
+model Employee {
+  id            String   @id @default(cuid())
+  name          String   @unique
+  phone         String?
+  address       String?
+  role          String   @default("STAFF")
+  balance       Float    @default(0) // Positive means we owe them, Negative means they owe us
+  createdAt     DateTime @default(now()) @map("created_at")
+  updatedAt     DateTime @updatedAt @map("updated_at")
+
+  ledgers       EmployeeLedger[]
+
+  @@map("employees")
+}
+
+model EmployeeLedger {
+  id            String   @id @default(cuid())
+  employeeId    String   @map("employee_id")
+  date          DateTime
+  type          String   // 'SALARY', 'ADVANCE', 'PAYMENT', 'DEDUCTION'
+  amount        Float
+  balance       Float    // Running balance
+  description   String?
+  createdAt     DateTime @default(now()) @map("created_at")
+
+  employee      Employee @relation(fields: [employeeId], references: [id], onDelete: Cascade)
+
+  @@index([employeeId])
+  @@index([date])
+  @@map("employee_ledgers")
+}
+
+model FuelPurchase {
+  id            String   @id @default(cuid())
+  date          DateTime
+  fuelType      String   @default("DIESEL") @map("fuel_type") // DIESEL, PETROL
+  pricePerLitre Float?   @map("price_per_litre")
+  qtyLitre      Float?   @map("qty_litre")
+  amount        Float
+  paidAmount    Float    @default(0) @map("paid_amount")
+  creditAmount  Float    @default(0) @map("credit_amount")
+  
+  isCan         Boolean  @default(false) @map("is_can")
+  vehicleId     String?  @map("vehicle_id")
+  vehicleNumber String?  @map("vehicle_number")
+  
+  sourceEventId String   @unique @map("source_event_id")
+  createdAt     DateTime @default(now()) @map("created_at")
+  updatedAt     DateTime @updatedAt @map("updated_at")
+
+  vehicle       Vehicle? @relation(fields: [vehicleId], references: [id], onDelete: SetNull)
+
+  @@index([date])
+  @@index([vehicleId])
+  @@map("fuel_purchases")
+}
+
+model SyncState {
+  id             String   @id @default("default")
+  lastSyncedAt   DateTime @default(dbgenerated("'1970-01-01 00:00:00'")) @map("last_synced_at")
+  status         String   @default("IDLE") // IDLE, SYNCING, ERROR
+  lastError      String?  @map("last_error")
+  updatedAt      DateTime @updatedAt @map("updated_at")
+
+  @@map("sync_state")
+}
+
+model GlobalSettings {
+  id             String   @id @default("default")
+  quarryName     String   @default("MBM Quarry") @map("quarry_name")
+  gstNumber      String   @default("") @map("gst_number")
+  address        String   @default("")
+  phone          String   @default("")
+  defaultPrinter String   @default("") @map("default_printer")
+  backupFolder   String   @default("") @map("backup_folder")
+  updatedAt      DateTime @updatedAt @map("updated_at")
+
+  @@map("global_settings")
+}

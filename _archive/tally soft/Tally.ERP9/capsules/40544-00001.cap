@@ -1,0 +1,26 @@
+<RtnVatFormLP2MainVO>
+<rtnDlrInfoVO>
+	<masterTin>$dealertin</masterTin>
+	<formNo>FORM LP-II</formNo>
+	<versionNo>3</versionNo>
+</rtnDlrInfoVO>
+<valuePurcReturnTotal>$amtbeftax</valuePurcReturnTotal>
+<sellerVatReturnTotal>$amttaxchg</sellerVatReturnTotal>
+<rtnFlag>INET</rtnFlag>
+<vatLP2Dtls>
+	<vatLP2DtlsBean>
+		<sellerName>$nameofseller</sellerName>
+		<sellerTin>$tinno</sellerTin>
+		<invoiceNo>$invoiceno</invoiceNo>
+		<invoiceDate>$dateofinvoice</invoiceDate>
+		<goodsReturnChallanNo>$challanno</goodsReturnChallanNo>
+		<goodsReturnChallanDate>$challandate</goodsReturnChallanDate>
+		<debitNoteNo>$creditnoteno</debitNoteNo>
+		<debitNoteDate>$creditnotedate</debitNoteDate>
+		<valuePurcReturn>$amtbeforetax</valuePurcReturn>
+		<sellerVat>$taxcharged</sellerVat>
+		<usedSugamP>$sugampno</usedSugamP>
+		<rateOfTax>$rateoftax</rateOfTax>
+	</vatLP2DtlsBean>
+</vatLP2Dtls>
+</RtnVatFormLP2MainVO>

@@ -1,13 +1,13 @@
 "use server";
 
 import { getDb } from "@/lib/prisma";
-import { revalidatePath } from "next/cache";
-import { syncNow } from "@/lib/sync/sync-service";
+import { pushSync, pullSync } from "@/lib/sync/sync-service";
 
 export async function forceSync() {
   try {
-    const result = await syncNow();
-    return { success: true, message: `Sync triggered. Pushed: ${result.pushed}, Pulled: ${result.pulled}` };
+    const pushResult = await pushSync();
+    const pullResult = await pullSync();
+    return { success: true, message: `Sync triggered. Pushed: ${pushResult.pushed}, Pulled: ${pullResult.pulled}` };
   } catch (error: any) {
     return { success: false, message: error.message };
   }
@@ -16,7 +16,7 @@ export async function forceSync() {
 export async function resetSyncQueue() {
   try {
     const db = await getDb();
-    const result = await db.financialEvent.deleteMany({
+    await db.financialEvent.deleteMany({
       where: {
         // Technically, all events in the local DB are essentially the queue,
         // but resetting it means wiping the unsynced ones.
@@ -40,7 +40,7 @@ export async function getDatabaseInfo() {
     const db = await getDb();
     
     // Get counts
-    const salesCount = await db.outgoingSales.count();
+    const salesCount = await db.outgoingSale.count();
     const boulderCount = await db.incomingBoulder.count();
     const eventCount = await db.financialEvent.count();
     

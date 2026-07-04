@@ -1,6 +1,6 @@
 # MBM Quarry ERP — Roadmap
 
-## Released: RC1 (v0.1.0-rc1) — 2026-06-27
+## Released: v1.9.0 — 2026-06-27
 
 ### Completed Features
 - Offline-first SQLite ERP (Sales, Purchases, Ledger, Credit, Expenses, Reports)

@@ -1,5 +1,5 @@
 export const isElectron = () => {
-  if (typeof window !== 'undefined' && typeof window.process === 'object' && window.process.type === 'renderer') {
+  if (typeof window !== 'undefined' && typeof window.process === 'object' && (window.process as any).type === 'renderer') {
     return true;
   }
   if (typeof process !== 'undefined' && typeof process.versions === 'object' && !!process.versions.electron) {

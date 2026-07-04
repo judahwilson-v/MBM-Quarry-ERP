@@ -13,11 +13,12 @@ import {
   ReceiptText,
   Truck,
   UserCircle,
-  X, Cloud, CloudOff, LayoutDashboard, Info, Settings, BookOpen, Fuel, Wallet, FileJson
+  X, Cloud, CloudOff, LayoutDashboard, Info, Settings, BookOpen, Fuel, Wallet, FileJson, Package
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
 import { AutoUpdater } from "./auto-updater";
+import { ThemeToggle } from "./theme-toggle";
 
 const navItems = [
   { href: "/", label: "Dashboard", icon: LayoutDashboard },
@@ -27,6 +28,7 @@ const navItems = [
   { href: "/expenses/vehicles", label: "Vehicle Expenses", icon: Truck },
   { href: "/purchases/boulder", label: "Incoming Boulder", icon: Pickaxe },
   { href: "/fuel", label: "Fuel Management", icon: Fuel },
+  { href: "/inventory", label: "Inventory Stock", icon: Package },
   { href: "/masters/vehicles", label: "Vehicles", icon: Truck },
   { href: "/masters/parties", label: "Parties", icon: UserCircle },
   { href: "/masters/materials", label: "Material Rates", icon: Boxes },
@@ -80,7 +82,7 @@ export function AppShell({ children }: { children: React.ReactNode }) {
         </div>
       ) : null}
 
-      <aside className="fixed inset-y-0 left-0 z-40 hidden w-64 flex flex-col border-r bg-card lg:block">
+      <aside className="fixed inset-y-0 left-0 z-40 hidden w-64 flex flex-col border-r bg-card lg:flex">
         <ShellBrand />
         <ShellNav pathname={pathname} />
         <ShellSync />
@@ -102,6 +104,9 @@ export function AppShell({ children }: { children: React.ReactNode }) {
               <div className="truncate text-sm font-semibold sm:text-base">MBM Quarry Management</div>
               <div className="truncate text-xs text-muted-foreground">Offline single-computer SQLite system</div>
             </div>
+          </div>
+          <div className="flex items-center gap-2">
+            <ThemeToggle />
           </div>
         </header>
 
@@ -131,7 +136,7 @@ export function AppShell({ children }: { children: React.ReactNode }) {
   );
 }
 
-import { SyncIndicator } from "./sync-indicator";
+
 
 function ShellBrand({ onClose }: { onClose?: () => void }) {
   return (
@@ -142,9 +147,6 @@ function ShellBrand({ onClose }: { onClose?: () => void }) {
         </div>
         <div>
           <div className="text-base font-semibold">MBM Quarry</div>
-          <div className="mt-0.5">
-            <SyncIndicator />
-          </div>
         </div>
       </div>
       {onClose ? (

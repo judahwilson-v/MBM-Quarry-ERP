@@ -55,7 +55,7 @@ export function SearchableSelect({
   return (
     <div className="relative">
       <input
-        className="h-10 w-full rounded-md border bg-background px-3 pr-9 text-sm outline-none focus:ring-2 focus:ring-ring"
+        className="flex h-10 w-full rounded-lg border border-input bg-background px-3 pr-9 py-2 text-sm text-foreground shadow-[var(--shadow-card)] transition-colors placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:border-accent"
         placeholder={placeholder}
         value={inputValue}
         onFocus={() => {
@@ -101,7 +101,7 @@ export function SearchableSelect({
       />
       <ChevronsUpDown className="pointer-events-none absolute right-3 top-3 h-4 w-4 opacity-60" />
       {open ? (
-        <div className="absolute z-50 mt-1 w-full rounded-md border bg-popover p-2 shadow-lg">
+        <div className="absolute z-50 mt-1 w-full rounded-lg border border-border bg-popover p-2 shadow-[var(--shadow-elevated)]">
           <div className="max-h-60 overflow-auto">
             {filtered.map((option, index) => (
               <button

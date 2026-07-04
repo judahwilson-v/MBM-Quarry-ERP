@@ -11,7 +11,7 @@ export function AutoUpdater() {
   const [state, setState] = useState<UpdaterState>("idle");
   const [progress, setProgress] = useState(0);
   const [version, setVersion] = useState("");
-  const [errorMsg, setErrorMsg] = useState("");
+
   const { toast } = useToast();
 
   useEffect(() => {
@@ -32,6 +32,10 @@ export function AutoUpdater() {
           break;
         case "not-available":
           setState("idle");
+          toast({
+            title: "Up to Date",
+            description: "You are already running the latest version.",
+          });
           break;
         case "progress":
           setState("downloading");
@@ -48,7 +52,7 @@ export function AutoUpdater() {
           break;
         case "error":
           setState("error");
-          setErrorMsg(data.error || "Unknown error");
+          console.error(data.error || "Unknown error");
           break;
       }
     });

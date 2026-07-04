@@ -501,3 +501,32 @@ model GlobalSettings {
 
   @@map("global_settings")
 }
+
+model InventoryStock {
+  id           String   @id @default(cuid())
+  materialName String   @unique @map("material_name") // Could be "20mm", "Boulder", "Dust"
+  quantity     Float    @default(0) // Balance in metric tons or cft
+  unit         String   @default("TONS") // TONS, CFT
+  lastUpdated  DateTime @default(now()) @updatedAt @map("last_updated")
+
+  transactions InventoryTransaction[]
+
+  @@map("inventory_stock")
+}
+
+model InventoryTransaction {
+  id             String   @id @default(cuid())
+  stockId        String   @map("stock_id")
+  date           DateTime @default(now())
+  type           String   // 'PRODUCTION_IN', 'SALE_OUT', 'MANUAL_ADJUST'
+  quantityChange Float    @map("quantity_change") // Positive for IN, Negative for OUT
+  referenceId    String?  @map("reference_id") // ID of OutgoingSale or IncomingBoulder
+  description    String?
+  createdAt      DateTime @default(now()) @map("created_at")
+
+  stock          InventoryStock @relation(fields: [stockId], references: [id], onDelete: Cascade)
+
+  @@index([stockId])
+  @@index([date])
+  @@map("inventory_transactions")
+}

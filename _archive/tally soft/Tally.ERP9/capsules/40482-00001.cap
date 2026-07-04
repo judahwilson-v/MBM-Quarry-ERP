@@ -1,0 +1,997 @@
+<?xml version="1.0"?>
+<?mso-application progid="Excel.Sheet"?>
+<Workbook xmlns="urn:schemas-microsoft-com:office:spreadsheet"
+ xmlns:o="urn:schemas-microsoft-com:office:office"
+ xmlns:x="urn:schemas-microsoft-com:office:excel"
+ xmlns:ss="urn:schemas-microsoft-com:office:spreadsheet"
+ xmlns:html="http://www.w3.org/TR/REC-html40">
+ <DocumentProperties xmlns="urn:schemas-microsoft-com:office:office">
+  <Created>2006-09-16T00:00:00Z</Created>
+  <LastSaved>2016-11-30T10:45:48Z</LastSaved>
+  <Version>15.00</Version>
+ </DocumentProperties>
+ <OfficeDocumentSettings xmlns="urn:schemas-microsoft-com:office:office">
+  <AllowPNG/>
+  <RemovePersonalInformation/>
+ </OfficeDocumentSettings>
+ <ExcelWorkbook xmlns="urn:schemas-microsoft-com:office:excel">
+  <WindowHeight>8445</WindowHeight>
+  <WindowWidth>20490</WindowWidth>
+  <WindowTopX>0</WindowTopX>
+  <WindowTopY>0</WindowTopY>
+  <ProtectStructure>False</ProtectStructure>
+  <ProtectWindows>False</ProtectWindows>
+ </ExcelWorkbook>
+ <Styles>
+  <Style ss:ID="Default" ss:Name="Normal">
+   <Alignment ss:Vertical="Bottom"/>
+   <Borders/>
+   <Font ss:FontName="Calibri" x:Family="Swiss" ss:Size="11" ss:Color="#000000"/>
+   <Interior/>
+   <NumberFormat/>
+   <Protection/>
+  </Style>
+  <Style ss:ID="m263084602640">
+   <Alignment ss:Horizontal="Center" ss:Vertical="Center" ss:WrapText="1"/>
+   <Borders>
+    <Border ss:Position="Bottom" ss:LineStyle="Continuous" ss:Weight="1"/>
+    <Border ss:Position="Left" ss:LineStyle="Continuous" ss:Weight="1"/>
+    <Border ss:Position="Right" ss:LineStyle="Continuous" ss:Weight="1"/>
+    <Border ss:Position="Top" ss:LineStyle="Continuous" ss:Weight="1"/>
+   </Borders>
+   <Font ss:FontName="Tahoma" x:Family="Swiss" ss:Size="8" ss:Color="#000000"
+    ss:Bold="1"/>
+  </Style>
+  <Style ss:ID="m263084602660">
+   <Alignment ss:Horizontal="Center" ss:Vertical="Center" ss:WrapText="1"/>
+   <Borders>
+    <Border ss:Position="Bottom" ss:LineStyle="Continuous" ss:Weight="1"/>
+    <Border ss:Position="Left" ss:LineStyle="Continuous" ss:Weight="1"/>
+    <Border ss:Position="Right" ss:LineStyle="Continuous" ss:Weight="1"/>
+    <Border ss:Position="Top" ss:LineStyle="Continuous" ss:Weight="1"/>
+   </Borders>
+   <Font ss:FontName="Tahoma" x:Family="Swiss" ss:Size="8" ss:Color="#000000"
+    ss:Bold="1"/>
+  </Style>
+  <Style ss:ID="m263084602680">
+   <Alignment ss:Horizontal="Center" ss:Vertical="Center" ss:WrapText="1"/>
+   <Borders>
+    <Border ss:Position="Bottom" ss:LineStyle="Continuous" ss:Weight="1"/>
+    <Border ss:Position="Left" ss:LineStyle="Continuous" ss:Weight="1"/>
+    <Border ss:Position="Right" ss:LineStyle="Continuous" ss:Weight="1"/>
+    <Border ss:Position="Top" ss:LineStyle="Continuous" ss:Weight="1"/>
+   </Borders>
+   <Font ss:FontName="Tahoma" x:Family="Swiss" ss:Size="8" ss:Color="#000000"
+    ss:Bold="1"/>
+  </Style>
+  <Style ss:ID="s62">
+   <Borders/>
+   <Font ss:FontName="Calibri" x:Family="Swiss" ss:Size="8" ss:Color="#000000"/>
+  </Style>
+  <Style ss:ID="s63">
+   <Alignment ss:Horizontal="Center" ss:Vertical="Center"/>
+   <Borders/>
+   <Font ss:FontName="Tahoma" x:Family="Swiss" ss:Size="11" ss:Color="#000000"
+    ss:Bold="1"/>
+  </Style>
+  <Style ss:ID="s65">
+   <Alignment ss:Vertical="Center"/>
+   <Borders/>
+   <Font ss:FontName="Tahoma" x:Family="Swiss" ss:Size="11" ss:Color="#000000"
+    ss:Bold="1"/>
+  </Style>
+  <Style ss:ID="s66">
+   <Alignment ss:Horizontal="Center" ss:Vertical="Center"/>
+   <Borders/>
+   <Font ss:FontName="Tahoma" x:Family="Swiss" ss:Size="8" ss:Color="#000000"
+    ss:Bold="1"/>
+  </Style>
+  <Style ss:ID="s68">
+   <Alignment ss:Vertical="Center"/>
+   <Borders/>
+   <Font ss:FontName="Tahoma" x:Family="Swiss" ss:Size="8" ss:Color="#000000"
+    ss:Bold="1"/>
+  </Style>
+  <Style ss:ID="s70">
+   <Alignment ss:Horizontal="Center" ss:Vertical="Bottom"/>
+   <Borders/>
+   <Font ss:FontName="Tahoma" x:Family="Swiss" ss:Size="8" ss:Color="#000000"
+    ss:Bold="1"/>
+  </Style>
+  <Style ss:ID="s71">
+   <Alignment ss:Horizontal="Center" ss:Vertical="Bottom"/>
+   <Borders/>
+   <Font ss:FontName="Tahoma" x:Family="Swiss" ss:Size="8" ss:Color="#000000"/>
+  </Style>
+  <Style ss:ID="s73">
+   <Alignment ss:Vertical="Bottom"/>
+   <Borders/>
+   <Font ss:FontName="Tahoma" x:Family="Swiss" ss:Size="8" ss:Color="#000000"/>
+  </Style>
+  <Style ss:ID="s75">
+   <Alignment ss:Horizontal="Center" ss:Vertical="Bottom"/>
+   <Borders/>
+   <Font ss:FontName="Calibri" x:Family="Swiss" ss:Size="8" ss:Color="#000000"/>
+  </Style>
+  <Style ss:ID="s76">
+   <Alignment ss:Vertical="Bottom"/>
+   <Borders/>
+   <Font ss:FontName="Calibri" x:Family="Swiss" ss:Size="8" ss:Color="#000000"/>
+  </Style>
+  <Style ss:ID="s77">
+   <Alignment ss:Vertical="Center" ss:WrapText="1"/>
+   <Font ss:FontName="Tahoma" x:Family="Swiss" ss:Size="8" ss:Color="#000000"/>
+  </Style>
+  <Style ss:ID="s79">
+   <Alignment ss:Vertical="Center"/>
+   <Font ss:FontName="Tahoma" x:Family="Swiss" ss:Size="8" ss:Color="#000000"/>
+  </Style>
+  <Style ss:ID="s81">
+   <Alignment ss:Horizontal="Left" ss:Vertical="Bottom"/>
+   <Borders/>
+   <Font ss:FontName="Tahoma" x:Family="Swiss" ss:Size="8" ss:Color="#000000"
+    ss:Underline="Single"/>
+  </Style>
+  <Style ss:ID="s82">
+   <Alignment ss:Vertical="Bottom"/>
+   <Borders/>
+   <Font ss:FontName="Tahoma" x:Family="Swiss" ss:Size="8" ss:Color="#000000"
+    ss:Underline="Single"/>
+  </Style>
+  <Style ss:ID="s86">
+   <Font ss:FontName="Tahoma" x:Family="Swiss" ss:Size="8" ss:Color="#000000"/>
+  </Style>
+  <Style ss:ID="s87">
+   <Alignment ss:Vertical="Center"/>
+   <Font ss:FontName="Tahoma" x:Family="Swiss" ss:Size="8" ss:Color="#000000"
+    ss:Underline="Single"/>
+  </Style>
+  <Style ss:ID="s88">
+   <Font ss:FontName="Calibri" x:Family="Swiss" ss:Size="8" ss:Color="#000000"/>
+  </Style>
+  <Style ss:ID="s89">
+   <Font ss:FontName="Tahoma" x:Family="Swiss" ss:Size="8" ss:Color="#000000"
+    ss:Underline="Single"/>
+  </Style>
+  <Style ss:ID="s90">
+   <Alignment ss:Horizontal="Left" ss:Vertical="Center"/>
+   <Borders/>
+   <Font ss:FontName="Tahoma" x:Family="Swiss" ss:Size="8" ss:Color="#000000"/>
+  </Style>
+  <Style ss:ID="s93">
+   <Borders/>
+   <Font ss:FontName="Calibri" x:Family="Swiss" ss:Size="9" ss:Color="#000000"/>
+  </Style>
+  <Style ss:ID="s94">
+   <Alignment ss:Horizontal="Right" ss:Vertical="Center"/>
+   <Borders/>
+   <Font ss:FontName="Tahoma" x:Family="Swiss" ss:Size="8" ss:Color="#000000"/>
+  </Style>
+  <Style ss:ID="s96">
+   <Alignment ss:Horizontal="Center" ss:Vertical="Center"/>
+   <Borders/>
+   <Font ss:FontName="Tahoma" x:Family="Swiss" ss:Size="8" ss:Color="#000000"/>
+  </Style>
+  <Style ss:ID="s97">
+   <Alignment ss:Vertical="Center"/>
+   <Borders/>
+   <Font ss:FontName="Tahoma" x:Family="Swiss" ss:Size="8" ss:Color="#000000"/>
+  </Style>
+  <Style ss:ID="s99">
+   <Alignment ss:Horizontal="Left" ss:Vertical="Bottom"/>
+   <Borders/>
+   <Font ss:FontName="Calibri" x:Family="Swiss" ss:Size="9" ss:Color="#000000"/>
+  </Style>
+  <Style ss:ID="s109">
+   <Alignment ss:Vertical="Center" ss:WrapText="1"/>
+   <Borders/>
+   <Font ss:FontName="Tahoma" x:Family="Swiss" ss:Size="8" ss:Color="#000000"
+    ss:Bold="1"/>
+  </Style>
+  <Style ss:ID="s110">
+   <Alignment ss:Horizontal="Center" ss:Vertical="Center" ss:WrapText="1"/>
+   <Borders>
+    <Border ss:Position="Bottom" ss:LineStyle="Continuous" ss:Weight="1"/>
+    <Border ss:Position="Left" ss:LineStyle="Continuous" ss:Weight="1"/>
+    <Border ss:Position="Right" ss:LineStyle="Continuous" ss:Weight="1"/>
+   </Borders>
+   <Font ss:FontName="Tahoma" x:Family="Swiss" ss:Size="8" ss:Color="#000000"/>
+  </Style>
+  <Style ss:ID="s111">
+   <Alignment ss:Horizontal="Center" ss:Vertical="Center" ss:WrapText="1"/>
+   <Borders>
+    <Border ss:Position="Bottom" ss:LineStyle="Continuous" ss:Weight="1"/>
+    <Border ss:Position="Left" ss:LineStyle="Continuous" ss:Weight="1"/>
+   </Borders>
+   <Font ss:FontName="Tahoma" x:Family="Swiss" ss:Size="8" ss:Color="#000000"/>
+  </Style>
+  <Style ss:ID="s112">
+   <Alignment ss:Horizontal="Center" ss:Vertical="Center" ss:WrapText="1"/>
+   <Borders/>
+   <Font ss:FontName="Tahoma" x:Family="Swiss" ss:Size="8" ss:Color="#000000"/>
+  </Style>
+  <Style ss:ID="s113">
+   <Alignment ss:Horizontal="Center" ss:Vertical="Center"/>
+   <Borders/>
+   <Font ss:FontName="Calibri" x:Family="Swiss" ss:Size="8" ss:Color="#000000"/>
+  </Style>
+  <Style ss:ID="s114">
+   <Alignment ss:Horizontal="Center" ss:Vertical="Center" ss:WrapText="1"/>
+   <Borders>
+    <Border ss:Position="Bottom" ss:LineStyle="Continuous" ss:Weight="1"/>
+    <Border ss:Position="Left" ss:LineStyle="Continuous" ss:Weight="1"/>
+    <Border ss:Position="Right" ss:LineStyle="Continuous" ss:Weight="1"/>
+    <Border ss:Position="Top" ss:LineStyle="Continuous" ss:Weight="1"/>
+   </Borders>
+   <Font ss:FontName="Tahoma" x:Family="Swiss" ss:Size="8" ss:Color="#000000"/>
+  </Style>
+  <Style ss:ID="s115">
+   <Alignment ss:Horizontal="Center" ss:Vertical="Center" ss:WrapText="1"/>
+   <Borders>
+    <Border ss:Position="Bottom" ss:LineStyle="Continuous" ss:Weight="1"/>
+    <Border ss:Position="Left" ss:LineStyle="Continuous" ss:Weight="1"/>
+    <Border ss:Position="Top" ss:LineStyle="Continuous" ss:Weight="1"/>
+   </Borders>
+   <Font ss:FontName="Tahoma" x:Family="Swiss" ss:Size="8" ss:Color="#000000"/>
+  </Style>
+  <Style ss:ID="s116">
+   <Alignment ss:Horizontal="Left" ss:Vertical="Center" ss:WrapText="1"/>
+   <Borders>
+    <Border ss:Position="Bottom" ss:LineStyle="Continuous" ss:Weight="1"/>
+    <Border ss:Position="Left" ss:LineStyle="Continuous" ss:Weight="1"/>
+    <Border ss:Position="Right" ss:LineStyle="Continuous" ss:Weight="1"/>
+    <Border ss:Position="Top" ss:LineStyle="Continuous" ss:Weight="1"/>
+   </Borders>
+   <Font ss:FontName="Tahoma" x:Family="Swiss" ss:Size="8" ss:Color="#000000"/>
+  </Style>
+  <Style ss:ID="s117">
+   <Alignment ss:Horizontal="Right" ss:Vertical="Center" ss:WrapText="1"/>
+   <Borders>
+    <Border ss:Position="Bottom" ss:LineStyle="Continuous" ss:Weight="1"/>
+    <Border ss:Position="Left" ss:LineStyle="Continuous" ss:Weight="1"/>
+    <Border ss:Position="Right" ss:LineStyle="Continuous" ss:Weight="1"/>
+    <Border ss:Position="Top" ss:LineStyle="Continuous" ss:Weight="1"/>
+   </Borders>
+   <Font ss:FontName="Tahoma" x:Family="Swiss" ss:Size="8" ss:Color="#000000"/>
+   <NumberFormat ss:Format="Fixed"/>
+  </Style>
+  <Style ss:ID="s118">
+   <Alignment ss:Horizontal="Right" ss:Vertical="Center" ss:WrapText="1"/>
+   <Borders>
+    <Border ss:Position="Bottom" ss:LineStyle="Continuous" ss:Weight="1"/>
+    <Border ss:Position="Left" ss:LineStyle="Continuous" ss:Weight="1"/>
+    <Border ss:Position="Top" ss:LineStyle="Continuous" ss:Weight="1"/>
+   </Borders>
+   <Font ss:FontName="Tahoma" x:Family="Swiss" ss:Size="8" ss:Color="#000000"/>
+   <NumberFormat ss:Format="Fixed"/>
+  </Style>
+  <Style ss:ID="s119">
+   <Borders/>
+   <Font ss:FontName="Calibri" x:Family="Swiss" ss:Size="8" ss:Color="#000000"/>
+   <NumberFormat ss:Format="Fixed"/>
+  </Style>
+  <Style ss:ID="s120">
+   <Alignment ss:Horizontal="Left" ss:Vertical="Center" ss:WrapText="1"/>
+   <Borders/>
+   <Font ss:FontName="Tahoma" x:Family="Swiss" ss:Size="8" ss:Color="#000000"
+    ss:Bold="1"/>
+  </Style>
+  <Style ss:ID="s122">
+   <Borders/>
+   <Font ss:FontName="Calibri" x:Family="Swiss" ss:Size="8" ss:Color="#000000"/>
+   <Interior/>
+  </Style>
+  <Style ss:ID="s123">
+   <Alignment ss:Horizontal="Left" ss:Vertical="Center" ss:WrapText="1"/>
+   <Borders/>
+   <Font ss:FontName="Tahoma" x:Family="Swiss" ss:Size="7.5" ss:Color="#000000"/>
+   <Interior/>
+  </Style>
+  <Style ss:ID="s124">
+   <Alignment ss:Horizontal="Left" ss:Vertical="Center" ss:WrapText="1"/>
+   <Borders/>
+   <Font ss:FontName="Tahoma" x:Family="Swiss" ss:Size="7.5" ss:Color="#000000"/>
+  </Style>
+  <Style ss:ID="s125">
+   <Alignment ss:Horizontal="Left" ss:Vertical="Center" ss:WrapText="1"/>
+   <Borders/>
+   <Font ss:FontName="Tahoma" x:Family="Swiss" ss:Size="8" ss:Color="#000000"/>
+   <Interior/>
+  </Style>
+  <Style ss:ID="s126">
+   <Alignment ss:Horizontal="Right" ss:Vertical="Center" ss:WrapText="1"/>
+   <Borders/>
+   <Font ss:FontName="Tahoma" x:Family="Swiss" ss:Size="8" ss:Color="#000000"/>
+   <Interior/>
+   <NumberFormat ss:Format="Fixed"/>
+  </Style>
+  <Style ss:ID="s127">
+   <Alignment ss:Vertical="Center" ss:WrapText="1"/>
+   <Borders/>
+   <Font ss:FontName="Tahoma" x:Family="Swiss" ss:Size="8"/>
+   <Interior/>
+  </Style>
+  <Style ss:ID="s128">
+   <Alignment ss:Vertical="Center" ss:WrapText="1"/>
+   <Borders/>
+   <Font ss:FontName="Tahoma" x:Family="Swiss" ss:Size="8" ss:Color="#000000"/>
+  </Style>
+  <Style ss:ID="s129">
+   <Alignment ss:Vertical="Center" ss:WrapText="1"/>
+   <Borders/>
+   <Font ss:FontName="Tahoma" x:Family="Swiss" ss:Size="8" ss:Color="#000000"/>
+   <Interior/>
+  </Style>
+  <Style ss:ID="s130">
+   <Alignment ss:Horizontal="Right" ss:Vertical="Bottom"/>
+   <Borders/>
+   <Font ss:FontName="Calibri" x:Family="Swiss" ss:Size="8" ss:Color="#000000"/>
+  </Style>
+  <Style ss:ID="s131">
+   <Alignment ss:Horizontal="Right" ss:Vertical="Center" ss:WrapText="1"/>
+   <Borders/>
+   <Font ss:FontName="Tahoma" x:Family="Swiss" ss:Size="8" ss:Color="#000000"/>
+  </Style>
+  <Style ss:ID="s132">
+   <Alignment ss:Horizontal="Center" ss:Vertical="Center" ss:WrapText="1"/>
+   <Borders/>
+   <Font ss:FontName="Tahoma" x:Family="Swiss" ss:Size="8" ss:Color="#000000"/>
+   <Interior/>
+  </Style>
+  <Style ss:ID="s134">
+   <Alignment ss:Horizontal="Center" ss:Vertical="Center" ss:WrapText="1"/>
+   <Borders/>
+   <Font ss:FontName="Tahoma" x:Family="Swiss" ss:Size="8"/>
+   <Interior/>
+  </Style>
+  <Style ss:ID="s135">
+   <Alignment ss:Horizontal="Right" ss:Vertical="Bottom" ss:WrapText="1"/>
+   <Borders/>
+   <Font ss:FontName="Calibri" x:Family="Swiss" ss:Size="8" ss:Color="#000000"/>
+  </Style>
+ </Styles>
+ <Worksheet ss:Name="JVAT Form 500">
+  <Table ss:ExpandedColumnCount="31" ss:ExpandedRowCount="40" x:FullColumns="1"
+   x:FullRows="1" ss:StyleID="s62" ss:DefaultColumnWidth="19.5"
+   ss:DefaultRowHeight="15">
+   <Column ss:StyleID="s62" ss:AutoFitWidth="0" ss:Width="39.75"/>
+   <Column ss:StyleID="s62" ss:AutoFitWidth="0" ss:Width="18"/>
+   <Column ss:StyleID="s62" ss:AutoFitWidth="0" ss:Width="61.5"/>
+   <Column ss:StyleID="s62" ss:AutoFitWidth="0" ss:Width="110.25"/>
+   <Column ss:StyleID="s62" ss:AutoFitWidth="0" ss:Width="111"/>
+   <Column ss:StyleID="s62" ss:AutoFitWidth="0" ss:Width="94.5"/>
+   <Column ss:StyleID="s62" ss:AutoFitWidth="0" ss:Width="100.5"/>
+   <Column ss:StyleID="s62" ss:AutoFitWidth="0" ss:Width="114" ss:Span="1"/>
+   <Column ss:Index="10" ss:StyleID="s62" ss:AutoFitWidth="0" ss:Width="22.5"/>
+   <Column ss:StyleID="s62" ss:AutoFitWidth="0" ss:Width="45"/>
+   <Column ss:StyleID="s62" ss:AutoFitWidth="0" ss:Width="90"/>
+   <Column ss:StyleID="s62" ss:AutoFitWidth="0" ss:Width="66.75"/>
+   <Column ss:StyleID="s62" ss:AutoFitWidth="0" ss:Width="67.5"/>
+   <Column ss:StyleID="s62" ss:AutoFitWidth="0" ss:Width="74.25"/>
+   <Column ss:StyleID="s62" ss:AutoFitWidth="0" ss:Width="71.25"/>
+   <Column ss:StyleID="s62" ss:AutoFitWidth="0" ss:Width="63"/>
+   <Column ss:StyleID="s62" ss:AutoFitWidth="0" ss:Width="67.5"/>
+   <Column ss:StyleID="s62" ss:AutoFitWidth="0" ss:Width="65.25"/>
+   <Column ss:StyleID="s62" ss:AutoFitWidth="0" ss:Width="58.5"/>
+   <Column ss:StyleID="s62" ss:AutoFitWidth="0" ss:Width="33"/>
+   <Column ss:StyleID="s62" ss:AutoFitWidth="0" ss:Width="81"/>
+   <Column ss:StyleID="s62" ss:AutoFitWidth="0" ss:Width="92.25" ss:Span="1"/>
+   <Column ss:Index="25" ss:StyleID="s62" ss:AutoFitWidth="0" ss:Width="93.75"/>
+   <Column ss:StyleID="s62" ss:AutoFitWidth="0" ss:Width="81"/>
+   <Column ss:StyleID="s62" ss:AutoFitWidth="0" ss:Width="102"/>
+   <Column ss:StyleID="s62" ss:AutoFitWidth="0" ss:Width="42"/>
+   <Row ss:AutoFitHeight="0" ss:Height="14.25">
+    <Cell ss:Index="2" ss:MergeAcross="6" ss:StyleID="s63"><Data ss:Type="String">Form JVAT 500</Data></Cell>
+    <Cell ss:StyleID="s63"/>
+    <Cell ss:StyleID="s63"/>
+    <Cell ss:MergeAcross="9" ss:StyleID="s63"><Data ss:Type="String">Form JVAT 500</Data></Cell>
+    <Cell ss:StyleID="s65"/>
+    <Cell ss:MergeAcross="5" ss:StyleID="s63"><Data ss:Type="String">Form JVAT 500</Data></Cell>
+    <Cell ss:StyleID="s65"/>
+    <Cell ss:StyleID="s65"/>
+    <Cell ss:StyleID="s65"/>
+    <Cell ss:StyleID="s63"/>
+   </Row>
+   <Row ss:AutoFitHeight="0" ss:Height="14.25">
+    <Cell ss:Index="2" ss:MergeAcross="6" ss:StyleID="s63"><Data ss:Type="String">GOVERNMENT OF JHARKHAND</Data></Cell>
+    <Cell ss:StyleID="s63"/>
+    <Cell ss:StyleID="s63"/>
+    <Cell ss:MergeAcross="9" ss:StyleID="s63"><Data ss:Type="String">GOVERNMENT OF JHARKHAND</Data></Cell>
+    <Cell ss:StyleID="s65"/>
+    <Cell ss:MergeAcross="5" ss:StyleID="s63"><Data ss:Type="String">GOVERNMENT OF JHARKHAND</Data></Cell>
+    <Cell ss:StyleID="s65"/>
+    <Cell ss:StyleID="s65"/>
+    <Cell ss:StyleID="s65"/>
+    <Cell ss:StyleID="s63"/>
+   </Row>
+   <Row ss:AutoFitHeight="0" ss:Height="14.25">
+    <Cell ss:Index="2" ss:StyleID="s63"/>
+    <Cell ss:StyleID="s63"/>
+    <Cell ss:StyleID="s63"/>
+    <Cell ss:StyleID="s63"/>
+    <Cell ss:StyleID="s63"/>
+    <Cell ss:StyleID="s63"/>
+    <Cell ss:StyleID="s63"/>
+    <Cell ss:StyleID="s63"/>
+    <Cell ss:StyleID="s63"/>
+    <Cell ss:MergeAcross="9" ss:StyleID="s63"/>
+    <Cell ss:StyleID="s65"/>
+    <Cell ss:MergeAcross="5" ss:StyleID="s63"/>
+    <Cell ss:StyleID="s65"/>
+    <Cell ss:StyleID="s65"/>
+    <Cell ss:StyleID="s65"/>
+    <Cell ss:StyleID="s63"/>
+   </Row>
+   <Row ss:AutoFitHeight="0" ss:Height="11.25">
+    <Cell ss:Index="2" ss:MergeAcross="6" ss:StyleID="s66"><Data ss:Type="String">COMMERCIAL TAXES DEPARTMENT</Data></Cell>
+    <Cell ss:StyleID="s66"/>
+    <Cell ss:StyleID="s66"/>
+    <Cell ss:MergeAcross="9" ss:StyleID="s66"><Data ss:Type="String">COMMERCIAL TAXES DEPARTMENT</Data></Cell>
+    <Cell ss:StyleID="s68"/>
+    <Cell ss:MergeAcross="5" ss:StyleID="s66"><Data ss:Type="String">COMMERCIAL TAXES DEPARTMENT</Data></Cell>
+    <Cell ss:StyleID="s68"/>
+    <Cell ss:StyleID="s68"/>
+    <Cell ss:StyleID="s68"/>
+    <Cell ss:StyleID="s66"/>
+   </Row>
+   <Row ss:AutoFitHeight="0" ss:Height="11.25">
+    <Cell ss:Index="2" ss:MergeAcross="6" ss:StyleID="s66"><Data ss:Type="String">[See Rule 38(2)(a)]</Data></Cell>
+    <Cell ss:StyleID="s66"/>
+    <Cell ss:StyleID="s66"/>
+    <Cell ss:MergeAcross="9" ss:StyleID="s66"><Data ss:Type="String">[See Rule 38(2)(a)]</Data></Cell>
+    <Cell ss:StyleID="s68"/>
+    <Cell ss:MergeAcross="5" ss:StyleID="s66"><Data ss:Type="String">[See Rule 38(2)(a)]</Data></Cell>
+    <Cell ss:StyleID="s68"/>
+    <Cell ss:StyleID="s68"/>
+    <Cell ss:StyleID="s68"/>
+    <Cell ss:StyleID="s66"/>
+   </Row>
+   <Row ss:AutoFitHeight="0" ss:Height="11.25">
+    <Cell ss:Index="2" ss:MergeAcross="6" ss:StyleID="s70"><Data ss:Type="String">Monthly Accounts of Purchases and Input Tax Payable, including Entry Tax</Data></Cell>
+    <Cell ss:StyleID="s71"/>
+    <Cell ss:StyleID="s71"/>
+    <Cell ss:MergeAcross="9" ss:StyleID="s71"><Data ss:Type="String">Monthly Accounts of Purchases and Input Tax Payable, including Entry Tax</Data></Cell>
+    <Cell ss:StyleID="s73"/>
+    <Cell ss:MergeAcross="5" ss:StyleID="s71"><Data ss:Type="String">Monthly Accounts of Purchases and Input Tax Payable, including Entry Tax</Data></Cell>
+    <Cell ss:StyleID="s73"/>
+    <Cell ss:StyleID="s73"/>
+    <Cell ss:StyleID="s73"/>
+    <Cell ss:StyleID="s71"/>
+   </Row>
+   <Row ss:AutoFitHeight="0" ss:Height="11.25">
+    <Cell ss:Index="2" ss:MergeAcross="5" ss:StyleID="s71"/>
+    <Cell ss:StyleID="s71"/>
+    <Cell ss:StyleID="s71"/>
+    <Cell ss:StyleID="s71"/>
+    <Cell ss:MergeAcross="9" ss:StyleID="s75"/>
+    <Cell ss:Index="22" ss:StyleID="s76"/>
+    <Cell ss:StyleID="s76"/>
+    <Cell ss:StyleID="s76"/>
+    <Cell ss:StyleID="s76"/>
+    <Cell ss:StyleID="s76"/>
+    <Cell ss:StyleID="s76"/>
+   </Row>
+   <Row ss:AutoFitHeight="0" ss:Height="11.25">
+    <Cell ss:Index="2" ss:MergeAcross="2" ss:StyleID="s77"><Data ss:Type="String">1 Name and address of the Dealer : </Data></Cell>
+    <Cell ss:MergeAcross="4" ss:StyleID="s79"><Data ss:Type="String">$nnaod</Data></Cell>
+    <Cell ss:StyleID="s79"/>
+    <Cell ss:StyleID="s81"/>
+    <Cell ss:StyleID="s81"/>
+    <Cell ss:Index="22" ss:StyleID="s82"/>
+    <Cell ss:StyleID="s82"/>
+    <Cell ss:StyleID="s82"/>
+    <Cell ss:StyleID="s82"/>
+    <Cell ss:StyleID="s82"/>
+    <Cell ss:StyleID="s82"/>
+   </Row>
+   <Row ss:AutoFitHeight="0">
+    <Cell ss:Index="2" ss:MergeAcross="2" ss:StyleID="Default"/>
+    <Cell ss:MergeAcross="4" ss:StyleID="Default"/>
+    <Cell ss:StyleID="s77"/>
+    <Cell ss:StyleID="s81"/>
+    <Cell ss:StyleID="s81"/>
+    <Cell ss:Index="22" ss:StyleID="s81"/>
+    <Cell ss:StyleID="s81"/>
+    <Cell ss:StyleID="s81"/>
+    <Cell ss:StyleID="s81"/>
+    <Cell ss:StyleID="s81"/>
+    <Cell ss:StyleID="s81"/>
+   </Row>
+   <Row ss:AutoFitHeight="0" ss:Height="11.25">
+    <Cell ss:Index="2" ss:MergeAcross="2" ss:StyleID="s77"><Data ss:Type="String">2. VAT Registration No. (TIN): </Data></Cell>
+    <Cell ss:MergeAcross="4" ss:StyleID="s79"><Data ss:Type="String">$vrtin</Data></Cell>
+    <Cell ss:StyleID="s77"/>
+    <Cell ss:StyleID="s81"/>
+    <Cell ss:StyleID="s81"/>
+    <Cell ss:Index="22" ss:MergeAcross="5" ss:StyleID="s81"/>
+   </Row>
+   <Row ss:AutoFitHeight="0">
+    <Cell ss:Index="2" ss:StyleID="s79"/>
+    <Cell ss:StyleID="s79"/>
+    <Cell ss:MergeAcross="6" ss:StyleID="Default"/>
+    <Cell ss:StyleID="s81"/>
+    <Cell ss:StyleID="s81"/>
+    <Cell ss:Index="22" ss:StyleID="s81"/>
+    <Cell ss:StyleID="s81"/>
+    <Cell ss:StyleID="s81"/>
+    <Cell ss:StyleID="s81"/>
+    <Cell ss:StyleID="s81"/>
+    <Cell ss:StyleID="s81"/>
+   </Row>
+   <Row ss:AutoFitHeight="0" ss:Height="11.25">
+    <Cell ss:Index="2" ss:StyleID="s86"><Data ss:Type="String">Purchases for the Tax Period:           From: </Data></Cell>
+    <Cell ss:StyleID="s87"/>
+    <Cell ss:StyleID="s88"/>
+    <Cell ss:StyleID="s86"/>
+    <Cell ss:StyleID="s89"><Data ss:Type="String">$fdt   </Data></Cell>
+    <Cell ss:StyleID="s86"><Data ss:Type="String">To:    </Data></Cell>
+    <Cell ss:StyleID="s89"><Data ss:Type="String">$tdt      </Data></Cell>
+    <Cell ss:StyleID="s89"/>
+    <Cell ss:StyleID="s89"/>
+    <Cell ss:Index="15" ss:StyleID="s90"/>
+    <Cell ss:Index="22" ss:MergeAcross="5"/>
+   </Row>
+   <Row ss:AutoFitHeight="0" ss:Height="11.25">
+    <Cell ss:Index="2" ss:StyleID="s79"/>
+    <Cell ss:StyleID="s87"/>
+    <Cell ss:StyleID="s86"/>
+    <Cell ss:StyleID="s86"/>
+    <Cell ss:StyleID="s89"/>
+    <Cell ss:StyleID="s86"/>
+    <Cell ss:StyleID="s89"/>
+    <Cell ss:StyleID="s89"/>
+    <Cell ss:StyleID="s89"/>
+    <Cell ss:Index="15" ss:StyleID="s90"/>
+   </Row>
+   <Row ss:AutoFitHeight="0" ss:Height="11.25">
+    <Cell ss:Index="2" ss:StyleID="s79"/>
+    <Cell ss:StyleID="s87"/>
+    <Cell ss:StyleID="s86"/>
+    <Cell ss:StyleID="s86"/>
+    <Cell ss:StyleID="s89"/>
+    <Cell ss:StyleID="s86"/>
+    <Cell ss:StyleID="s89"/>
+    <Cell ss:StyleID="s89"/>
+    <Cell ss:StyleID="s89"/>
+    <Cell ss:Index="15" ss:StyleID="s90"/>
+   </Row>
+   <Row ss:AutoFitHeight="0" ss:Height="12">
+    <Cell ss:Index="2" ss:MergeAcross="2" ss:StyleID="s93"/>
+    <Cell ss:MergeAcross="3" ss:StyleID="s94"/>
+    <Cell ss:StyleID="s96"/>
+    <Cell ss:StyleID="s96"/>
+    <Cell ss:MergeAcross="2" ss:StyleID="s93"/>
+    <Cell ss:MergeAcross="6" ss:StyleID="s94"/>
+    <Cell ss:StyleID="s97"/>
+    <Cell ss:MergeAcross="1" ss:StyleID="s99"/>
+    <Cell ss:MergeAcross="3" ss:StyleID="s94"/>
+    <Cell ss:StyleID="s94"/>
+    <Cell ss:StyleID="s94"/>
+    <Cell ss:StyleID="s94"/>
+    <Cell ss:StyleID="s94"/>
+   </Row>
+   <Row ss:AutoFitHeight="0" ss:Height="11.25">
+    <Cell ss:Index="2" ss:MergeAcross="7" ss:MergeDown="1"
+     ss:StyleID="m263084602640"><Data ss:Type="String">Purchases / Arrivals from Outside the State / Country</Data></Cell>
+    <Cell ss:Index="11" ss:MergeAcross="9" ss:MergeDown="1"
+     ss:StyleID="m263084602660"><Data ss:Type="String">Purchases / Arrivals within the State</Data></Cell>
+    <Cell ss:StyleID="s109"/>
+    <Cell ss:MergeAcross="5" ss:MergeDown="1" ss:StyleID="m263084602680"><Data
+      ss:Type="String">Input Tax Charged and Paid in the State</Data></Cell>
+   </Row>
+   <Row ss:AutoFitHeight="0" ss:Height="11.25">
+    <Cell ss:Index="21" ss:StyleID="s109"/>
+   </Row>
+   <Row ss:AutoFitHeight="0" ss:Height="115.5">
+    <Cell ss:Index="2" ss:StyleID="s110"><Data ss:Type="String">Sr. No.</Data></Cell>
+    <Cell ss:StyleID="s110"><Data ss:Type="String">Inv. No. / Date</Data></Cell>
+    <Cell ss:StyleID="s110"><Data ss:Type="String">Name &amp; TIN of the Dealer&#10;from/by whom purchased /&#10;transferred or dispatch&#10;otherwise than by way of sale</Data></Cell>
+    <Cell ss:StyleID="s110"><Data ss:Type="String">Value of Inter-State&#10;purchases including&#10;Purchases u/s 3(b) read&#10;with 6(2) of the CST Act,&#10;excluding CST paid</Data></Cell>
+    <Cell ss:StyleID="s110"><Data ss:Type="String">Value of Arrivals by way&#10;of Stock Transfer or for&#10;sale on consignment&#10;basis</Data></Cell>
+    <Cell ss:StyleID="s110"><Data ss:Type="String">Value of Import of Goods&#10;from outside the country&#10;and the details thereof</Data></Cell>
+    <Cell ss:StyleID="s111"><Data ss:Type="String">Value of Purchase of&#10;goods on which Entry Tax&#10;is payable</Data></Cell>
+    <Cell ss:StyleID="s110"><Data ss:Type="String">Amount of CST Paid in&#10;course of inter-State&#10;purchases</Data></Cell>
+    <Cell ss:Index="11" ss:StyleID="s110"><Data ss:Type="String">Inv. No./ Date</Data></Cell>
+    <Cell ss:StyleID="s110"><Data ss:Type="String">Name &amp; TIN of the&#10;Dealer from / by whom&#10;purchased / transferred&#10;or dispatch otherwise&#10;than by way of sale</Data></Cell>
+    <Cell ss:StyleID="s110"><Data ss:Type="String">Value of Arrival of&#10;goods from Branches / Head Offices / Principle / Agents as&#10;the case may be</Data></Cell>
+    <Cell ss:StyleID="s110"><Data ss:Type="String">Purchase Prices of&#10;exempted goods&#10;listed in Schedule -I of the Act</Data></Cell>
+    <Cell ss:StyleID="s110"><Data ss:Type="String">Purchase Prices of&#10;goods listed in Schedule -&#10;II Part-E of the Act&#10;excluding the Input&#10;Tax charged therein</Data></Cell>
+    <Cell ss:StyleID="s110"><Data ss:Type="String">Purchase Prices of&#10;goods listed in Schedule -&#10;II Part-A i.e. taxable&#10;@1% excluding the Input&#10;Tax charged therein</Data></Cell>
+    <Cell ss:StyleID="s110"><Data ss:Type="String">Purchase Prices of&#10;goods listed in Schedule -&#10;II Part-B i.e. taxable&#10;@4% excluding the Input&#10;Tax charged therein</Data></Cell>
+    <Cell ss:StyleID="s110"><Data ss:Type="String">Purchase Prices of&#10;goods listed in&#10;Schedule - II Part-C&#10;i.e. taxable @4%&#10;excluding the Input&#10;Tax charged therein</Data></Cell>
+    <Cell ss:StyleID="s110"><Data ss:Type="String">Purchase Prices of&#10;goods listed in Schedule -&#10;II Part-D i.e. taxable&#10;@12.5% excluding&#10;the Input Tax&#10;charged therein</Data></Cell>
+    <Cell ss:StyleID="s110"><Data ss:Type="String">Purchase Prices of&#10;goods from unregistered&#10;dealers /persons</Data></Cell>
+    <Cell ss:StyleID="s112"/>
+    <Cell ss:StyleID="s110"><Data ss:Type="String">Amount of Entry Tax paid and claimed as Input Tax </Data></Cell>
+    <Cell ss:StyleID="s110"><Data ss:Type="String">Amount of Input Tax&#10; paid @1% (Schedule II Part A Goods)</Data></Cell>
+    <Cell ss:StyleID="s110"><Data ss:Type="String">Amount of Input Tax&#10; paid @4% (Schedule II Part B Goods)</Data></Cell>
+    <Cell ss:StyleID="s110"><Data ss:Type="String">Amount of Input Tax &#10;paid@4% (Industrial&#10;inputs - Schedule II Part C Goods)</Data></Cell>
+    <Cell ss:StyleID="s110"><Data ss:Type="String">Amount of Input Tax paid @ 12.5 % (Schedule - II Part-D Goods)</Data></Cell>
+    <Cell ss:StyleID="s110"><Data ss:Type="String">Total Amount of Input Tax Paid &#10;(18 + 19 + 20+ 21 + 22)</Data></Cell>
+   </Row>
+   <Row ss:AutoFitHeight="0" ss:Height="11.25" ss:StyleID="s113">
+    <Cell ss:Index="2" ss:StyleID="s114"/>
+    <Cell ss:StyleID="s114"><Data ss:Type="Number">1</Data></Cell>
+    <Cell ss:StyleID="s114"><Data ss:Type="Number">2</Data></Cell>
+    <Cell ss:StyleID="s114"><Data ss:Type="Number">3</Data></Cell>
+    <Cell ss:StyleID="s114"><Data ss:Type="Number">4</Data></Cell>
+    <Cell ss:StyleID="s114"><Data ss:Type="Number">5</Data></Cell>
+    <Cell ss:StyleID="s115"><Data ss:Type="Number">6</Data></Cell>
+    <Cell ss:StyleID="s114"><Data ss:Type="Number">7</Data></Cell>
+    <Cell ss:Index="11" ss:StyleID="s114"><Data ss:Type="Number">8</Data></Cell>
+    <Cell ss:StyleID="s114"><Data ss:Type="Number">9</Data></Cell>
+    <Cell ss:StyleID="s114"><Data ss:Type="Number">10</Data></Cell>
+    <Cell ss:StyleID="s114"><Data ss:Type="Number">11</Data></Cell>
+    <Cell ss:StyleID="s114"><Data ss:Type="Number">12</Data></Cell>
+    <Cell ss:StyleID="s114"><Data ss:Type="Number">13</Data></Cell>
+    <Cell ss:StyleID="s114"><Data ss:Type="Number">14</Data></Cell>
+    <Cell ss:StyleID="s114"><Data ss:Type="Number">15</Data></Cell>
+    <Cell ss:StyleID="s114"><Data ss:Type="Number">16</Data></Cell>
+    <Cell ss:StyleID="s114"><Data ss:Type="Number">17</Data></Cell>
+    <Cell ss:StyleID="s112"/>
+    <Cell ss:StyleID="s114"><Data ss:Type="Number">18</Data></Cell>
+    <Cell ss:StyleID="s114"><Data ss:Type="Number">19</Data></Cell>
+    <Cell ss:StyleID="s114"><Data ss:Type="Number">20</Data></Cell>
+    <Cell ss:StyleID="s114"><Data ss:Type="Number">21</Data></Cell>
+    <Cell ss:StyleID="s114"><Data ss:Type="Number">22</Data></Cell>
+    <Cell ss:StyleID="s114"><Data ss:Type="Number">23</Data></Cell>
+   </Row>
+   <Row ss:AutoFitHeight="0" ss:Height="11.25">
+    <Cell ss:Index="2" ss:StyleID="s114"><Data ss:Type="String">$sl</Data></Cell>
+    <Cell ss:StyleID="s116"><Data ss:Type="String">$invno</Data></Cell>
+    <Cell ss:StyleID="s116"><Data ss:Type="String">$nntini</Data></Cell>
+    <Cell ss:StyleID="s117"><Data ss:Type="String">$iisp</Data></Cell>
+    <Cell ss:StyleID="s117"><Data ss:Type="String">$bti</Data></Cell>
+    <Cell ss:StyleID="s117"><Data ss:Type="String">$imp</Data></Cell>
+    <Cell ss:StyleID="s118"><Data ss:Type="String">$et</Data></Cell>
+    <Cell ss:StyleID="s117"><Data ss:Type="String">$cstpd</Data></Cell>
+    <Cell ss:Index="11" ss:StyleID="s114"><Data ss:Type="String">$sld</Data></Cell>
+    <Cell ss:StyleID="s116"><Data ss:Type="String">$nntint</Data></Cell>
+    <Cell ss:StyleID="s117"><Data ss:Type="String">$cti</Data></Cell>
+    <Cell ss:StyleID="s117"><Data ss:Type="String">$xmg</Data></Cell>
+    <Cell ss:StyleID="s117"><Data ss:Type="String">$stpe</Data></Cell>
+    <Cell ss:StyleID="s117"><Data ss:Type="String">$stpa</Data></Cell>
+    <Cell ss:StyleID="s117"><Data ss:Type="String">$stpb</Data></Cell>
+    <Cell ss:StyleID="s117"><Data ss:Type="String">$stpc</Data></Cell>
+    <Cell ss:StyleID="s117"><Data ss:Type="String">$stpd</Data></Cell>
+    <Cell ss:StyleID="s117"><Data ss:Type="String">$urd</Data></Cell>
+    <Cell ss:StyleID="s119"/>
+    <Cell ss:StyleID="s117"><Data ss:Type="String">$etp</Data></Cell>
+    <Cell ss:StyleID="s117"><Data ss:Type="String">$stpap</Data></Cell>
+    <Cell ss:StyleID="s117"><Data ss:Type="String">$stpbp</Data></Cell>
+    <Cell ss:StyleID="s117"><Data ss:Type="String">$stpcp</Data></Cell>
+    <Cell ss:StyleID="s117"><Data ss:Type="String">$stpdp</Data></Cell>
+    <Cell ss:StyleID="s117"><Data ss:Type="String">$ttxp</Data></Cell>
+   </Row>
+   <Row ss:AutoFitHeight="0" ss:Height="11.25">
+    <Cell ss:Index="22" ss:StyleID="s97"/>
+    <Cell ss:StyleID="s97"/>
+    <Cell ss:StyleID="s97"/>
+    <Cell ss:StyleID="s97"/>
+    <Cell ss:StyleID="s97"/>
+    <Cell ss:StyleID="s97"/>
+   </Row>
+   <Row ss:AutoFitHeight="0" ss:Height="11.25">
+    <Cell ss:Index="22" ss:StyleID="s97"/>
+    <Cell ss:StyleID="s97"/>
+    <Cell ss:StyleID="s97"/>
+    <Cell ss:StyleID="s97"/>
+    <Cell ss:StyleID="s97"/>
+    <Cell ss:StyleID="s97"/>
+   </Row>
+   <Row ss:AutoFitHeight="0" ss:Height="11.25">
+    <Cell ss:Index="2" ss:MergeAcross="2" ss:StyleID="s120"><Data ss:Type="String">Returns/Additions:</Data></Cell>
+    <Cell ss:Index="22" ss:StyleID="s97"/>
+    <Cell ss:StyleID="s97"/>
+    <Cell ss:StyleID="s97"/>
+    <Cell ss:StyleID="s97"/>
+    <Cell ss:StyleID="s97"/>
+    <Cell ss:StyleID="s97"/>
+   </Row>
+   <Row ss:AutoFitHeight="0" ss:Height="11.25">
+    <Cell ss:Index="2" ss:StyleID="s114"><Data ss:Type="String">$srl</Data></Cell>
+    <Cell ss:StyleID="s116"><Data ss:Type="String">$invnor</Data></Cell>
+    <Cell ss:StyleID="s116"><Data ss:Type="String">$nntinir</Data></Cell>
+    <Cell ss:StyleID="s117"><Data ss:Type="String">$iispr</Data></Cell>
+    <Cell ss:StyleID="s117"><Data ss:Type="String">$btir</Data></Cell>
+    <Cell ss:StyleID="s117"><Data ss:Type="String">$impr</Data></Cell>
+    <Cell ss:StyleID="s118"><Data ss:Type="String">$etr</Data></Cell>
+    <Cell ss:StyleID="s117"><Data ss:Type="String">$cstpdr</Data></Cell>
+    <Cell ss:Index="11" ss:StyleID="s114"><Data ss:Type="String">$sldr</Data></Cell>
+    <Cell ss:StyleID="s116"><Data ss:Type="String">$nntintr</Data></Cell>
+    <Cell ss:StyleID="s117"><Data ss:Type="String">$ctir</Data></Cell>
+    <Cell ss:StyleID="s117"><Data ss:Type="String">$xmgr</Data></Cell>
+    <Cell ss:StyleID="s117"><Data ss:Type="String">$stper</Data></Cell>
+    <Cell ss:StyleID="s117"><Data ss:Type="String">$stpar</Data></Cell>
+    <Cell ss:StyleID="s117"><Data ss:Type="String">$stpbr</Data></Cell>
+    <Cell ss:StyleID="s117"><Data ss:Type="String">$stpcr</Data></Cell>
+    <Cell ss:StyleID="s117"><Data ss:Type="String">$stpdr</Data></Cell>
+    <Cell ss:StyleID="s117"><Data ss:Type="String">$urdr</Data></Cell>
+    <Cell ss:Index="22" ss:StyleID="s117"><Data ss:Type="String">$etpr</Data></Cell>
+    <Cell ss:StyleID="s117"><Data ss:Type="String">$stpapr</Data></Cell>
+    <Cell ss:StyleID="s117"><Data ss:Type="String">$stpbpr</Data></Cell>
+    <Cell ss:StyleID="s117"><Data ss:Type="String">$stpcpr</Data></Cell>
+    <Cell ss:StyleID="s117"><Data ss:Type="String">$stpdpr</Data></Cell>
+    <Cell ss:StyleID="s117"><Data ss:Type="String">$ttxpr</Data></Cell>
+   </Row>
+   <Row ss:AutoFitHeight="0" ss:Height="11.25">
+    <Cell ss:Index="4" ss:StyleID="s120"><Data ss:Type="String">Returns/Additions :</Data></Cell>
+    <Cell ss:StyleID="s117"><Data ss:Type="String">$iisprt</Data></Cell>
+    <Cell ss:StyleID="s117"><Data ss:Type="String">$btirt</Data></Cell>
+    <Cell ss:StyleID="s117"><Data ss:Type="String">$imprt</Data></Cell>
+    <Cell ss:StyleID="s118"><Data ss:Type="String">$etrt</Data></Cell>
+    <Cell ss:StyleID="s117"><Data ss:Type="String">$cstpdrt</Data></Cell>
+    <Cell ss:Index="12" ss:StyleID="s120"><Data ss:Type="String">Returns/Additions :</Data></Cell>
+    <Cell ss:StyleID="s117"><Data ss:Type="String">$ctirt</Data></Cell>
+    <Cell ss:StyleID="s117"><Data ss:Type="String">$xmgrt</Data></Cell>
+    <Cell ss:StyleID="s117"><Data ss:Type="String">$stpert</Data></Cell>
+    <Cell ss:StyleID="s117"><Data ss:Type="String">$stpart</Data></Cell>
+    <Cell ss:StyleID="s117"><Data ss:Type="String">$stpbrt</Data></Cell>
+    <Cell ss:StyleID="s117"><Data ss:Type="String">$stpcrt</Data></Cell>
+    <Cell ss:StyleID="s117"><Data ss:Type="String">$stpdrt</Data></Cell>
+    <Cell ss:StyleID="s117"><Data ss:Type="String">$urdrt</Data></Cell>
+    <Cell ss:Index="22" ss:StyleID="s117"><Data ss:Type="String">$etprt</Data></Cell>
+    <Cell ss:StyleID="s117"><Data ss:Type="String">$stpaprt</Data></Cell>
+    <Cell ss:StyleID="s117"><Data ss:Type="String">$stpbprt</Data></Cell>
+    <Cell ss:StyleID="s117"><Data ss:Type="String">$stpcprt</Data></Cell>
+    <Cell ss:StyleID="s117"><Data ss:Type="String">$stpdprt</Data></Cell>
+    <Cell ss:StyleID="s117"><Data ss:Type="String">$ttxprt</Data></Cell>
+   </Row>
+   <Row ss:AutoFitHeight="0" ss:Height="11.25">
+    <Cell ss:Index="4" ss:StyleID="s120"><Data ss:Type="String">Nett Purchases:</Data></Cell>
+    <Cell ss:StyleID="s117"><Data ss:Type="String">$iisptt</Data></Cell>
+    <Cell ss:StyleID="s117"><Data ss:Type="String">$btitt</Data></Cell>
+    <Cell ss:StyleID="s117"><Data ss:Type="String">$imptt</Data></Cell>
+    <Cell ss:StyleID="s118"><Data ss:Type="String">$ettt</Data></Cell>
+    <Cell ss:StyleID="s117"><Data ss:Type="String">$cstpdtt</Data></Cell>
+    <Cell ss:Index="12" ss:StyleID="s120"><Data ss:Type="String">Nett Purchases:</Data></Cell>
+    <Cell ss:StyleID="s117"><Data ss:Type="String">$ctitt</Data></Cell>
+    <Cell ss:StyleID="s117"><Data ss:Type="String">$xmgtt</Data></Cell>
+    <Cell ss:StyleID="s117"><Data ss:Type="String">$stpett</Data></Cell>
+    <Cell ss:StyleID="s117"><Data ss:Type="String">$stpatt</Data></Cell>
+    <Cell ss:StyleID="s117"><Data ss:Type="String">$stpbtt</Data></Cell>
+    <Cell ss:StyleID="s117"><Data ss:Type="String">$stpctt</Data></Cell>
+    <Cell ss:StyleID="s117"><Data ss:Type="String">$stpdtt</Data></Cell>
+    <Cell ss:StyleID="s117"><Data ss:Type="String">$urdtt</Data></Cell>
+    <Cell ss:Index="22" ss:StyleID="s117"><Data ss:Type="String">$etptt</Data></Cell>
+    <Cell ss:StyleID="s117"><Data ss:Type="String">$stpaptt</Data></Cell>
+    <Cell ss:StyleID="s117"><Data ss:Type="String">$stpbptt</Data></Cell>
+    <Cell ss:StyleID="s117"><Data ss:Type="String">$stpcptt</Data></Cell>
+    <Cell ss:StyleID="s117"><Data ss:Type="String">$stpdptt</Data></Cell>
+    <Cell ss:StyleID="s117"><Data ss:Type="String">$ttxptt</Data></Cell>
+   </Row>
+   <Row ss:AutoFitHeight="0" ss:Height="11.25">
+    <Cell ss:Index="22" ss:StyleID="s97"/>
+    <Cell ss:StyleID="s97"/>
+    <Cell ss:StyleID="s97"/>
+    <Cell ss:StyleID="s97"/>
+    <Cell ss:StyleID="s97"/>
+    <Cell ss:StyleID="s97"/>
+   </Row>
+   <Row ss:AutoFitHeight="0" ss:Height="11.25">
+    <Cell ss:Index="22" ss:StyleID="s97"/>
+    <Cell ss:StyleID="s97"/>
+    <Cell ss:StyleID="s97"/>
+    <Cell ss:StyleID="s97"/>
+    <Cell ss:StyleID="s97"/>
+    <Cell ss:StyleID="s97"/>
+   </Row>
+   <Row ss:AutoFitHeight="0" ss:Height="11.25">
+    <Cell ss:Index="22" ss:StyleID="s97"/>
+    <Cell ss:StyleID="s97"/>
+    <Cell ss:StyleID="s97"/>
+    <Cell ss:StyleID="s97"/>
+    <Cell ss:StyleID="s97"/>
+    <Cell ss:StyleID="s97"/>
+   </Row>
+   <Row ss:AutoFitHeight="0" ss:Height="11.25">
+    <Cell ss:Index="3" ss:StyleID="s122"/>
+    <Cell ss:StyleID="s122"/>
+    <Cell ss:StyleID="s122"/>
+    <Cell ss:StyleID="s122"/>
+    <Cell ss:StyleID="s122"/>
+    <Cell ss:StyleID="s122"/>
+    <Cell ss:StyleID="s122"/>
+    <Cell ss:StyleID="s122"/>
+    <Cell ss:StyleID="s122"/>
+    <Cell ss:StyleID="s122"/>
+    <Cell ss:StyleID="s122"/>
+    <Cell ss:Index="22" ss:StyleID="s97"/>
+    <Cell ss:StyleID="s97"/>
+    <Cell ss:StyleID="s97"/>
+    <Cell ss:StyleID="s97"/>
+    <Cell ss:StyleID="s97"/>
+    <Cell ss:StyleID="s97"/>
+   </Row>
+   <Row ss:AutoFitHeight="0" ss:Height="11.25">
+    <Cell ss:Index="3" ss:StyleID="s122"/>
+    <Cell ss:StyleID="s122"/>
+    <Cell ss:StyleID="s122"/>
+    <Cell ss:StyleID="s122"/>
+    <Cell ss:StyleID="s122"/>
+    <Cell ss:StyleID="s122"/>
+    <Cell ss:StyleID="s122"/>
+    <Cell ss:StyleID="s122"/>
+    <Cell ss:StyleID="s122"/>
+    <Cell ss:StyleID="s122"/>
+    <Cell ss:StyleID="s122"/>
+    <Cell ss:Index="22" ss:StyleID="s97"/>
+    <Cell ss:StyleID="s97"/>
+    <Cell ss:StyleID="s97"/>
+    <Cell ss:StyleID="s97"/>
+    <Cell ss:StyleID="s97"/>
+    <Cell ss:StyleID="s97"/>
+   </Row>
+   <Row ss:AutoFitHeight="0" ss:Height="11.25">
+    <Cell ss:Index="3" ss:StyleID="s122"/>
+    <Cell ss:StyleID="s122"/>
+    <Cell ss:StyleID="s122"/>
+    <Cell ss:StyleID="s122"/>
+    <Cell ss:StyleID="s122"/>
+    <Cell ss:StyleID="s122"/>
+    <Cell ss:StyleID="s122"/>
+    <Cell ss:StyleID="s122"/>
+    <Cell ss:StyleID="s122"/>
+    <Cell ss:StyleID="s122"/>
+    <Cell ss:StyleID="s122"/>
+    <Cell ss:Index="22" ss:StyleID="s97"/>
+    <Cell ss:StyleID="s97"/>
+    <Cell ss:StyleID="s97"/>
+    <Cell ss:StyleID="s97"/>
+    <Cell ss:StyleID="s97"/>
+    <Cell ss:StyleID="s97"/>
+   </Row>
+   <Row ss:AutoFitHeight="0" ss:Height="11.25">
+    <Cell ss:Index="3" ss:StyleID="s123"/>
+    <Cell ss:StyleID="s123"/>
+    <Cell ss:StyleID="s123"/>
+    <Cell ss:StyleID="s123"/>
+    <Cell ss:StyleID="s123"/>
+    <Cell ss:StyleID="s123"/>
+    <Cell ss:StyleID="s123"/>
+    <Cell ss:StyleID="s123"/>
+    <Cell ss:StyleID="s123"/>
+    <Cell ss:StyleID="s123"/>
+    <Cell ss:StyleID="s123"/>
+    <Cell ss:StyleID="s124"/>
+    <Cell ss:StyleID="s124"/>
+    <Cell ss:StyleID="s124"/>
+    <Cell ss:Index="22" ss:MergeAcross="5" ss:StyleID="s66"><Data ss:Type="String">VERIFICATION</Data></Cell>
+   </Row>
+   <Row ss:AutoFitHeight="0" ss:Height="11.25">
+    <Cell ss:Index="2" ss:StyleID="s112"/>
+    <Cell ss:StyleID="s125"/>
+    <Cell ss:StyleID="s125"/>
+    <Cell ss:StyleID="s126"/>
+    <Cell ss:StyleID="s126"/>
+    <Cell ss:StyleID="s126"/>
+    <Cell ss:StyleID="s126"/>
+    <Cell ss:StyleID="s126"/>
+    <Cell ss:StyleID="s127"/>
+    <Cell ss:StyleID="s122"/>
+    <Cell ss:StyleID="s122"/>
+    <Cell ss:StyleID="s122"/>
+    <Cell ss:Index="22" ss:MergeAcross="5"><Data ss:Type="String">The above details are true and complete to the best of my knowledge and belief and nothing has been concealed therein.</Data></Cell>
+   </Row>
+   <Row ss:AutoFitHeight="0" ss:Height="11.25">
+    <Cell ss:Index="2" ss:StyleID="s128"/>
+    <Cell ss:StyleID="s129"/>
+    <Cell ss:StyleID="s129"/>
+    <Cell ss:StyleID="s129"/>
+    <Cell ss:StyleID="s129"/>
+    <Cell ss:StyleID="s129"/>
+    <Cell ss:StyleID="s129"/>
+    <Cell ss:StyleID="s127"/>
+    <Cell ss:StyleID="s127"/>
+    <Cell ss:StyleID="s122"/>
+    <Cell ss:StyleID="s122"/>
+    <Cell ss:StyleID="s122"/>
+   </Row>
+   <Row ss:AutoFitHeight="0" ss:Height="11.25">
+    <Cell ss:Index="2" ss:StyleID="s128"/>
+    <Cell ss:StyleID="s129"/>
+    <Cell ss:StyleID="s129"/>
+    <Cell ss:StyleID="s129"/>
+    <Cell ss:StyleID="s129"/>
+    <Cell ss:StyleID="s129"/>
+    <Cell ss:StyleID="s129"/>
+    <Cell ss:StyleID="s127"/>
+    <Cell ss:StyleID="s127"/>
+    <Cell ss:StyleID="s122"/>
+    <Cell ss:StyleID="s122"/>
+    <Cell ss:StyleID="s122"/>
+    <Cell ss:Index="15" ss:StyleID="s94"><Data ss:Type="String"></Data></Cell>
+    <Cell ss:Index="26" ss:StyleID="s130"><Data ss:Type="String">Signature</Data></Cell>
+    <Cell ss:StyleID="s131"><Data ss:Type="String">$sig</Data></Cell>
+   </Row>
+   <Row ss:AutoFitHeight="0">
+    <Cell ss:Index="2" ss:StyleID="s112"/>
+    <Cell ss:StyleID="s132"/>
+    <Cell ss:StyleID="s132"/>
+    <Cell ss:StyleID="s132"/>
+    <Cell ss:MergeAcross="2" ss:StyleID="s132"/>
+    <Cell ss:StyleID="s134"/>
+    <Cell ss:StyleID="s134"/>
+    <Cell ss:StyleID="s122"/>
+    <Cell ss:StyleID="s122"/>
+    <Cell ss:StyleID="s122"/>
+    <Cell ss:Index="22"><Data ss:Type="String">Place: </Data></Cell>
+    <Cell><Data ss:Type="String">$place</Data></Cell>
+    <Cell ss:Index="26" ss:StyleID="s130"><Data ss:Type="String">Status: </Data></Cell>
+    <Cell ss:StyleID="s135"><Data ss:Type="String">$status</Data></Cell>
+   </Row>
+   <Row ss:AutoFitHeight="0">
+    <Cell ss:Index="3" ss:StyleID="s122"/>
+    <Cell ss:StyleID="s122"/>
+    <Cell ss:StyleID="s122"/>
+    <Cell ss:StyleID="s122"/>
+    <Cell ss:StyleID="s122"/>
+    <Cell ss:StyleID="s122"/>
+    <Cell ss:StyleID="s122"/>
+    <Cell ss:StyleID="s122"/>
+    <Cell ss:StyleID="s122"/>
+    <Cell ss:StyleID="s122"/>
+    <Cell ss:StyleID="s122"/>
+    <Cell ss:Index="22"><Data ss:Type="String">Date:</Data></Cell>
+    <Cell><Data ss:Type="String">$rfdate</Data></Cell>
+    <Cell ss:Index="26" ss:StyleID="s130"><Data ss:Type="String">Full Name : </Data></Cell>
+    <Cell ss:StyleID="s135"><Data ss:Type="String">$fullname</Data></Cell>
+   </Row>
+   <Row ss:AutoFitHeight="0">
+    <Cell ss:Index="3" ss:StyleID="s122"/>
+    <Cell ss:StyleID="s122"/>
+    <Cell ss:StyleID="s122"/>
+    <Cell ss:StyleID="s122"/>
+    <Cell ss:StyleID="s122"/>
+    <Cell ss:StyleID="s122"/>
+    <Cell ss:StyleID="s122"/>
+    <Cell ss:StyleID="s122"/>
+    <Cell ss:StyleID="s122"/>
+    <Cell ss:StyleID="s122"/>
+    <Cell ss:StyleID="s122"/>
+   </Row>
+   <Row ss:AutoFitHeight="0">
+    <Cell ss:Index="3" ss:StyleID="s122"/>
+    <Cell ss:StyleID="s122"/>
+    <Cell ss:StyleID="s122"/>
+    <Cell ss:StyleID="s122"/>
+    <Cell ss:StyleID="s122"/>
+    <Cell ss:StyleID="s122"/>
+    <Cell ss:StyleID="s122"/>
+    <Cell ss:StyleID="s122"/>
+    <Cell ss:StyleID="s122"/>
+    <Cell ss:StyleID="s122"/>
+    <Cell ss:StyleID="s122"/>
+   </Row>
+  </Table>
+  <WorksheetOptions xmlns="urn:schemas-microsoft-com:office:excel">
+   <PageSetup>
+    <Layout x:Orientation="Landscape" x:CenterHorizontal="1"/>
+    <Header x:Margin="0.31496062992126"/>
+    <Footer x:Margin="0.31496062992126"/>
+    <PageMargins x:Bottom="0.74803040244969399" x:Left="0.70866141732283505"
+     x:Right="0.70866141732283505" x:Top="0.74803040244969399"/>
+   </PageSetup>
+   <Unsynced/>
+   <FitToPage/>
+   <Print>
+    <ValidPrinterInfo/>
+    <PaperSizeIndex>9</PaperSizeIndex>
+    <Scale>85</Scale>
+    <HorizontalResolution>-1</HorizontalResolution>
+    <VerticalResolution>-1</VerticalResolution>
+   </Print>
+   <Selected/>
+   <Panes>
+    <Pane>
+     <Number>3</Number>
+     <ActiveRow>9</ActiveRow>
+     <ActiveCol>4</ActiveCol>
+     <RangeSelection>R10C5:R10C9</RangeSelection>
+    </Pane>
+   </Panes>
+   <ProtectObjects>False</ProtectObjects>
+   <ProtectScenarios>False</ProtectScenarios>
+  </WorksheetOptions>
+ </Worksheet>
+</Workbook>

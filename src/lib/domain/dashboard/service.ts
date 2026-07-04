@@ -8,6 +8,9 @@ export async function getDashboardMetrics() {
   const todayStr = now.toISOString().split('T')[0];
   const today = new Date(`${todayStr}T00:00:00.000Z`);
   const firstOfMonth = new Date(now.getFullYear(), now.getMonth(), 1);
+  
+  const sevenDaysAgo = new Date(today);
+  sevenDaysAgo.setDate(sevenDaysAgo.getDate() - 6);
 
   const [
     salesToday,
@@ -17,7 +20,9 @@ export async function getDashboardMetrics() {
     expensesToday,
     expensesMonth,
     latestDayBook,
-    parties
+    parties,
+    sevenDaySales,
+    sevenDayExpenses
   ] = await Promise.all([
     db.outgoingSale.aggregate({
       _sum: { amount: true, finalAmount: true },
@@ -53,6 +58,14 @@ export async function getDashboardMetrics() {
           take: 1
         }
       }
+    }),
+    db.outgoingSale.findMany({
+      where: { saleDate: { gte: sevenDaysAgo } },
+      select: { saleDate: true, finalAmount: true, amount: true }
+    }),
+    db.expense.findMany({
+      where: { expenseDate: { gte: sevenDaysAgo } },
+      select: { expenseDate: true, amount: true }
     })
   ]);
 
@@ -67,6 +80,28 @@ export async function getDashboardMetrics() {
       if (bal > 0) totalToReceive += bal;
       else if (bal < 0) totalToPay += Math.abs(bal);
     }
+  }
+
+  // Generate 7-day chart data
+  const chartData = [];
+  const days = ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"];
+  for (let i = 0; i < 7; i++) {
+    const d = new Date(sevenDaysAgo);
+    d.setDate(d.getDate() + i);
+    const dayStr = d.toISOString().split('T')[0];
+    
+    const daySales = sevenDaySales.filter((s: any) => s.saleDate.toISOString().split('T')[0] === dayStr)
+      .reduce((sum: number, s: any) => sum + (s.finalAmount || s.amount || 0), 0);
+      
+    const dayExpenses = sevenDayExpenses.filter((e: any) => e.expenseDate.toISOString().split('T')[0] === dayStr)
+      .reduce((sum: number, e: any) => sum + (e.amount || 0), 0);
+
+    chartData.push({
+      name: days[d.getDay()],
+      sales: daySales,
+      expenses: dayExpenses,
+      date: dayStr
+    });
   }
 
   return {
@@ -84,6 +119,7 @@ export async function getDashboardMetrics() {
     bankBalance: latestDayBook?.closingBankBalance || 0,
     outstandingCredit: totalOutstandingCredit,
     totalToReceive,
-    totalToPay
+    totalToPay,
+    chartData
   };
 }

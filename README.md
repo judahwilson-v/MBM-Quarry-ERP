@@ -49,5 +49,5 @@ All documentation is in [`docs/`](./docs/).
 
 ## Project Status
 
-**RC1 — v0.1.0-rc1** · Field Testing phase
+**v1.9.0** · Field Testing phase
 See [`docs/PROJECT_STATE.md`](./docs/PROJECT_STATE.md) for full status.

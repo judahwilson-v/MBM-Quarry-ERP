@@ -1,0 +1,9 @@
+
+> mbm-quarry-erp@0.1.0 electron:dev
+> node scripts/electron-dev.js
+
+
+✅ Found existing Next.js dev server on port 3005. Reusing it!
+
+🖥️  Starting Electron application...
+Electron app closed with code 0.

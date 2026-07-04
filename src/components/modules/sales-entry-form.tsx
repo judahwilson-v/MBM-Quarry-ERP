@@ -350,7 +350,7 @@ export function SalesEntryForm({
 
           <Field label="Discount Type">
             <select
-              className="h-10 w-full rounded-md border bg-background px-3 text-sm"
+              className="flex h-10 w-full rounded-lg border border-input bg-background px-3 py-2 text-sm text-foreground shadow-[var(--shadow-card)] transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:border-accent"
               value={form.discountType}
               onChange={(event) => updateForm("discountType", event.target.value as "percentage" | "fixed")}
             >

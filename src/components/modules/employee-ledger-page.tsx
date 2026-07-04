@@ -44,6 +44,7 @@ export function EmployeeLedgerPage({ id }: { id: string }) {
 
   useEffect(() => {
     void load();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [id]);
 
   async function submit() {

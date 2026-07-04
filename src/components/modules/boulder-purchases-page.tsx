@@ -90,6 +90,7 @@ export function BoulderPurchasesPage() {
         }));
       });
     }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   const load = useCallback(async () => {

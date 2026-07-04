@@ -18,7 +18,7 @@ function startOfBusinessDay(value: string) {
 }
 
 
-async function getOrCreateDayBook(tx: Prisma.TransactionClient, businessDate: string) {
+export async function getOrCreateDayBook(tx: Prisma.TransactionClient, businessDate: string) {
   const day = startOfBusinessDay(businessDate);
   const existing = await tx.dayBook.findUnique({ where: { businessDate: day } });
   if (existing) return existing;

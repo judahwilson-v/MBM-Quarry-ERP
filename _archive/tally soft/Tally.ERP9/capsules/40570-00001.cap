@@ -1,0 +1,42 @@
+<CSTFormsHistoryVO>
+    <periodFrom>$periodfrom</periodFrom>
+    <periodTo>$periodto</periodTo>
+    <canReqFormNo></canReqFormNo>
+    <canReason></canReason>
+    <version>1.0.1.25</version>
+    <tempFormName>e-CST Form E1/E2</tempFormName>
+    <salesInvoiceLst>
+        <salesInvoiceLstBean>
+            <placeMovement>$placeofgoods</placeMovement>
+            <invoiceNo>$invoiceno</invoiceNo>
+            <invoiceDate>$invoicedate</invoiceDate>
+            <qtyWeightGood>$qty</qtyWeightGood>
+            <otherUnit>$others</otherUnit>
+            <valueGood>$valueofgoods</valueGood>
+            <tax>$tax</tax>
+            <totalValue>$totalvalue</totalValue>
+            <purchaserName>$purchasedlr</purchaserName>
+            <purchaserTin>$purchtin</purchaserTin>
+            <purchaserAddress>$address</purchaserAddress>
+            <purchaserCFormNo>$formcno</purchaserCFormNo>
+            <CFormRecievedDate>$formcdate</CFormRecievedDate>
+            <noOfReceipt>$tranportno</noOfReceipt>
+            <consigneeName>$consigneename</consigneeName>
+            <consigneeTin>$consigneetin</consigneeTin>
+            <dateOfReceipt>$tranportdate</dateOfReceipt>
+            <placeOfConsignedGoods>$consignedplace</placeOfConsignedGoods>
+            <certificateNo>$e1certificateno</certificateNo>
+            <docNo>$docnumber</docNo>
+            <docDate>$documentdate</docDate>
+            <permitNo>$permitno</permitNo>
+            <formType>$formtype</formType>
+            <stateMovement>$stateofgoods</stateMovement>
+            <commodityDesc>$descofgoods</commodityDesc>
+            <unit>$unit</unit>
+            <purchaserState>$State</purchaserState>
+            <stateOfConsignedGoods>$consignedgoods</stateOfConsignedGoods>
+            <docName>$typeofdoc</docName>
+            <permitType>$permitfrom</permitType>
+        </salesInvoiceLstBean>
+    </salesInvoiceLst>
+</CSTFormsHistoryVO>

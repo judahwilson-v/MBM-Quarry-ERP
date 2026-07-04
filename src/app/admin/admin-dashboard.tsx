@@ -1,11 +1,11 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { useToast } from "@/components/ui/use-toast";
 import { forceSync, resetSyncQueue, getDatabaseInfo } from "@/app/actions/admin";
-import { Database, RefreshCw, AlertTriangle, Download } from "lucide-react";
+import { Database, RefreshCw, AlertTriangle } from "lucide-react";
 
 export function AdminDashboard({ expectedPin }: { expectedPin: string }) {
   const [isAuthenticated, setIsAuthenticated] = useState(false);
