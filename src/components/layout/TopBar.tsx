@@ -84,8 +84,9 @@ export default function TopBar({
             ))}
           </nav>
         )}
-        <h1 className="text-xl font-bold text-[var(--text-primary)] tracking-tight">
+        <h1 className="text-xl font-bold text-[var(--text-primary)] tracking-tight flex items-center gap-2">
           {title}
+          <span className="text-xs bg-[var(--accent)] text-white px-2 py-0.5 rounded-full">v1.9.1</span>
         </h1>
       </div>
 

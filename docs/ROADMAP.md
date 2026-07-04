@@ -28,7 +28,24 @@
 
 ---
 
-## Phase 8: Owner Dashboard (Scheduled — after Phase 7)
+## Phase 8: Refinement, Sync Validation & UI Polish (Current Phase)
+- Fix auto-updater and confirm remote desktop updates (Completed v1.9.0).
+- Run full local tests and QA.
+- Remove any unwanted features or clutter.
+- Verify 100% of data is correctly saving/syncing to Supabase.
+- Add any missing features needed for daily operations.
+- Make the UI better, cleaner, and more polished.
+
+---
+
+## Phase 8.5: Dynamic System Automation
+- Automate hardcoded system details in `About` page.
+- Make Database Schema version dynamically read from Prisma/Migrations so any table update reflects automatically.
+- Make Cloud Sync connection and SQLite connection status dynamic and real-time.
+
+---
+
+## Phase 9: Owner Dashboard Web App (Scheduled)
 > A **separate** Next.js web app. Do not merge into the Electron ERP.
 
 - Read-only dashboard connecting directly to Supabase.
@@ -37,13 +54,6 @@
 - Sync Status widget: last sync time, pending changes, DB version.
 - Responsive for desktop, tablet, and mobile.
 - Full PRD at `docs/OWNER_DASHBOARD_PRD.md`.
-
----
-
-## Phase 9: MBM Mobile (Future — not planned yet)
-- Android / iOS app for on-the-go owner monitoring.
-- Read-only, connected to Supabase.
-- Push notifications for sales milestones.
 
 ---
 

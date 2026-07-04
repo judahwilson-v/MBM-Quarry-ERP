@@ -47,4 +47,5 @@ See `docs/IDEAS.md` for unconfirmed feature ideas.
 ## Next Confirmed Phases
 - **Field Testing**: Deploy to quarry PC, collect feedback (1–2 weeks)
 - **Phase 7**: Tally Integration (GST billing XML export) — after field testing
-- **Phase 8**: Owner Dashboard (separate Next.js web app, read-only, Supabase-connected)
+- **Phase 8**: Refinement, Sync Validation & UI Polish (Current Focus)
+- **Phase 9**: Owner Dashboard (separate Next.js web app, read-only, Supabase-connected)
