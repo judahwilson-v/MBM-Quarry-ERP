@@ -607,8 +607,8 @@ export async function saveIncomingBoulder(input: IncomingBoulderInput) {
     combinedPayment: input.combinedPayment || false,
     remarks: cleanText(input.remarks),
   };
-  const normalizedVehicle = normalizeVehicleNumber(requiredText(input.vehicleNumber, "Vehicle number"));
-  const partyName = requiredText(input.partyName, "Party name");
+  const normalizedVehicle = normalizeVehicleNumber(cleanText(input.vehicleNumber) ?? "");
+  const partyName = cleanText(input.partyName) ?? "";
   
   let partyId = null;
   if (partyName) {

@@ -241,8 +241,6 @@ export function SalesEntryForm({
     setError("");
     setMessage("");
     try {
-      if (!form.vehicleNumber?.trim()) throw new Error("Vehicle Number is required.");
-      if (!form.partyName?.trim()) throw new Error("Party Name is required.");
       if (!form.materialId) throw new Error("Material is required.");
       if (!form.qty || Number(form.qty) <= 0) throw new Error("Quantity must be greater than 0.");
       if (!form.ratePerCft || Number(form.ratePerCft) < 0) throw new Error("Rate must be a valid number.");

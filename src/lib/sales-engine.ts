@@ -109,8 +109,8 @@ function parseDateInput(value?: string | null) {
 }
 
 export function deriveSalesEngine(draft: SalesDraft, deps: SalesEngineDeps) {
-  const vehicleNumber = normalizeVehicleNumber(requiredText(draft.vehicleNumber, "Vehicle number"));
-  const partyName = requiredText(draft.partyName, "Party name");
+  const vehicleNumber = normalizeVehicleNumber(cleanText(draft.vehicleNumber) ?? "");
+  const partyName = cleanText(draft.partyName) ?? "";
   const material = deps.material;
   if (!material) throw new Error("Material is required.");
 
