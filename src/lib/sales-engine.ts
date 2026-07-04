@@ -122,8 +122,8 @@ export function deriveSalesEngine(draft: SalesDraft, deps: SalesEngineDeps) {
 
   const autoQty = deps.vehicle?.companyBodyQty ?? deps.vehicle?.extraBodyQty ?? null;
   const originalQty = qtyInput;
-  const qty = autoQty && autoQty > 0 ? autoQty : qtyInput;
-  const qtyChanged = autoQty !== null && autoQty !== undefined && roundMoney(originalQty) !== roundMoney(qty);
+  const qty = qtyInput;
+  const qtyChanged = autoQty !== null && autoQty !== undefined && autoQty > 0 && roundMoney(autoQty) !== roundMoney(qty);
   const quantityReason = qtyChanged ? cleanText(draft.quantityReason) : null;
 
   if (qty <= 0) throw new Error("Qty must be greater than 0.");

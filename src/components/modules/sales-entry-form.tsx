@@ -351,6 +351,21 @@ export function SalesEntryForm({
               onChange={(e) => updateForm("qty", e.target.value)}
             />
           </Field>
+          {(() => {
+            const vehicle = vehicles.find(v => v.id === form.vehicleId);
+            const defaultQty = vehicle?.companyBodyQty ?? vehicle?.extraBodyQty ?? null;
+            const isChanged = defaultQty !== null && defaultQty > 0 && Number(form.qty) !== defaultQty;
+            if (!isChanged) return null;
+            return (
+              <Field label="Quantity Reason (Required)">
+                <Input 
+                  value={form.quantityReason} 
+                  onChange={(e) => updateForm("quantityReason", e.target.value)} 
+                  placeholder="Why did qty change?"
+                />
+              </Field>
+            );
+          })()}
 
           <Field label="Discount Type">
             <select

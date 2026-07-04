@@ -17,6 +17,8 @@ export function SystemDiagnostics({
   const { toast } = useToast();
   const [isChecking, setIsChecking] = useState(false);
   const [updateStatus, setUpdateStatus] = useState<string | null>(null);
+  const [updateAvailable, setUpdateAvailable] = useState(false);
+  const [updateDownloaded, setUpdateDownloaded] = useState(false);
 
   useEffect(() => {
     if (typeof window !== "undefined" && (window as any).electron) {
@@ -34,10 +36,11 @@ export function SystemDiagnostics({
             
           case "available":
             setIsChecking(false);
+            setUpdateAvailable(true);
             setUpdateStatus("Update available");
             toast({
               title: "Update Found!",
-              description: `A new version is available. It is downloading in the background.`,
+              description: `A new version is available. Click 'Download Update' to begin.`,
             });
             break;
             
@@ -56,10 +59,12 @@ export function SystemDiagnostics({
             
           case "downloaded":
             setIsChecking(false);
+            setUpdateAvailable(false);
+            setUpdateDownloaded(true);
             setUpdateStatus("Ready to install");
             toast({
               title: "Update Ready",
-              description: "The update has been downloaded and will be installed on restart.",
+              description: "The update has been downloaded. Click 'Install Update' to restart and apply.",
             });
             break;
             
@@ -110,6 +115,35 @@ export function SystemDiagnostics({
     }
   };
 
+  const handleDownloadUpdate = async () => {
+    if (typeof window !== "undefined" && (window as any).electron) {
+      setUpdateStatus("Starting download...");
+      setUpdateAvailable(false);
+      try {
+        await (window as any).electron.downloadUpdate();
+      } catch (err: any) {
+        console.error("Failed to download update", err);
+        setUpdateStatus("Download failed");
+        toast({
+          title: "Download Error",
+          description: err.message || "Failed to start download.",
+          variant: "destructive"
+        });
+      }
+    }
+  };
+
+  const handleInstallUpdate = async () => {
+    if (typeof window !== "undefined" && (window as any).electron) {
+      setUpdateStatus("Installing...");
+      try {
+        await (window as any).electron.installUpdate();
+      } catch (err: any) {
+        console.error("Failed to install update", err);
+      }
+    }
+  };
+
   const handleExportLogs = () => {
     toast({
       title: "Logs exported",
@@ -147,10 +181,22 @@ export function SystemDiagnostics({
         </div>
         
         <div className="pt-4 flex gap-2 flex-wrap">
-          <Button variant="outline" size="sm" onClick={handleCheckUpdates} className="flex-1" disabled={isChecking}>
-            {isChecking ? <Loader2 className="w-4 h-4 mr-2 animate-spin" /> : <RefreshCw className="w-4 h-4 mr-2" />}
-            {updateStatus ? updateStatus : "Check Updates"}
-          </Button>
+          {updateDownloaded ? (
+            <Button variant="default" size="sm" onClick={handleInstallUpdate} className="flex-1">
+              <RefreshCw className="w-4 h-4 mr-2" />
+              Install Update
+            </Button>
+          ) : updateAvailable ? (
+            <Button variant="default" size="sm" onClick={handleDownloadUpdate} className="flex-1">
+              <RefreshCw className="w-4 h-4 mr-2" />
+              Download Update
+            </Button>
+          ) : (
+            <Button variant="outline" size="sm" onClick={handleCheckUpdates} className="flex-1" disabled={isChecking}>
+              {isChecking ? <Loader2 className="w-4 h-4 mr-2 animate-spin" /> : <RefreshCw className="w-4 h-4 mr-2" />}
+              {updateStatus ? updateStatus : "Check Updates"}
+            </Button>
+          )}
           <Button variant="outline" size="sm" onClick={handleBackup} className="flex-1">
             <HardDrive className="w-4 h-4 mr-2" />
             Backup Now

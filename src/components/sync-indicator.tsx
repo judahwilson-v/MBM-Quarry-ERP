@@ -40,7 +40,6 @@ export function SyncIndicator() {
   }, []);
 
   const handleForceSync = async () => {
-    if (!isOnline) return;
     setIsSyncing(true);
     try {
       await triggerSync();
@@ -53,9 +52,6 @@ export function SyncIndicator() {
   };
 
   const getStatusDisplay = () => {
-    if (!isOnline) {
-      return { icon: <CloudOff className="w-4 h-4 text-rose-500" />, text: "Offline", color: "text-rose-500" };
-    }
     if (isSyncing || status.status === "SYNCING") {
       return { icon: <RefreshCw className="w-4 h-4 text-blue-500 animate-spin" />, text: "Syncing...", color: "text-blue-500" };
     }
@@ -64,6 +60,9 @@ export function SyncIndicator() {
     }
     if (status.pendingCount > 0) {
       return { icon: <Cloud className="w-4 h-4 text-[#f39c12]" />, text: `${status.pendingCount} pending`, color: "text-[#f39c12]" };
+    }
+    if (!isOnline) {
+      return { icon: <CloudOff className="w-4 h-4 text-rose-500" />, text: "Offline", color: "text-rose-500" };
     }
     return { icon: <Cloud className="w-4 h-4 text-emerald-500" />, text: "Synced", color: "text-emerald-500" };
   };
@@ -86,7 +85,7 @@ export function SyncIndicator() {
         </span>
       </div>
 
-      {(status.pendingCount > 0 || status.status === "ERROR") && isOnline && (
+      {(status.pendingCount > 0 || status.status === "ERROR") && (
         <Button 
           variant="ghost" 
           size="sm" 
