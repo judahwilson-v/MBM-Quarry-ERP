@@ -8,6 +8,8 @@
 - Added the missing inventory tables, global settings PIN columns, authenticated RLS policy script, and focused sync configuration tests.
 - Switched synchronization to the signed-in server-side Supabase client; anonymous database access is no longer required.
 - Persisted browser authentication in SSR-compatible cookies so Server Actions can satisfy authenticated RLS policies.
+- Replaced hardcoded About-page versions and health flags with live package, migration, SQLite, authentication, and Supabase checks.
+- Connected the dashboard to live daily/monthly sales, purchase, expense, party-balance, day-book, and sync metrics using local-time date boundaries.
 
 ## v1.9.6 (2026-07-04)
 - **UI & Validation Fixes**: Fixed manual update UI logic, added sales quantity validation, and corrected offline sync button behavior.

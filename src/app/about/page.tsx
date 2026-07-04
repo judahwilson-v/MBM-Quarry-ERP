@@ -1,41 +1,29 @@
 import { fetchSyncStatus } from "@/app/actions/sync";
-import fs from "fs";
-import path from "path";
 import { CheckCircle2, XCircle } from "lucide-react";
 import { BackupManager } from "@/components/backup-manager";
+import { getSystemInfo } from "@/lib/system/system-info";
+
+export const dynamic = "force-dynamic";
 
 export default async function AboutPage() {
-  const syncStatus = await fetchSyncStatus().catch(() => null);
+  const [syncStatus, systemInfo] = await Promise.all([
+    fetchSyncStatus().catch(() => null),
+    getSystemInfo(),
+  ]);
 
-  let appVersion = process.env.NEXT_PUBLIC_APP_VERSION;
-  let buildDate = process.env.NEXT_PUBLIC_BUILD_DATE;
-
-  if (!appVersion) {
-    try {
-      const versionFile = path.join(process.cwd(), "VERSION");
-      if (fs.existsSync(versionFile)) {
-        const content = fs.readFileSync(versionFile, "utf-8");
-        const versionMatch = content.match(/VERSION=(.*)/);
-        const dateMatch = content.match(/BUILD_DATE=(.*)/);
-        if (versionMatch) appVersion = versionMatch[1].trim();
-        if (dateMatch) buildDate = dateMatch[1].trim();
-      }
-    } catch {
-      // Ignore
-    }
-  }
-
-  appVersion = appVersion || "1.9.0";
-  buildDate = buildDate || "Unknown";
-  const databasePath = process.env.DATABASE_URL || "Local DB";
-  
-  const dbSchemaVersion = "v1";
-  const syncEngineVersion = "v1";
-  const electronVersion = process.versions?.electron || "Unknown (Dev Mode)";
-
-  const isOfflineReady = true;
-  const isCloudSyncEnabled = true;
-  const isSqliteConnected = true;
+  const {
+    appVersion,
+    buildDate,
+    dbSchemaVersion,
+    syncEngineVersion,
+    electronVersion,
+    databasePath,
+    isOfflineReady,
+    isCloudSyncEnabled,
+    isSqliteConnected,
+    sqliteDetail,
+    cloudDetail,
+  } = systemInfo;
 
   return (
     <div className="flex-1 space-y-8 p-4 pt-6 md:p-8 max-w-5xl mx-auto">
@@ -85,11 +73,17 @@ export default async function AboutPage() {
               </div>
               <div className="flex items-center gap-2">
                 {isCloudSyncEnabled ? <CheckCircle2 className="h-5 w-5 text-emerald-500" /> : <XCircle className="h-5 w-5 text-red-500" />}
-                <span>Cloud Sync Enabled {syncStatus?.pendingCount ? `(${syncStatus.pendingCount} pending)` : ""}</span>
+                <div>
+                  <span>Cloud Sync Enabled {syncStatus?.pendingCount ? `(${syncStatus.pendingCount} pending)` : ""}</span>
+                  <p className="text-xs text-muted-foreground">{cloudDetail}</p>
+                </div>
               </div>
               <div className="flex items-center gap-2">
                 {isSqliteConnected ? <CheckCircle2 className="h-5 w-5 text-emerald-500" /> : <XCircle className="h-5 w-5 text-red-500" />}
-                <span className="truncate" title={databasePath}>SQLite Connected</span>
+                <div className="min-w-0">
+                  <span className="block">SQLite Connected</span>
+                  <p className="truncate text-xs text-muted-foreground" title={sqliteDetail || databasePath}>{sqliteDetail}</p>
+                </div>
               </div>
             </div>
           </div>

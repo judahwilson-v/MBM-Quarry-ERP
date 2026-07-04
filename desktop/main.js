@@ -474,7 +474,9 @@ if (!gotTheLock) {
 
     createWindow();
     
-    // Check for updates if packaged
+    // Check for updates if packaged.
+    // Event listeners for forwarding to the React UI are already registered
+    // at module scope (lines 96-119). Do NOT add duplicate listeners here.
     if (app.isPackaged) {
       console.log("Checking for auto-updates...");
       
@@ -482,33 +484,10 @@ if (!gotTheLock) {
       autoUpdater.autoDownload = false; // We prompt before download now for safety
       autoUpdater.autoInstallOnAppQuit = true;
 
-      autoUpdater.checkForUpdatesAndNotify().catch(err => {
-        console.error("Auto-update failed:", err);
-      });
-      
-      autoUpdater.on('update-available', (info) => {
-        console.log('Update available:', info.version);
-        isManualUpdateCheck = false;
-        // The frontend will now handle the UI prompt
-      });
-
-      autoUpdater.on('update-not-available', (info) => {
-        isManualUpdateCheck = false;
-      });
-
-      autoUpdater.on('download-progress', (progressObj) => {
-        let log_message = `Download speed: ${Math.round(progressObj.bytesPerSecond / 1024)} KB/s - Downloaded ${Math.round(progressObj.percent)}%`;
-        console.log(log_message);
-      });
-      
-      autoUpdater.on('update-downloaded', (info) => {
-        console.log('Update downloaded:', info.version);
-        // The frontend will now handle the UI prompt to restart
-      });
-      
-      autoUpdater.on('error', (err) => {
-        console.error('Error in auto-updater.', err);
-        isManualUpdateCheck = false;
+      // Use checkForUpdates() — not checkForUpdatesAndNotify() — because
+      // the React UI handles all user-facing notifications via IPC events.
+      autoUpdater.checkForUpdates().catch(err => {
+        console.error("Auto-update check failed:", err);
       });
     }
   });

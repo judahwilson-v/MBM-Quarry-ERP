@@ -7,7 +7,7 @@
     "dev:4000": "next dev -p 4000",
     "prebuild": "node scripts/stamp-version.js",
     "build": "prisma generate && next build && node scripts/copy-prisma-engine.js",
-    "test": "tsx tests/ledger-replay.test.ts && tsx tests/sync-config.test.ts",
+    "test": "tsx tests/ledger-replay.test.ts && tsx tests/sync-config.test.ts && tsx tests/system-info.test.ts && tsx tests/dashboard-metrics.test.ts",
     "stress": "tsx scripts/stress-test.ts",
     "start": "next start",
     "lint": "next lint",
