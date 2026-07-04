@@ -1,12 +1,13 @@
 "use server";
 
-import { pushSync, getSyncStatus } from "@/lib/sync/sync-service";
+import { pushSync, pullSync, getSyncStatus } from "@/lib/sync/sync-service";
 import { revalidatePath } from "next/cache";
 
 export async function triggerSync() {
-  const result = await pushSync();
+  const pushResult = await pushSync();
+  const pullResult = await pullSync();
   revalidatePath("/", "layout");
-  return result;
+  return { pushed: pushResult.pushed, pulled: pullResult.pulled };
 }
 
 export async function fetchSyncStatus() {

@@ -25,6 +25,30 @@ const TABLE_MAP: Record<string, string> = {
   GlobalSettings: "global_settings"
 };
 
+// Dependency order for safe foreign key insertion
+const PULL_ORDER = [
+  "GlobalSettings",
+  "Material",
+  "Party",
+  "Vehicle",
+  "Employee",
+  "OutgoingSale",
+  "IncomingBoulder",
+  "PartyCredit",
+  "PartyCollection",
+  "PartyLedger",
+  "PartyPayment",
+  "EmployeeCredit",
+  "OtherCredit",
+  "Expense",
+  "DayBook",
+  "DayBookEntry",
+  "DayBookExpenseEntry",
+  "EmployeeLedger",
+  "FuelPurchase",
+  "CashTransfer"
+];
+
 // Convert camelCase object keys to snake_case for Supabase REST API
 function toSnakeCase(obj: any): any {
   if (Array.isArray(obj)) {
@@ -33,6 +57,20 @@ function toSnakeCase(obj: any): any {
     return Object.keys(obj).reduce((result, key) => {
       const snakeKey = key.replace(/([A-Z])/g, "_$1").toLowerCase();
       result[snakeKey] = toSnakeCase(obj[key]);
+      return result;
+    }, {} as any);
+  }
+  return obj;
+}
+
+// Convert snake_case to camelCase for Prisma
+function toCamelCase(obj: any): any {
+  if (Array.isArray(obj)) {
+    return obj.map((v) => toCamelCase(v));
+  } else if (obj !== null && typeof obj === 'object') {
+    return Object.keys(obj).reduce((result, key) => {
+      const camelKey = key.replace(/_([a-z])/g, (g) => g[1].toUpperCase());
+      result[camelKey] = toCamelCase(obj[key]);
       return result;
     }, {} as any);
   }
@@ -66,23 +104,25 @@ export async function pushSync() {
   try {
     for (const log of unsyncedLogs) {
       const tableName = TABLE_MAP[log.entityName];
-      if (!tableName) {
-        lastProcessedTime = log.createdAt;
-        continue;
-      }
-
-      if (log.action === "delete") {
-        const { error } = await supabase.from(tableName).delete().eq("id", log.entityId);
-        if (error) throw error;
-      } else {
-        if (log.payload) {
-          const rawData = JSON.parse(log.payload);
-          const snakeData = toSnakeCase(rawData);
-          const { error } = await supabase.from(tableName).upsert(snakeData);
+      
+      if (tableName) {
+        if (log.action === "delete") {
+          const { error } = await supabase.from(tableName).delete().eq("id", log.entityId);
           if (error) throw error;
+        } else {
+          if (log.payload) {
+            const rawData = JSON.parse(log.payload);
+            const snakeData = toSnakeCase(rawData);
+            const { error } = await supabase.from(tableName).upsert(snakeData);
+            if (error) throw error;
+          }
         }
       }
       
+      // Push the audit log itself to Supabase so other PCs know about deletions
+      const { error: auditError } = await supabase.from("audit_logs").upsert(toSnakeCase(log));
+      if (auditError) throw auditError;
+
       lastProcessedTime = log.createdAt;
       successCount++;
     }
@@ -98,30 +138,119 @@ export async function pushSync() {
       where: { id: "default" },
       data: { status: "ERROR", lastError: e.message || "Unknown sync error" }
     });
-    // Stop syncing on first error to maintain ordering. The next sync will resume from lastProcessedTime.
+    // Stop syncing on first error to maintain ordering
   }
 
   return { pushed: successCount };
 }
 
 export async function pullSync() {
-   // Pull logic implementation requires a strategy for fetching remote changes
-   // Because Supabase is the central hub, we would query `updated_at` on all tables
-   // For now, Push is the primary driver from the local SQLite source-of-truth.
-   return { pulled: 0 };
+  const db = await getDb();
+  
+  // 1. Get pull state
+  let pullState = await db.syncState.findUnique({ where: { id: "pull_state" } });
+  if (!pullState) {
+    pullState = await db.syncState.create({
+      data: { id: "pull_state", lastSyncedAt: new Date(0) }
+    });
+  }
+
+  let lastProcessedTime = pullState.lastSyncedAt;
+  let successCount = 0;
+
+  await db.syncState.update({ where: { id: "pull_state" }, data: { status: "SYNCING" } });
+
+  try {
+    // 2. Fetch deletions from audit_logs
+    const { data: deleteLogs, error: deleteError } = await supabase
+      .from('audit_logs')
+      .select('*')
+      .eq('action', 'delete')
+      .gt('created_at', pullState.lastSyncedAt.toISOString())
+      .order('created_at', { ascending: true });
+
+    if (deleteError) throw deleteError;
+
+    if (deleteLogs && deleteLogs.length > 0) {
+      for (const log of deleteLogs) {
+        const camelLog = toCamelCase(log);
+        const prismaModel = camelLog.entityName;
+        if ((db as any)[prismaModel]) {
+           try {
+             await (db as any)[prismaModel].delete({ where: { id: camelLog.entityId } });
+             successCount++;
+           } catch (err) {
+             // If already deleted or missing, ignore
+           }
+        }
+        const logDate = new Date(camelLog.createdAt);
+        if (logDate > lastProcessedTime) lastProcessedTime = logDate;
+      }
+    }
+
+    // 3. Fetch creations/updates from actual tables
+    for (const prismaModel of PULL_ORDER) {
+      const tableName = TABLE_MAP[prismaModel];
+      if (!tableName) continue;
+
+      const { data: rows, error: rowsError } = await supabase
+        .from(tableName)
+        .select('*')
+        .gt('updated_at', pullState.lastSyncedAt.toISOString())
+        .order('updated_at', { ascending: true });
+
+      if (rowsError) throw rowsError;
+
+      if (rows && rows.length > 0) {
+        for (const row of rows) {
+           const camelRow = toCamelCase(row);
+           try {
+             await (db as any)[prismaModel].upsert({
+               where: { id: camelRow.id },
+               update: camelRow,
+               create: camelRow
+             });
+             successCount++;
+           } catch(e) {
+             console.error(`Failed to upsert ${prismaModel} ${camelRow.id}`, e);
+           }
+           
+           const rowDate = new Date(camelRow.updatedAt);
+           if (rowDate > lastProcessedTime) lastProcessedTime = rowDate;
+        }
+      }
+    }
+
+    await db.syncState.update({
+      where: { id: "pull_state" },
+      data: { lastSyncedAt: lastProcessedTime, status: "IDLE", lastError: null }
+    });
+
+  } catch (e: any) {
+    console.error(`Pull sync error:`, e);
+    await db.syncState.update({
+      where: { id: "pull_state" },
+      data: { status: "ERROR", lastError: e.message || "Unknown pull error" }
+    });
+  }
+
+  return { pulled: successCount };
 }
 
 export async function getSyncStatus() {
   const db = await getDb();
-  const syncState = await db.syncState.findUnique({ where: { id: "default" } });
+  const pushState = await db.syncState.findUnique({ where: { id: "default" } });
+  const pullState = await db.syncState.findUnique({ where: { id: "pull_state" } });
   
   const pendingCount = await db.auditLog.count({
-    where: { createdAt: { gt: syncState?.lastSyncedAt || new Date(0) } }
+    where: { createdAt: { gt: pushState?.lastSyncedAt || new Date(0) } }
   });
 
   return {
-    lastSyncedAt: syncState?.lastSyncedAt || null,
-    status: syncState?.status || "IDLE",
+    lastSyncedAt: pushState?.lastSyncedAt || null,
+    lastPulledAt: pullState?.lastSyncedAt || null,
+    status: pushState?.status === "ERROR" || pullState?.status === "ERROR" ? "ERROR" : 
+            pushState?.status === "SYNCING" || pullState?.status === "SYNCING" ? "SYNCING" : "IDLE",
     pendingCount
   };
 }
