@@ -5,7 +5,15 @@ contextBridge.exposeInMainWorld('electron', {
   checkUpdates: () => ipcRenderer.invoke('check-updates'),
   downloadUpdate: () => ipcRenderer.invoke('download-update'),
   installUpdate: (version) => ipcRenderer.invoke('install-update', version),
-  // Allow rendering to listen for print events if needed
-  onPrintComplete: (callback) => ipcRenderer.on('print-complete', callback),
-  onUpdaterEvent: (callback) => ipcRenderer.on('updater-event', (event, data) => callback(data)),
+  // Allow rendering to listen for events
+  onPrintComplete: (callback) => {
+    const fn = (event, ...args) => callback(...args);
+    ipcRenderer.on('print-complete', fn);
+    return () => ipcRenderer.removeListener('print-complete', fn);
+  },
+  onUpdaterEvent: (callback) => {
+    const fn = (event, data) => callback(data);
+    ipcRenderer.on('updater-event', fn);
+    return () => ipcRenderer.removeListener('updater-event', fn);
+  },
 });
