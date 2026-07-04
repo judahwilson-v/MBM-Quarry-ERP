@@ -30,6 +30,7 @@
 
 ## Phase 8: Refinement, Sync Validation & UI Polish (Current Phase)
 - Fix auto-updater and confirm remote desktop updates (Completed v1.9.0).
+- **Phase 8.2.1**: Implement modern React update notification UI (replacing native dialogs).
 - Run full local tests and QA.
 - Remove any unwanted features or clutter.
 - Verify 100% of data is correctly saving/syncing to Supabase.

@@ -79,7 +79,16 @@ ipcMain.handle('check-updates', async () => {
   }
 });
 
-ipcMain.handle('install-update', () => {
+ipcMain.handle('download-update', () => {
+  console.log("✓ IPC received: download-update");
+  autoUpdater.downloadUpdate();
+});
+
+ipcMain.handle('install-update', async (event, version) => {
+  console.log("✓ IPC received: install-update. Creating pre-update backup...");
+  if (typeof performDatabaseBackup === 'function') {
+    await performDatabaseBackup(`pre-update-${version || 'manual'}`);
+  }
   autoUpdater.quitAndInstall(false, true);
 });
 
@@ -415,44 +424,7 @@ if (!gotTheLock) {
     } catch (e) {}
     console.log("=======================================");
     
-    // Backup Functions
-    const performDatabaseBackup = async (prefix = 'manual') => {
-      try {
-        const documentsPath = app.getPath('documents');
-        const backupDir = path.join(documentsPath, 'MBM-Backups');
-        if (!fs.existsSync(backupDir)) {
-          fs.mkdirSync(backupDir, { recursive: true });
-        }
-
-        const userDataPath = app.getPath("userData");
-        const dbPath = path.join(userDataPath, "quarry.db");
-        
-        if (!fs.existsSync(dbPath)) return false;
-
-        const timestamp = new Date().toISOString().replace(/[:.]/g, '-');
-        const backupFilename = `MBM_Backup_${prefix}_${timestamp}.sqlite`;
-        const backupPath = path.join(backupDir, backupFilename);
-
-        fs.copyFileSync(dbPath, backupPath);
-        console.log(`Successfully created backup: ${backupPath}`);
-        
-        // Cleanup old backups (> 30 days logic can be simple: keep last 30 files)
-        const files = fs.readdirSync(backupDir)
-          .filter(f => f.startsWith('MBM_Backup_') && f.endsWith('.sqlite'))
-          .map(f => ({ name: f, path: path.join(backupDir, f), stat: fs.statSync(path.join(backupDir, f)) }))
-          .sort((a, b) => b.stat.mtimeMs - a.stat.mtimeMs);
-          
-        if (files.length > 30) {
-          const toDelete = files.slice(30);
-          toDelete.forEach(f => fs.unlinkSync(f.path));
-        }
-        
-        return backupPath;
-      } catch (err) {
-        console.error(`Failed to create ${prefix} backup:`, err);
-        return false;
-      }
-    };
+    // performDatabaseBackup is now globally defined below
 
     const ensureDailyBackup = async () => {
       try {
@@ -517,29 +489,11 @@ if (!gotTheLock) {
       autoUpdater.on('update-available', (info) => {
         console.log('Update available:', info.version);
         isManualUpdateCheck = false;
-        dialog.showMessageBox({
-          type: 'info',
-          title: 'Update Available',
-          message: `Version ${info.version} is available.\n\n• New Dashboard\n• Bug Fixes\n\nWould you like to download it now?`,
-          buttons: ['Download', 'Later'],
-          defaultId: 0,
-          cancelId: 1
-        }).then((result) => {
-          if (result.response === 0) {
-            autoUpdater.downloadUpdate();
-          }
-        });
+        // The frontend will now handle the UI prompt
       });
 
       autoUpdater.on('update-not-available', (info) => {
-        if (isManualUpdateCheck) {
-          dialog.showMessageBox({
-            type: 'info',
-            title: 'Up to Date',
-            message: 'You are already running the latest version of MBM Quarry ERP.'
-          });
-          isManualUpdateCheck = false;
-        }
+        isManualUpdateCheck = false;
       });
 
       autoUpdater.on('download-progress', (progressObj) => {
@@ -549,35 +503,54 @@ if (!gotTheLock) {
       
       autoUpdater.on('update-downloaded', (info) => {
         console.log('Update downloaded:', info.version);
-        dialog.showMessageBox({
-          type: 'info',
-          title: 'Update Ready',
-          message: `The update is ready.\n\nPlease finish your current work.\n\n(A safety backup of your database will be created before installing).`,
-          buttons: ['Restart & Install', 'Later'],
-          defaultId: 0,
-          cancelId: 1
-        }).then(async (result) => {
-          if (result.response === 0) {
-            console.log("Creating pre-update backup before installation...");
-            await performDatabaseBackup(`pre-update-${info.version}`);
-            autoUpdater.quitAndInstall(false, true);
-          }
-        });
+        // The frontend will now handle the UI prompt to restart
       });
       
       autoUpdater.on('error', (err) => {
         console.error('Error in auto-updater.', err);
-        if (isManualUpdateCheck) {
-          dialog.showMessageBox({
-            type: 'warning',
-            title: 'Update Error',
-            message: 'There was a problem checking for updates. Please verify your internet connection.'
-          });
-          isManualUpdateCheck = false;
-        }
+        isManualUpdateCheck = false;
       });
     }
   });
+
+  // Global backup function
+  global.performDatabaseBackup = async (prefix = 'manual') => {
+    try {
+      const documentsPath = app.getPath('documents');
+      const backupDir = path.join(documentsPath, 'MBM-Backups');
+      if (!fs.existsSync(backupDir)) {
+        fs.mkdirSync(backupDir, { recursive: true });
+      }
+
+      const userDataPath = app.getPath("userData");
+      const dbPath = path.join(userDataPath, "quarry.db");
+      
+      if (!fs.existsSync(dbPath)) return false;
+
+      const timestamp = new Date().toISOString().replace(/[:.]/g, '-');
+      const backupFilename = `MBM_Backup_${prefix}_${timestamp}.sqlite`;
+      const backupPath = path.join(backupDir, backupFilename);
+
+      fs.copyFileSync(dbPath, backupPath);
+      console.log(`Successfully created backup: ${backupPath}`);
+      
+      const files = fs.readdirSync(backupDir)
+        .filter(f => f.startsWith('MBM_Backup_') && f.endsWith('.sqlite'))
+        .map(f => ({ name: f, path: path.join(backupDir, f), stat: fs.statSync(path.join(backupDir, f)) }))
+        .sort((a, b) => b.stat.mtimeMs - a.stat.mtimeMs);
+        
+      if (files.length > 30) {
+        const toDelete = files.slice(30);
+        toDelete.forEach(f => fs.unlinkSync(f.path));
+      }
+      return backupPath;
+    } catch (err) {
+      console.error(`Failed to create ${prefix} backup:`, err);
+      return false;
+    }
+  };
+
+  const performDatabaseBackup = global.performDatabaseBackup;
 
   app.on("window-all-closed", () => {
     if (process.platform !== "darwin") {
