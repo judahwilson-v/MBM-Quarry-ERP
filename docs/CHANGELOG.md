@@ -1,5 +1,14 @@
 # MBM Quarry ERP — Changelog
 
+## Unreleased — Phase A Sync Reliability
+- Corrected audit payload extraction so cloud upserts receive the entity snapshot rather than the audit wrapper.
+- Added the `Sale` → `OutgoingSale` alias and lower-camel Prisma delegate mappings used by pull sync.
+- Stopped pull cursors from advancing after failed local upserts or deletions.
+- Added timestamp-aware push/pull support for financial events, ledger entries, inventory stock, and inventory transactions.
+- Added the missing inventory tables, global settings PIN columns, authenticated RLS policy script, and focused sync configuration tests.
+- Switched synchronization to the signed-in server-side Supabase client; anonymous database access is no longer required.
+- Persisted browser authentication in SSR-compatible cookies so Server Actions can satisfy authenticated RLS policies.
+
 ## v1.9.6 (2026-07-04)
 - **UI & Validation Fixes**: Fixed manual update UI logic, added sales quantity validation, and corrected offline sync button behavior.
 

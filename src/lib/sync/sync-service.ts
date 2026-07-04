@@ -1,53 +1,22 @@
 import { getDb } from "@/lib/prisma";
-import { supabase } from "@/lib/supabase/client";
+import { createClient } from "@/lib/supabase/server";
+import {
+  DIRECT_PUSH_MODELS,
+  extractEntityData,
+  getRowTimestamp,
+  LOCAL_CONFLICT_FIELDS,
+  PULL_ORDER,
+  REMOTE_CONFLICT_COLUMNS,
+  resolveSyncModel,
+  SYNC_MODEL_CONFIG,
+} from "./sync-config";
 
-// Mappings for Prisma model names to Supabase table names
-const TABLE_MAP: Record<string, string> = {
-  Vehicle: "vehicles",
-  Party: "parties",
-  Material: "materials",
-  OutgoingSale: "outgoing_sales",
-  IncomingBoulder: "incoming_boulder",
-  PartyCredit: "party_credit",
-  PartyCollection: "party_collections",
-  PartyLedger: "party_ledger",
-  PartyPayment: "party_payments",
-  Expense: "expenses",
-  EmployeeCredit: "employee_credit",
-  OtherCredit: "other_credits",
-  DayBook: "day_books",
-  DayBookEntry: "day_book_entries",
-  DayBookExpenseEntry: "day_book_expense_entries",
-  Employee: "employees",
-  EmployeeLedger: "employee_ledgers",
-  FuelPurchase: "fuel_purchases",
-  CashTransfer: "cash_transfers",
-  GlobalSettings: "global_settings"
-};
-
-// Dependency order for safe foreign key insertion
-const PULL_ORDER = [
-  "GlobalSettings",
-  "Material",
-  "Party",
-  "Vehicle",
-  "Employee",
-  "OutgoingSale",
-  "IncomingBoulder",
-  "PartyCredit",
-  "PartyCollection",
-  "PartyLedger",
-  "PartyPayment",
-  "EmployeeCredit",
-  "OtherCredit",
-  "Expense",
-  "DayBook",
-  "DayBookEntry",
-  "DayBookExpenseEntry",
-  "EmployeeLedger",
-  "FuelPurchase",
-  "CashTransfer"
-];
+async function requireAuthenticatedUser(supabase: ReturnType<typeof createClient>) {
+  const { data, error } = await supabase.auth.getUser();
+  if (error || !data.user) {
+    throw new Error(`[Sync Auth] Sign in before syncing: ${error?.message ?? "no active Supabase session"}`);
+  }
+}
 
 // Convert camelCase object keys to snake_case for Supabase REST API
 function toSnakeCase(obj: any): any {
@@ -79,6 +48,7 @@ function toCamelCase(obj: any): any {
 
 export async function pushSync() {
   const db = await getDb();
+  const supabase = createClient();
   
   // 1. Get sync state
   let syncState = await db.syncState.findUnique({ where: { id: "default" } });
@@ -94,27 +64,30 @@ export async function pushSync() {
     orderBy: { createdAt: 'asc' }
   });
 
-  if (unsyncedLogs.length === 0) return { pushed: 0 };
-
   let lastProcessedTime = syncState.lastSyncedAt;
   let successCount = 0;
 
   await db.syncState.update({ where: { id: "default" }, data: { status: "SYNCING" } });
 
   try {
+    await requireAuthenticatedUser(supabase);
+
     for (const log of unsyncedLogs) {
-      const tableName = TABLE_MAP[log.entityName];
+      const modelName = resolveSyncModel(log.entityName);
+      const config = modelName ? SYNC_MODEL_CONFIG[modelName] : null;
       
-      if (tableName) {
+      if (config) {
         if (log.action === "delete") {
-          const { error } = await supabase.from(tableName).delete().eq("id", log.entityId);
-          if (error) throw error;
-        } else {
-          if (log.payload) {
-            const rawData = JSON.parse(log.payload);
-            const snakeData = toSnakeCase(rawData);
-            const { error } = await supabase.from(tableName).upsert(snakeData);
-            if (error) throw error;
+          console.log(`[Sync Push] Deleting ${config.table}:${log.entityId}`);
+          const { error } = await supabase.from(config.table).delete().eq("id", log.entityId);
+          if (error) throw new Error(`[Sync Push] Delete failed for ${config.table}:${log.entityId}: ${error.message}`);
+        } else if ((log.action === "create" || log.action === "update") && log.payload) {
+          const entityData = extractEntityData(JSON.parse(log.payload));
+          const snakeData = toSnakeCase(entityData);
+          console.log(`[Sync Push] Upserting ${config.table}:${String(snakeData.id ?? log.entityId)}`);
+          const { error } = await supabase.from(config.table).upsert(snakeData);
+          if (error) {
+            throw new Error(`[Sync Push] Upsert failed for ${config.table}:${log.entityId}: ${error.message}`);
           }
         }
       }
@@ -125,6 +98,32 @@ export async function pushSync() {
 
       lastProcessedTime = log.createdAt;
       successCount++;
+    }
+
+    // Event, ledger, and inventory projections are not represented by their
+    // own audit rows. Scan their timestamps so they are not silently omitted.
+    for (const modelName of DIRECT_PUSH_MODELS) {
+      const config = SYNC_MODEL_CONFIG[modelName];
+      const delegate = (db as any)[config.delegate];
+      const rows = await delegate.findMany({
+        where: { [config.timeField]: { gt: syncState.lastSyncedAt } },
+        orderBy: { [config.timeField]: "asc" },
+      });
+
+      for (const row of rows as Record<string, unknown>[]) {
+        const snakeData = toSnakeCase(row);
+        console.log(`[Sync Push] Upserting projection ${config.table}:${String(snakeData.id)}`);
+        const conflictColumn = REMOTE_CONFLICT_COLUMNS[modelName];
+        const { error } = await supabase
+          .from(config.table)
+          .upsert(snakeData, conflictColumn ? { onConflict: conflictColumn } : undefined);
+        if (error) {
+          throw new Error(`[Sync Push] Projection upsert failed for ${config.table}:${String(snakeData.id)}: ${error.message}`);
+        }
+        const rowDate = getRowTimestamp(row, config.timeField);
+        if (rowDate > lastProcessedTime) lastProcessedTime = rowDate;
+        successCount++;
+      }
     }
 
     await db.syncState.update({
@@ -138,7 +137,8 @@ export async function pushSync() {
       where: { id: "default" },
       data: { status: "ERROR", lastError: e.message || "Unknown sync error" }
     });
-    // Stop syncing on first error to maintain ordering
+    // Stop syncing on first error to maintain ordering and let the UI report it.
+    throw e;
   }
 
   return { pushed: successCount };
@@ -146,6 +146,7 @@ export async function pushSync() {
 
 export async function pullSync() {
   const db = await getDb();
+  const supabase = createClient();
   
   // 1. Get pull state
   let pullState = await db.syncState.findUnique({ where: { id: "pull_state" } });
@@ -161,6 +162,8 @@ export async function pullSync() {
   await db.syncState.update({ where: { id: "pull_state" }, data: { status: "SYNCING" } });
 
   try {
+    await requireAuthenticatedUser(supabase);
+
     // 2. Fetch deletions from audit_logs
     const { data: deleteLogs, error: deleteError } = await supabase
       .from('audit_logs')
@@ -174,13 +177,17 @@ export async function pullSync() {
     if (deleteLogs && deleteLogs.length > 0) {
       for (const log of deleteLogs) {
         const camelLog = toCamelCase(log);
-        const prismaModel = camelLog.entityName;
-        if ((db as any)[prismaModel]) {
+        const modelName = resolveSyncModel(camelLog.entityName);
+        if (modelName) {
+           const config = SYNC_MODEL_CONFIG[modelName];
+           const delegate = (db as any)[config.delegate];
            try {
-             await (db as any)[prismaModel].delete({ where: { id: camelLog.entityId } });
+             await delegate.delete({ where: { id: camelLog.entityId } });
              successCount++;
-           } catch (err) {
-             // If already deleted or missing, ignore
+           } catch (error: any) {
+             // P2025 means the row was already absent locally; other failures
+             // must stop the cursor from moving past an unapplied deletion.
+             if (error?.code !== "P2025") throw error;
            }
         }
         const logDate = new Date(camelLog.createdAt);
@@ -189,33 +196,35 @@ export async function pullSync() {
     }
 
     // 3. Fetch creations/updates from actual tables
-    for (const prismaModel of PULL_ORDER) {
-      const tableName = TABLE_MAP[prismaModel];
-      if (!tableName) continue;
+    for (const modelName of PULL_ORDER) {
+      const config = SYNC_MODEL_CONFIG[modelName];
 
       const { data: rows, error: rowsError } = await supabase
-        .from(tableName)
+        .from(config.table)
         .select('*')
-        .gt('updated_at', pullState.lastSyncedAt.toISOString())
-        .order('updated_at', { ascending: true });
+        .gt(config.timeColumn, pullState.lastSyncedAt.toISOString())
+        .order(config.timeColumn, { ascending: true });
 
-      if (rowsError) throw rowsError;
+      if (rowsError) throw new Error(`[Sync Pull] Fetch failed for ${config.table}: ${rowsError.message}`);
 
       if (rows && rows.length > 0) {
+        console.log(`[Sync Pull] Fetched ${rows.length} rows for ${config.table}`);
         for (const row of rows) {
            const camelRow = toCamelCase(row);
+           const delegate = (db as any)[config.delegate];
+           const conflictField = LOCAL_CONFLICT_FIELDS[modelName] ?? "id";
            try {
-             await (db as any)[prismaModel].upsert({
-               where: { id: camelRow.id },
+             await delegate.upsert({
+               where: { [conflictField]: camelRow[conflictField] },
                update: camelRow,
                create: camelRow
              });
              successCount++;
-           } catch(e) {
-             console.error(`Failed to upsert ${prismaModel} ${camelRow.id}`, e);
+           } catch(error: any) {
+             throw new Error(`[Sync Pull] Local upsert failed for ${config.table}:${camelRow.id}: ${error?.message ?? error}`);
            }
            
-           const rowDate = new Date(camelRow.updatedAt);
+           const rowDate = getRowTimestamp(camelRow, config.timeField);
            if (rowDate > lastProcessedTime) lastProcessedTime = rowDate;
         }
       }
@@ -232,6 +241,7 @@ export async function pullSync() {
       where: { id: "pull_state" },
       data: { status: "ERROR", lastError: e.message || "Unknown pull error" }
     });
+    throw e;
   }
 
   return { pulled: successCount };
@@ -242,9 +252,17 @@ export async function getSyncStatus() {
   const pushState = await db.syncState.findUnique({ where: { id: "default" } });
   const pullState = await db.syncState.findUnique({ where: { id: "pull_state" } });
   
-  const pendingCount = await db.auditLog.count({
-    where: { createdAt: { gt: pushState?.lastSyncedAt || new Date(0) } }
-  });
+  const pushCursor = pushState?.lastSyncedAt || new Date(0);
+  const [auditCount, ...projectionCounts] = await Promise.all([
+    db.auditLog.count({ where: { createdAt: { gt: pushCursor } } }),
+    ...DIRECT_PUSH_MODELS.map((modelName) => {
+      const config = SYNC_MODEL_CONFIG[modelName];
+      return (db as any)[config.delegate].count({
+        where: { [config.timeField]: { gt: pushCursor } },
+      }) as Promise<number>;
+    }),
+  ]);
+  const pendingCount = auditCount + projectionCounts.reduce((total, count) => total + count, 0);
 
   return {
     lastSyncedAt: pushState?.lastSyncedAt || null,

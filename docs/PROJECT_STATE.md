@@ -17,7 +17,7 @@
 | Employee Credit | ✅ Complete |
 | Other Credit | ✅ Complete |
 | Reports | ✅ Complete |
-| Sync Engine | ✅ Built — two-way sync with deletion tracking |
+| Sync Engine | 🟡 Phase A reliability fixes complete locally; cloud policy migration pending |
 | Electron Dev | ✅ Working |
 | Electron Production (.dmg) | ✅ Built (macOS RC1) |
 | Backup Manager | ✅ Complete |
@@ -28,7 +28,7 @@
 Full QA validation pass at the quarry + real-world field testing.
 
 ## Blocking Issues
-- Supabase sync requires `supabase_schema.sql` to be applied to the cloud project.
+- Supabase requires `supabase_phase_a_sync_migration.sql` and the authenticated policies in `supabase_rls_policies.sql` before field testing.
 - Electron production build for **Windows** has not been packaged yet (only macOS DMG exists).
 
 ## Completed Phases

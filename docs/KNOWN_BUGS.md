@@ -9,8 +9,8 @@ The only packaged build is a macOS `.dmg`. A Windows `.exe` / `nsis` installer h
 
 ### KB-002: Supabase Sync Requires Manual Schema Setup
 **Severity**: High  
-The `Sync Now` button will fail silently if `supabase_schema.sql` has not been executed in the Supabase SQL Editor.  
-**Resolution**: Run `supabase_schema.sql` and `supabase_rls_policies.sql` once before enabling sync.
+The sync engine cannot access a new cloud project until its schema and authenticated RLS policies are installed. Sync failures are now logged with the affected table and record ID.
+**Resolution**: For an existing project, run `supabase_phase_a_sync_migration.sql` and then `supabase_rls_policies.sql`. For a new project, run `supabase_schema.sql` followed by `supabase_rls_policies.sql`.
 
 ### KB-003: Silent Printing Not Yet Supported
 **Severity**: Low  

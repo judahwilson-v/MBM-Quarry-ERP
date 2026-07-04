@@ -422,13 +422,49 @@ CREATE TABLE "global_settings" (
     "phone" TEXT NOT NULL DEFAULT '',
     "default_printer" TEXT NOT NULL DEFAULT '',
     "backup_folder" TEXT NOT NULL DEFAULT '',
+    "admin_pin" TEXT NOT NULL DEFAULT '8888',
+    "delete_pin" TEXT NOT NULL DEFAULT '7711',
     "updated_at" TIMESTAMP(3) NOT NULL,
 
     CONSTRAINT "global_settings_pkey" PRIMARY KEY ("id")
 );
 
+-- CreateTable
+CREATE TABLE "inventory_stock" (
+    "id" TEXT NOT NULL,
+    "material_name" TEXT NOT NULL,
+    "quantity" DOUBLE PRECISION NOT NULL DEFAULT 0,
+    "unit" TEXT NOT NULL DEFAULT 'TONS',
+    "last_updated" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
+
+    CONSTRAINT "inventory_stock_pkey" PRIMARY KEY ("id")
+);
+
+-- CreateTable
+CREATE TABLE "inventory_transactions" (
+    "id" TEXT NOT NULL,
+    "stock_id" TEXT NOT NULL,
+    "date" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    "type" TEXT NOT NULL,
+    "quantity_change" DOUBLE PRECISION NOT NULL,
+    "reference_id" TEXT,
+    "description" TEXT,
+    "created_at" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
+
+    CONSTRAINT "inventory_transactions_pkey" PRIMARY KEY ("id")
+);
+
 -- CreateIndex
 CREATE UNIQUE INDEX "vehicles_vehicle_number_key" ON "vehicles"("vehicle_number");
+
+-- CreateIndex
+CREATE UNIQUE INDEX "inventory_stock_material_name_key" ON "inventory_stock"("material_name");
+
+-- CreateIndex
+CREATE INDEX "inventory_transactions_stock_id_idx" ON "inventory_transactions"("stock_id");
+
+-- CreateIndex
+CREATE INDEX "inventory_transactions_date_idx" ON "inventory_transactions"("date");
 
 -- CreateIndex
 CREATE INDEX "vehicles_party_id_idx" ON "vehicles"("party_id");
@@ -643,3 +679,5 @@ ALTER TABLE "employee_ledgers" ADD CONSTRAINT "employee_ledgers_employee_id_fkey
 -- AddForeignKey
 ALTER TABLE "fuel_purchases" ADD CONSTRAINT "fuel_purchases_vehicle_id_fkey" FOREIGN KEY ("vehicle_id") REFERENCES "vehicles"("id") ON DELETE SET NULL ON UPDATE CASCADE;
 
+-- AddForeignKey
+ALTER TABLE "inventory_transactions" ADD CONSTRAINT "inventory_transactions_stock_id_fkey" FOREIGN KEY ("stock_id") REFERENCES "inventory_stock"("id") ON DELETE CASCADE ON UPDATE CASCADE;

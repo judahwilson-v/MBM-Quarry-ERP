@@ -16,17 +16,8 @@ export async function forceSync() {
 export async function resetSyncQueue() {
   try {
     const db = await getDb();
-    await db.financialEvent.deleteMany({
-      where: {
-        // Technically, all events in the local DB are essentially the queue,
-        // but resetting it means wiping the unsynced ones.
-        // For MBM, the sync engine tracks by cursor. So to "reset" the queue,
-        // we could just drop all local events and rely on Supabase pulling them down again,
-        // OR we just reset the sync_state cursor to 0 to force a full re-download.
-      }
-    });
-    
-    // Instead of deleting data, resetting the cursor is safer to fix stuck syncs
+    // Never delete financial events to reset sync. Rewind only the cursors so
+    // the immutable local records are pushed/pulled again.
     await db.$executeRawUnsafe(`UPDATE sync_state SET last_synced_at = '1970-01-01T00:00:00.000Z'`);
     
     return { success: true, message: "Sync cursor reset to origin. Next sync will be a full pull." };

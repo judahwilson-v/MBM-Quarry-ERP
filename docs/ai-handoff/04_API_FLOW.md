@@ -32,11 +32,11 @@ Standard REST API routes (`/api/...`) are reserved primarily for external integr
 
 ### `sync.ts`
 - **Mutations**:
-  - `triggerSync()`: Executes `pushSync()` from `sync-service.ts`.
+  - `triggerSync()`: Executes `pushSync()` followed by `pullSync()` from `sync-service.ts`.
 - **Queries**:
   - `fetchSyncStatus()`: Returns `lastSyncedAt`, `status`, and `pendingCount`.
-- **Data Flow**: Reads local `AuditLog`, formats payload to `snake_case`, upserts to Supabase via `supabase-js`, updates local `SyncState`.
-- **Error Handling**: Catches network errors, stops sync to prevent ordering issues, and marks `SyncState` as `ERROR`.
+- **Data Flow**: Uses the signed-in server-side Supabase session; extracts `payload.after` from standard audit events; maps aliases such as `Sale` to `outgoing_sales`; and scans non-audited financial/inventory projections by timestamp. Pull uses explicit lower-camel Prisma delegate names and table-specific cursor columns.
+- **Error Handling**: Stops on the first remote or local write failure, records table/row context, marks `SyncState` as `ERROR`, and does not advance past an unapplied row.
 
 ### `tally.ts`
 - **Queries**:
