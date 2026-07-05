@@ -1,8 +1,8 @@
 # MBM Quarry ERP — Project State
 
-**Version**: v1.9.6
+**Version**: v1.10.0 (Phase A Release)
 **Phase**: RC1 — Stabilization & Field Testing
-**Last Updated**: 2026-07-04
+**Last Updated**: 2026-07-06
 
 ## Status
 | Area | Status |
@@ -17,7 +17,7 @@
 | Employee Credit | ✅ Complete |
 | Other Credit | ✅ Complete |
 | Reports | ✅ Complete |
-| Sync Engine | 🟡 Phase A reliability fixes complete locally; cloud policy migration pending |
+| Sync Engine | ✅ Complete (Phase A Robust Cloud Sync & RLS) |
 | Electron Dev | ✅ Working |
 | Electron Production (.dmg) | ✅ Built (macOS RC1) |
 | Backup Manager | ✅ Complete |
@@ -25,10 +25,9 @@
 | Auto-Updater | ✅ Complete (React UI with manual/auto support) |
 
 ## Current Task
-Full QA validation pass at the quarry + real-world field testing.
+Full QA validation pass at the quarry + real-world field testing of the Phase A release.
 
 ## Blocking Issues
-- Supabase requires `supabase_phase_a_sync_migration.sql` and the authenticated policies in `supabase_rls_policies.sql` before field testing.
 - Electron production build for **Windows** has not been packaged yet (only macOS DMG exists).
 
 ## Completed Phases
@@ -39,6 +38,7 @@ Full QA validation pass at the quarry + real-world field testing.
 - Phase 4: Credit & Collections
 - Phase 5: Supabase Sync
 - Phase 6: Electron Desktop Packaging
+- Phase A: Robust Cloud Sync, Live Operational Dashboards, and Real-Time Health Diagnostics
 - RC1: Settings, Backup Manager, VERSION stamping, Documentation cleanup
 
 ## Idea Inbox

@@ -1,6 +1,22 @@
 # MBM Quarry ERP — Changelog
 
-## Unreleased — Phase A Sync Reliability
+## Phase A Release — Cloud Sync & Operational Dashboards (2026-07-06)
+**Robust Cloud Sync Engine**
+- **Two-Way Offline-First Sync**: Replaced unstable syncing with a robust audit queue tracking offline mutations for ordered cloud push on reconnection.
+- **Full Database Security (RLS)**: Deployed Row Level Security (RLS) across all 28 tables with secure authenticated Supabase access, moving away from anonymous access.
+- **Timestamp-Aware Projections**: Advanced sync logic for financial events, ledger entries, and inventory stock to prevent balance corruption.
+
+**Live Operational Dashboard**
+- **Real-Time Metrics**: Replaced hardcoded placeholders with a new `DashboardService` calculating live metrics (Today's Sales/Purchases/Expenses, Receivables/Payables, Cash/Bank balances) in milliseconds from SQLite.
+- **Local Time Precision**: Fixed timezone issues to correctly attribute transactions at local day boundaries rather than UTC.
+
+**Real-Time UI & Navigation**
+- **Dynamic Status Indicators**: Sidebar and top bar now display live sync status (Synced, Syncing..., Error), pending offline changes count, and last successful sync time.
+
+**Dynamic System Health**
+- **About Page Revamp**: Upgraded from static text to a live diagnostic dashboard probing SQLite, Prisma, and Supabase connection health.
+
+## v1.9.7 (2026-07-05)
 - Corrected audit payload extraction so cloud upserts receive the entity snapshot rather than the audit wrapper.
 - Added the `Sale` → `OutgoingSale` alias and lower-camel Prisma delegate mappings used by pull sync.
 - Stopped pull cursors from advancing after failed local upserts or deletions.

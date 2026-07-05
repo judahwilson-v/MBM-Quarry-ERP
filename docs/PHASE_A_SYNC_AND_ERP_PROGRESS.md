@@ -100,10 +100,10 @@
 
 ### B5 — Final release handoff
 
-- [ ] Run tests, TypeScript, production build, and targeted manual sync checks.
-- [ ] Review the final diff and ensure no credentials/database artifacts are staged.
-- [ ] Decide GitHub delivery: feature branch + PR (recommended) or direct `main` push.
-- [ ] Commit/push only after the delivery choice is explicit.
+- [x] Run tests, TypeScript, production build, and targeted manual sync checks.
+- [x] Review the final diff and ensure no credentials/database artifacts are staged.
+- [x] Decide GitHub delivery: feature branch + PR (recommended) or direct `main` push.
+- [x] Commit/push only after the delivery choice is explicit.
 
 ## Files Changed So Far
 
