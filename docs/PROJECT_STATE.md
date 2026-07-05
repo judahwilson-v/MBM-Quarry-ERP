@@ -19,16 +19,16 @@
 | Reports | ✅ Complete |
 | Sync Engine | ✅ Complete (Phase A Robust Cloud Sync & RLS) |
 | Electron Dev | ✅ Working |
-| Electron Production (.dmg) | ✅ Built (macOS RC1) |
+| Electron Production | ✅ Built (macOS DMG & Windows EXE) |
 | Backup Manager | ✅ Complete |
 | Settings Page | ✅ Complete |
 | Auto-Updater | ✅ Complete (React UI with manual/auto support) |
 
 ## Current Task
-Full QA validation pass at the quarry + real-world field testing of the Phase A release.
+Full QA validation pass at the quarry + real-world field testing.
 
 ## Blocking Issues
-- Electron production build for **Windows** has not been packaged yet (only macOS DMG exists).
+- None at this time.
 
 ## Completed Phases
 - Phase 0: Foundation (SQLite, Prisma, offline-first)
@@ -37,7 +37,8 @@ Full QA validation pass at the quarry + real-world field testing of the Phase A 
 - Phase 3: Ledger + Day Book
 - Phase 4: Credit & Collections
 - Phase 5: Supabase Sync
-- Phase 6: Electron Desktop Packaging
+- Phase 6: Electron Desktop Packaging (Windows & macOS)
+- Phase 7: Tally Integration (GST billing XML export)
 - Phase A: Robust Cloud Sync, Live Operational Dashboards, and Real-Time Health Diagnostics
 - RC1: Settings, Backup Manager, VERSION stamping, Documentation cleanup
 
@@ -46,6 +47,5 @@ See `docs/IDEAS.md` for unconfirmed feature ideas.
 
 ## Next Confirmed Phases
 - **Field Testing**: Deploy to quarry PC, collect feedback (1–2 weeks)
-- **Phase 7**: Tally Integration (GST billing XML export) — after field testing
 - **Phase 8**: Refinement, Sync Validation & UI Polish (Current Focus)
 - **Phase 9**: Owner Dashboard (separate Next.js web app, read-only, Supabase-connected)
