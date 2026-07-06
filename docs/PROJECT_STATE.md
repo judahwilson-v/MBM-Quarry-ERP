@@ -1,6 +1,7 @@
 # MBM Quarry ERP — Project State
 
-**Version**: v1.10.0 (Phase A Release)
+**Status**: Cloud-Synced (Active Deployment)
+**Version**: `v1.10.1`
 **Phase**: RC1 — Stabilization & Field Testing
 **Last Updated**: 2026-07-06
 
@@ -17,7 +18,7 @@
 | Employee Credit | ✅ Complete |
 | Other Credit | ✅ Complete |
 | Reports | ✅ Complete |
-| Sync Engine | ✅ Complete (Phase A Robust Cloud Sync & RLS) |
+| Sync Engine | ✅ Complete (Anonymous Sync — RLS Disabled) |
 | Electron Dev | ✅ Working |
 | Electron Production | ✅ Built (macOS DMG & Windows EXE) |
 | Backup Manager | ✅ Complete |

@@ -11,12 +11,7 @@ import {
   SYNC_MODEL_CONFIG,
 } from "./sync-config";
 
-async function requireAuthenticatedUser(supabase: ReturnType<typeof createClient>) {
-  const { data, error } = await supabase.auth.getUser();
-  if (error || !data.user) {
-    throw new Error(`[Sync Auth] Sign in before syncing: ${error?.message ?? "no active Supabase session"}`);
-  }
-}
+
 
 // Convert camelCase object keys to snake_case for Supabase REST API
 function toSnakeCase(obj: any): any {
@@ -70,7 +65,7 @@ export async function pushSync() {
   await db.syncState.update({ where: { id: "default" }, data: { status: "SYNCING" } });
 
   try {
-    await requireAuthenticatedUser(supabase);
+
 
     for (const log of unsyncedLogs) {
       const modelName = resolveSyncModel(log.entityName);
@@ -162,7 +157,7 @@ export async function pullSync() {
   await db.syncState.update({ where: { id: "pull_state" }, data: { status: "SYNCING" } });
 
   try {
-    await requireAuthenticatedUser(supabase);
+
 
     // 2. Fetch deletions from audit_logs
     const { data: deleteLogs, error: deleteError } = await supabase

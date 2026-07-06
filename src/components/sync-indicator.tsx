@@ -2,41 +2,32 @@
 
 import { useEffect, useState } from "react";
 import { Cloud, CloudOff, RefreshCw, AlertCircle } from "lucide-react";
-import { fetchSyncStatus, triggerSync } from "@/app/actions/sync";
+import { fetchSyncStatus, triggerSync, fetchOnlineStatus } from "@/app/actions/sync";
 import { formatDistanceToNow } from "date-fns";
 import { Button } from "@/components/ui/button";
 
 export function SyncIndicator() {
   const [status, setStatus] = useState<any>({ status: "IDLE", lastSyncedAt: null, pendingCount: 0 });
   const [isSyncing, setIsSyncing] = useState(false);
-  const [isOnline, setIsOnline] = useState(true);
+  const [isOnline, setIsOnline] = useState<boolean | null>(null);
 
   const checkStatus = async () => {
     try {
-      const data = await fetchSyncStatus();
+      const [data, online] = await Promise.all([
+        fetchSyncStatus(),
+        fetchOnlineStatus(),
+      ]);
       setStatus(data);
+      setIsOnline(online);
     } catch (e) {
       console.error(e);
     }
   };
 
   useEffect(() => {
-    setIsOnline(navigator.onLine);
-    
-    const handleOnline = () => setIsOnline(true);
-    const handleOffline = () => setIsOnline(false);
-    
-    window.addEventListener("online", handleOnline);
-    window.addEventListener("offline", handleOffline);
-
     checkStatus();
-    const interval = setInterval(checkStatus, 30000); // Poll every 30s
-
-    return () => {
-      window.removeEventListener("online", handleOnline);
-      window.removeEventListener("offline", handleOffline);
-      clearInterval(interval);
-    };
+    const interval = setInterval(checkStatus, 15000); // Poll every 15s
+    return () => clearInterval(interval);
   }, []);
 
   const handleForceSync = async () => {
@@ -61,7 +52,7 @@ export function SyncIndicator() {
     if (status.pendingCount > 0) {
       return { icon: <Cloud className="w-4 h-4 text-[#f39c12]" />, text: `${status.pendingCount} pending`, color: "text-[#f39c12]" };
     }
-    if (!isOnline) {
+    if (isOnline === false) {
       return { icon: <CloudOff className="w-4 h-4 text-rose-500" />, text: "Offline", color: "text-rose-500" };
     }
     return { icon: <Cloud className="w-4 h-4 text-emerald-500" />, text: "Synced", color: "text-emerald-500" };

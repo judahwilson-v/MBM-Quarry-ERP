@@ -1,7 +1,7 @@
 "use client";
 
 import { useState, useEffect } from "react";
-import { triggerSync, fetchSyncStatus } from "@/app/actions/sync";
+import { triggerSync, fetchSyncStatus, fetchOnlineStatus } from "@/app/actions/sync";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import {
@@ -102,7 +102,7 @@ export function AppShell({ children }: { children: React.ReactNode }) {
             </Button>
             <div className="min-w-0">
               <div className="truncate text-sm font-semibold sm:text-base">MBM Quarry Management</div>
-              <div className="truncate text-xs text-muted-foreground">Offline single-computer SQLite system</div>
+              <div className="truncate text-xs text-muted-foreground">Cloud-synced quarry management</div>
             </div>
           </div>
           <div className="flex items-center gap-2">
@@ -171,33 +171,39 @@ function ShellNav({ pathname, onNavigate }: { pathname: string; onNavigate?: () 
 function ShellSync() {
   const [syncStatus, setSyncStatus] = useState<any>(null);
   const [isSyncing, setIsSyncing] = useState(false);
-  const [isOnline, setIsOnline] = useState(true);
+  const [isOnline, setIsOnline] = useState<boolean | null>(null);
 
   useEffect(() => {
-    setIsOnline(navigator.onLine);
-    const handleOnline = () => setIsOnline(true);
-    const handleOffline = () => setIsOnline(false);
-    window.addEventListener('online', handleOnline);
-    window.addEventListener('offline', handleOffline);
-
-    fetchSyncStatus().then(setSyncStatus).catch(console.error);
-    const interval = setInterval(() => {
-      fetchSyncStatus().then(setSyncStatus).catch(console.error);
-    }, 15000);
-
-    return () => {
-      clearInterval(interval);
-      window.removeEventListener('online', handleOnline);
-      window.removeEventListener('offline', handleOffline);
+    // Use server-side ping instead of navigator.onLine (broken in Electron)
+    const checkAll = async () => {
+      try {
+        const [status, online] = await Promise.all([
+          fetchSyncStatus(),
+          fetchOnlineStatus(),
+        ]);
+        setSyncStatus(status);
+        setIsOnline(online);
+      } catch (e) {
+        console.error(e);
+      }
     };
+
+    checkAll();
+    const interval = setInterval(checkAll, 10000); // Poll every 10s
+
+    return () => clearInterval(interval);
   }, []);
 
   const handleSync = async () => {
     setIsSyncing(true);
     try {
       await triggerSync();
-      const newStatus = await fetchSyncStatus();
+      const [newStatus, online] = await Promise.all([
+        fetchSyncStatus(),
+        fetchOnlineStatus(),
+      ]);
       setSyncStatus(newStatus);
+      setIsOnline(online);
     } catch (e) {
       console.error(e);
     } finally {
@@ -228,7 +234,12 @@ function ShellSync() {
     <div className="p-4 border-t flex-shrink-0 bg-card">
       <div className="mb-3">
         <div className="flex items-center gap-2 text-sm font-semibold mb-1">
-          {isOnline && !isError ? (
+          {isOnline === null ? (
+            <>
+              <span className="text-gray-400">⚪</span>
+              <span>Checking...</span>
+            </>
+          ) : isOnline && !isError ? (
             <>
               <span className="text-emerald-500">🟢</span>
               <span>Online</span>
@@ -236,7 +247,7 @@ function ShellSync() {
           ) : (
             <>
               <span className="text-red-500">🔴</span>
-              <span>Offline</span>
+              <span>{isError ? "Sync Error" : "Offline"}</span>
             </>
           )}
         </div>
@@ -254,7 +265,7 @@ function ShellSync() {
       <div className="space-y-1">
         <button 
           onClick={handleSync}
-          disabled={isSyncing || syncStatus?.status === "SYNCING" || !isOnline}
+          disabled={isSyncing || syncStatus?.status === "SYNCING"}
           className="flex w-full items-center justify-between gap-3 rounded-md px-3 py-2 text-sm text-foreground transition-all border shadow-sm hover:bg-accent disabled:opacity-50"
         >
           <div className="flex items-center gap-2">

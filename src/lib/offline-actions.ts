@@ -1,6 +1,7 @@
 "use server";
 
 import { getDb } from "@/lib/prisma";
+import { triggerAutoSync } from "@/lib/sync/auto-sync";
 import { deriveSalesEngine, type SalesDraft } from "@/lib/sales-engine";
 import { calculateRemainingCredit, decrementVehicleTrips, incrementVehicleTrips, writeAuditEvent } from "@/lib/domain";
 import { emitFinancialEvent } from "@/lib/domain/financial-events";
@@ -167,6 +168,16 @@ async function upsertVehicleByNumber(vehicleNumber: string, partyName?: string, 
   return existing;
 }
 
+
+async function runTx<T>(txFn: (tx: any) => Promise<T>): Promise<T> {
+  const db = await getDb();
+  try {
+    return await runTx(txFn);
+  } finally {
+    triggerAutoSync().catch(console.error);
+  }
+}
+
 export async function listVehicles(search = "") {
   const db = await getDb();
   const rows = await db.vehicle.findMany({ orderBy: { vehicleNumber: "asc" } });
@@ -184,14 +195,14 @@ export async function saveVehicle(input: VehicleInput) {
 
   const data = { vehicleNumber, partyName, companyBodyQty, extraBodyQty };
   if (input.id) {
-    return serialize(await db.$transaction(async (tx) => {
+    return serialize(await runTx(async (tx) => {
       const before = await tx.vehicle.findUnique({ where: { id: input.id } });
       const row = await tx.vehicle.update({ where: { id: input.id }, data });
       await writeAuditEvent(tx, { entityName: "Vehicle", entityId: row.id, action: "update", role: "system", before, after: row });
       return row;
     }));
   }
-  return serialize(await db.$transaction(async (tx) => {
+  return serialize(await runTx(async (tx) => {
     const row = await tx.vehicle.create({ data });
     await writeAuditEvent(tx, { entityName: "Vehicle", entityId: row.id, action: "create", role: "system", after: row });
     return row;
@@ -200,7 +211,7 @@ export async function saveVehicle(input: VehicleInput) {
 
 export async function deleteVehicle(id: string) {
   const db = await getDb();
-  await db.$transaction(async (tx) => {
+  await runTx(async (tx) => {
     const before = await tx.vehicle.findUnique({ where: { id } });
     await tx.vehicle.delete({ where: { id } });
     if (before) await writeAuditEvent(tx, { entityName: "Vehicle", entityId: id, action: "delete", role: "system", before });
@@ -221,14 +232,14 @@ export async function saveParty(input: PartyInput) {
     address: cleanText(input.address),
   };
   if (input.id) {
-    return serialize(await db.$transaction(async (tx) => {
+    return serialize(await runTx(async (tx) => {
       const before = await tx.party.findUnique({ where: { id: input.id } });
       const row = await tx.party.update({ where: { id: input.id }, data });
       await writeAuditEvent(tx, { entityName: "Party", entityId: row.id, action: "update", role: "system", before, after: row });
       return row;
     }));
   }
-  return serialize(await db.$transaction(async (tx) => {
+  return serialize(await runTx(async (tx) => {
     const row = await tx.party.create({ data });
     await writeAuditEvent(tx, { entityName: "Party", entityId: row.id, action: "create", role: "system", after: row });
     return row;
@@ -237,7 +248,7 @@ export async function saveParty(input: PartyInput) {
 
 export async function deleteParty(id: string) {
   const db = await getDb();
-  await db.$transaction(async (tx) => {
+  await runTx(async (tx) => {
     const before = await tx.party.findUnique({ where: { id } });
     await tx.party.delete({ where: { id } });
     if (before) await writeAuditEvent(tx, { entityName: "Party", entityId: id, action: "delete", role: "system", before });
@@ -254,7 +265,7 @@ export async function updateMaterialRate(id: string, ratePerCft: string | number
   const db = await getDb();
   const rate = parseNumber(ratePerCft, "Rate");
   if (rate === null || rate < 0) throw new Error("Rate must be zero or greater.");
-  return serialize(await db.$transaction(async (tx) => {
+  return serialize(await runTx(async (tx) => {
     const before = await tx.material.findUnique({ where: { id } });
     const row = await tx.material.update({ where: { id }, data: { ratePerCft: rate } });
     await writeAuditEvent(tx, { entityName: "Material", entityId: row.id, action: "update", role: "system", before, after: row });
@@ -316,7 +327,7 @@ export async function saveSale(input: SaleInput) {
   if (vehicle && !partyId) partyId = vehicle.partyId;
 
   return serialize(
-    await db.$transaction(async (tx) => {
+    await runTx(async (tx) => {
       const existing = input.id ? await tx.outgoingSale.findUnique({ where: { id: input.id } }) : null;
       const engine = deriveSalesEngine(
         { ...input, partyId } as unknown as SalesDraft,
@@ -481,7 +492,7 @@ export async function saveSale(input: SaleInput) {
 
 export async function deleteSale(id: string) {
   const db = await getDb();
-  await db.$transaction(async (tx) => {
+  await runTx(async (tx) => {
     const existing = await tx.outgoingSale.findUnique({ where: { id } });
     if (existing) {
       await tx.outgoingSale.delete({ where: { id } });
@@ -502,7 +513,7 @@ export async function deleteSale(id: string) {
       
       // Cascade delete financial events and ledger entries
       const events = await tx.financialEvent.findMany({ where: { entityId: id } });
-      const eventIds = events.map(e => e.eventId);
+      const eventIds = events.map((e: any) => e.eventId);
       if (eventIds.length > 0) {
         await tx.ledgerEntry.deleteMany({ where: { financialEventId: { in: eventIds } } });
         await tx.financialEvent.deleteMany({ where: { eventId: { in: eventIds } } });
@@ -517,7 +528,7 @@ export async function deleteSale(id: string) {
 
 export async function purgeNonGstSales(): Promise<number> {
   const db = await getDb();
-  return await db.$transaction(async (tx) => {
+  return await runTx(async (tx) => {
     const nonGstSales = await tx.outgoingSale.findMany({
       where: { gstEnabled: false },
     });
@@ -533,9 +544,9 @@ export async function purgeNonGstSales(): Promise<number> {
       affectedDates.add(sale.saleDate.toISOString());
     }
 
-    const saleIds = nonGstSales.map(s => s.id);
+    const saleIds = nonGstSales.map((s: any) => s.id);
     const events = await tx.financialEvent.findMany({ where: { entityId: { in: saleIds } } });
-    const eventIds = events.map(e => e.eventId);
+    const eventIds = events.map((e: any) => e.eventId);
     if (eventIds.length > 0) {
       await tx.ledgerEntry.deleteMany({ where: { financialEventId: { in: eventIds } } });
       await tx.financialEvent.deleteMany({ where: { eventId: { in: eventIds } } });
@@ -559,7 +570,7 @@ export async function purgeNonGstSales(): Promise<number> {
       entityId: "BULK_PURGE",
       action: "delete",
       role: "system",
-      before: { count: nonGstSales.length, ids: nonGstSales.map(s => s.id) },
+      before: { count: nonGstSales.length, ids: nonGstSales.map((s: any) => s.id) },
     });
 
     return deleteResult.count;
@@ -625,7 +636,7 @@ export async function saveIncomingBoulder(input: IncomingBoulderInput) {
   const finalData = { ...data, partyId, vehicleId };
 
   if (input.id) {
-    return serialize(await db.$transaction(async (tx) => {
+    return serialize(await runTx(async (tx) => {
       const before = await tx.incomingBoulder.findUnique({ where: { id: input.id } });
       const row = await tx.incomingBoulder.update({ where: { id: input.id }, data: finalData });
       await writeAuditEvent(tx, { entityName: "IncomingBoulder", entityId: row.id, action: "update", role: "system", before, after: row });
@@ -651,7 +662,7 @@ export async function saveIncomingBoulder(input: IncomingBoulderInput) {
       return row;
     }));
   }
-  return serialize(await db.$transaction(async (tx) => {
+  return serialize(await runTx(async (tx) => {
     const row = await tx.incomingBoulder.create({ data: finalData });
     await writeAuditEvent(tx, { entityName: "IncomingBoulder", entityId: row.id, action: "create", role: "system", after: row });
     
@@ -676,7 +687,7 @@ export async function saveIncomingBoulder(input: IncomingBoulderInput) {
 
 export async function deleteIncomingBoulder(id: string) {
   const db = await getDb();
-  await db.$transaction(async (tx) => {
+  await runTx(async (tx) => {
     const before = await tx.incomingBoulder.findUnique({ where: { id } });
     await tx.incomingBoulder.delete({ where: { id } });
     if (before) {
@@ -691,7 +702,7 @@ export async function deleteIncomingBoulder(id: string) {
       const expenses = await tx.dayBookExpenseEntry.findMany({ where: { description: expenseDesc } });
       if (expenses.length > 0) {
         await tx.dayBookExpenseEntry.deleteMany({ where: { description: expenseDesc } });
-        const sourceEventIds = expenses.map(e => e.sourceEventId);
+        const sourceEventIds = expenses.map((e: any) => e.sourceEventId);
         await tx.financialEvent.deleteMany({ where: { eventId: { in: sourceEventIds } } });
       }
 
@@ -746,14 +757,14 @@ export async function saveEmployeeCredit(input: EmployeeCreditInput) {
   };
   if (data.amount <= 0) throw new Error("Amount must be greater than 0.");
   if (input.id) {
-    return serialize(await db.$transaction(async (tx) => {
+    return serialize(await runTx(async (tx) => {
       const before = await tx.employeeCredit.findUnique({ where: { id: input.id } });
       const row = await tx.employeeCredit.update({ where: { id: input.id }, data });
       await writeAuditEvent(tx, { entityName: "EmployeeCredit", entityId: row.id, action: "update", role: "system", before, after: row });
       return row;
     }));
   }
-  return serialize(await db.$transaction(async (tx) => {
+  return serialize(await runTx(async (tx) => {
     const row = await tx.employeeCredit.create({ data });
     await writeAuditEvent(tx, { entityName: "EmployeeCredit", entityId: row.id, action: "create", role: "system", after: row });
     return row;
@@ -762,7 +773,7 @@ export async function saveEmployeeCredit(input: EmployeeCreditInput) {
 
 export async function deleteEmployeeCredit(id: string) {
   const db = await getDb();
-  await db.$transaction(async (tx) => {
+  await runTx(async (tx) => {
     const before = await tx.employeeCredit.findUnique({ where: { id } });
     await tx.employeeCredit.delete({ where: { id } });
     if (before) await writeAuditEvent(tx, { entityName: "EmployeeCredit", entityId: id, action: "delete", role: "system", before });
@@ -781,7 +792,7 @@ export async function saveDayBookOpeningBalances(input: any) {
   const openingCashBalance = parseNumber(input.openingCashBalance, "Opening cash balance") ?? 0;
   const openingBankBalance = parseNumber(input.openingBankBalance, "Opening bank balance") ?? 0;
   return serialize(
-    await db.$transaction(async (tx: any) => setDayBookOpeningBalances(tx, {
+    await runTx(async (tx: any) => setDayBookOpeningBalances(tx, {
       businessDate: input.businessDate,
       openingCashBalance,
       openingBankBalance,
@@ -794,7 +805,7 @@ export async function saveDayBookExpense(input: any) {
   const amount = parseNumber(input.amount, "Expense amount") ?? 0;
   if (amount <= 0) throw new Error("Expense amount must be greater than 0.");
   return serialize(
-    await db.$transaction(async (tx: any) => addDayBookExpense(tx, {
+    await runTx(async (tx: any) => addDayBookExpense(tx, {
       businessDate: input.businessDate,
       expenseType: input.expenseType,
       amount,
@@ -805,7 +816,7 @@ export async function saveDayBookExpense(input: any) {
 
 export async function rebuildBusinessDayBook(businessDate?: string) {
   const db = await getDb();
-  return serialize(await db.$transaction(async (tx: any) => rebuildDayBook(tx, businessDate)));
+  return serialize(await runTx(async (tx: any) => rebuildDayBook(tx, businessDate)));
 }
 
 function normalizePartyName(value: string) {
@@ -844,7 +855,7 @@ export async function savePartyCollection(input: any) {
   const collectionDate = input.collectionDate ? new Date(input.collectionDate) : new Date();
 
   return serialize(
-    await db.$transaction(async (tx: any) => {
+    await runTx(async (tx: any) => {
       const party = await tx.party.findFirst({ where: { partyName: { equals: partyName } } });
       if (!party) throw new Error("Party not found.");
       
@@ -909,7 +920,7 @@ export async function savePartyPayment(input: any) {
   const paymentDate = input.paymentDate ? new Date(input.paymentDate) : new Date();
 
   return serialize(
-    await db.$transaction(async (tx: any) => {
+    await runTx(async (tx: any) => {
       const party = await tx.party.findFirst({ where: { partyName: { equals: partyName } } });
       if (!party) throw new Error("Party not found.");
       
@@ -957,7 +968,7 @@ export async function savePartyPayment(input: any) {
 
 export async function deletePartyCollection(id: string) {
   const db = await getDb();
-  await db.$transaction(async (tx: any) => {
+  await runTx(async (tx: any) => {
     const collection = await tx.partyCollection.findUnique({ where: { id } });
     if (!collection) return;
     await tx.partyCollection.delete({ where: { id } });
@@ -971,7 +982,7 @@ export async function deletePartyCollection(id: string) {
 
 export async function deletePartyPayment(id: string) {
   const db = await getDb();
-  await db.$transaction(async (tx: any) => {
+  await runTx(async (tx: any) => {
     const payment = await tx.partyPayment.findUnique({ where: { id } });
     if (!payment) return;
     await tx.partyPayment.delete({ where: { id } });
@@ -1000,14 +1011,14 @@ export async function saveOtherCredit(input: any) {
   };
   if (data.amount <= 0) throw new Error("Amount must be greater than 0.");
   if (input.id) {
-    return serialize(await db.$transaction(async (tx: any) => {
+    return serialize(await runTx(async (tx: any) => {
       const before = await tx.otherCredit.findUnique({ where: { id: input.id } });
       const row = await tx.otherCredit.update({ where: { id: input.id }, data });
       await writeAuditEvent(tx, { entityName: "OtherCredit", entityId: row.id, action: "update", role: "system", before, after: row });
       return row;
     }));
   }
-  return serialize(await db.$transaction(async (tx: any) => {
+  return serialize(await runTx(async (tx: any) => {
     const row = await tx.otherCredit.create({ data });
     await writeAuditEvent(tx, { entityName: "OtherCredit", entityId: row.id, action: "create", role: "system", after: row });
     return row;
@@ -1016,7 +1027,7 @@ export async function saveOtherCredit(input: any) {
 
 export async function deleteOtherCredit(id: string) {
   const db = await getDb();
-  await db.$transaction(async (tx: any) => {
+  await runTx(async (tx: any) => {
     const before = await tx.otherCredit.findUnique({ where: { id } });
     await tx.otherCredit.delete({ where: { id } });
     if (before) await writeAuditEvent(tx, { entityName: "OtherCredit", entityId: id, action: "delete", role: "system", before });
@@ -1064,7 +1075,7 @@ export async function saveExpense(input: any) {
   const amount = parseNumber(input.amount, "Amount") ?? 0;
   if (amount <= 0) throw new Error("Expense amount must be greater than 0.");
   
-  return serialize(await db.$transaction(async (tx: any) => {
+  return serialize(await runTx(async (tx: any) => {
     let partyId = input.partyId;
     let partyName = input.partyName;
     if (partyName) {
@@ -1194,7 +1205,7 @@ export async function saveExpense(input: any) {
 
 export async function deleteExpense(id: string) {
   const db = await getDb();
-  return serialize(await db.$transaction(async (tx: any) => {
+  return serialize(await runTx(async (tx: any) => {
     const row = await tx.expense.findUnique({ where: { id } });
     if (!row) throw new Error("Expense not found");
 
@@ -1286,7 +1297,7 @@ export async function saveFuelPurchase(input: FuelPurchaseInput) {
     vehicleNumber: input.vehicleNumber || null,
   };
 
-  return serialize(await db.$transaction(async (tx) => {
+  return serialize(await runTx(async (tx) => {
     let row;
     if (input.id) {
       const before = await tx.fuelPurchase.findUnique({ where: { id: input.id } });
@@ -1387,7 +1398,7 @@ export async function saveFuelPurchase(input: FuelPurchaseInput) {
 
 export async function deleteFuelPurchase(id: string) {
   const db = await getDb();
-  return serialize(await db.$transaction(async (tx: any) => {
+  return serialize(await runTx(async (tx: any) => {
     const row = await tx.fuelPurchase.findUnique({ where: { id } });
     if (!row) throw new Error("Fuel purchase not found");
     
@@ -1462,7 +1473,7 @@ export async function saveEmployeeLedgerEntry(input: EmployeeLedgerInput) {
   const cashPaid = parseNumber(input.cashPaid, "Cash Paid", false) || 0;
   const date = parseDateInput(input.date);
   
-  return serialize(await db.$transaction(async (tx) => {
+  return serialize(await runTx(async (tx) => {
     const employee = await tx.employee.findUnique({ where: { id: input.employeeId } });
     if (!employee) throw new Error("Employee not found");
     

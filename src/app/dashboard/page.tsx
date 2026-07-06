@@ -145,8 +145,8 @@ export default async function DashboardPage() {
             </div>
 
             <div className="pt-8 pb-4 text-center">
-              <p className="text-xs text-[var(--text-muted)]">
-                MBM Quarry Management • Offline SQLite System • Last updated: {currentDate}
+              <p className="text-xs text-muted-foreground">
+                MBM Quarry Management • Cloud Synced • Last updated: {currentDate}
               </p>
             </div>
           </div>

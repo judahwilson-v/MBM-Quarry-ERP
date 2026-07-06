@@ -1,8 +1,13 @@
 # MBM Quarry ERP — Changelog
 
+## v1.10.1 — Anonymous Sync & RLS Disable (2026-07-06)
+- **RLS Disabled**: Dropped `authenticated_sync_access` policies and disabled Row Level Security on all 28 Supabase tables for frictionless anonymous sync.
+- **Auth Removed from Sync**: Removed `requireAuthenticatedUser()` gate from `pushSync()` and `pullSync()` so the sync engine operates with the anon key alone.
+- **Dashboard Verified**: Confirmed dashboard reads exclusively from local SQLite via Prisma — no Supabase dependency for metrics display.
+
 ## Phase A Release — Cloud Sync & Operational Dashboards (2026-07-06)
 **Robust Cloud Sync Engine**
-- **Two-Way Offline-First Sync**: Replaced unstable syncing with a robust audit queue tracking offline mutations for ordered cloud push on reconnection.
+- **Two-Way Cloud Sync**: Replaced unstable syncing with a robust audit queue tracking local mutations for ordered cloud push.
 - **Full Database Security (RLS)**: Deployed Row Level Security (RLS) across all 28 tables with secure authenticated Supabase access, moving away from anonymous access.
 - **Timestamp-Aware Projections**: Advanced sync logic for financial events, ledger entries, and inventory stock to prevent balance corruption.
 
