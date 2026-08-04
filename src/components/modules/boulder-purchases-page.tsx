@@ -2,7 +2,7 @@
 import { usePrompt } from "@/components/ui/prompt-provider";
 
 import { useCallback, useEffect, useState } from "react";
-import { Pencil, Save, Search, Trash2, X } from "lucide-react";
+import { Pencil, Save, Search, Trash2, X, Download, Printer } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Field } from "@/components/ui/field";
@@ -14,6 +14,7 @@ import { deleteIncomingBoulder, listIncomingBoulder, saveIncomingBoulder } from 
 import { listVehicles } from "@/app/actions/vehicles";
 import { getLastBookPage } from "@/app/actions/sales";
 import { formatCurrency, formatDate, formatQty, todayInputValue } from "@/lib/utils";
+import { exportToExcel } from "@/lib/export";
 
 type BoulderRow = {
   id: string;
@@ -167,14 +168,75 @@ export function BoulderPurchasesPage() {
     }
   }
 
+  function handleExportExcel() {
+    if (rows.length === 0) return;
+    
+    let totalQty = 0;
+    let totalAmount = 0;
+    let totalPaid = 0;
+    let totalCredit = 0;
+
+    const excelData: Record<string, any>[] = rows.map((row) => {
+      totalQty += row.qty;
+      totalAmount += row.amount;
+      totalPaid += row.paidTotal;
+      totalCredit += row.remainingCredit;
+
+      return {
+        Date: formatDate(row.date),
+        Time: row.time || "-",
+        "Book/Page": row.bookNumber && row.pageNumber ? `${row.bookNumber}/${row.pageNumber}` : row.bookNumber || row.pageNumber || "-",
+        Vehicle: row.vehicleNumber,
+        Supplier: row.partyName,
+        Qty: row.qty,
+        Rate: row.rockRate,
+        Amount: row.amount,
+        Paid: row.paidTotal,
+        Credit: row.remainingCredit,
+        Remarks: row.remarks || "-"
+      };
+    });
+    
+    excelData.push({
+      Date: "TOTAL",
+      Time: "",
+      "Book/Page": "",
+      Vehicle: "",
+      Supplier: "",
+      Qty: totalQty,
+      Rate: "",
+      Amount: totalAmount,
+      Paid: totalPaid,
+      Credit: totalCredit,
+      Remarks: ""
+    });
+
+    exportToExcel(excelData, `Boulder_Purchases_${new Date().toISOString().slice(0,10)}`);
+  }
+
   return (
-    <div className="space-y-5 p-4 lg:p-6">
-      <div>
+    <div className="space-y-5 p-4 lg:p-6 print:p-0 print:space-y-0 print:max-w-none">
+      <div className="print:hidden">
         <h1 className="text-2xl font-semibold tracking-normal">Incoming Boulder</h1>
         <p className="text-sm text-muted-foreground">ROCK material entries stored in the local database.</p>
       </div>
 
-      <Card>
+      <div className="hidden print:block mb-8 text-center border-b pb-4">
+        <h1 className="text-3xl font-bold tracking-tight">MBM QUARRY</h1>
+        <p className="text-muted-foreground text-sm uppercase tracking-wider mt-1">Boulder Purchases Report</p>
+        <div className="mt-6 flex justify-between items-end text-left">
+          <div>
+            <p className="text-sm text-muted-foreground">Report Date</p>
+            <h2 className="text-xl font-bold">{new Date().toLocaleDateString('en-IN')}</h2>
+          </div>
+          <div className="text-right">
+            <p className="text-sm text-muted-foreground">Generated On</p>
+            <p className="font-medium">{new Date().toLocaleString('en-IN')}</p>
+          </div>
+        </div>
+      </div>
+
+      <Card className="print:hidden">
         <CardHeader className="flex-row items-center justify-between">
           <CardTitle>{form.id ? "Edit Boulder Entry" : "Boulder Entry"}</CardTitle>
           {form.id ? (
@@ -306,17 +368,28 @@ export function BoulderPurchasesPage() {
         </CardContent>
       </Card>
 
-      <Card>
-        <CardHeader className="flex-row flex-wrap items-center justify-between gap-3">
+      <Card className="print:border-none print:shadow-none">
+        <CardHeader className="flex-row flex-wrap items-center justify-between gap-3 print:hidden">
           <CardTitle>Boulder Table</CardTitle>
-          <div className="relative w-full sm:w-80">
-            <Search className="pointer-events-none absolute left-3 top-3 h-4 w-4 text-muted-foreground" />
-            <Input className="pl-9" placeholder="Search boulder entries..." value={search} onChange={(event) => setSearch(event.target.value)} />
+          <div className="flex w-full sm:w-auto gap-2 items-center">
+            <div className="relative w-full sm:w-64">
+              <Search className="pointer-events-none absolute left-3 top-3 h-4 w-4 text-muted-foreground" />
+              <Input className="pl-9" placeholder="Search boulder entries..." value={search} onChange={(event) => setSearch(event.target.value)} />
+            </div>
+            <Button variant="outline" size="sm" onClick={handleExportExcel} className="text-xs gap-1.5">
+              <Download className="h-3.5 w-3.5" />
+              Export
+            </Button>
+            <Button variant="outline" size="sm" onClick={() => window.print()} className="text-xs gap-1.5">
+              <Printer className="h-3.5 w-3.5" />
+              Print
+            </Button>
           </div>
         </CardHeader>
-        <CardContent>
+        <CardContent className="print:p-0">
+          <div className="overflow-x-auto rounded-md border print:border-none">
           <Table>
-            <TableHeader>
+            <TableHeader className="bg-muted/50 print:bg-transparent print:border-b-2 print:border-black">
               <TableRow>
                 <TableHead>Date</TableHead>
                 <TableHead>Time</TableHead>
@@ -329,12 +402,12 @@ export function BoulderPurchasesPage() {
                 <TableHead className="text-right">Paid</TableHead>
                 <TableHead className="text-right">Credit</TableHead>
                 <TableHead>Remarks</TableHead>
-                <TableHead className="w-24 text-right">Actions</TableHead>
+                <TableHead className="w-24 text-right print:hidden">Actions</TableHead>
               </TableRow>
             </TableHeader>
             <TableBody>
               {rows.map((row) => (
-                <TableRow key={row.id}>
+                <TableRow key={row.id} className="print:border-b print:border-gray-200">
                   <TableCell>{formatDate(row.date)}</TableCell>
                   <TableCell>{row.time || "-"}</TableCell>
                   <TableCell>
@@ -347,8 +420,8 @@ export function BoulderPurchasesPage() {
                   <TableCell className="number-cell font-medium">{formatCurrency(row.amount)}</TableCell>
                   <TableCell className="number-cell text-emerald-600">{formatCurrency(row.paidTotal)}</TableCell>
                   <TableCell className="number-cell text-destructive">{formatCurrency(row.remainingCredit)}</TableCell>
-                  <TableCell className="max-w-40 truncate" title={row.remarks || ""}>{row.remarks}</TableCell>
-                  <TableCell className="text-right">
+                  <TableCell className="max-w-40 truncate print:whitespace-normal" title={row.remarks || ""}>{row.remarks}</TableCell>
+                  <TableCell className="text-right print:hidden">
                     <div className="inline-flex gap-1">
                       <Button variant="ghost" size="icon" onClick={() => edit(row)} aria-label="Edit boulder entry">
                         <Pencil className="h-4 w-4" />
@@ -369,6 +442,7 @@ export function BoulderPurchasesPage() {
               ) : null}
             </TableBody>
           </Table>
+          </div>
         </CardContent>
       </Card>
     </div>

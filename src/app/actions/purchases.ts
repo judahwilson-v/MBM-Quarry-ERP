@@ -4,33 +4,13 @@
 
 import { getDb } from "@/lib/prisma";
 import { triggerAutoSync } from "@/lib/sync/auto-sync";
-import { deriveSalesEngine, type SalesDraft } from "@/lib/sales-engine";
-import { calculateRemainingCredit, decrementVehicleTrips, incrementVehicleTrips, writeAuditEvent } from "@/lib/domain";
-import { emitFinancialEvent } from "@/lib/domain/financial-events";
-import { addDayBookExpense, rebuildDayBook, setDayBookOpeningBalances, projectDayBookExpense, recalculateDayBook, getOrCreateDayBook } from "@/lib/domain/daybook";
+import { writeAuditEvent } from "@/lib/domain";
+import { addDayBookExpense, recalculateDayBook, getOrCreateDayBook } from "@/lib/domain/daybook";
 import { recalculatePartyLedger } from "@/lib/domain/ledger/party-ledger-service";
 import { txAdjustInventoryStock } from "@/lib/domain/inventory/service";
-import { verifyEditPassword } from "@/app/actions/auth";
 
-type VehicleInput = {
-  id?: string;
-  vehicleNumber: string;
-  partyName?: string | null;
-  companyBodyQty?: string | number | null;
-  extraBodyQty?: string | number | null;
-};
 
-type PartyInput = {
-  id?: string;
-  partyName: string;
-  phone?: string | null;
-  address?: string | null;
-};
 
-type SaleInput = SalesDraft & {
-  id?: string;
-  vehicleId?: string;
-};
 
 type IncomingBoulderInput = {
   id?: string;
@@ -50,14 +30,6 @@ type IncomingBoulderInput = {
   remarks?: string | null;
 };
 
-type EmployeeCreditInput = {
-  id?: string;
-  employeeName: string;
-  amount: string | number;
-  reason?: string | null;
-  expectedDueDate?: string | null;
-  status: string;
-};
 
 const dateTimeKeys = new Set(["createdAt", "updatedAt", "saleDate", "date", "expectedDueDate"]);
 
@@ -79,20 +51,12 @@ function normalizeVehicleNumber(value: string) {
   return value.trim().replace(/\s+/g, " ").toUpperCase();
 }
 
-function roundMoney(value: number) {
-  return Math.round((value + Number.EPSILON) * 100) / 100;
-}
 
 function cleanText(value?: string | null) {
   const text = value?.trim() ?? "";
   return text || null;
 }
 
-function requiredText(value: string | null | undefined, label: string) {
-  const text = value?.trim();
-  if (!text) throw new Error(`${label} is required.`);
-  return text;
-}
 
 function parseNumber(value: string | number | null | undefined, label: string, required = true) {
   if (value === null || value === undefined || value === "") {
@@ -111,11 +75,6 @@ function parseDateInput(value?: string | null) {
   return date;
 }
 
-function dateOnly(value: Date | string) {
-  const date = value instanceof Date ? value : new Date(value);
-  const offset = date.getTimezoneOffset() * 60000;
-  return new Date(date.getTime() - offset).toISOString().slice(0, 10);
-}
 
 function containsSearch(row: Record<string, unknown>, search?: string) {
   const query = search?.trim().toLowerCase();
@@ -173,7 +132,6 @@ async function upsertVehicleByNumber(vehicleNumber: string, partyName?: string, 
 
 
 async function runTx<T>(txFn: (tx: any) => Promise<T>): Promise<T> {
-  const db = await getDb();
   try {
     return await runTx(txFn);
   } finally {
@@ -190,7 +148,6 @@ export async function listIncomingBoulder(search = "") {
 
 
 export async function saveIncomingBoulder(input: IncomingBoulderInput) {
-  const db = await getDb();
   const qty = parseNumber(input.qty, "Qty") ?? 0;
   const rockRate = parseNumber(input.rockRate, "Rock Rate") ?? 26;
   const amount = qty * rockRate;
@@ -293,7 +250,6 @@ export async function saveIncomingBoulder(input: IncomingBoulderInput) {
 
 
 export async function deleteIncomingBoulder(id: string) {
-  const db = await getDb();
   await runTx(async (tx) => {
     const before = await tx.incomingBoulder.findUnique({ where: { id } });
     await tx.incomingBoulder.delete({ where: { id } });

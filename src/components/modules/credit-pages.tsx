@@ -2,7 +2,7 @@
 import { usePrompt } from "@/components/ui/prompt-provider";
 
 import { useCallback, useEffect, useMemo, useState } from "react";
-import { Pencil, Plus, Save, Search, Trash2, X } from "lucide-react";
+import { Pencil, Plus, Save, Search, Trash2, X, Download, Printer } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Field } from "@/components/ui/field";
@@ -12,6 +12,7 @@ import { Textarea } from "@/components/ui/textarea";
 import { deleteEmployeeCredit, listEmployeeCredits, saveEmployeeCredit } from "@/app/actions/employees";
 import { listPartyCreditEntries, listPartyCreditSummary, listPartyCollectionHistory, listPartyCollectionSummary, savePartyCollection, deleteOtherCredit, listOtherCredits, saveOtherCredit } from "@/app/actions/credits";
 import { cn, formatCurrency, formatDate } from "@/lib/utils";
+import { exportToExcel } from "@/lib/export";
 import { verifyEditPassword } from "@/app/actions/auth";
 
 type PartySummary = {
@@ -135,25 +136,76 @@ export function PartyCreditPage() {
     return query ? summary.filter((row) => row.partyName.toLowerCase().includes(query)) : summary;
   }, [search, summary]);
 
+  function handleExportExcel() {
+    if (visibleSummary.length === 0) return;
+    
+    let totalCredit = 0;
+    let totalTrucks = 0;
+
+    const excelData = visibleSummary.map(row => {
+      totalCredit += row.totalCredit;
+      totalTrucks += row.truckCount;
+      return {
+        "Party Name": row.partyName,
+        "Total Credit": row.totalCredit,
+        "Truck Count": row.truckCount
+      };
+    });
+    
+    excelData.push({
+      "Party Name": "TOTAL",
+      "Total Credit": totalCredit,
+      "Truck Count": totalTrucks
+    });
+
+    exportToExcel(excelData, `Party_Credit_Summary_${new Date().toISOString().slice(0,10)}`);
+  }
+
   return (
-    <div className="space-y-5 p-4 lg:p-6">
-      <div>
+    <div className="space-y-5 p-4 lg:p-6 print:p-0 print:space-y-0 print:max-w-none">
+      <div className="print:hidden">
         <h1 className="text-2xl font-semibold tracking-normal">Party Credit</h1>
         <p className="text-sm text-muted-foreground">Credits grouped by party from outgoing sales.</p>
       </div>
 
-      <Card>
-        <CardHeader className="flex-row flex-wrap items-center justify-between gap-3">
+      <div className="hidden print:block mb-8 text-center border-b pb-4">
+        <h1 className="text-3xl font-bold tracking-tight">MBM QUARRY</h1>
+        <p className="text-muted-foreground text-sm uppercase tracking-wider mt-1">Party Credit Summary</p>
+        <div className="mt-6 flex justify-between items-end text-left">
+          <div>
+            <p className="text-sm text-muted-foreground">Report Date</p>
+            <h2 className="text-xl font-bold">{new Date().toLocaleDateString('en-IN')}</h2>
+          </div>
+          <div className="text-right">
+            <p className="text-sm text-muted-foreground">Generated On</p>
+            <p className="font-medium">{new Date().toLocaleString('en-IN')}</p>
+          </div>
+        </div>
+      </div>
+
+      <Card className="print:border-none print:shadow-none">
+        <CardHeader className="flex-row flex-wrap items-center justify-between gap-3 print:hidden">
           <CardTitle>Party Summary</CardTitle>
-          <div className="relative w-full sm:w-80">
-            <Search className="pointer-events-none absolute left-3 top-3 h-4 w-4 text-muted-foreground" />
-            <Input className="pl-9" placeholder="Search party..." value={search} onChange={(event) => setSearch(event.target.value)} />
+          <div className="flex w-full sm:w-auto gap-2 items-center">
+            <div className="relative w-full sm:w-64">
+              <Search className="pointer-events-none absolute left-3 top-3 h-4 w-4 text-muted-foreground" />
+              <Input className="pl-9" placeholder="Search party..." value={search} onChange={(event) => setSearch(event.target.value)} />
+            </div>
+            <Button variant="outline" size="sm" onClick={handleExportExcel} className="text-xs gap-1.5">
+              <Download className="h-3.5 w-3.5" />
+              Export
+            </Button>
+            <Button variant="outline" size="sm" onClick={() => window.print()} className="text-xs gap-1.5">
+              <Printer className="h-3.5 w-3.5" />
+              Print
+            </Button>
           </div>
         </CardHeader>
-        <CardContent>
-          {error ? <p className="mb-3 text-sm text-destructive">{error}</p> : null}
+        <CardContent className="print:p-0">
+          {error ? <p className="mb-3 text-sm text-destructive print:hidden">{error}</p> : null}
+          <div className="overflow-x-auto rounded-md border print:border-none">
           <Table>
-            <TableHeader>
+            <TableHeader className="bg-muted/50 print:bg-transparent print:border-b-2 print:border-black">
               <TableRow>
                 <TableHead>Party Name</TableHead>
                 <TableHead className="text-right">Total Credit</TableHead>
@@ -164,7 +216,7 @@ export function PartyCreditPage() {
               {visibleSummary.map((row) => (
                 <TableRow
                   key={row.partyName}
-                  className={cn("cursor-pointer", selectedParty === row.partyName && "bg-accent/70")}
+                  className={cn("cursor-pointer print:border-b print:border-gray-200", selectedParty === row.partyName && "bg-accent/70")}
                   onClick={() => void loadEntries(row.partyName)}
                 >
                   <TableCell className="font-medium">{row.partyName}</TableCell>
@@ -181,11 +233,12 @@ export function PartyCreditPage() {
               ) : null}
             </TableBody>
           </Table>
+          </div>
         </CardContent>
       </Card>
 
       {selectedParty ? (
-        <Card>
+        <Card className="print:hidden">
           <CardHeader>
             <CardTitle>{selectedParty} Entries</CardTitle>
           </CardHeader>
@@ -294,22 +347,74 @@ export function EmployeeCreditPage() {
     }
   }
 
+  function handleExportExcel() {
+    if (rows.length === 0) return;
+    
+    let totalAmount = 0;
+
+    const excelData = rows.map(row => {
+      totalAmount += row.amount;
+      return {
+        "Employee Name": row.employeeName,
+        Amount: row.amount,
+        Reason: row.reason || "-",
+        "Expected Due Date": row.expectedDueDate ? formatDate(row.expectedDueDate) : "-",
+        Status: row.status
+      };
+    });
+    
+    excelData.push({
+      "Employee Name": "TOTAL",
+      Amount: totalAmount,
+      Reason: "",
+      "Expected Due Date": "",
+      Status: ""
+    });
+
+    exportToExcel(excelData, `Employee_Credit_${new Date().toISOString().slice(0,10)}`);
+  }
+
   return (
-    <div className="space-y-5 p-4 lg:p-6">
-      <div className="flex flex-col gap-3 sm:flex-row sm:items-end sm:justify-between">
+    <div className="space-y-5 p-4 lg:p-6 print:p-0 print:space-y-0 print:max-w-none">
+      <div className="flex flex-col gap-3 sm:flex-row sm:items-end sm:justify-between print:hidden">
         <div>
           <h1 className="text-2xl font-semibold tracking-normal">Employee Credit</h1>
           <p className="text-sm text-muted-foreground">Employee advance and credit records.</p>
         </div>
-        <Button onClick={startCreate}>
-          <Plus className="h-4 w-4" />
-          Add
-        </Button>
+        <div className="flex gap-2">
+          <Button variant="outline" onClick={handleExportExcel} className="gap-1.5">
+            <Download className="h-4 w-4" />
+            Export
+          </Button>
+          <Button variant="outline" onClick={() => window.print()} className="gap-1.5">
+            <Printer className="h-4 w-4" />
+            Print
+          </Button>
+          <Button onClick={startCreate}>
+            <Plus className="h-4 w-4" />
+            Add
+          </Button>
+        </div>
       </div>
 
-      <Card>
-        <CardContent className="grid gap-4 pt-5">
-          <div className="relative">
+      <div className="hidden print:block mb-8 text-center border-b pb-4">
+        <h1 className="text-3xl font-bold tracking-tight">MBM QUARRY</h1>
+        <p className="text-muted-foreground text-sm uppercase tracking-wider mt-1">Employee Credit List</p>
+        <div className="mt-6 flex justify-between items-end text-left">
+          <div>
+            <p className="text-sm text-muted-foreground">Report Date</p>
+            <h2 className="text-xl font-bold">{new Date().toLocaleDateString('en-IN')}</h2>
+          </div>
+          <div className="text-right">
+            <p className="text-sm text-muted-foreground">Generated On</p>
+            <p className="font-medium">{new Date().toLocaleString('en-IN')}</p>
+          </div>
+        </div>
+      </div>
+
+      <Card className="print:border-none print:shadow-none">
+        <CardContent className="grid gap-4 pt-5 print:p-0">
+          <div className="relative print:hidden">
             <Search className="pointer-events-none absolute left-3 top-3 h-4 w-4 text-muted-foreground" />
             <Input className="pl-9" placeholder="Search employee credit..." value={search} onChange={(event) => setSearch(event.target.value)} />
           </div>
@@ -366,29 +471,30 @@ export function EmployeeCreditPage() {
             </div>
           ) : null}
 
-          {error ? <p className="text-sm text-destructive">{error}</p> : null}
-          {message ? <p className="text-sm text-success">{message}</p> : null}
+          {error ? <p className="text-sm text-destructive print:hidden">{error}</p> : null}
+          {message ? <p className="text-sm text-success print:hidden">{message}</p> : null}
 
+          <div className="overflow-x-auto rounded-md border print:border-none">
           <Table>
-            <TableHeader>
+            <TableHeader className="bg-muted/50 print:bg-transparent print:border-b-2 print:border-black">
               <TableRow>
                 <TableHead>Employee Name</TableHead>
                 <TableHead className="text-right">Amount</TableHead>
                 <TableHead>Reason</TableHead>
                 <TableHead>Expected Due Date</TableHead>
                 <TableHead>Status</TableHead>
-                <TableHead className="w-24 text-right">Actions</TableHead>
+                <TableHead className="w-24 text-right print:hidden">Actions</TableHead>
               </TableRow>
             </TableHeader>
             <TableBody>
               {rows.map((row) => (
-                <TableRow key={row.id}>
+                <TableRow key={row.id} className="print:border-b print:border-gray-200">
                   <TableCell className="font-medium">{row.employeeName}</TableCell>
                   <TableCell className="number-cell">{formatCurrency(row.amount)}</TableCell>
-                  <TableCell className="max-w-64 truncate">{row.reason}</TableCell>
+                  <TableCell className="max-w-64 truncate print:whitespace-normal">{row.reason}</TableCell>
                   <TableCell>{row.expectedDueDate ? formatDate(row.expectedDueDate) : "-"}</TableCell>
                   <TableCell className="capitalize">{row.status}</TableCell>
-                  <TableCell className="text-right">
+                  <TableCell className="text-right print:hidden">
                     <div className="inline-flex gap-1">
                       <Button variant="ghost" size="icon" onClick={() => startEdit(row)} aria-label="Edit employee credit">
                         <Pencil className="h-4 w-4" />
@@ -409,6 +515,7 @@ export function EmployeeCreditPage() {
               ) : null}
             </TableBody>
           </Table>
+          </div>
         </CardContent>
       </Card>
     </div>
@@ -659,22 +766,74 @@ export function OtherCreditPage() {
     }
   }
 
+  function handleExportExcel() {
+    if (rows.length === 0) return;
+    
+    let totalAmount = 0;
+
+    const excelData = rows.map(row => {
+      totalAmount += row.amount;
+      return {
+        Name: row.name,
+        Amount: row.amount,
+        Reason: row.reason || "-",
+        "Expected Due Date": row.expectedDueDate ? formatDate(row.expectedDueDate) : "-",
+        Status: row.status
+      };
+    });
+    
+    excelData.push({
+      Name: "TOTAL",
+      Amount: totalAmount,
+      Reason: "",
+      "Expected Due Date": "",
+      Status: ""
+    });
+
+    exportToExcel(excelData, `Other_Credit_${new Date().toISOString().slice(0,10)}`);
+  }
+
   return (
-    <div className="space-y-5 p-4 lg:p-6">
-      <div className="flex flex-col gap-3 sm:flex-row sm:items-end sm:justify-between">
+    <div className="space-y-5 p-4 lg:p-6 print:p-0 print:space-y-0 print:max-w-none">
+      <div className="flex flex-col gap-3 sm:flex-row sm:items-end sm:justify-between print:hidden">
         <div>
           <h1 className="text-2xl font-semibold tracking-normal">Other Credit</h1>
           <p className="text-sm text-muted-foreground">General/Other credit records not linked to standard customers.</p>
         </div>
-        <Button onClick={startCreate}>
-          <Plus className="h-4 w-4" />
-          Add
-        </Button>
+        <div className="flex gap-2">
+          <Button variant="outline" onClick={handleExportExcel} className="gap-1.5">
+            <Download className="h-4 w-4" />
+            Export
+          </Button>
+          <Button variant="outline" onClick={() => window.print()} className="gap-1.5">
+            <Printer className="h-4 w-4" />
+            Print
+          </Button>
+          <Button onClick={startCreate}>
+            <Plus className="h-4 w-4" />
+            Add
+          </Button>
+        </div>
       </div>
 
-      <Card>
-        <CardContent className="grid gap-4 pt-5">
-          <div className="relative">
+      <div className="hidden print:block mb-8 text-center border-b pb-4">
+        <h1 className="text-3xl font-bold tracking-tight">MBM QUARRY</h1>
+        <p className="text-muted-foreground text-sm uppercase tracking-wider mt-1">Other Credit List</p>
+        <div className="mt-6 flex justify-between items-end text-left">
+          <div>
+            <p className="text-sm text-muted-foreground">Report Date</p>
+            <h2 className="text-xl font-bold">{new Date().toLocaleDateString('en-IN')}</h2>
+          </div>
+          <div className="text-right">
+            <p className="text-sm text-muted-foreground">Generated On</p>
+            <p className="font-medium">{new Date().toLocaleString('en-IN')}</p>
+          </div>
+        </div>
+      </div>
+
+      <Card className="print:border-none print:shadow-none">
+        <CardContent className="grid gap-4 pt-5 print:p-0">
+          <div className="relative print:hidden">
             <Search className="pointer-events-none absolute left-3 top-3 h-4 w-4 text-muted-foreground" />
             <Input className="pl-9" placeholder="Search other credit..." value={search} onChange={(event) => setSearch(event.target.value)} />
           </div>
@@ -731,29 +890,30 @@ export function OtherCreditPage() {
             </div>
           ) : null}
 
-          {error ? <p className="text-sm text-destructive">{error}</p> : null}
-          {message ? <p className="text-sm text-success">{message}</p> : null}
+          {error ? <p className="text-sm text-destructive print:hidden">{error}</p> : null}
+          {message ? <p className="text-sm text-success print:hidden">{message}</p> : null}
 
+          <div className="overflow-x-auto rounded-md border print:border-none">
           <Table>
-            <TableHeader>
+            <TableHeader className="bg-muted/50 print:bg-transparent print:border-b-2 print:border-black">
               <TableRow>
                 <TableHead>Name</TableHead>
                 <TableHead className="text-right">Amount</TableHead>
                 <TableHead>Reason</TableHead>
                 <TableHead>Expected Due Date</TableHead>
                 <TableHead>Status</TableHead>
-                <TableHead className="w-24 text-right">Actions</TableHead>
+                <TableHead className="w-24 text-right print:hidden">Actions</TableHead>
               </TableRow>
             </TableHeader>
             <TableBody>
               {rows.map((row) => (
-                <TableRow key={row.id}>
+                <TableRow key={row.id} className="print:border-b print:border-gray-200">
                   <TableCell className="font-medium">{row.name}</TableCell>
                   <TableCell className="number-cell">{formatCurrency(row.amount)}</TableCell>
-                  <TableCell className="max-w-64 truncate">{row.reason}</TableCell>
+                  <TableCell className="max-w-64 truncate print:whitespace-normal">{row.reason}</TableCell>
                   <TableCell>{row.expectedDueDate ? formatDate(row.expectedDueDate) : "-"}</TableCell>
                   <TableCell className="capitalize">{row.status}</TableCell>
-                  <TableCell className="text-right">
+                  <TableCell className="text-right print:hidden">
                     <div className="inline-flex gap-1">
                       <Button variant="ghost" size="icon" onClick={() => startEdit(row)} aria-label="Edit other credit">
                         <Pencil className="h-4 w-4" />
@@ -774,6 +934,7 @@ export function OtherCreditPage() {
               ) : null}
             </TableBody>
           </Table>
+          </div>
         </CardContent>
       </Card>
     </div>

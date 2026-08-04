@@ -175,7 +175,7 @@ async function upsertVehicleByNumber(vehicleNumber: string, partyName?: string, 
 async function runTx<T>(txFn: (tx: any) => Promise<T>): Promise<T> {
   const db = await getDb();
   try {
-    return await runTx(txFn);
+    return await db.$transaction(txFn);
   } finally {
     triggerAutoSync().catch(console.error);
   }

@@ -2,7 +2,7 @@
 import { usePrompt } from "@/components/ui/prompt-provider";
 
 import { useCallback, useEffect, useMemo, useState } from "react";
-import { ArrowUpDown, Pencil, Search, Shield, Trash2 } from "lucide-react";
+import { ArrowUpDown, Pencil, Search, Shield, Trash2, Printer, Download } from "lucide-react";
 import { SalesEntryForm, type EditableSale } from "@/components/modules/sales-entry-form";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
@@ -11,6 +11,7 @@ import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@
 import { deleteSale, listSales, purgeNonGstSales } from "@/app/actions/sales";
 import { verifyEditPassword } from "@/app/actions/auth";
 import { cn, formatCurrency, formatDate, formatQty } from "@/lib/utils";
+import { exportToExcel } from "@/lib/export";
 
 type SaleRow = EditableSale & {
   amount: number;
@@ -140,24 +141,77 @@ export function SalesPage() {
     }
   }
 
+  function handleExportExcel() {
+    if (visibleRows.length === 0) return;
+    
+    const excelData: Record<string, any>[] = visibleRows.map((row) => ({
+      Date: formatDate(row.saleDate),
+      Time: new Date(row.createdAt).toLocaleTimeString("en-IN", { hour: "2-digit", minute: "2-digit" }),
+      Vehicle: row.vehicleNumber,
+      Party: row.partyName,
+      Material: row.materialName,
+      Qty: row.qty,
+      Rate: row.ratePerCft,
+      Amount: row.amount,
+      Discount: row.discountType === "percentage" ? `${row.discountValue}%` : row.discountValue,
+      "Final Amount": row.finalAmount,
+      Remarks: row.remarks || "-",
+      "Book/Page": row.bookNumber && row.pageNumber ? `${row.bookNumber}/${row.pageNumber}` : row.bookNumber || row.pageNumber || "-"
+    }));
+    
+    excelData.push({
+      Date: "TOTAL REVENUE",
+      Time: "",
+      Vehicle: "",
+      Party: "",
+      Material: "",
+      Qty: "",
+      Rate: "",
+      Amount: "",
+      Discount: "",
+      "Final Amount": summary.totalRevenue,
+      Remarks: "",
+      "Book/Page": ""
+    });
+
+    exportToExcel(excelData, `Sales_Report_${new Date().toISOString().slice(0,10)}`);
+  }
+
   return (
-    <div className="space-y-5 p-4 lg:p-6">
-      <div>
+    <div className="space-y-5 p-4 lg:p-6 print:p-0 print:space-y-0 print:max-w-none">
+      <div className="print:hidden">
         <h1 className="text-2xl font-semibold tracking-normal">Outgoing Sales</h1>
         <p className="text-sm text-muted-foreground">Local sales entry, serial register, and material totals.</p>
       </div>
 
-      <SalesEntryForm
-        editingSale={editingSale}
-        onSaved={() => {
-          setEditingSale(null);
-          void loadSales();
-        }}
-        onCancelEdit={() => setEditingSale(null)}
-      />
+      <div className="print:hidden">
+        <SalesEntryForm
+          editingSale={editingSale}
+          onSaved={() => {
+            setEditingSale(null);
+            void loadSales();
+          }}
+          onCancelEdit={() => setEditingSale(null)}
+        />
+      </div>
 
-      <Card>
-        <CardHeader className="flex-row flex-wrap items-center justify-between gap-3">
+      <div className="hidden print:block mb-8 text-center border-b pb-4">
+        <h1 className="text-3xl font-bold tracking-tight">MBM QUARRY</h1>
+        <p className="text-muted-foreground text-sm uppercase tracking-wider mt-1">Sales Report</p>
+        <div className="mt-6 flex justify-between items-end text-left">
+          <div>
+            <p className="text-sm text-muted-foreground">Report Date</p>
+            <h2 className="text-xl font-bold">{new Date().toLocaleDateString('en-IN')}</h2>
+          </div>
+          <div className="text-right">
+            <p className="text-sm text-muted-foreground">Generated On</p>
+            <p className="font-medium">{new Date().toLocaleString('en-IN')}</p>
+          </div>
+        </div>
+      </div>
+
+      <Card className="print:border-none print:shadow-none">
+        <CardHeader className="flex-row flex-wrap items-center justify-between gap-3 print:hidden">
           <div className="flex items-center gap-3">
             <CardTitle>Sales Table</CardTitle>
             <Button
@@ -169,6 +223,14 @@ export function SalesPage() {
             >
               <Shield className="h-3.5 w-3.5" />
               Purge Non-GST
+            </Button>
+            <Button variant="outline" size="sm" onClick={handleExportExcel} className="text-xs gap-1.5">
+              <Download className="h-3.5 w-3.5" />
+              Export
+            </Button>
+            <Button variant="outline" size="sm" onClick={() => window.print()} className="text-xs gap-1.5">
+              <Printer className="h-3.5 w-3.5" />
+              Print
             </Button>
           </div>
           <div className="flex w-full sm:w-auto gap-2 items-center">
@@ -187,10 +249,11 @@ export function SalesPage() {
             </div>
           </div>
         </CardHeader>
-        <CardContent className="grid gap-4">
-          {error ? <p className="text-sm text-destructive">{error}</p> : null}
-          <Table>
-            <TableHeader>
+        <CardContent className="grid gap-4 print:p-0">
+          {error ? <p className="text-sm text-destructive print:hidden">{error}</p> : null}
+          <div className="overflow-x-auto rounded-md border print:border-none">
+            <Table>
+              <TableHeader className="bg-muted/50 print:bg-transparent print:border-b-2 print:border-black">
               <TableRow>
                 <TableHead>GST</TableHead>
                 <SortableHead label="Date" active={sortKey === "saleDate"} onClick={() => sortBy("saleDate")} />
@@ -201,17 +264,17 @@ export function SalesPage() {
                 <SortableHead label="Qty" active={sortKey === "qty"} alignRight onClick={() => sortBy("qty")} />
                 <TableHead className="text-right">Rate</TableHead>
                 <TableHead className="text-right">Amount</TableHead>
-                <TableHead className="text-right">Discount</TableHead>
+                <TableHead className="text-right print:hidden">Discount</TableHead>
                 <SortableHead label="Final" active={sortKey === "finalAmount"} alignRight onClick={() => sortBy("finalAmount")} />
-                <TableHead>Remarks</TableHead>
-                <TableHead>Book/Page</TableHead>
-                <TableHead className="w-24 text-right">Actions</TableHead>
+                <TableHead className="print:hidden">Remarks</TableHead>
+                <TableHead className="print:hidden">Book/Page</TableHead>
+                <TableHead className="w-24 text-right print:hidden">Actions</TableHead>
               </TableRow>
             </TableHeader>
             <TableBody>
               {visibleRows.map((row) => (
-                <TableRow key={row.id} className={cn(editingSale?.id === row.id && "bg-accent/70", row.gstEnabled && "bg-red-50 hover:bg-red-100")}>
-                  <TableCell>
+                <TableRow key={row.id} className={cn(editingSale?.id === row.id && "bg-accent/70", row.gstEnabled && "bg-red-50 hover:bg-red-100", "print:border-b print:border-gray-200")}>
+                  <TableCell className="print:hidden">
                     {row.gstEnabled ? (
                       <span className="inline-flex items-center gap-1 rounded-md bg-red-600 px-2.5 py-1 text-xs font-bold text-white shadow-sm ring-2 ring-red-400/50 animate-pulse">
                         GST
@@ -233,11 +296,11 @@ export function SalesPage() {
                     {row.discountType === "percentage" ? `${row.discountValue}%` : formatCurrency(row.discountValue)}
                   </TableCell>
                   <TableCell className="number-cell font-medium">{formatCurrency(row.finalAmount)}</TableCell>
-                  <TableCell className="max-w-44 truncate">{row.remarks}</TableCell>
-                  <TableCell className="tabular-nums text-muted-foreground">
+                  <TableCell className="max-w-44 truncate print:hidden">{row.remarks}</TableCell>
+                  <TableCell className="tabular-nums text-muted-foreground print:hidden">
                     {row.bookNumber && row.pageNumber ? `${row.bookNumber}/${row.pageNumber}` : row.bookNumber || row.pageNumber || "-"}
                   </TableCell>
-                  <TableCell className="text-right">
+                  <TableCell className="text-right print:hidden">
                     <div className="inline-flex gap-1">
                       <Button
                         variant="ghost"
@@ -270,12 +333,14 @@ export function SalesPage() {
               ) : null}
             </TableBody>
           </Table>
+          </div>
 
-          <div className="grid gap-2 border-t pt-4 sm:grid-cols-2 lg:grid-cols-4">
-            <SummaryLine label="Total Revenue" value={formatCurrency(summary.totalRevenue)} strong />
-            {materialTotals.map((material) => (
-              <SummaryLine key={material} label={`Total ${material}`} value={formatQty(summary[material] ?? 0)} />
-            ))}
+          <div className="grid gap-2 border-t pt-4 sm:grid-cols-2 lg:grid-cols-4 print:grid-cols-3 print:gap-4 print:border-black print:border-t-2">
+            <SummaryLine label="Total Revenue" value={formatCurrency(summary.totalRevenue)} strong className="print:col-span-3 print:text-lg print:border-none print:px-0" />
+            {materialTotals.map((material) => {
+              if (summary[material] === 0) return null;
+              return <SummaryLine key={material} label={`Total ${material}`} value={formatQty(summary[material] ?? 0)} className="print:border-none print:px-0" />;
+            })}
           </div>
         </CardContent>
       </Card>
@@ -308,10 +373,10 @@ function SortableHead({
   );
 }
 
-function SummaryLine({ label, value, strong = false }: { label: string; value: string; strong?: boolean }) {
+function SummaryLine({ label, value, strong = false, className }: { label: string; value: string; strong?: boolean; className?: string }) {
   return (
-    <div className={cn("flex items-center justify-between gap-3 rounded-md border bg-background px-3 py-2 text-sm", strong && "font-semibold")}>
-      <span className="text-muted-foreground">{label}</span>
+    <div className={cn("flex items-center justify-between gap-3 rounded-md border bg-background px-3 py-2 text-sm", strong && "font-semibold", className)}>
+      <span className="text-muted-foreground print:text-black">{label}</span>
       <span className="tabular-nums">{value}</span>
     </div>
   );
