@@ -1,5 +1,10 @@
 # MBM Quarry ERP — Changelog
 
+## v1.10.2 (2026-08-04)
+- **Phase 10**: Print & Export Modules implemented.
+- **Bug Fix**: Resolved `runTx` maximum call stack issues across all actions.
+- **UI Tweaks**: Minor improvements to sales, boulder purchases, and credit pages.
+
 ## v1.10.1 — Anonymous Sync & RLS Disable (2026-07-06)
 - **RLS Disabled**: Dropped `authenticated_sync_access` policies and disabled Row Level Security on all 28 Supabase tables for frictionless anonymous sync.
 - **Auth Removed from Sync**: Removed `requireAuthenticatedUser()` gate from `pushSync()` and `pullSync()` so the sync engine operates with the anon key alone.
