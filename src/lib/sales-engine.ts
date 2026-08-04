@@ -80,12 +80,6 @@ function normalizeVehicleNumber(value: string) {
   return value.trim().replace(/\s+/g, " ").toUpperCase();
 }
 
-function requiredText(value: string | null | undefined, label: string) {
-  const text = value?.trim();
-  if (!text) throw new Error(`${label} is required.`);
-  return text;
-}
-
 function cleanText(value?: string | null) {
   const text = value?.trim() ?? "";
   return text || null;

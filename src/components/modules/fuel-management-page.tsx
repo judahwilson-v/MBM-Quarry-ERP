@@ -6,7 +6,8 @@ import { Search, Check, Fuel } from "lucide-react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
-import { listFuelPurchases, saveFuelPurchase, listVehicles, deleteFuelPurchase } from "@/lib/offline-actions";
+import { listFuelPurchases, saveFuelPurchase, deleteFuelPurchase } from "@/app/actions/fuel";
+import { listVehicles } from "@/app/actions/vehicles";
 import { formatCurrency } from "@/lib/utils";
 import { SearchableSelect } from "@/components/ui/searchable-select";
 

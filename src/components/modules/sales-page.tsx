@@ -8,8 +8,8 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
-import { deleteSale, listSales, purgeNonGstSales } from "@/lib/offline-actions";
-import { verifyEditPassword } from "@/lib/domain";
+import { deleteSale, listSales, purgeNonGstSales } from "@/app/actions/sales";
+import { verifyEditPassword } from "@/app/actions/auth";
 import { cn, formatCurrency, formatDate, formatQty } from "@/lib/utils";
 
 type SaleRow = EditableSale & {
@@ -72,7 +72,7 @@ export function SalesPage() {
             .toLowerCase()
             .includes(query),
         )
-      : sales;
+      : filtered;
 
     return [...filtered].sort((a, b) => {
       const left = a[sortKey];
@@ -107,13 +107,13 @@ export function SalesPage() {
   async function remove(id: string) {
     if (!(await confirmAction("Delete this sale?"))) return;
     const password = await promptPassword("Enter delete password:");
-    if (!password || !verifyEditPassword(password)) {
+    if (!password || !(await verifyEditPassword(password))) {
       setError("Delete password is invalid.");
       return;
     }
     setError("");
     try {
-      await deleteSale(id);
+      await deleteSale(id, password);
       if (editingSale?.id === id) setEditingSale(null);
       await loadSales();
     } catch (err) {
@@ -123,9 +123,14 @@ export function SalesPage() {
 
   async function raidPurge() {
     if (!(await confirmAction("\u26a0\ufe0f RAID MODE: Delete ALL non-GST sales? Only GST sales will remain. This cannot be undone."))) return;
+    const password = await promptPassword("Enter delete password:");
+    if (!password || !(await verifyEditPassword(password))) {
+      setError("Delete password is invalid.");
+      return;
+    }
     setError("");
     try {
-      const count = await purgeNonGstSales();
+      const count = await purgeNonGstSales(password);
       setEditingSale(null);
       await loadSales();
       setError("");
@@ -134,18 +139,6 @@ export function SalesPage() {
       setError(err instanceof Error ? err.message : "Purge failed.");
     }
   }
-
-  // Keyboard shortcut: Ctrl+D for raid purge
-  useEffect(() => {
-    function handleKeyDown(e: KeyboardEvent) {
-      if (e.ctrlKey && e.key.toLowerCase() === "d") {
-        e.preventDefault();
-        void raidPurge();
-      }
-    }
-    window.addEventListener("keydown", handleKeyDown);
-    return () => window.removeEventListener("keydown", handleKeyDown);
-  });
 
   return (
     <div className="space-y-5 p-4 lg:p-6">
@@ -172,7 +165,7 @@ export function SalesPage() {
               size="sm"
               className="border-red-300 text-red-700 hover:bg-red-50 hover:text-red-800 text-xs gap-1.5"
               onClick={() => void raidPurge()}
-              title="Ctrl+D — Delete all non-GST sales"
+              title="Purge all non-GST sales"
             >
               <Shield className="h-3.5 w-3.5" />
               Purge Non-GST
@@ -251,7 +244,7 @@ export function SalesPage() {
                         size="icon"
                         onClick={async () => {
                           const password = await promptPassword("Enter edit password:");
-                          if (!password || !verifyEditPassword(password)) {
+                          if (!password || !(await verifyEditPassword(password))) {
                             setError("Edit password is invalid.");
                             return;
                           }

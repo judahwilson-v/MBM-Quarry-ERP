@@ -7,7 +7,7 @@ import { Button } from "@/components/ui/button";
 import { Field } from "@/components/ui/field";
 import { formatCurrency, todayInputValue } from "@/lib/utils";
 import { fetchDayBookData, saveCashTransfer, logDayBookAudit } from "@/lib/daybook-actions";
-import { saveDayBookOpeningBalances } from "@/lib/offline-actions";
+import { saveDayBookOpeningBalances } from "@/app/actions/daybook_offline";
 import { usePrompt } from "@/components/ui/prompt-provider";
 
 export function DayBookPage() {
@@ -15,7 +15,7 @@ export function DayBookPage() {
   const [userName, setUserName] = useState<string>("");
   const [data, setData] = useState<any>(null);
   const [loading, setLoading] = useState(true);
-  const { promptPassword, confirmAction } = usePrompt();
+  const { promptPassword, promptNumber, confirmAction } = usePrompt();
 
   const loadData = useCallback(async () => {
     setLoading(true);
@@ -46,7 +46,7 @@ export function DayBookPage() {
       return;
     }
     const currentVal = type === "cash" ? data.openingCash : data.openingBank;
-    const newVal = await promptPassword(`Enter new Opening ${type === "cash" ? "Cash" : "Bank"} Balance:`);
+    const newVal = await promptNumber(`Enter new Opening ${type === "cash" ? "Cash" : "Bank"} Balance:`);
     if (!newVal || isNaN(Number(newVal))) return;
 
     const numVal = Number(newVal);

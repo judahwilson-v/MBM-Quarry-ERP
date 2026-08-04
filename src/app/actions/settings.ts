@@ -2,6 +2,8 @@
 
 import { getDb } from "@/lib/prisma";
 import { revalidatePath } from "next/cache";
+import { writeAuditEvent } from "@/lib/domain";
+import { triggerAutoSync } from "@/lib/sync/auto-sync";
 
 export async function getGlobalSettings() {
   const prisma = await getDb();
@@ -14,9 +16,12 @@ export async function getGlobalSettings() {
   return settings;
 }
 
+
+
 export async function updateGlobalSettings(data: any) {
   try {
     const prisma = await getDb();
+    const before = await prisma.globalSettings.findUnique({ where: { id: "default" } });
     const settings = await prisma.globalSettings.upsert({
       where: { id: "default" },
       update: {
@@ -27,7 +32,11 @@ export async function updateGlobalSettings(data: any) {
         defaultPrinter: data.defaultPrinter,
         backupFolder: data.backupFolder,
         adminPin: data.adminPin,
-        deletePin: data.deletePin
+        deletePin: data.deletePin,
+        enableWeighbridge: data.enableWeighbridge ?? before?.enableWeighbridge ?? false,
+        enableFleetMaintenance: data.enableFleetMaintenance ?? before?.enableFleetMaintenance ?? false,
+        enableCustomerPortal: data.enableCustomerPortal ?? before?.enableCustomerPortal ?? false,
+        enableCreditLocks: data.enableCreditLocks ?? before?.enableCreditLocks ?? false,
       },
       create: {
         id: "default",
@@ -38,9 +47,22 @@ export async function updateGlobalSettings(data: any) {
         defaultPrinter: data.defaultPrinter || "",
         backupFolder: data.backupFolder || "",
         adminPin: data.adminPin || "8888",
-        deletePin: data.deletePin || "7711"
+        deletePin: data.deletePin || "7711",
+        enableWeighbridge: data.enableWeighbridge ?? false,
+        enableFleetMaintenance: data.enableFleetMaintenance ?? false,
+        enableCustomerPortal: data.enableCustomerPortal ?? false,
+        enableCreditLocks: data.enableCreditLocks ?? false,
       }
     });
+    await writeAuditEvent(prisma, {
+      entityName: "GlobalSettings",
+      entityId: settings.id,
+      action: before ? "update" : "create",
+      role: "system",
+      before,
+      after: settings,
+    });
+    triggerAutoSync().catch(console.error);
     revalidatePath("/settings");
     revalidatePath("/");
     return { success: true, settings };

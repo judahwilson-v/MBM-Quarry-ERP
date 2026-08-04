@@ -8,8 +8,8 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
-import { deleteExpense, listExpenses } from "@/lib/offline-actions";
-import { verifyEditPassword } from "@/lib/domain";
+import { deleteExpense, listExpenses } from "@/app/actions/expenses";
+import { verifyEditPassword } from "@/app/actions/auth";
 import { cn, formatCurrency, formatDate } from "@/lib/utils";
 
 type ExpenseRow = EditableExpense & {
@@ -73,7 +73,7 @@ export function ExpensesPage() {
   async function remove(id: string) {
     if (!(await confirmAction("Delete this expense?"))) return;
     const password = await promptPassword("Enter delete password:");
-    if (!password || !verifyEditPassword(password)) {
+    if (!password || !(await verifyEditPassword(password))) {
       setError("Delete password is invalid.");
       return;
     }
@@ -147,7 +147,7 @@ export function ExpensesPage() {
                         size="icon"
                         onClick={async () => {
                           const password = await promptPassword("Enter edit password:");
-                          if (!password || !verifyEditPassword(password)) {
+                          if (!password || !(await verifyEditPassword(password))) {
                             setError("Edit password is invalid.");
                             return;
                           }

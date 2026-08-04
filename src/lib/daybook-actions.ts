@@ -1,7 +1,8 @@
 "use server";
 
 import { getDb } from "./prisma";
-// removed unused imports
+import { writeAuditEvent } from "@/lib/domain";
+import { triggerAutoSync } from "@/lib/sync/auto-sync";
 function getDayBounds(dateString?: string) {
   const d = dateString ? new Date(dateString) : new Date();
   
@@ -137,7 +138,7 @@ export async function fetchDayBookData(dateString?: string) {
 
 export async function saveCashTransfer(data: { type: string; amount: number; time: string; date: string; remarks: string; userName: string }) {
   const db = await getDb();
-  await db.cashTransfer.create({
+  const transfer = await db.cashTransfer.create({
     data: {
       type: data.type,
       amount: Number(data.amount),
@@ -147,24 +148,16 @@ export async function saveCashTransfer(data: { type: string; amount: number; tim
       userName: data.userName,
     }
   });
-  
-  // Create audit log
-  await db.auditLog.create({
-    data: {
-      entityName: "DayBook",
-      entityId: "transfer",
-      action: "transfer_created",
-      payload: JSON.stringify({
-        userName: data.userName,
-        date: data.date,
-        time: data.time,
-        oldValue: 0,
-        newValue: data.amount,
-        action: data.type,
-        module: "DayBook"
-      })
-    }
+
+  await writeAuditEvent(db, {
+    entityName: "CashTransfer",
+    entityId: transfer.id,
+    action: "create",
+    role: data.userName || "system",
+    after: transfer,
   });
+
+  triggerAutoSync().catch(console.error);
 }
 
 export async function logDayBookAudit(data: { userName: string; date: string; time: string; oldValue: any; newValue: any; action: string; module: string }) {

@@ -9,8 +9,10 @@ import { Field } from "@/components/ui/field";
 import { Input } from "@/components/ui/input";
 import { SearchableSelect } from "@/components/ui/searchable-select";
 import { Textarea } from "@/components/ui/textarea";
-import { listParties, listVehicles, saveExpense } from "@/lib/offline-actions";
-import { verifyEditPassword } from "@/lib/domain";
+import { listParties } from "@/app/actions/parties";
+import { listVehicles } from "@/app/actions/vehicles";
+import { saveExpense } from "@/app/actions/expenses";
+import { verifyEditPassword } from "@/app/actions/auth";
 import { todayInputValue } from "@/lib/utils";
 
 export type EditableExpense = {
@@ -131,7 +133,7 @@ export function ExpenseEntryForm({
     e.preventDefault();
     if (editingExpense) {
       const password = await promptPassword("Enter edit password to save changes:");
-      if (!password || !verifyEditPassword(password)) {
+      if (!password || !(await verifyEditPassword(password))) {
         setError("Edit password is invalid.");
         return;
       }

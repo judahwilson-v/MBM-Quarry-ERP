@@ -13,12 +13,14 @@ export default function VehiclesPage() {
         { name: "partyName", label: "Party name" },
         { name: "companyBodyQty", label: "Company body qty (CFT)", type: "number" },
         { name: "extraBodyQty", label: "Extra body qty (CFT)", type: "number" },
+        { name: "vehicleType", label: "Vehicle type" },
       ]}
       columns={[
         { key: "vehicleNumber", label: "Vehicle Number" },
         { key: "partyName", label: "Party Name" },
         { key: "companyBodyQty", label: "Company Body (CFT)" },
         { key: "extraBodyQty", label: "Extra Body (CFT)" },
+        { key: "vehicleType", label: "Type" },
       ]}
     />
   );

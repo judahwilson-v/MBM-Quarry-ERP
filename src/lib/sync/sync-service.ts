@@ -15,6 +15,9 @@ import {
 
 // Convert camelCase object keys to snake_case for Supabase REST API
 function toSnakeCase(obj: any): any {
+  if (obj instanceof Date) {
+    return obj.toISOString();
+  }
   if (Array.isArray(obj)) {
     return obj.map((v) => toSnakeCase(v));
   } else if (obj !== null && typeof obj === 'object') {
@@ -29,6 +32,9 @@ function toSnakeCase(obj: any): any {
 
 // Convert snake_case to camelCase for Prisma
 function toCamelCase(obj: any): any {
+  if (obj instanceof Date) {
+    return obj;
+  }
   if (Array.isArray(obj)) {
     return obj.map((v) => toCamelCase(v));
   } else if (obj !== null && typeof obj === 'object') {
@@ -264,6 +270,7 @@ export async function getSyncStatus() {
     lastPulledAt: pullState?.lastSyncedAt || null,
     status: pushState?.status === "ERROR" || pullState?.status === "ERROR" ? "ERROR" : 
             pushState?.status === "SYNCING" || pullState?.status === "SYNCING" ? "SYNCING" : "IDLE",
+    lastError: pushState?.lastError || pullState?.lastError || null,
     pendingCount
   };
 }

@@ -9,21 +9,16 @@ import { Field } from "@/components/ui/field";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
-import {
-  deleteParty,
-  deleteVehicle,
-  listParties,
-  listVehicles,
-  saveParty,
-  saveVehicle,
-} from "@/lib/offline-actions";
-import { verifyEditPassword } from "@/lib/domain";
+import { deleteParty, listParties, saveParty } from "@/app/actions/parties";
+import { deleteVehicle, listVehicles, saveVehicle } from "@/app/actions/vehicles";
+import { verifyEditPassword } from "@/app/actions/auth";
 
 type FieldConfig = {
   name: string;
   label: string;
-  type?: "text" | "number" | "textarea";
+  type?: "text" | "number" | "textarea" | "select";
   required?: boolean;
+  options?: string[];
 };
 
 type MasterRecord = {
@@ -96,6 +91,7 @@ export function MasterDataPage({ resource, title, description, fields, columns }
           partyName: form["partyName"] ? String(form["partyName"]) : null,
           companyBodyQty: companyBodyQty === "" || companyBodyQty == null ? null : Number(companyBodyQty),
           extraBodyQty: extraBodyQty === "" || extraBodyQty == null ? null : Number(extraBodyQty),
+          vehicleType: form["vehicleType"] ? String(form["vehicleType"]) : null,
         });
       } else {
         await saveParty({
@@ -103,6 +99,7 @@ export function MasterDataPage({ resource, title, description, fields, columns }
           partyName: String(form["partyName"] ?? ""),
           phone: form["phone"] ? String(form["phone"]) : null,
           address: form["address"] ? String(form["address"]) : null,
+          partyGroup: form["partyGroup"] ? String(form["partyGroup"]) : null,
         });
       }
       setEditing(null);
@@ -117,7 +114,7 @@ export function MasterDataPage({ resource, title, description, fields, columns }
   async function remove(id: string) {
     if (!(await confirmAction("Delete this record?"))) return;
     const password = await promptPassword("Enter delete password:");
-    if (!password || !verifyEditPassword(password)) {
+    if (!password || !(await verifyEditPassword(password))) {
       setError("Delete password is invalid.");
       return;
     }
@@ -223,6 +220,20 @@ export function MasterDataPage({ resource, title, description, fields, columns }
 function renderField(field: FieldConfig, value: MasterFormValue, onChange: (value: MasterFormValue) => void) {
   if (field.type === "textarea") {
     return <Textarea value={value ?? ""} onChange={(event) => onChange(event.target.value)} />;
+  }
+  if (field.type === "select" && field.options) {
+    return (
+      <select
+        className="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
+        value={String(value ?? "")}
+        onChange={(event) => onChange(event.target.value || null)}
+      >
+        <option value="">— None —</option>
+        {field.options.map((opt) => (
+          <option key={opt} value={opt}>{opt.replace(/_/g, " ")}</option>
+        ))}
+      </select>
+    );
   }
   return (
     <Input

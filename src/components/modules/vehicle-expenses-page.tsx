@@ -6,7 +6,8 @@ import { Truck, Search, Receipt, ArrowLeft } from "lucide-react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
-import { listVehicles, listExpenses } from "@/lib/offline-actions";
+import { listVehicles } from "@/app/actions/vehicles";
+import { listExpenses } from "@/app/actions/expenses";
 import { formatCurrency } from "@/lib/utils";
 
 type VehicleRow = any;

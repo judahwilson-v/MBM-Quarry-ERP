@@ -12,9 +12,10 @@ export async function checkOnlineStatus(): Promise<boolean> {
     return false;
   }
 
+  let timeout: ReturnType<typeof setTimeout> | undefined;
   try {
     const controller = new AbortController();
-    const timeout = setTimeout(() => controller.abort(), 3000);
+    timeout = setTimeout(() => controller.abort(), 3000);
 
     const response = await fetch(`${supabaseUrl}/rest/v1/`, {
       method: "HEAD",
@@ -22,11 +23,14 @@ export async function checkOnlineStatus(): Promise<boolean> {
       headers: {
         apikey: process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY || "",
       },
+      cache: "no-store",
     });
 
-    clearTimeout(timeout);
-    return response.ok || response.status === 400; // 400 = reachable but no table specified
+    // Any non-5xx response means the desktop app can reach Supabase.
+    return response.status < 500;
   } catch {
     return false;
+  } finally {
+    if (timeout) clearTimeout(timeout);
   }
 }

@@ -1,7 +1,7 @@
 "use client";
 
 import { useCallback, useEffect, useMemo, useState } from "react";
-import { Plus, Search, Printer, Trash2 } from "lucide-react";
+import { Plus, Search, Printer, Trash2, Download } from "lucide-react";
 import { usePrompt } from "@/components/ui/prompt-provider";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
@@ -9,15 +9,9 @@ import { Field } from "@/components/ui/field";
 import { Input } from "@/components/ui/input";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { Textarea } from "@/components/ui/textarea";
-import {
-  listPartiesWithBalances,
-  listPartyLedgerEntries,
-  savePartyCollection,
-  savePartyPayment,
-  deletePartyCollection,
-  deletePartyPayment,
-} from "@/lib/offline-actions";
+import { listPartiesWithBalances, listPartyLedgerEntries, savePartyCollection, savePartyPayment, deletePartyCollection, deletePartyPayment } from "@/app/actions/credits";
 import { cn, formatCurrency, formatDate } from "@/lib/utils";
+import { exportToExcel } from "@/lib/export";
 
 type PartySummary = {
   id: string;
@@ -219,6 +213,36 @@ export function PartyLedgerPage() {
     printWindow.document.close();
   }
 
+  function handleExportExcel() {
+    if (!selectedParty || entries.length === 0) return;
+    
+    // Map entries to a clean format for Excel
+    const excelData = entries.map(entry => ({
+      Date: formatDate(entry.date),
+      Time: entry.time || "-",
+      Type: entry.type.replace("_", " "),
+      Description: entry.description || "-",
+      Method: entry.paymentMethod || "-",
+      Debit: entry.debitAmount > 0 ? entry.debitAmount : 0,
+      Credit: entry.creditAmount > 0 ? entry.creditAmount : 0,
+      Balance: entry.balance
+    }));
+    
+    // Add a summary row at the bottom
+    excelData.push({
+      Date: "CLOSING BALANCE",
+      Time: "",
+      Type: "",
+      Description: "",
+      Method: "",
+      Debit: selectedParty.balance > 0 ? selectedParty.balance : 0,
+      Credit: selectedParty.balance < 0 ? Math.abs(selectedParty.balance) : 0,
+      Balance: selectedParty.balance
+    });
+
+    exportToExcel(excelData, `Ledger_${selectedParty.partyName.replace(/\s+/g, '_')}`);
+  }
+
   return (
     <div className="space-y-5 p-4 lg:p-6 print:p-0 print:space-y-0">
       <div className="print:hidden">
@@ -310,7 +334,11 @@ export function PartyLedgerPage() {
                     </span>
                   </p>
                 </div>
-                <div className="flex gap-2">
+                <div className="flex flex-wrap gap-2">
+                  <Button variant="outline" onClick={handleExportExcel} className="print:hidden">
+                    <Download className="mr-2 h-4 w-4" />
+                    Export Excel
+                  </Button>
                   <Button variant="outline" onClick={() => window.print()} className="print:hidden">
                     <Printer className="mr-2 h-4 w-4" />
                     Print Statement

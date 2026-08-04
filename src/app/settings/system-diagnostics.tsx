@@ -22,63 +22,44 @@ export function SystemDiagnostics({
 
   useEffect(() => {
     if (typeof window !== "undefined" && (window as any).electron) {
-      (window as any).electron.onUpdaterEvent((data: any) => {
-        console.log("✓ IPC received updater-event:", data.type);
-        
-        switch(data.type) {
-          case "checking":
-            setUpdateStatus("Searching for updates...");
-            toast({
-              title: "Checking for Updates",
-              description: "Searching for the latest release...",
-            });
-            break;
-            
-          case "available":
-            setIsChecking(false);
-            setUpdateAvailable(true);
-            setUpdateStatus("Update available");
-            toast({
-              title: "Update Found!",
-              description: `A new version is available. Click 'Download Update' to begin.`,
-            });
-            break;
-            
-          case "not-available":
-            setIsChecking(false);
-            setUpdateStatus("Up to date");
-            toast({
-              title: "You're up to date",
-              description: "You are already running the latest version of MBM Quarry.",
-            });
-            break;
-            
-          case "progress":
-            setUpdateStatus(`Downloading... ${Math.round(data.progress?.percent || 0)}%`);
-            break;
-            
-          case "downloaded":
-            setIsChecking(false);
-            setUpdateAvailable(false);
-            setUpdateDownloaded(true);
-            setUpdateStatus("Ready to install");
-            toast({
-              title: "Update Ready",
-              description: "The update has been downloaded. Click 'Install Update' to restart and apply.",
-            });
-            break;
-            
-          case "error":
-            setIsChecking(false);
-            setUpdateStatus("Update failed");
-            toast({
-              title: "Update Error",
-              description: data.error || "Failed to check for updates.",
-              variant: "destructive"
-            });
-            break;
-        }
-      });
+    const cleanup = (window as any).electron.onUpdaterEvent((data: any) => {
+      console.log("✓ IPC received updater-event:", data.type);
+      
+      switch(data.type) {
+        case "checking":
+          setUpdateStatus("Searching for updates...");
+          break;
+          
+        case "available":
+          setIsChecking(false);
+          setUpdateAvailable(true);
+          setUpdateStatus("Update available");
+          break;
+          
+        case "not-available":
+          setIsChecking(false);
+          setUpdateStatus("Up to date");
+          break;
+          
+        case "progress":
+          setUpdateStatus(`Downloading... ${Math.round(data.progress?.percent || 0)}%`);
+          break;
+          
+        case "downloaded":
+          setIsChecking(false);
+          setUpdateAvailable(false);
+          setUpdateDownloaded(true);
+          setUpdateStatus("Ready to install");
+          break;
+          
+        case "error":
+          setIsChecking(false);
+          setUpdateStatus("Update failed");
+          break;
+      }
+    });
+    
+    return cleanup;
     }
   }, [toast]);
   

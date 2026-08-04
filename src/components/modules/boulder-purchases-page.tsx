@@ -10,7 +10,9 @@ import { Input } from "@/components/ui/input";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { Textarea } from "@/components/ui/textarea";
 import { SearchableSelect } from "@/components/ui/searchable-select";
-import { deleteIncomingBoulder, listIncomingBoulder, saveIncomingBoulder, listVehicles, getLastBookPage } from "@/lib/offline-actions";
+import { deleteIncomingBoulder, listIncomingBoulder, saveIncomingBoulder } from "@/app/actions/purchases";
+import { listVehicles } from "@/app/actions/vehicles";
+import { getLastBookPage } from "@/app/actions/sales";
 import { formatCurrency, formatDate, formatQty, todayInputValue } from "@/lib/utils";
 
 type BoulderRow = {

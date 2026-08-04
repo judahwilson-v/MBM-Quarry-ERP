@@ -9,21 +9,10 @@ import { Field } from "@/components/ui/field";
 import { Input } from "@/components/ui/input";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { Textarea } from "@/components/ui/textarea";
-import {
-  deleteEmployeeCredit,
-  listEmployeeCredits,
-  listPartyCreditEntries,
-  listPartyCreditSummary,
-  listPartyCollectionHistory,
-  listPartyCollectionSummary,
-  saveEmployeeCredit,
-  savePartyCollection,
-  deleteOtherCredit,
-  listOtherCredits,
-  saveOtherCredit,
-} from "@/lib/offline-actions";
+import { deleteEmployeeCredit, listEmployeeCredits, saveEmployeeCredit } from "@/app/actions/employees";
+import { listPartyCreditEntries, listPartyCreditSummary, listPartyCollectionHistory, listPartyCollectionSummary, savePartyCollection, deleteOtherCredit, listOtherCredits, saveOtherCredit } from "@/app/actions/credits";
 import { cn, formatCurrency, formatDate } from "@/lib/utils";
-import { verifyEditPassword } from "@/lib/domain";
+import { verifyEditPassword } from "@/app/actions/auth";
 
 type PartySummary = {
   partyName: string;
@@ -291,7 +280,7 @@ export function EmployeeCreditPage() {
   async function remove(id: string) {
     if (!(await confirmAction("Delete this employee credit?"))) return;
     const password = await promptPassword("Enter delete password:");
-    if (!password || !verifyEditPassword(password)) {
+    if (!password || !(await verifyEditPassword(password))) {
       setError("Delete password is invalid.");
       return;
     }
@@ -656,7 +645,7 @@ export function OtherCreditPage() {
   async function remove(id: string) {
     if (!(await confirmAction("Delete this other credit record?"))) return;
     const password = await promptPassword("Enter delete password:");
-    if (!password || !verifyEditPassword(password)) {
+    if (!password || !(await verifyEditPassword(password))) {
       setError("Delete password is invalid.");
       return;
     }

@@ -9,9 +9,11 @@ import { Field } from "@/components/ui/field";
 import { Input } from "@/components/ui/input";
 import { SearchableSelect } from "@/components/ui/searchable-select";
 import { Textarea } from "@/components/ui/textarea";
-import { listMaterials, listVehicles, saveSale, getLastBookPage } from "@/lib/offline-actions";
+import { listMaterials } from "@/app/actions/materials";
+import { listVehicles } from "@/app/actions/vehicles";
+import { saveSale, getLastBookPage } from "@/app/actions/sales";
 import { deriveSalesEngine } from "@/lib/sales-engine";
-import { verifyEditPassword } from "@/lib/domain";
+import { verifyEditPassword } from "@/app/actions/auth";
 import { formatCurrency, todayInputValue } from "@/lib/utils";
 
 type VehicleRow = {
@@ -247,7 +249,7 @@ export function SalesEntryForm({
 
       if (form.id) {
         const password = await promptPassword("Enter edit password:");
-        if (!password || !verifyEditPassword(password)) {
+        if (!password || !(await verifyEditPassword(password))) {
           throw new Error("Edit password is invalid.");
         }
       }

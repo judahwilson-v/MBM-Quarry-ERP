@@ -5,7 +5,7 @@ import { Search, Check, User, ChevronRight } from "lucide-react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
-import { listEmployees, saveEmployee, deleteEmployee } from "@/lib/offline-actions";
+import { listEmployees, saveEmployee, deleteEmployee } from "@/app/actions/employees";
 import { formatCurrency } from "@/lib/utils";
 import Link from "next/link";
 

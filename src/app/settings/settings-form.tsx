@@ -14,13 +14,18 @@ export function SettingsForm({ initialData }: { initialData: any }) {
     phone: initialData?.phone || "",
     defaultPrinter: initialData?.defaultPrinter || "",
     backupFolder: initialData?.backupFolder || "",
+    enableWeighbridge: initialData?.enableWeighbridge || false,
+    enableFleetMaintenance: initialData?.enableFleetMaintenance || false,
+    enableCustomerPortal: initialData?.enableCustomerPortal || false,
+    enableCreditLocks: initialData?.enableCreditLocks || false,
   });
 
   const [isSaving, setIsSaving] = useState(false);
   const [saveStatus, setSaveStatus] = useState<"idle" | "success" | "error">("idle");
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    setFormData(prev => ({ ...prev, [e.target.name]: e.target.value }));
+    const value = e.target.type === 'checkbox' ? e.target.checked : e.target.value;
+    setFormData(prev => ({ ...prev, [e.target.name]: value }));
     setSaveStatus("idle");
   };
 
@@ -127,7 +132,46 @@ export function SettingsForm({ initialData }: { initialData: any }) {
           />
         </div>
 
-        <Button type="submit" disabled={isSaving} className="w-full gap-2">
+        <div className="mt-8 pt-6 border-t border-[var(--border-light)]">
+          <h4 className="text-md font-semibold mb-4 text-[var(--text-primary)]">Advanced Modules</h4>
+          <p className="text-sm text-[var(--text-secondary)] mb-6">Enable or disable advanced enterprise modules. When toggled on, new pages and workflows will appear.</p>
+          
+          <div className="space-y-4">
+            <label className="flex items-center justify-between p-4 rounded-lg border border-[var(--border-light)] hover:bg-[var(--bg-muted)] cursor-pointer transition-colors">
+              <div>
+                <div className="font-medium">IoT Weighbridge Integration</div>
+                <div className="text-xs text-[var(--text-secondary)]">Direct RS-232/Ethernet integration with physical weighbridge indicators.</div>
+              </div>
+              <input type="checkbox" name="enableWeighbridge" checked={formData.enableWeighbridge} onChange={handleChange} className="w-5 h-5 accent-blue-600 rounded" />
+            </label>
+
+            <label className="flex items-center justify-between p-4 rounded-lg border border-[var(--border-light)] hover:bg-[var(--bg-muted)] cursor-pointer transition-colors">
+              <div>
+                <div className="font-medium">Fleet & Heavy Machinery Maintenance</div>
+                <div className="text-xs text-[var(--text-secondary)]">Track engine hours, PM schedules, and fuel consumption for assets.</div>
+              </div>
+              <input type="checkbox" name="enableFleetMaintenance" checked={formData.enableFleetMaintenance} onChange={handleChange} className="w-5 h-5 accent-blue-600 rounded" />
+            </label>
+
+            <label className="flex items-center justify-between p-4 rounded-lg border border-[var(--border-light)] hover:bg-[var(--bg-muted)] cursor-pointer transition-colors">
+              <div>
+                <div className="font-medium">Customer Self-Service Portal</div>
+                <div className="text-xs text-[var(--text-secondary)]">Allow parties to log in, view live ledger balances, and download invoices.</div>
+              </div>
+              <input type="checkbox" name="enableCustomerPortal" checked={formData.enableCustomerPortal} onChange={handleChange} className="w-5 h-5 accent-blue-600 rounded" />
+            </label>
+
+            <label className="flex items-center justify-between p-4 rounded-lg border border-[var(--border-light)] hover:bg-[var(--bg-muted)] cursor-pointer transition-colors">
+              <div>
+                <div className="font-medium">Credit Limit Auto-Locks</div>
+                <div className="text-xs text-[var(--text-secondary)]">Automatically block sales dispatches if a party exceeds their defined credit limit.</div>
+              </div>
+              <input type="checkbox" name="enableCreditLocks" checked={formData.enableCreditLocks} onChange={handleChange} className="w-5 h-5 accent-blue-600 rounded" />
+            </label>
+          </div>
+        </div>
+
+        <Button type="submit" disabled={isSaving} className="w-full gap-2 mt-4">
           {isSaving ? <Loader2 className="h-4 w-4 animate-spin" /> : <Save className="h-4 w-4" />}
           {isSaving ? "Saving..." : "Save Settings"}
         </Button>

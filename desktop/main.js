@@ -119,7 +119,7 @@ autoUpdater.on('update-downloaded', (info) => {
 });
 
 // Function to poll the port until Next.js is ready
-function waitForServer(url, timeoutMs = 30000) {
+function waitForServer(url, timeoutMs = 60000) {
   return new Promise((resolve, reject) => {
     const startTime = Date.now();
     

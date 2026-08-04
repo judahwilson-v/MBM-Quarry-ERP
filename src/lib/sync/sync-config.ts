@@ -1,6 +1,7 @@
 export const SYNC_MODEL_CONFIG = {
   Vehicle: { table: "vehicles", delegate: "vehicle", timeColumn: "updated_at", timeField: "updatedAt" },
   Party: { table: "parties", delegate: "party", timeColumn: "updated_at", timeField: "updatedAt" },
+  Supplier: { table: "suppliers", delegate: "supplier", timeColumn: "updated_at", timeField: "updatedAt" },
   Material: { table: "materials", delegate: "material", timeColumn: "updated_at", timeField: "updatedAt" },
   OutgoingSale: { table: "outgoing_sales", delegate: "outgoingSale", timeColumn: "updated_at", timeField: "updatedAt" },
   IncomingBoulder: { table: "incoming_boulder", delegate: "incomingBoulder", timeColumn: "updated_at", timeField: "updatedAt" },
@@ -45,6 +46,7 @@ export const PULL_ORDER: SyncModelName[] = [
   "GlobalSettings",
   "Material",
   "Party",
+  "Supplier",
   "Vehicle",
   "Employee",
   "FinancialEvent",

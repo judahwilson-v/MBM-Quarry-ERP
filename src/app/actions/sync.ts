@@ -5,6 +5,11 @@ import { checkOnlineStatus } from "@/lib/sync/connectivity";
 import { revalidatePath } from "next/cache";
 
 export async function triggerSync() {
+  const online = await checkOnlineStatus();
+  if (!online) {
+    return { pushed: 0, pulled: 0, skipped: "offline" };
+  }
+
   const pushResult = await pushSync();
   const pullResult = await pullSync();
   revalidatePath("/", "layout");

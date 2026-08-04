@@ -125,7 +125,7 @@ export function Dashboard({ metrics }: { metrics: Metrics }) {
       <div className="grid gap-4 md:grid-cols-3">
         <QuickLink href="/sales" icon={Factory} label="Go to Sales" />
         <QuickLink href="/purchases/boulder" icon={TrendingDown} label="Go to Purchases" />
-        <QuickLink href="/reports" icon={PieChart} label="View Day Book" />
+        <QuickLink href="/daybook" icon={PieChart} label="View Day Book" />
       </div>
     </div>
   );

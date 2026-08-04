@@ -67,6 +67,31 @@ function NavLink({ item, active, onClick }: { item: typeof navItems[0], active: 
 export function AppShell({ children }: { children: React.ReactNode }) {
   const pathname = usePathname();
   const [sidebarOpen, setSidebarOpen] = useState(false);
+  const [features, setFeatures] = useState<any>({ enableWeighbridge: false });
+
+  useEffect(() => {
+    // Fetch global settings to determine feature flags
+    import("@/app/actions/settings").then(({ getGlobalSettings }) => {
+      getGlobalSettings().then((settings) => {
+        setFeatures(settings);
+      });
+    });
+  }, []);
+
+  const visibleNavItems = navItems.filter((item) => {
+    if (item.href === "/weighbridge" && !features.enableWeighbridge) return false;
+    return true;
+  });
+
+  // Inject Weighbridge dynamically based on feature flag
+  const dynamicNavItems = [...navItems];
+  if (features.enableWeighbridge && !dynamicNavItems.find(i => i.href === "/weighbridge")) {
+    // Insert it after Day Book
+    const insertIndex = dynamicNavItems.findIndex(i => i.href === "/daybook") + 1;
+    import("lucide-react").then(({ Scale }) => {
+      dynamicNavItems.splice(insertIndex, 0, { href: "/weighbridge", label: "Weighbridge", icon: Scale as any });
+    });
+  }
 
   return (
     <div className="min-h-screen bg-background text-foreground">
@@ -76,7 +101,7 @@ export function AppShell({ children }: { children: React.ReactNode }) {
           <div className="fixed inset-0 bg-black/50" onClick={() => setSidebarOpen(false)} />
           <aside className="fixed inset-y-0 left-0 z-50 w-72 flex flex-col border-r bg-card shadow-xl">
             <ShellBrand onClose={() => setSidebarOpen(false)} />
-            <ShellNav pathname={pathname} onNavigate={() => setSidebarOpen(false)} />
+            <ShellNav pathname={pathname} navItems={dynamicNavItems} onNavigate={() => setSidebarOpen(false)} />
             <ShellSync />
           </aside>
         </div>
@@ -84,7 +109,7 @@ export function AppShell({ children }: { children: React.ReactNode }) {
 
       <aside className="fixed inset-y-0 left-0 z-40 hidden w-64 flex flex-col border-r bg-card lg:flex">
         <ShellBrand />
-        <ShellNav pathname={pathname} />
+        <ShellNav pathname={pathname} navItems={dynamicNavItems} />
         <ShellSync />
       </aside>
 
@@ -158,7 +183,7 @@ function ShellBrand({ onClose }: { onClose?: () => void }) {
   );
 }
 
-function ShellNav({ pathname, onNavigate }: { pathname: string; onNavigate?: () => void }) {
+function ShellNav({ pathname, navItems, onNavigate }: { pathname: string; navItems: any[]; onNavigate?: () => void }) {
   return (
     <nav className="grid gap-1 overflow-y-auto p-3 flex-1">
       {navItems.map((item) => (

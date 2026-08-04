@@ -15,6 +15,7 @@ model Vehicle {
   partyName       String?  @map("party_name")
   companyBodyQty  Float?   @map("company_body_qty")
   extraBodyQty    Float?   @map("extra_body_qty")
+  vehicleType     String?  @map("vehicle_type")
   tripCount       Int      @default(0) @map("trip_count")
   createdAt       DateTime @default(now()) @map("created_at")
   updatedAt       DateTime @updatedAt @map("updated_at")
@@ -34,6 +35,7 @@ model Party {
   partyName     String         @unique @map("party_name")
   phone         String?
   address       String?
+  partyGroup    String?        @map("party_group")
   createdAt     DateTime       @default(now()) @map("created_at")
   updatedAt     DateTime       @updatedAt @map("updated_at")
 
@@ -488,16 +490,23 @@ model SyncState {
 }
 
 model GlobalSettings {
-  id             String   @id @default("default")
-  quarryName     String   @default("MBM Quarry") @map("quarry_name")
-  gstNumber      String   @default("") @map("gst_number")
-  address        String   @default("")
-  phone          String   @default("")
-  defaultPrinter String   @default("") @map("default_printer")
-  backupFolder   String   @default("") @map("backup_folder")
-  adminPin       String   @default("8888") @map("admin_pin")
-  deletePin      String   @default("7711") @map("delete_pin")
-  updatedAt      DateTime @updatedAt @map("updated_at")
+  id                     String   @id @default("default")
+  quarryName             String   @default("MBM Quarry") @map("quarry_name")
+  gstNumber              String   @default("") @map("gst_number")
+  address                String   @default("")
+  phone                  String   @default("")
+  defaultPrinter         String   @default("") @map("default_printer")
+  backupFolder           String   @default("") @map("backup_folder")
+  adminPin               String   @default("8888") @map("admin_pin")
+  deletePin              String   @default("7711") @map("delete_pin")
+  
+  // Feature Flags
+  enableWeighbridge      Boolean  @default(false) @map("enable_weighbridge")
+  enableFleetMaintenance Boolean  @default(false) @map("enable_fleet_maintenance")
+  enableCustomerPortal   Boolean  @default(false) @map("enable_customer_portal")
+  enableCreditLocks      Boolean  @default(false) @map("enable_credit_locks")
+  
+  updatedAt              DateTime @updatedAt @map("updated_at")
 
   @@map("global_settings")
 }
@@ -529,4 +538,33 @@ model InventoryTransaction {
   @@index([stockId])
   @@index([date])
   @@map("inventory_transactions")
+}
+
+model WeighbridgeTicket {
+  id              String   @id @default(cuid())
+  ticketNumber    Int      @unique @map("ticket_number")
+  vehicleNumber   String   @map("vehicle_number")
+  vehicleId       String?  @map("vehicle_id")
+  partyId         String?  @map("party_id")
+  materialId      String?  @map("material_id")
+  
+  ticketType      String   @default("OUTGOING") // OUTGOING (Sale) or INCOMING (Purchase)
+  status          String   @default("FIRST_WEIGHT") // FIRST_WEIGHT, SECOND_WEIGHT, COMPLETED, VOID
+  
+  grossWeight     Float?   @map("gross_weight")
+  grossTime       DateTime? @map("gross_time")
+  tareWeight      Float?   @map("tare_weight")
+  tareTime        DateTime? @map("tare_time")
+  netWeight       Float?   @map("net_weight")
+  
+  linkedSaleId    String?  @unique @map("linked_sale_id")
+  linkedBoulderId String?  @unique @map("linked_boulder_id")
+  
+  remarks         String?
+  createdAt       DateTime @default(now()) @map("created_at")
+  updatedAt       DateTime @updatedAt @map("updated_at")
+
+  @@index([vehicleNumber])
+  @@index([status])
+  @@map("weighbridge_tickets")
 }

@@ -1,11 +1,11 @@
 "use client";
 
-import { useTheme } from "@/components/providers/ThemeProvider";
+import { useTheme } from "next-themes";
 import { Button } from "@/components/ui/button";
 import { Moon, Sun } from "lucide-react";
 
 export function ThemeSettings() {
-  const { theme, toggleTheme } = useTheme();
+  const { theme, setTheme } = useTheme();
 
   return (
     <div className="bg-card border rounded-lg p-6 space-y-6">
@@ -30,7 +30,7 @@ export function ThemeSettings() {
               : "Light mode improves readability in bright environments."}
           </p>
         </div>
-        <Button onClick={toggleTheme} variant="outline" className="gap-2">
+        <Button onClick={() => setTheme(theme === 'dark' ? 'light' : 'dark')} variant="outline" className="gap-2">
           {theme === "dark" ? <Sun className="w-4 h-4" /> : <Moon className="w-4 h-4" />}
           Switch to {theme === "dark" ? "Light" : "Dark"}
         </Button>

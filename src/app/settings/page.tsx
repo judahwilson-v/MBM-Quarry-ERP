@@ -25,7 +25,7 @@ export default async function SettingsPage() {
     }
   }
 
-  appVersion = appVersion || "1.9.0";
+  appVersion = appVersion || "1.10.1";
   const databasePath = process.env.DATABASE_URL || "Local DB";
   
   return (

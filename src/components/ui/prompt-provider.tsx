@@ -6,6 +6,7 @@ import { Input } from "@/components/ui/input";
 
 type PromptContextType = {
   promptPassword: (message: string) => Promise<string | null>;
+  promptNumber: (message: string) => Promise<string | null>;
   confirmAction: (message: string) => Promise<boolean>;
 };
 
@@ -22,11 +23,13 @@ export function PromptProvider({ children }: { children: React.ReactNode }) {
     isOpen: boolean;
     message: string;
     isPassword: boolean;
+    isNumber: boolean;
     resolve: ((value: string | null | boolean) => void) | null;
   }>({
     isOpen: false,
     message: "",
     isPassword: false,
+    isNumber: false,
     resolve: null,
   });
   
@@ -35,13 +38,20 @@ export function PromptProvider({ children }: { children: React.ReactNode }) {
   const promptPassword = useCallback((message: string) => {
     return new Promise<string | null>((resolve) => {
       setInputValue("");
-      setPromptState({ isOpen: true, message, isPassword: true, resolve: resolve as any });
+      setPromptState({ isOpen: true, message, isPassword: true, isNumber: false, resolve: resolve as any });
+    });
+  }, []);
+
+  const promptNumber = useCallback((message: string) => {
+    return new Promise<string | null>((resolve) => {
+      setInputValue("");
+      setPromptState({ isOpen: true, message, isPassword: false, isNumber: true, resolve: resolve as any });
     });
   }, []);
 
   const confirmAction = useCallback((message: string) => {
     return new Promise<boolean>((resolve) => {
-      setPromptState({ isOpen: true, message, isPassword: false, resolve: resolve as any });
+      setPromptState({ isOpen: true, message, isPassword: false, isNumber: false, resolve: resolve as any });
     });
   }, []);
 
@@ -49,11 +59,11 @@ export function PromptProvider({ children }: { children: React.ReactNode }) {
     if (promptState.resolve) {
       promptState.resolve(value);
     }
-    setPromptState({ isOpen: false, message: "", isPassword: false, resolve: null });
+    setPromptState({ isOpen: false, message: "", isPassword: false, isNumber: false, resolve: null });
   };
 
   return (
-    <PromptContext.Provider value={{ promptPassword, confirmAction }}>
+    <PromptContext.Provider value={{ promptPassword, promptNumber, confirmAction }}>
       {children}
       {promptState.isOpen && (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 p-4">
@@ -72,12 +82,27 @@ export function PromptProvider({ children }: { children: React.ReactNode }) {
                 }}
               />
             )}
+            {promptState.isNumber && (
+              <Input
+                type="number"
+                inputMode="numeric"
+                pattern="[0-9]*"
+                autoFocus
+                className="mb-4"
+                value={inputValue}
+                onChange={(e) => setInputValue(e.target.value)}
+                onKeyDown={(e) => {
+                  if (e.key === "Enter") close(inputValue);
+                  if (e.key === "Escape") close(null);
+                }}
+              />
+            )}
             <div className="flex justify-end gap-3">
-              <Button variant="outline" onClick={() => close(promptState.isPassword ? null : false)}>
+              <Button variant="outline" onClick={() => close(promptState.isPassword || promptState.isNumber ? null : false)}>
                 Cancel
               </Button>
-              <Button onClick={() => close(promptState.isPassword ? inputValue : true)}>
-                {promptState.isPassword ? "Submit" : "Confirm"}
+              <Button onClick={() => close(promptState.isPassword || promptState.isNumber ? inputValue : true)}>
+                {promptState.isPassword || promptState.isNumber ? "Submit" : "Confirm"}
               </Button>
             </div>
           </div>
