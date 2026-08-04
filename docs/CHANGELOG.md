@@ -1,9 +1,11 @@
 # MBM Quarry ERP — Changelog
 
-## v1.10.2 (2026-08-04)
-- **Phase 10**: Print & Export Modules implemented.
-- **Bug Fix**: Resolved `runTx` maximum call stack issues across all actions.
-- **UI Tweaks**: Minor improvements to sales, boulder purchases, and credit pages.
+## v1.11.0 — Major Feature Update (2026-08-04)
+- **Phase 10 (Print/Export)**: Implemented Print & Export modules for reports and ledgers.
+- **Phase 9 (Owner Dashboard)**: MBM Quarry Dashboard completed with live data integration.
+- **Weighbridge Integration**: Added weighbridge feature with toggle (on/off) capabilities.
+- **New Development Cycle**: Commenced a new set of phases (1-10) following the completion of the Auto-Updater UI.
+- **Bug Fixes**: Fixed bugs across branches C, H, M, and L, and resolved `runTx` maximum call stack issues.
 
 ## v1.10.1 — Anonymous Sync & RLS Disable (2026-07-06)
 - **RLS Disabled**: Dropped `authenticated_sync_access` policies and disabled Row Level Security on all 28 Supabase tables for frictionless anonymous sync.
