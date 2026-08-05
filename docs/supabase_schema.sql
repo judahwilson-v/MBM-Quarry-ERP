@@ -424,6 +424,10 @@ CREATE TABLE "global_settings" (
     "backup_folder" TEXT NOT NULL DEFAULT '',
     "admin_pin" TEXT NOT NULL DEFAULT '8888',
     "delete_pin" TEXT NOT NULL DEFAULT '7711',
+    "enable_weighbridge" BOOLEAN NOT NULL DEFAULT false,
+    "enable_fleet_maintenance" BOOLEAN NOT NULL DEFAULT false,
+    "enable_customer_portal" BOOLEAN NOT NULL DEFAULT false,
+    "enable_credit_locks" BOOLEAN NOT NULL DEFAULT false,
     "updated_at" TIMESTAMP(3) NOT NULL,
 
     CONSTRAINT "global_settings_pkey" PRIMARY KEY ("id")
@@ -681,3 +685,55 @@ ALTER TABLE "fuel_purchases" ADD CONSTRAINT "fuel_purchases_vehicle_id_fkey" FOR
 
 -- AddForeignKey
 ALTER TABLE "inventory_transactions" ADD CONSTRAINT "inventory_transactions_stock_id_fkey" FOREIGN KEY ("stock_id") REFERENCES "inventory_stock"("id") ON DELETE CASCADE ON UPDATE CASCADE;
+
+-- CreateTable
+CREATE TABLE "maintenance_records" (
+    "id" TEXT NOT NULL,
+    "vehicle_id" TEXT NOT NULL,
+    "date" TIMESTAMP(3) NOT NULL,
+    "engine_hours" DOUBLE PRECISION NOT NULL,
+    "service_type" TEXT NOT NULL,
+    "description" TEXT,
+    "cost" DOUBLE PRECISION NOT NULL DEFAULT 0,
+    "created_at" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    "updated_at" TIMESTAMP(3) NOT NULL,
+
+    CONSTRAINT "maintenance_records_pkey" PRIMARY KEY ("id")
+);
+
+-- CreateTable
+CREATE TABLE "maintenance_schedules" (
+    "id" TEXT NOT NULL,
+    "vehicle_id" TEXT NOT NULL,
+    "service_type" TEXT NOT NULL,
+    "interval_hours" DOUBLE PRECISION,
+    "interval_days" INTEGER,
+    "next_due_hours" DOUBLE PRECISION,
+    "next_due_date" TIMESTAMP(3),
+    "created_at" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    "updated_at" TIMESTAMP(3) NOT NULL,
+
+    CONSTRAINT "maintenance_schedules_pkey" PRIMARY KEY ("id")
+);
+
+-- CreateTable
+CREATE TABLE "vehicle_stats" (
+    "id" TEXT NOT NULL,
+    "vehicle_id" TEXT NOT NULL,
+    "engine_hours" DOUBLE PRECISION NOT NULL DEFAULT 0,
+    "created_at" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    "updated_at" TIMESTAMP(3) NOT NULL,
+
+    CONSTRAINT "vehicle_stats_pkey" PRIMARY KEY ("id")
+);
+
+-- CreateIndex
+CREATE INDEX "maintenance_records_vehicle_id_idx" ON "maintenance_records"("vehicle_id");
+CREATE INDEX "maintenance_records_date_idx" ON "maintenance_records"("date");
+CREATE INDEX "maintenance_schedules_vehicle_id_idx" ON "maintenance_schedules"("vehicle_id");
+CREATE UNIQUE INDEX "vehicle_stats_vehicle_id_key" ON "vehicle_stats"("vehicle_id");
+
+-- AddForeignKey
+ALTER TABLE "maintenance_records" ADD CONSTRAINT "maintenance_records_vehicle_id_fkey" FOREIGN KEY ("vehicle_id") REFERENCES "vehicles"("id") ON DELETE CASCADE ON UPDATE CASCADE;
+ALTER TABLE "maintenance_schedules" ADD CONSTRAINT "maintenance_schedules_vehicle_id_fkey" FOREIGN KEY ("vehicle_id") REFERENCES "vehicles"("id") ON DELETE CASCADE ON UPDATE CASCADE;
+ALTER TABLE "vehicle_stats" ADD CONSTRAINT "vehicle_stats_vehicle_id_fkey" FOREIGN KEY ("vehicle_id") REFERENCES "vehicles"("id") ON DELETE CASCADE ON UPDATE CASCADE;
