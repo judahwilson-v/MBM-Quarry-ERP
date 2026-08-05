@@ -30,6 +30,23 @@ During static generation (`npm run build`), Prisma may log an error about `main.
 ## Resolved (RC1)
 - *(none yet — tracking begins from RC1)*
 
+## Resolved Post-Mortems
+
+### KB-PM-001: Electron Startup Timeout (Prisma Schema Mismatch)
+**Severity**: Critical (Resolved)  
+**Symptom**: Packaged Windows `.exe` crashed on startup before window opened with dialog: *"Timeout waiting for Next.js server to boot."*  
+**Root Cause**: Next.js threw a 500 error on boot because the Prisma schema compiled into standalone app did not match user's local SQLite database (`%APPDATA%/quarry.db`). Prisma rejected queries for missing columns.  
+**Resolution**: 
+1. Updated `package.json` to explicitly include `prisma/local.db` in `extraResources` for electron-builder.
+2. Updated `desktop/main.js` to implement a "Factory Reset" fallback dialog if Next.js server times out, allowing users to restore pristine `local.db`.  
+**Lesson**: Never assume local database schema matches the binary. Always provide a Factory Reset escape hatch for corrupted or outdated local databases.
+
+### KB-PM-002: ZIP Extraction Pathing Issue
+**Severity**: Medium (Resolved)  
+**Symptom**: Extracting project ZIP file natively on Windows via `Expand-Archive` stripped top-level directory, flattening file paths and breaking relative imports and git context.  
+**Resolution**: Used `tar -xf` to extract ZIP file while preserving full directory hierarchy.  
+**Lesson**: Use directory-preserving extraction tools (`tar -xf`) for cross-platform archive transfers.
+
 ---
 
 *Add new entries above the Resolved section. Format: `KB-NNN: Short title`, severity, description, resolution.*

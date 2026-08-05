@@ -201,11 +201,11 @@ export function SalesPage() {
         <div className="mt-6 flex justify-between items-end text-left">
           <div>
             <p className="text-sm text-muted-foreground">Report Date</p>
-            <h2 className="text-xl font-bold">{new Date().toLocaleDateString('en-IN')}</h2>
+            <h2 className="text-xl font-bold" suppressHydrationWarning>{new Date().toLocaleDateString('en-IN')}</h2>
           </div>
           <div className="text-right">
             <p className="text-sm text-muted-foreground">Generated On</p>
-            <p className="font-medium">{new Date().toLocaleString('en-IN')}</p>
+            <p className="font-medium" suppressHydrationWarning>{new Date().toLocaleString('en-IN')}</p>
           </div>
         </div>
       </div>

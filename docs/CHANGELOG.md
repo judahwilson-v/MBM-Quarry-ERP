@@ -1,5 +1,10 @@
 # MBM Quarry ERP — Changelog
 
+## v1.11.4 — Pull Sync & Hydration Fixes (2026-08-05)
+- **Pull Sync ID Mapping**: Fixed a critical bug in `pullSync` where the `toCamelCase` function was empty, causing `prisma.material.upsert` to crash due to missing `materialName` arguments during pull operations.
+- **Pull Sync Date Format**: Fixed `Invalid ISO-8601 DateTime` crash. Supabase drops the timezone 'Z' from timestamp columns, causing Prisma to reject them. Updated `toCamelCase` to automatically append 'Z' to incoming Supabase timestamps.
+- **Pull Sync Unique Constraint**: Added a global intercept in `pullSync` for `P2002` (Unique Constraint) errors. If a remote pulled entity (like a vehicle or party) collides with a local unique name, it now gracefully appends `(Merge <id>)` and retries, mirroring the Push logic.
+- **UI Hydration Mismatch**: Fixed a `Text content does not match server-rendered HTML` crash on the Sales Page caused by `new Date()` mismatching between server and client rendering by adding `suppressHydrationWarning`.
 ## v1.11.3 — Zero-Regression Architecture & Emergency Startup Fixes (2026-08-05)
 - **Startup Crash Fix**: Fixed Schema Desync where 3 Prisma fleet maintenance models (`MaintenanceRecord`, `MaintenanceSchedule`, `VehicleStats`) were missing from SQLite initialization in `bootstrap.ts`, causing fatal startup timeouts.
 - **Sync Map Engine**: Replaced regex string transformation in `sync-service.ts` with build-time O(1) metadata schema generator (`generate-sync-map.js`) to guarantee exact 1:1 column mapping to Supabase.

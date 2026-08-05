@@ -62,7 +62,7 @@ type EmployeeCreditInput = {
 const dateTimeKeys = new Set(["createdAt", "updatedAt", "saleDate", "date", "expectedDueDate"]);
 
 function serialize<T>(value: T): T {
-  if (value instanceof Date) return value.toISOString() as T;
+  if (value instanceof Date) { try { return value.toISOString() as T; } catch { return null as unknown as T; } }
   if (Array.isArray(value)) return value.map((item) => serialize(item)) as T;
   if (value && typeof value === "object") {
     return Object.fromEntries(

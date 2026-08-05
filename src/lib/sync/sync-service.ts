@@ -47,9 +47,17 @@ function toCamelCase(obj: any): any {
   if (obj instanceof Date) {
     return obj;
   }
+  if (typeof obj === 'string' && /^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}(\.\d+)?$/.test(obj)) {
+    return new Date(obj + 'Z');
+  }
   if (Array.isArray(obj)) {
     return obj.map((v) => toCamelCase(v));
   } else if (obj !== null && typeof obj === 'object') {
+    return Object.keys(obj).reduce((result, key) => {
+      const camelKey = DB_TO_CAMEL[key] ?? key.replace(/_([a-z])/g, (_, letter) => letter.toUpperCase());
+      result[camelKey] = toCamelCase(obj[key]);
+      return result;
+    }, {} as any);
   }
   return obj;
 }
@@ -124,7 +132,22 @@ export async function pushSync() {
               console.warn(`[Sync Push] Skipping ${config.table}:${log.entityId} (FK dep missing, will retry)`);
               continue;
             }
-            throw new Error(`[Sync Push] Upsert failed for ${config.table}:${log.entityId}: ${error.message}`);
+            if (error.code === '23505') {
+              console.warn(`[Sync Push] Unique constraint violation on ${config.table}:${log.entityId}. Appending merge suffix and retrying.`);
+              if (config.table === 'parties' && snakeData.party_name) {
+                snakeData.party_name = `${snakeData.party_name} (Merge ${log.entityId.slice(-4)})`;
+              } else if (config.table === 'vehicles' && snakeData.vehicle_number) {
+                snakeData.vehicle_number = `${snakeData.vehicle_number} (Merge ${log.entityId.slice(-4)})`;
+              } else if (config.table === 'outgoing_sales' && snakeData.serial_number) {
+                snakeData.serial_number = null; // Drop conflicting auto-number
+              }
+              const { error: retryError } = await supabase.from(config.table).upsert(snakeData);
+              if (retryError) {
+                 throw new Error(`[Sync Push] Upsert retry failed for ${config.table}:${log.entityId}: ${retryError.message}`);
+              }
+            } else {
+              throw new Error(`[Sync Push] Upsert failed for ${config.table}:${log.entityId}: ${error.message}`);
+            }
           }
         }
       }
@@ -258,6 +281,28 @@ export async function pullSync() {
              });
              successCount++;
            } catch(error: any) {
+             const errMsg = error?.message || '';
+             if (error?.code === 'P2002' || errMsg.includes('Unique constraint')) {
+               console.warn(`[Sync Pull] Unique constraint violation on ${config.table}:${camelRow.id}. Appending merge suffix and retrying.`);
+               if (config.table === 'parties' && camelRow.partyName) {
+                 camelRow.partyName = `${camelRow.partyName} (Merge ${camelRow.id.slice(-4)})`;
+               } else if (config.table === 'vehicles' && camelRow.vehicleNumber) {
+                 camelRow.vehicleNumber = `${camelRow.vehicleNumber} (Merge ${camelRow.id.slice(-4)})`;
+               }
+               try {
+                 await delegate.upsert({
+                   where: { [conflictField]: camelRow[conflictField] },
+                   update: camelRow,
+                   create: camelRow
+                 });
+                 successCount++;
+                 const rowDate = getRowTimestamp(camelRow, config.timeField);
+                 if (rowDate > lastProcessedTime) lastProcessedTime = rowDate;
+                 continue;
+               } catch(retryError: any) {
+                 throw new Error(`[Sync Pull] Local upsert retry failed for ${config.table}:${camelRow.id}: ${retryError?.message ?? retryError}`);
+               }
+             }
              throw new Error(`[Sync Pull] Local upsert failed for ${config.table}:${camelRow.id}: ${error?.message ?? error}`);
            }
            

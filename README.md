@@ -25,7 +25,7 @@ All documentation is in [`docs/`](./docs/).
 
 | Document | Purpose |
 |----------|---------|
-| [`docs/AI_HANDOFF.md`](./docs/AI_HANDOFF.md) | **Start here** — orientation for new developers or AI sessions |
+| [`AI_PROGRESS.md`](./AI_PROGRESS.md) | **Start here** — live AI progress checkpoint & developer onboarding |
 | [`docs/AI_PROGRESS_TEMPLATE.md`](./docs/AI_PROGRESS_TEMPLATE.md) | Template for AI continuation checkpoints for long-running tasks |
 | [`docs/ARCHITECTURE.md`](./docs/ARCHITECTURE.md) | System design and data flow |
 | [`docs/AUTO_UPDATE.md`](./docs/AUTO_UPDATE.md) | Guide for automated background updates using electron-updater |
@@ -38,13 +38,11 @@ All documentation is in [`docs/`](./docs/).
 | [`docs/ENGINEERING_RULES.md`](./docs/ENGINEERING_RULES.md) | Production safety and escalation protocol for AI and developers |
 | [`docs/FINANCIAL_EVENT_ARCHITECTURE.md`](./docs/FINANCIAL_EVENT_ARCHITECTURE.md) | Financial event system reference |
 | [`docs/IDEAS.md`](./docs/IDEAS.md) | Unconfirmed feature ideas |
-| [`docs/KNOWN_BUGS.md`](./docs/KNOWN_BUGS.md) | Active bugs and workarounds |
-| [`docs/KNOWN_ISSUES.md`](./docs/KNOWN_ISSUES.md) | Log of resolved critical bugs and their lessons |
+| [`docs/KNOWN_BUGS.md`](./docs/KNOWN_BUGS.md) | Active bugs, workarounds, and resolved post-mortems |
 | [`docs/MAINTAINERS.md`](./docs/MAINTAINERS.md) | Maintainers guide outlining architecture, data flow, and safety |
 | [`docs/OWNER_DASHBOARD_PRD.md`](./docs/OWNER_DASHBOARD_PRD.md) | Phase 8 owner dashboard specification |
 | [`docs/PHASE_A_SYNC_AND_ERP_PROGRESS.md`](./docs/PHASE_A_SYNC_AND_ERP_PROGRESS.md) | Progress tracker for Phase A Sync and ERP Improvements |
 | [`docs/PROJECT_STATE.md`](./docs/PROJECT_STATE.md) | Current version, phase, and blocking issues |
-| [`docs/PROJECT_STRUCTURE.md`](./docs/PROJECT_STRUCTURE.md) | Codebase folder layout and module responsibilities |
 | [`docs/RELEASE.md`](./docs/RELEASE.md) | Process for publishing a new version and verifying auto-updates |
 | [`docs/RELEASE_NOTES.md`](./docs/RELEASE_NOTES.md) | RC1 release notes |
 | [`docs/ROADMAP.md`](./docs/ROADMAP.md) | Confirmed upcoming phases |

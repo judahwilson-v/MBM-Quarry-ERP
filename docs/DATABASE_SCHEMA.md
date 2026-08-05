@@ -545,3 +545,58 @@ All database tables follow a snake_case naming convention (e.g., `vehicles`, `ou
 | `default_printer` | String | Required | `""` | |
 | `backup_folder` | String | Required | `""` | |
 | `updated_at` | DateTime | Required | auto-updated | |
+
+---
+
+## Example Record JSON Payloads
+
+### Vehicle Record
+```json
+{
+  "id": "cuid_example_id",
+  "vehicleNumber": "TN 01 AB 1234",
+  "partyId": "party_cuid_123",
+  "partyName": "ABC Transporters",
+  "companyBodyQty": 400.0,
+  "extraBodyQty": 50.0,
+  "tripCount": 5
+}
+```
+
+### OutgoingSale Record
+```json
+{
+  "id": "sale_cuid_456",
+  "saleDate": "2026-08-05T10:00:00.000Z",
+  "serialNumber": 1001,
+  "vehicleNumber": "TN 01 AB 1234",
+  "partyName": "Kovai Builders",
+  "materialName": "20mm",
+  "ratePerCft": 45.0,
+  "qty": 300.0,
+  "amount": 13500.0,
+  "gstEnabled": false,
+  "finalAmount": 13500.0,
+  "cashPaid": 5000.0,
+  "remainingCredit": 8500.0
+}
+```
+
+### FinancialEvent Record
+```json
+{
+  "id": "event_cuid_789",
+  "eventId": "550e8400-e29b-41d4-a716-446655440000",
+  "correlationId": "corr_123",
+  "eventType": "SALE_CREATED",
+  "entityType": "OutgoingSale",
+  "entityId": "sale_cuid_456",
+  "schemaVersion": 1,
+  "payload": {
+    "saleId": "sale_cuid_456",
+    "amount": 13500.0,
+    "cashPaid": 5000.0,
+    "remainingCredit": 8500.0
+  }
+}
+```
