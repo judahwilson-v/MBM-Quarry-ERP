@@ -1,5 +1,14 @@
 # MBM Quarry ERP — Changelog
 
+## v1.11.3 — Zero-Regression Architecture & Emergency Startup Fixes (2026-08-05)
+- **Startup Crash Fix**: Fixed Schema Desync where 3 Prisma fleet maintenance models (`MaintenanceRecord`, `MaintenanceSchedule`, `VehicleStats`) were missing from SQLite initialization in `bootstrap.ts`, causing fatal startup timeouts.
+- **Sync Map Engine**: Replaced regex string transformation in `sync-service.ts` with build-time O(1) metadata schema generator (`generate-sync-map.js`) to guarantee exact 1:1 column mapping to Supabase.
+- **Build Validation**: Added `validate-build.js` pre-package hook and runtime checks in Electron `main.js` to ensure critical assets (`preload.js`, `server.js`, `local.db`) are always present before boot.
+- **Security Master Override**: Added offline Master PIN override (`master` / `mbm@admin2024`) for local POS Security Settings access without cloud auth dependencies.
+- **Vercel Read-Only Fallback**: Updated `getGlobalSettings` to use `findUnique` read-only queries with graceful in-memory fallbacks to prevent Server Component 500 errors on read-only environments.
+- **Vehicle Directory Cleanup**: Executed relational purge of vehicle directory table (`deleteMany`) while preserving foreign-key linked sales history (`onDelete: SetNull`).
+- **Dark & Light Mode Polish**: Added WebKit `:-webkit-autofill` dark mode background overrides in `globals.css` and fixed `next-themes` SSR hydration mismatches in theme toggles.
+
 ## v1.11.2 — Auto-Updater Fixes & Sync Resilience (2026-08-05)
 - **Auto-Updater**: Fixed race condition where update checks fired before the UI was loaded. Removed conflicting updater components. The UI now reliably prompts users to download updates.
 - **Sync Fixes**: Replaced the publishable key with the correct JWT anon key in the environment to fix 401 Unauthorized errors.
