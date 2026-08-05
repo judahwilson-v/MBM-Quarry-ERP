@@ -1,14 +1,21 @@
-# AI Progress — Bug Fix Session v1.11.2
+# AI Progress — Bug Fix Session v1.11.3
 
 **Objective**: Fix known bugs one-by-one from the prioritized bug list.
-**Status**: 100% — All bugs fixed. v1.11.2 packaged and ready for deployment.
-**Last Updated**: 2026-08-05T12:54 IST
+**Status**: 100% — All bugs fixed. v1.11.3 pushed & deployed.
+**Last Updated**: 2026-08-05T13:03 IST
 
 ---
 
 ## CURRENT STATE
 
-All 7 bugs fixed. v1.11.2 built and packaged successfully. Installers ready in `release-v2/`.
+All 7 bugs + Schema Desync Startup Crash fixed. v1.11.3 tagged, committed, and pushed to GitHub for automated release.
+
+---
+
+## Startup Crash Fix (v1.11.3)
+- **Error**: `Schema Desync: Missing tables in SQLite database: maintenance_records, maintenance_schedules, vehicle_stats`
+- **Root Cause**: Prisma schema defined 3 fleet maintenance models (`MaintenanceRecord`, `MaintenanceSchedule`, `VehicleStats`), but `bootstrap.ts` lacked `CREATE TABLE IF NOT EXISTS` statements for them. When `verifySchemaSync()` ran on startup, it threw a fatal exception, causing Electron's boot timeout.
+- **Fix**: Added missing `CREATE TABLE IF NOT EXISTS` statements and indexes to `src/lib/bootstrap.ts`. All 32 Prisma models now have matching SQLite table creation statements.
 
 ---
 
@@ -57,12 +64,13 @@ All 7 bugs fixed. v1.11.2 built and packaged successfully. Installers ready in `
 1. `src/lib/sync/sync-service.ts` — Redesigned to use O(1) generated map instead of regex for mapping fields.
 2. `package.json` — Added electron packaging validators, `desktop/preload.js`, and mapped generator scripts.
 3. `src/app/actions/settings.ts` — Fixed `getGlobalSettings` to avoid `upsert` crashes on read-only environments.
-4. `scripts/generate-sync-map.js` — [NEW] Script to parse Prisma schema.
-5. `scripts/validate-build.js` — [NEW] Script to validate required packaging files.
-6. `desktop/main.js` — Added robust runtime health checks for critical files (`preload.js`, `server.js`, `local.db`).
-7. `src/app/globals.css` — Fixed WebKit autofill bug in dark mode.
-8. `src/components/theme-toggle.tsx` — Fixed theme toggle logic (SSR/hydration/system theme).
-9. `src/app/settings/theme-settings.tsx` — Fixed settings toggle logic.
+4. `src/lib/bootstrap.ts` — Added missing `CREATE TABLE` statements for `maintenance_records`, `maintenance_schedules`, `vehicle_stats`.
+5. `scripts/generate-sync-map.js` — [NEW] Script to parse Prisma schema.
+6. `scripts/validate-build.js` — [NEW] Script to validate required packaging files.
+7. `desktop/main.js` — Added robust runtime health checks for critical files (`preload.js`, `server.js`, `local.db`).
+8. `src/app/globals.css` — Fixed WebKit autofill bug in dark mode.
+9. `src/components/theme-toggle.tsx` — Fixed theme toggle logic (SSR/hydration/system theme).
+10. `src/app/settings/theme-settings.tsx` — Fixed settings toggle logic.
 
 ## Verification Status
 | Check | Result |
