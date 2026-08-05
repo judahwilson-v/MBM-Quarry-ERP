@@ -27,7 +27,7 @@ export async function getGlobalSettings() {
     }
   }
 
-  return settings;
+  return settings!;
 }
 
 

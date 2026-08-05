@@ -553,7 +553,43 @@ export async function initializeDatabase(prisma: PrismaClient) {
       updated_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP
     )`,
     `CREATE INDEX IF NOT EXISTS weighbridge_tickets_vehicle_number_idx ON weighbridge_tickets (vehicle_number)`,
-    `CREATE INDEX IF NOT EXISTS weighbridge_tickets_status_idx ON weighbridge_tickets (status)`
+    `CREATE INDEX IF NOT EXISTS weighbridge_tickets_status_idx ON weighbridge_tickets (status)`,
+    // --- Fleet Maintenance tables (added v1.11.2) ---
+    `CREATE TABLE IF NOT EXISTS maintenance_records (
+      id TEXT PRIMARY KEY NOT NULL,
+      vehicle_id TEXT NOT NULL,
+      date DATETIME NOT NULL,
+      engine_hours REAL NOT NULL,
+      service_type TEXT NOT NULL,
+      description TEXT,
+      cost REAL NOT NULL DEFAULT 0,
+      created_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
+      updated_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
+      FOREIGN KEY (vehicle_id) REFERENCES vehicles(id) ON DELETE CASCADE
+    )`,
+    `CREATE INDEX IF NOT EXISTS maintenance_records_vehicle_id_idx ON maintenance_records (vehicle_id)`,
+    `CREATE INDEX IF NOT EXISTS maintenance_records_date_idx ON maintenance_records (date)`,
+    `CREATE TABLE IF NOT EXISTS maintenance_schedules (
+      id TEXT PRIMARY KEY NOT NULL,
+      vehicle_id TEXT NOT NULL,
+      service_type TEXT NOT NULL,
+      interval_hours REAL,
+      interval_days INTEGER,
+      next_due_hours REAL,
+      next_due_date DATETIME,
+      created_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
+      updated_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
+      FOREIGN KEY (vehicle_id) REFERENCES vehicles(id) ON DELETE CASCADE
+    )`,
+    `CREATE INDEX IF NOT EXISTS maintenance_schedules_vehicle_id_idx ON maintenance_schedules (vehicle_id)`,
+    `CREATE TABLE IF NOT EXISTS vehicle_stats (
+      id TEXT PRIMARY KEY NOT NULL,
+      vehicle_id TEXT NOT NULL UNIQUE,
+      engine_hours REAL NOT NULL DEFAULT 0,
+      created_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
+      updated_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
+      FOREIGN KEY (vehicle_id) REFERENCES vehicles(id) ON DELETE CASCADE
+    )`
   ];
 
   for (const statement of statements) {
