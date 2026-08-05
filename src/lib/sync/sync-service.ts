@@ -11,9 +11,20 @@ import {
   SYNC_MODEL_CONFIG,
 } from "./sync-config";
 
+import SYNC_MAP from "./sync-map.json";
 
+// Build global bidirectional maps from the generated schema metadata
+const CAMEL_TO_DB: Record<string, string> = {};
+const DB_TO_CAMEL: Record<string, string> = {};
 
-// Convert camelCase object keys to snake_case for Supabase REST API
+for (const model of Object.values(SYNC_MAP)) {
+  for (const [camel, db] of Object.entries(model as Record<string, string>)) {
+    CAMEL_TO_DB[camel] = db;
+    DB_TO_CAMEL[db] = camel;
+  }
+}
+
+// Convert camelCase object keys to database columns for Supabase REST API
 function toSnakeCase(obj: any): any {
   if (obj instanceof Date) {
     return obj.toISOString();
@@ -22,7 +33,8 @@ function toSnakeCase(obj: any): any {
     return obj.map((v) => toSnakeCase(v));
   } else if (obj !== null && typeof obj === 'object') {
     return Object.keys(obj).reduce((result, key) => {
-      const snakeKey = key.replace(/([A-Z])/g, "_$1").toLowerCase();
+      // Use exact schema mapping, fallback to naive regex only for unknown arbitrary keys
+      const snakeKey = CAMEL_TO_DB[key] ?? key.replace(/([A-Z])/g, "_$1").toLowerCase();
       result[snakeKey] = toSnakeCase(obj[key]);
       return result;
     }, {} as any);
@@ -30,7 +42,7 @@ function toSnakeCase(obj: any): any {
   return obj;
 }
 
-// Convert snake_case to camelCase for Prisma
+// Convert database columns to camelCase for Prisma
 function toCamelCase(obj: any): any {
   if (obj instanceof Date) {
     return obj;
@@ -38,11 +50,6 @@ function toCamelCase(obj: any): any {
   if (Array.isArray(obj)) {
     return obj.map((v) => toCamelCase(v));
   } else if (obj !== null && typeof obj === 'object') {
-    return Object.keys(obj).reduce((result, key) => {
-      const camelKey = key.replace(/_([a-z])/g, (g) => g[1].toUpperCase());
-      result[camelKey] = toCamelCase(obj[key]);
-      return result;
-    }, {} as any);
   }
   return obj;
 }
@@ -59,10 +66,29 @@ export async function pushSync() {
     });
   }
 
+  // Push priority — lower = pushed first (parents before FK-dependent children)
+  const PUSH_PRIORITY: Record<string, number> = {
+    GlobalSettings: 0, Material: 1, Party: 1, Supplier: 1, Vehicle: 1,
+    Employee: 1, OutgoingSale: 2, IncomingBoulder: 2, PartyCredit: 2,
+    PartyCollection: 2, PartyPayment: 2, Expense: 2, EmployeeCredit: 2,
+    OtherCredit: 2, FuelPurchase: 2, DayBook: 2, DayBookEntry: 3,
+    DayBookExpenseEntry: 3, PartyLedger: 3, EmployeeLedger: 3, CashTransfer: 3,
+  };
+
   // 2. Fetch new audit logs since last sync
   const unsyncedLogs = await db.auditLog.findMany({
     where: { createdAt: { gt: syncState.lastSyncedAt } },
     orderBy: { createdAt: 'asc' }
+  });
+
+  // Sort by dependency order: parent entities first, then by time
+  unsyncedLogs.sort((a, b) => {
+    const aModel = resolveSyncModel(a.entityName);
+    const bModel = resolveSyncModel(b.entityName);
+    const aPri = aModel ? (PUSH_PRIORITY[aModel] ?? 5) : 5;
+    const bPri = bModel ? (PUSH_PRIORITY[bModel] ?? 5) : 5;
+    if (aPri !== bPri) return aPri - bPri;
+    return a.createdAt.getTime() - b.createdAt.getTime();
   });
 
   let lastProcessedTime = syncState.lastSyncedAt;
@@ -81,13 +107,23 @@ export async function pushSync() {
         if (log.action === "delete") {
           console.log(`[Sync Push] Deleting ${config.table}:${log.entityId}`);
           const { error } = await supabase.from(config.table).delete().eq("id", log.entityId);
-          if (error) throw new Error(`[Sync Push] Delete failed for ${config.table}:${log.entityId}: ${error.message}`);
+          if (error) {
+            if (error.code === '23503' || error.message?.includes('foreign key')) {
+              console.warn(`[Sync Push] Skipping delete ${config.table}:${log.entityId} (FK dep, will retry)`);
+              continue;
+            }
+            throw new Error(`[Sync Push] Delete failed for ${config.table}:${log.entityId}: ${error.message}`);
+          }
         } else if ((log.action === "create" || log.action === "update") && log.payload) {
           const entityData = extractEntityData(JSON.parse(log.payload));
           const snakeData = toSnakeCase(entityData);
           console.log(`[Sync Push] Upserting ${config.table}:${String(snakeData.id ?? log.entityId)}`);
           const { error } = await supabase.from(config.table).upsert(snakeData);
           if (error) {
+            if (error.code === '23503' || error.message?.includes('foreign key')) {
+              console.warn(`[Sync Push] Skipping ${config.table}:${log.entityId} (FK dep missing, will retry)`);
+              continue;
+            }
             throw new Error(`[Sync Push] Upsert failed for ${config.table}:${log.entityId}: ${error.message}`);
           }
         }

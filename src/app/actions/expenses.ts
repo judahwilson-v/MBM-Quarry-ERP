@@ -325,7 +325,10 @@ export async function saveExpense(input: any) {
 }
 
 
-export async function deleteExpense(id: string) {
+export async function deleteExpense(id: string, pin?: string) {
+  if (!pin || !(await verifyEditPassword(pin, "delete"))) {
+    throw new Error("Invalid delete PIN");
+  }
   const db = await getDb();
   return serialize(await runTx(async (tx: any) => {
     const row = await tx.expense.findUnique({ where: { id } });

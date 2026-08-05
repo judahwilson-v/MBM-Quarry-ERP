@@ -291,9 +291,33 @@ export function SalesEntryForm({
         ) : null}
       </CardHeader>
       <CardContent className="grid gap-4">
-        <div className="grid gap-3 md:grid-cols-2 xl:grid-cols-4">
+        <div className="grid gap-4 grid-cols-1 md:grid-cols-2 xl:grid-cols-4 items-start">
+          {/* Row 1: Document & Vehicle Info */}
           <Field label="Date">
             <Input type="date" value={form.saleDate} onChange={(e) => updateForm("saleDate", e.target.value)} />
+          </Field>
+          <Field label="Book #">
+            <Input
+              className="text-right tabular-nums"
+              type="number"
+              min="1"
+              step="1"
+              value={form.bookNumber}
+              onChange={(e) => updateForm("bookNumber", e.target.value)}
+              placeholder="1"
+            />
+          </Field>
+          <Field label="Page # (1–50)">
+            <Input
+              className="text-right tabular-nums"
+              type="number"
+              min="1"
+              max="50"
+              step="1"
+              value={form.pageNumber}
+              onChange={(e) => updateForm("pageNumber", e.target.value)}
+              placeholder="1"
+            />
           </Field>
           <Field label="Vehicle Number">
             <SearchableSelect
@@ -319,8 +343,10 @@ export function SalesEntryForm({
               }
             />
           </Field>
+
+          {/* Row 2: Customer, Material & Rates */}
           <Field label="Party Name">
-            <Input value={form.partyName} onChange={(e) => updateForm("partyName", e.target.value)} />
+            <Input value={form.partyName} onChange={(e) => updateForm("partyName", e.target.value)} placeholder="Customer name" />
           </Field>
           <Field label="Material">
             <SearchableSelect
@@ -353,13 +379,15 @@ export function SalesEntryForm({
               onChange={(e) => updateForm("qty", e.target.value)}
             />
           </Field>
+
+          {/* Quantity Reason if changed */}
           {(() => {
             const vehicle = vehicles.find(v => v.id === form.vehicleId);
             const defaultQty = vehicle?.companyBodyQty ?? vehicle?.extraBodyQty ?? null;
             const isChanged = defaultQty !== null && defaultQty > 0 && Number(form.qty) !== defaultQty;
             if (!isChanged) return null;
             return (
-              <Field label="Quantity Reason (Required)">
+              <Field label="Quantity Reason (Required)" className="xl:col-span-4">
                 <Input 
                   value={form.quantityReason} 
                   onChange={(e) => updateForm("quantityReason", e.target.value)} 
@@ -369,6 +397,7 @@ export function SalesEntryForm({
             );
           })()}
 
+          {/* Row 3: Discount & GST */}
           <Field label="Discount Type">
             <select
               className="flex h-10 w-full rounded-lg border border-input bg-background px-3 py-2 text-sm text-foreground shadow-[var(--shadow-card)] transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:border-accent"
@@ -388,8 +417,8 @@ export function SalesEntryForm({
               onChange={(e) => updateForm("discountValue", e.target.value)}
             />
           </Field>
-          <Field label="GST (5%)" className="md:col-span-2">
-            <div className="flex items-center gap-3">
+          <Field label="GST (5%)" className="xl:col-span-2">
+            <div className="flex items-center gap-3 h-10">
               <label className="relative inline-flex items-center cursor-pointer">
                 <input
                   type="checkbox"
@@ -400,15 +429,19 @@ export function SalesEntryForm({
                 <div className="w-11 h-6 bg-gray-200 peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-red-300 rounded-full peer peer-checked:after:translate-x-full rtl:peer-checked:after:-translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:start-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-red-600"></div>
                 <span className="ms-3 text-sm font-medium">{form.gstEnabled ? "GST Enabled" : "No GST"}</span>
               </label>
+              {form.gstEnabled && totals.gstAmount > 0 && (
+                <div className="flex items-center gap-2 rounded-md border border-red-200 bg-red-50 px-3 py-1 text-xs text-red-700 font-medium">
+                  <span>SGST: {formatCurrency(totals.sgst)}</span>
+                  <span>•</span>
+                  <span>CGST: {formatCurrency(totals.cgst)}</span>
+                  <span>•</span>
+                  <span className="font-bold text-red-800">Total: {formatCurrency(totals.gstAmount)}</span>
+                </div>
+              )}
             </div>
-            {form.gstEnabled && totals.gstAmount > 0 && (
-              <div className="mt-2 flex flex-wrap gap-3 rounded-md border border-red-200 bg-red-50 px-3 py-2 text-sm">
-                <span className="text-red-700">SGST (2.5%): <strong>{formatCurrency(totals.sgst)}</strong></span>
-                <span className="text-red-700">CGST (2.5%): <strong>{formatCurrency(totals.cgst)}</strong></span>
-                <span className="text-red-800 font-bold">GST Total: {formatCurrency(totals.gstAmount)}</span>
-              </div>
-            )}
           </Field>
+
+          {/* Row 4: Payments & Credit (4 Columns Aligned) */}
           <Field label="Cash Paid (₹)">
             <Input
               className="text-right tabular-nums"
@@ -442,40 +475,24 @@ export function SalesEntryForm({
               placeholder="0"
             />
           </Field>
-          <Field label="Final Amount (₹)" className="md:col-span-2">
+          <Field label="Remaining Credit (₹)">
+            <Input className="text-right tabular-nums font-semibold text-amber-500 bg-amber-500/5 border-amber-500/20" readOnly value={formatCurrency(totals.remainingCredit)} />
+          </Field>
+
+          {/* Row 5: Summary & Remarks */}
+          <Field label="Final Amount (₹)" className="xl:col-span-2">
             <Input
-              className="text-right tabular-nums font-semibold text-lg"
+              className="text-right tabular-nums font-bold text-xl text-emerald-500 bg-emerald-500/5 border-emerald-500/20 h-10"
               readOnly
               value={formatCurrency(totals.finalAmount)}
             />
           </Field>
-          <Field label="Remaining Credit (₹)" className="md:col-span-2">
-            <Input className="text-right tabular-nums font-semibold" readOnly value={formatCurrency(totals.remainingCredit)} />
-          </Field>
-          <Field label="Remarks" className="md:col-span-2">
-            <Textarea value={form.remarks} onChange={(e) => updateForm("remarks", e.target.value)} />
-          </Field>
-          <Field label="Book #">
+          <Field label="Remarks" className="xl:col-span-2">
             <Input
-              className="text-right tabular-nums"
-              type="number"
-              min="1"
-              step="1"
-              value={form.bookNumber}
-              onChange={(e) => updateForm("bookNumber", e.target.value)}
-              placeholder="1"
-            />
-          </Field>
-          <Field label="Page # (1–50)">
-            <Input
-              className="text-right tabular-nums"
-              type="number"
-              min="1"
-              max="50"
-              step="1"
-              value={form.pageNumber}
-              onChange={(e) => updateForm("pageNumber", e.target.value)}
-              placeholder="1"
+              value={form.remarks}
+              onChange={(e) => updateForm("remarks", e.target.value)}
+              placeholder="Optional notes or remarks"
+              className="h-10"
             />
           </Field>
         </div>

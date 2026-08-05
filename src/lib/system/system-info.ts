@@ -66,19 +66,14 @@ export async function getSystemInfo() {
   );
 
   let isCloudSyncEnabled = false;
-  let cloudDetail = cloudConfigured ? "Sign in required" : "Supabase environment is not configured";
+  let cloudDetail = cloudConfigured ? "Checking..." : "Supabase environment is not configured";
 
   if (cloudConfigured) {
     try {
       const supabase = createClient();
-      const { data, error: authError } = await supabase.auth.getUser();
-      if (authError || !data.user) {
-        cloudDetail = authError?.message ?? "Sign in required";
-      } else {
-        const { error: queryError } = await supabase.from("global_settings").select("id").limit(1);
-        isCloudSyncEnabled = !queryError;
-        cloudDetail = queryError ? queryError.message : `Connected as ${data.user.email ?? "authenticated user"}`;
-      }
+      const { error: queryError } = await supabase.from("global_settings").select("id").limit(1);
+      isCloudSyncEnabled = !queryError;
+      cloudDetail = queryError ? queryError.message : "Connected (anonymous sync)";
     } catch (error: any) {
       cloudDetail = error?.message ?? "Supabase connectivity check failed";
     }

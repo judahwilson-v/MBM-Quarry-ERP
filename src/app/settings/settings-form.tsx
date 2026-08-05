@@ -17,7 +17,6 @@ export function SettingsForm({ initialData }: { initialData: any }) {
     enableWeighbridge: initialData?.enableWeighbridge || false,
     enableFleetMaintenance: initialData?.enableFleetMaintenance || false,
     enableCustomerPortal: initialData?.enableCustomerPortal || false,
-    enableCreditLocks: initialData?.enableCreditLocks || false,
   });
 
   const [isSaving, setIsSaving] = useState(false);
@@ -159,14 +158,6 @@ export function SettingsForm({ initialData }: { initialData: any }) {
                 <div className="text-xs text-[var(--text-secondary)]">Allow parties to log in, view live ledger balances, and download invoices.</div>
               </div>
               <input type="checkbox" name="enableCustomerPortal" checked={formData.enableCustomerPortal} onChange={handleChange} className="w-5 h-5 accent-blue-600 rounded" />
-            </label>
-
-            <label className="flex items-center justify-between p-4 rounded-lg border border-[var(--border-light)] hover:bg-[var(--bg-muted)] cursor-pointer transition-colors">
-              <div>
-                <div className="font-medium">Credit Limit Auto-Locks</div>
-                <div className="text-xs text-[var(--text-secondary)]">Automatically block sales dispatches if a party exceeds their defined credit limit.</div>
-              </div>
-              <input type="checkbox" name="enableCreditLocks" checked={formData.enableCreditLocks} onChange={handleChange} className="w-5 h-5 accent-blue-600 rounded" />
             </label>
           </div>
         </div>

@@ -8,32 +8,39 @@ This document outlines the strict end-to-end process for publishing a new versio
 
 Whenever you are ready to ship new features or bug fixes to the quarry staff, you must follow these exact steps:
 
-### 1. Update Version
-Open `package.json` and increment the `"version"` field. 
-*Example: Change `"1.9.0"` to `"1.9.1"`.*
-> **Critical**: If you do not change the version, the auto-updater will ignore the release because it thinks the client is already up to date.
+### 1. Update Changelog & Progress (CRITICAL)
+Before cutting a release, you MUST:
+1. Update `docs/CHANGELOG.md` with the new version number and a summary of all changes.
+2. Update `AI_PROGRESS.md` with the status of the release.
+3. Update any other relevant `.md` documentation files related to the features you just built.
 
-### 2. Commit and Push
-Ensure all your local changes are committed and pushed to the `main` branch of your GitHub repository.
-```bash
-git add .
-git commit -m "Bump version for release"
-git push origin main
-```
+> **Failure to do this means users won't know what changed, and future AI agents will lack context.**
 
-### 3. Run `npm run electron:publish`
-Ensure your terminal is authenticated with GitHub by setting your Personal Access Token.
+### 2. Run the Release Script
+Ensure your terminal is authenticated with GitHub (if required, though the script uses your local Git credentials).
+Run one of the following commands depending on the size of the update:
 ```bash
-export GH_TOKEN="your_personal_access_token_here"
-npm run electron:publish
+npm run release:patch  # For bug fixes (e.g. 1.9.0 -> 1.9.1)
+npm run release:minor  # For new features (e.g. 1.9.0 -> 1.10.0)
+npm run release:major  # For massive overhauls (e.g. 1.9.0 -> 2.0.0)
 ```
-This command will compile the Next.js app, package the Electron binaries (Mac `.dmg` and Windows `.exe`), and automatically upload them to your GitHub Releases page.
+This script will automatically:
+- Bump the version in `package.json`
+- Stamp the `VERSION` file with the build date
+- Create a Git commit and tag
+- Push everything to GitHub
+
+### 3. GitHub Actions Takes Over
+Once the tag is pushed to GitHub, the **Release Windows App** GitHub Action automatically starts. It will:
+- Build the Next.js app
+- Package the Electron binaries (`.exe`)
+- Publish the release to the GitHub Releases page automatically.
+
+You do NOT need to run `npm run electron:publish` manually anymore.
 
 ### 4. Verify the GitHub Release
-1. Open your web browser and navigate to [mbm-quarry/MBM-Quarry-ERP Releases](https://github.com/mbm-quarry/MBM-Quarry-ERP/releases).
-2. Locate the newly created release. It may be marked as a **Draft**.
-3. Edit the release, ensure the `.exe` and `.dmg` installer files are attached in the Assets section, and click **Publish Release**.
-> **Note**: `electron-updater` will only pull updates from releases that are fully "Published" (not Drafts or Pre-releases).
+1. Open your web browser and navigate to [mbm-quarry/MBM-Quarry-ERP Releases](https://github.com/mbm-quarry/MBM-Quarry-ERP/releases) (or the relevant repo URL).
+2. Ensure the new release is published and the `.exe` installer is attached in the Assets section.
 
 ### 5. Test Auto-Update from an Older Installed Version
 To confirm the entire pipeline works end-to-end:

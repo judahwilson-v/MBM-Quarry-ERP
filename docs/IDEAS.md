@@ -33,3 +33,8 @@ Format each entry as:
 - Summary: Generate Tally-compatible XML/CSV exports from sales data for GST filing.
 - Why it matters: Quarry accountant uses Tally ERP 9 / Tally Prime.
 - Status: rejected — scheduled as Phase 7, after field testing.
+
+### 2026-08-05 — IoT Weighbridge Integration
+- Summary: Direct RS-232/Ethernet integration with physical weighbridge indicators.
+- Why it matters: Prevents manual entry errors and speeds up the ticketing process.
+- Status: paused — put on hold per user request.

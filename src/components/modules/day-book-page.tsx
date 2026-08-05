@@ -6,6 +6,7 @@ import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { Field } from "@/components/ui/field";
 import { formatCurrency, todayInputValue } from "@/lib/utils";
+import { UserCircle } from "lucide-react";
 import { fetchDayBookData, saveCashTransfer, logDayBookAudit } from "@/lib/daybook-actions";
 import { saveDayBookOpeningBalances } from "@/app/actions/daybook_offline";
 import { usePrompt } from "@/components/ui/prompt-provider";
@@ -116,11 +117,17 @@ export function DayBookPage() {
           <p className="text-muted-foreground">Daily financial summary and transfers.</p>
         </div>
         <div className="flex gap-4 items-center">
-          <Field label="Current User" error="">
-            <Input value={userName} onChange={e => handleNameChange(e.target.value)} placeholder="e.g. Judah" className="w-32 bg-white" />
-          </Field>
+          <div className="flex items-center gap-1.5 bg-muted/50 rounded-lg px-2.5 py-1.5 mt-6" title="Your name for tracking edits">
+            <UserCircle className="h-4 w-4 text-muted-foreground flex-shrink-0" />
+            <input
+              value={userName}
+              onChange={e => handleNameChange(e.target.value)}
+              placeholder="Your name"
+              className="bg-transparent border-none text-sm w-24 focus:outline-none focus:ring-0 placeholder:text-muted-foreground/60"
+            />
+          </div>
           <Field label="Date" error="">
-            <Input type="date" value={date} onChange={e => setDate(e.target.value)} className="bg-white" />
+            <Input type="date" value={date} onChange={e => setDate(e.target.value)} />
           </Field>
           <Button variant="outline" onClick={() => window.print()} className="mt-6">Print</Button>
         </div>
@@ -239,7 +246,7 @@ export function DayBookPage() {
               <form onSubmit={handleTransfer} className="space-y-4">
                 <Field label="Type" error="">
                   <select 
-                    className="flex h-9 w-full rounded-md border border-input bg-white px-3 py-1 text-sm shadow-sm"
+                    className="flex h-9 w-full rounded-md border border-input px-3 py-1 text-sm shadow-sm"
                     value={transferForm.type}
                     onChange={e => setTransferForm({...transferForm, type: e.target.value})}
                   >

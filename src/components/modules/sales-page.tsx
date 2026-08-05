@@ -107,9 +107,9 @@ export function SalesPage() {
 
   async function remove(id: string) {
     if (!(await confirmAction("Delete this sale?"))) return;
-    const password = await promptPassword("Enter delete password:");
-    if (!password || !(await verifyEditPassword(password))) {
-      setError("Delete password is invalid.");
+    const password = await promptPassword("Enter delete PIN:");
+    if (!password || !(await verifyEditPassword(password, "delete"))) {
+      setError("❌ Incorrect Delete PIN. Delete cancelled.");
       return;
     }
     setError("");
@@ -123,10 +123,10 @@ export function SalesPage() {
   }
 
   async function raidPurge() {
-    if (!(await confirmAction("\u26a0\ufe0f RAID MODE: Delete ALL non-GST sales? Only GST sales will remain. This cannot be undone."))) return;
-    const password = await promptPassword("Enter delete password:");
-    if (!password || !(await verifyEditPassword(password))) {
-      setError("Delete password is invalid.");
+    if (!(await confirmAction("⚠️ RAID MODE: Delete ALL non-GST sales? Only GST sales will remain. This cannot be undone."))) return;
+    const password = await promptPassword("Enter delete PIN:");
+    if (!password || !(await verifyEditPassword(password, "delete"))) {
+      setError("❌ Incorrect Delete PIN. Purge cancelled.");
       return;
     }
     setError("");

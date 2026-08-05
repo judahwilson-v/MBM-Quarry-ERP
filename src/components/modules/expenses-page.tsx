@@ -72,9 +72,9 @@ export function ExpensesPage() {
 
   async function remove(id: string) {
     if (!(await confirmAction("Delete this expense?"))) return;
-    const password = await promptPassword("Enter delete password:");
-    if (!password || !(await verifyEditPassword(password))) {
-      setError("Delete password is invalid.");
+    const password = await promptPassword("Enter delete PIN:");
+    if (!password || !(await verifyEditPassword(password, "delete"))) {
+      setError("❌ Incorrect Delete PIN. Delete cancelled.");
       return;
     }
     setError("");

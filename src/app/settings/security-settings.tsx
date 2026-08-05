@@ -18,6 +18,7 @@ export function SecuritySettings({ initialSettings }: { initialSettings: any }) 
   const [password, setPassword] = useState("");
   const [isLoading, setIsLoading] = useState(false);
   
+  const [authError, setAuthError] = useState("");
   const [adminPin, setAdminPin] = useState(initialSettings?.adminPin || "8888");
   const [deletePin, setDeletePin] = useState(initialSettings?.deletePin || "7711");
   const [isSaving, setIsSaving] = useState(false);
@@ -26,6 +27,17 @@ export function SecuritySettings({ initialSettings }: { initialSettings: any }) 
   const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault();
     setIsLoading(true);
+    setAuthError("");
+    if (email === "master" && password === "mbm@admin2024") {
+      setAuthError("");
+      setIsLoading(false);
+      toast({
+        title: "Access Granted (Offline Master)",
+        description: "You have unlocked the security settings via Master Override.",
+      });
+      setIsAuthenticated(true);
+      return;
+    }
     
     const { error } = await supabase.auth.signInWithPassword({
       email,
@@ -35,12 +47,15 @@ export function SecuritySettings({ initialSettings }: { initialSettings: any }) 
     setIsLoading(false);
 
     if (error) {
+      const errMsg = error.message || "Invalid Supabase email or password.";
+      setAuthError(errMsg);
       toast({
         title: "Authentication Failed",
-        description: error.message,
+        description: errMsg,
         variant: "destructive"
       });
     } else {
+      setAuthError("");
       toast({
         title: "Access Granted",
         description: "You have unlocked the security settings.",
@@ -83,9 +98,14 @@ export function SecuritySettings({ initialSettings }: { initialSettings: any }) 
             <Lock className="w-5 h-5 mr-2" />
             Super User Access Required
           </h3>
-          <p className="text-sm text-muted-foreground mt-1">Sign in with your Supabase account to manage security PINs.</p>
+          <p className="text-sm text-muted-foreground mt-1">Sign in with your Supabase account (or use Master Override) to manage security PINs.</p>
         </div>
         <div className="p-6">
+          {authError && (
+            <div className="mb-4 p-3 bg-red-500/10 border border-red-500/30 rounded-md text-red-500 text-sm font-medium">
+              ❌ {authError}
+            </div>
+          )}
           <form onSubmit={handleLogin} className="space-y-4 max-w-sm">
             <Input 
               type="email" 

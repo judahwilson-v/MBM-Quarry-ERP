@@ -384,7 +384,7 @@ export function PartyLedgerPage() {
                         </Field>
                         <Field label="Payment Method" error="">
                           <select
-                            className="flex h-9 w-full rounded-md border border-input bg-transparent px-3 py-1 text-sm shadow-sm transition-colors focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring disabled:cursor-not-allowed disabled:opacity-50 bg-white"
+                            className="flex h-9 w-full rounded-md border border-input bg-transparent px-3 py-1 text-sm shadow-sm transition-colors focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring disabled:cursor-not-allowed disabled:opacity-50"
                             value={paymentForm.paymentMethod}
                             onChange={(e) => setPaymentForm({ ...paymentForm, paymentMethod: e.target.value })}
                           >
@@ -406,7 +406,7 @@ export function PartyLedgerPage() {
                           placeholder="Optional notes..."
                           value={paymentForm.remarks}
                           onChange={(e) => setPaymentForm({ ...paymentForm, remarks: e.target.value })}
-                          className="h-16 resize-none bg-white"
+                          className="h-16 resize-none"
                         />
                       </Field>
                       <div className="flex gap-2 justify-end">

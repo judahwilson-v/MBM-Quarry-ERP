@@ -17,6 +17,7 @@ model Vehicle {
   extraBodyQty    Float?   @map("extra_body_qty")
   vehicleType     String?  @map("vehicle_type")
   tripCount       Int      @default(0) @map("trip_count")
+  engineHours     Float?   @map("engine_hours")
   createdAt       DateTime @default(now()) @map("created_at")
   updatedAt       DateTime @updatedAt @map("updated_at")
 
@@ -25,6 +26,9 @@ model Vehicle {
   incomingBoulder IncomingBoulder[]
   expenses   Expense[]
   fuelPurchases FuelPurchase[]
+  maintenanceRecords    MaintenanceRecord[]
+  maintenanceSchedules  MaintenanceSchedule[]
+  vehicleStats          VehicleStats?
 
   @@index([partyId])
   @@map("vehicles")
@@ -567,4 +571,51 @@ model WeighbridgeTicket {
   @@index([vehicleNumber])
   @@index([status])
   @@map("weighbridge_tickets")
+}
+
+model MaintenanceRecord {
+  id             String   @id @default(cuid())
+  vehicleId      String   @map("vehicle_id")
+  date           DateTime
+  engineHours    Float    @map("engine_hours")
+  serviceType    String   @map("service_type")
+  description    String?
+  cost           Float    @default(0)
+  createdAt      DateTime @default(now()) @map("created_at")
+  updatedAt      DateTime @updatedAt @map("updated_at")
+
+  vehicle        Vehicle  @relation(fields: [vehicleId], references: [id], onDelete: Cascade)
+
+  @@index([vehicleId])
+  @@index([date])
+  @@map("maintenance_records")
+}
+
+model MaintenanceSchedule {
+  id             String   @id @default(cuid())
+  vehicleId      String   @map("vehicle_id")
+  serviceType    String   @map("service_type")
+  intervalHours  Float?   @map("interval_hours")
+  intervalDays   Int?     @map("interval_days")
+  nextDueHours   Float?   @map("next_due_hours")
+  nextDueDate    DateTime? @map("next_due_date")
+  createdAt      DateTime @default(now()) @map("created_at")
+  updatedAt      DateTime @updatedAt @map("updated_at")
+
+  vehicle        Vehicle  @relation(fields: [vehicleId], references: [id], onDelete: Cascade)
+
+  @@index([vehicleId])
+  @@map("maintenance_schedules")
+}
+
+model VehicleStats {
+  id             String   @id @default(cuid())
+  vehicleId      String   @unique @map("vehicle_id")
+  engineHours    Float    @default(0) @map("engine_hours")
+  createdAt      DateTime @default(now()) @map("created_at")
+  updatedAt      DateTime @updatedAt @map("updated_at")
+
+  vehicle        Vehicle  @relation(fields: [vehicleId], references: [id], onDelete: Cascade)
+
+  @@map("vehicle_stats")
 }

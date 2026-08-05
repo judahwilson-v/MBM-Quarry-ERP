@@ -13,11 +13,10 @@ import {
   ReceiptText,
   Truck,
   UserCircle,
-  X, Cloud, CloudOff, LayoutDashboard, Info, Settings, BookOpen, Fuel, Wallet, FileJson, Package
+  X, Cloud, CloudOff, LayoutDashboard, Info, Settings, BookOpen, Fuel, Wallet, FileJson, Package, FileText
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
-import { AutoUpdater } from "./auto-updater";
 import { ThemeToggle } from "./theme-toggle";
 
 const navItems = [
@@ -36,6 +35,8 @@ const navItems = [
   { href: "/employees", label: "Employees", icon: UserCircle },
   { href: "/credit/other", label: "Other Credit", icon: CircleDollarSign },
   { href: "/tally", label: "Tally Export", icon: FileJson },
+  { href: "/user-logs", label: "User Logs", icon: FileText },
+  { href: "/fleet", label: "Fleet Maintenance", icon: Truck },
   { href: "/about", label: "About & Backup", icon: Info },
   { href: "/settings", label: "Settings", icon: Settings },
 ];
@@ -68,34 +69,33 @@ export function AppShell({ children }: { children: React.ReactNode }) {
   const pathname = usePathname();
   const [sidebarOpen, setSidebarOpen] = useState(false);
   const [features, setFeatures] = useState<any>({ enableWeighbridge: false });
+  const [dynamicNavItems, setDynamicNavItems] = useState([...navItems]);
 
   useEffect(() => {
     // Fetch global settings to determine feature flags
     import("@/app/actions/settings").then(({ getGlobalSettings }) => {
       getGlobalSettings().then((settings) => {
         setFeatures(settings);
+        const filtered = navItems.filter((item) => {
+          if (item.href === "/fleet" && !settings.enableFleetMaintenance) return false;
+          return true;
+        });
+        
+        if (settings.enableWeighbridge) {
+          import("lucide-react").then(({ Scale }) => {
+            const insertIndex = filtered.findIndex(i => i.href === "/daybook") + 1;
+            filtered.splice(insertIndex, 0, { href: "/weighbridge", label: "Weighbridge", icon: Scale as any });
+            setDynamicNavItems(filtered);
+          });
+        } else {
+          setDynamicNavItems(filtered);
+        }
       });
     });
   }, []);
 
-  const visibleNavItems = navItems.filter((item) => {
-    if (item.href === "/weighbridge" && !features.enableWeighbridge) return false;
-    return true;
-  });
-
-  // Inject Weighbridge dynamically based on feature flag
-  const dynamicNavItems = [...navItems];
-  if (features.enableWeighbridge && !dynamicNavItems.find(i => i.href === "/weighbridge")) {
-    // Insert it after Day Book
-    const insertIndex = dynamicNavItems.findIndex(i => i.href === "/daybook") + 1;
-    import("lucide-react").then(({ Scale }) => {
-      dynamicNavItems.splice(insertIndex, 0, { href: "/weighbridge", label: "Weighbridge", icon: Scale as any });
-    });
-  }
-
   return (
     <div className="min-h-screen bg-background text-foreground">
-      <AutoUpdater />
       {sidebarOpen ? (
         <div className="fixed inset-0 z-50 lg:hidden">
           <div className="fixed inset-0 bg-black/50" onClick={() => setSidebarOpen(false)} />

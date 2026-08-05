@@ -301,7 +301,13 @@ async function createWindow() {
       console.log(`Next.js is ready. Loading window.`);
       mainWindow.loadURL(url);
       
-      // Startup update check has been moved to app.on("ready") to prevent duplicates
+      // Now that the UI is loaded, check for updates
+      console.log("Checking for auto-updates...");
+      autoUpdater.autoDownload = false; // Prompt before download
+      autoUpdater.autoInstallOnAppQuit = true;
+      autoUpdater.checkForUpdates().catch(err => {
+        console.error("Auto-update check failed:", err);
+      });
       
     } catch (err) {
       console.error("Fatal error booting Next.js:", err);
@@ -449,6 +455,20 @@ if (!gotTheLock) {
         const documentsPath = app.getPath('documents');
         const backupDir = path.join(documentsPath, 'MBM-Backups');
 
+        // Check Critical Runtime Files
+        const criticalFiles = [
+          path.join(__dirname, "preload.js"),
+          path.join(process.resourcesPath, "standalone", "server.js"),
+          path.join(process.resourcesPath, "standalone", "prisma", "local.db")
+        ];
+
+        for (const file of criticalFiles) {
+          if (!fs.existsSync(file)) {
+            dialog.showErrorBox("Corrupted Installation", `A critical application file is missing:\n${file}\n\nPlease reinstall MBM Quarry ERP.`);
+            app.exit(1);
+          }
+        }
+
         // Check if we can write to userData
         const testFile = path.join(userDataPath, '.healthcheck');
         fs.writeFileSync(testFile, 'ok');
@@ -474,22 +494,8 @@ if (!gotTheLock) {
 
     createWindow();
     
-    // Check for updates if packaged.
     // Event listeners for forwarding to the React UI are already registered
     // at module scope (lines 96-119). Do NOT add duplicate listeners here.
-    if (app.isPackaged) {
-      console.log("Checking for auto-updates...");
-      
-      autoUpdater.logger = log;
-      autoUpdater.autoDownload = false; // We prompt before download now for safety
-      autoUpdater.autoInstallOnAppQuit = true;
-
-      // Use checkForUpdates() — not checkForUpdatesAndNotify() — because
-      // the React UI handles all user-facing notifications via IPC events.
-      autoUpdater.checkForUpdates().catch(err => {
-        console.error("Auto-update check failed:", err);
-      });
-    }
   });
 
   // Global backup function

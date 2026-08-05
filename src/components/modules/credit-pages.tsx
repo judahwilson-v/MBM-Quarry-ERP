@@ -332,9 +332,9 @@ export function EmployeeCreditPage() {
 
   async function remove(id: string) {
     if (!(await confirmAction("Delete this employee credit?"))) return;
-    const password = await promptPassword("Enter delete password:");
-    if (!password || !(await verifyEditPassword(password))) {
-      setError("Delete password is invalid.");
+    const password = await promptPassword("Enter delete PIN:");
+    if (!password || !(await verifyEditPassword(password, "delete"))) {
+      setError("❌ Incorrect Delete PIN. Delete cancelled.");
       return;
     }
     setError("");
@@ -751,9 +751,9 @@ export function OtherCreditPage() {
 
   async function remove(id: string) {
     if (!(await confirmAction("Delete this other credit record?"))) return;
-    const password = await promptPassword("Enter delete password:");
-    if (!password || !(await verifyEditPassword(password))) {
-      setError("Delete password is invalid.");
+    const password = await promptPassword("Enter delete PIN:");
+    if (!password || !(await verifyEditPassword(password, "delete"))) {
+      setError("❌ Incorrect Delete PIN. Delete cancelled.");
       return;
     }
     setError("");

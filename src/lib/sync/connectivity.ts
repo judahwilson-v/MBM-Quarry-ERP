@@ -17,17 +17,17 @@ export async function checkOnlineStatus(): Promise<boolean> {
     const controller = new AbortController();
     timeout = setTimeout(() => controller.abort(), 3000);
 
-    const response = await fetch(`${supabaseUrl}/rest/v1/`, {
-      method: "HEAD",
+    const response = await fetch(`${supabaseUrl}/rest/v1/global_settings?select=id&limit=1`, {
+      method: "GET",
       signal: controller.signal,
       headers: {
         apikey: process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY || "",
+        Authorization: `Bearer ${process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY || ""}`,
       },
       cache: "no-store",
     });
 
-    // Any non-5xx response means the desktop app can reach Supabase.
-    return response.status < 500;
+    return response.ok;
   } catch {
     return false;
   } finally {

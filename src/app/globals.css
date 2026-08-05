@@ -4,7 +4,7 @@
 
 @layer base {
   :root,
-  [data-theme="dark"] {
+  .dark {
     --bg-base: #151821;
     --bg-surface: #0B0D13;
     --bg-card: #0B0D13;
@@ -35,7 +35,7 @@
     --foreground: 210 40% 98%;
   }
 
-  [data-theme="light"] {
+  .light {
     --bg-base: #FFFFFF;
     --bg-surface: #F8FAFC;
     --bg-card: #F8FAFC;
@@ -84,6 +84,16 @@
     -moz-appearance: textfield; /* Firefox */
     appearance: textfield;
   }
+
+  /* Fix WebKit autofill in dark mode (prevents white background on white text) */
+  input:-webkit-autofill,
+  input:-webkit-autofill:hover, 
+  input:-webkit-autofill:focus, 
+  input:-webkit-autofill:active {
+      -webkit-box-shadow: 0 0 0 30px var(--bg-base) inset !important;
+      -webkit-text-fill-color: var(--text-primary) !important;
+      transition: background-color 5000s ease-in-out 0s;
+  }
 }
 
 @layer components {
@@ -96,21 +106,21 @@
 }
 
 /* Scrollbar styles for dark mode */
-[data-theme="dark"] ::-webkit-scrollbar {
+.dark ::-webkit-scrollbar {
   width: 6px;
   height: 6px;
 }
 
-[data-theme="dark"] ::-webkit-scrollbar-track {
+.dark ::-webkit-scrollbar-track {
   background: var(--bg-base);
 }
 
-[data-theme="dark"] ::-webkit-scrollbar-thumb {
+.dark ::-webkit-scrollbar-thumb {
   background: var(--accent);
   border-radius: 4px;
 }
 
-[data-theme="dark"] ::-webkit-scrollbar-thumb:hover {
+.dark ::-webkit-scrollbar-thumb:hover {
   background: var(--accent-hover);
 }
 

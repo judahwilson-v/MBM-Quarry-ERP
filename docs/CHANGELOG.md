@@ -1,5 +1,12 @@
 # MBM Quarry ERP — Changelog
 
+## v1.11.2 — Auto-Updater Fixes & Sync Resilience (2026-08-05)
+- **Auto-Updater**: Fixed race condition where update checks fired before the UI was loaded. Removed conflicting updater components. The UI now reliably prompts users to download updates.
+- **Sync Fixes**: Replaced the publishable key with the correct JWT anon key in the environment to fix 401 Unauthorized errors.
+- **Sync Resilience**: Added robust foreign-key dependency ordering to the sync engine (parents push before children), and added skip-and-retry logic for isolated FK violations to prevent blocking the queue.
+- **User Interface**: Redesigned the DayBook "Current User" field to an elegant user badge.
+- **User Logs**: Added a full User Logs / Audit Logs viewer page with date and entity filters.
+
 ## v1.11.0 — Major Feature Update (2026-08-04)
 - **Phase 10 (Print/Export)**: Implemented Print & Export modules for reports and ledgers.
 - **Phase 9 (Owner Dashboard)**: MBM Quarry Dashboard completed with live data integration.
