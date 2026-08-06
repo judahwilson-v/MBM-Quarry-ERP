@@ -79,9 +79,13 @@ export function ExpensesPage() {
     }
     setError("");
     try {
-      await deleteExpense(id);
-      if (editingExpense?.id === id) setEditingExpense(null);
-      await loadExpenses();
+      const res = await deleteExpense(id);
+      if (res.success) {
+        if (editingExpense?.id === id) setEditingExpense(null);
+        await loadExpenses();
+      } else {
+        setError(res.error || "Delete failed.");
+      }
     } catch (err) {
       setError(err instanceof Error ? err.message : "Delete failed.");
     }

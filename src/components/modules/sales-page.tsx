@@ -114,9 +114,13 @@ export function SalesPage() {
     }
     setError("");
     try {
-      await deleteSale(id, password);
-      if (editingSale?.id === id) setEditingSale(null);
-      await loadSales();
+      const res = await deleteSale(id, password);
+      if (res.success) {
+        if (editingSale?.id === id) setEditingSale(null);
+        await loadSales();
+      } else {
+        setError(res.error || "Delete failed.");
+      }
     } catch (err) {
       setError(err instanceof Error ? err.message : "Delete failed.");
     }

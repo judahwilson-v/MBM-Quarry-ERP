@@ -275,7 +275,7 @@ export function SalesEntryForm({
           throw new Error("Edit password is invalid.");
         }
       }
-      await saveSale({
+      const res = await saveSale({
         id: form.id,
         saleDate: form.saleDate,
         vehicleNumber: form.vehicleNumber,
@@ -294,9 +294,13 @@ export function SalesEntryForm({
         bookNumber: form.bookNumber,
         pageNumber: form.pageNumber,
       });
-      setMessage(form.id ? "Sale updated." : "Sale saved.");
-      setForm(blankSale());
-      onSaved?.();
+      if (res.success) {
+        setMessage(form.id ? "Sale updated." : "Sale saved.");
+        setForm(blankSale());
+        onSaved?.();
+      } else {
+        setError(res.error || "Failed to save sale.");
+      }
     } catch (err) {
       setError(err instanceof Error ? err.message : "Could not save sale.");
     } finally {

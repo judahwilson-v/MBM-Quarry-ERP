@@ -142,10 +142,14 @@ export function ExpenseEntryForm({
     setMessage("");
     setLoading(true);
     try {
-      await saveExpense(form);
-      setMessage(editingExpense ? "Expense updated successfully." : "Expense saved successfully.");
-      setForm(blankForm());
-      onSaved();
+      const res = await saveExpense(form);
+      if (res.success) {
+        setMessage(editingExpense ? "Expense updated successfully." : "Expense saved successfully.");
+        setForm(blankForm());
+        onSaved();
+      } else {
+        setError(res.error || "Failed to save expense.");
+      }
     } catch (err) {
       setError(err instanceof Error ? err.message : "Failed to save expense.");
     } finally {

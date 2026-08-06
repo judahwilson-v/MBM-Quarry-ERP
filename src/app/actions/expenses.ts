@@ -41,7 +41,7 @@ export async function saveExpense(input: any) {
     const validated = validateWithSchema(ExpenseInputSchema, input);
     const amount = validated.amount;
     
-    return serialize(await runTx(async (tx: Prisma.TransactionClient) => {
+    return { success: true, data: serialize(await runTx(async (tx: Prisma.TransactionClient) => {
       let partyId = validated.partyId;
       let partyName = validated.partyName;
       if (partyName) {
@@ -161,9 +161,9 @@ export async function saveExpense(input: any) {
 
       await writeAuditEvent(tx, { entityName: "Expense", entityId: row.id, action: "create", role: "system", before: null, after: row });
       return row;
-    }));
+    })) };
   } catch (error) {
-    throw new Error(sanitizeError(error));
+    return { success: false, error: sanitizeError(error) };
   }
 }
 
@@ -174,7 +174,7 @@ export async function deleteExpense(id: string, pin?: string) {
     if (!pin || !(await verifyEditPassword(pin, "delete"))) {
       throw new Error("Invalid delete PIN");
     }
-    return serialize(await runTx(async (tx: Prisma.TransactionClient) => {
+    return { success: true, data: serialize(await runTx(async (tx: Prisma.TransactionClient) => {
       const row = await tx.expense.findUnique({ where: { id } });
       if (!row) throw new Error("Expense not found");
 
@@ -193,9 +193,9 @@ export async function deleteExpense(id: string, pin?: string) {
 
       await writeAuditEvent(tx, { entityName: "Expense", entityId: id, action: "delete", role: "system", before: row, after: null });
       return row;
-    }));
+    })) };
   } catch (error) {
-    throw new Error(sanitizeError(error));
+    return { success: false, error: sanitizeError(error) };
   }
 }
 

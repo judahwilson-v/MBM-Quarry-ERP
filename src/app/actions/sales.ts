@@ -164,7 +164,7 @@ export async function saveSale(input: SaleInput, pin?: string) {
     const vehicle = await upsertVehicleByNumber(normalizedVehicleNumber, validated.partyName ?? "", partyId, parsedQty);
     if (vehicle && !partyId) partyId = vehicle.partyId;
 
-    return serialize(
+    return { success: true, data: serialize(
       await runTx(async (tx) => {
         const existing = validated.id ? await tx.outgoingSale.findUnique({ where: { id: validated.id } }) : null;
         const engine = deriveSalesEngine(
@@ -333,9 +333,9 @@ export async function saveSale(input: SaleInput, pin?: string) {
 
         return sale;
       }),
-    );
+    ) };
   } catch (error) {
-    throw new Error(sanitizeError(error));
+    return { success: false, error: sanitizeError(error) };
   }
 }
 
@@ -378,8 +378,9 @@ export async function deleteSale(id: string, pin?: string) {
         await recalculateDayBook(tx, dayBook);
       }
     });
+    return { success: true };
   } catch (error) {
-    throw new Error(sanitizeError(error));
+    return { success: false, error: sanitizeError(error) };
   }
 }
 
