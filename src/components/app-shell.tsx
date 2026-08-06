@@ -220,6 +220,7 @@ function ShellSync() {
   }, []);
 
   const handleSync = async () => {
+    if (isSyncing) return;
     setIsSyncing(true);
     try {
       await triggerSync();
@@ -229,12 +230,56 @@ function ShellSync() {
       ]);
       setSyncStatus(newStatus);
       setIsOnline(online);
+      
+      // Force a re-fetch of server components (e.g., table lists) to instantly show pulled data
+      const { useRouter } = require("next/navigation");
+      // App router refresh is handled globally, but revalidatePath in triggerSync should handle it.
+      // We don't have useRouter in this hook scope, so we rely on triggerSync's revalidatePath
     } catch (e) {
       console.error(e);
     } finally {
       setIsSyncing(false);
     }
   };
+
+  useEffect(() => {
+    // Setup Supabase Realtime Listener for instant cross-PC syncing
+    let channel: any;
+    
+    import("@/lib/supabase/client").then(({ supabase }) => {
+      // In React Strict Mode, useEffect runs twice. To prevent "cannot add .on() after subscribe()" errors,
+      // we generate a unique channel name for each execution.
+      const uniqueChannelName = `schema-db-changes-${Math.random().toString(36).substring(7)}`;
+      
+      // We listen to the audit_logs table to detect any writes from other PCs
+      channel = supabase.channel(uniqueChannelName)
+        .on(
+          'postgres_changes',
+          { event: 'INSERT', schema: 'public', table: 'audit_logs' },
+          (payload) => {
+             console.log('[Realtime] Detected remote change, triggering pull sync...', payload);
+             handleSync();
+          }
+        )
+        // Also listen to direct projection tables in case they didn't produce audit logs
+        .on(
+          'postgres_changes',
+          { event: 'INSERT', schema: 'public', table: 'outgoing_sales' },
+          () => handleSync()
+        )
+        .subscribe((status) => {
+          console.log('[Realtime] Status:', status);
+        });
+    });
+
+    return () => {
+      if (channel) {
+        import("@/lib/supabase/client").then(({ supabase }) => {
+          supabase.removeChannel(channel);
+        });
+      }
+    };
+  }, []);
 
   const getRelativeTime = (dateString?: string) => {
     if (!dateString) return "Never";
