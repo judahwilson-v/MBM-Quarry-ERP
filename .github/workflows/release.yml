@@ -27,6 +27,11 @@ jobs:
       - name: Generate Prisma Client
         run: npx prisma generate
         
+      - name: Create GitHub Release
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: gh release create ${{ github.ref_name }} --title "Release ${{ github.ref_name }}" --generate-notes
+        
       - name: Build and Publish Electron App
         run: npm run electron:publish
         env:
