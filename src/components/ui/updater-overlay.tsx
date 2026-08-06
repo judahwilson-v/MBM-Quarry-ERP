@@ -1,7 +1,7 @@
 "use client";
 
 import React, { useEffect, useState } from "react";
-import { Download, RefreshCcw, X, CheckCircle2, AlertCircle, ArrowDownToLine, Zap } from "lucide-react";
+import { Download, RefreshCcw, X, CheckCircle2, AlertCircle, ArrowDownToLine, Zap, Minus, Maximize2 } from "lucide-react";
 
 type UpdaterStatus = "idle" | "checking" | "available" | "downloading" | "ready" | "error";
 
@@ -19,6 +19,7 @@ export function UpdaterOverlay() {
   const [stats, setStats] = useState<DownloadStats | null>(null);
   const [errorMsg, setErrorMsg] = useState<string>("");
   const [visible, setVisible] = useState(false);
+  const [isMinimized, setIsMinimized] = useState(false);
 
   // Format bytes to human readable
   const formatBytes = (bytes: number, decimals = 2) => {
@@ -54,6 +55,7 @@ export function UpdaterOverlay() {
           setReleaseNotes(notes || "Enhancements, performance improvements, and bug fixes.");
           
           setVisible(true);
+          setIsMinimized(false);
           break;
         case "not-available":
           if (status === "checking") {
@@ -81,6 +83,7 @@ export function UpdaterOverlay() {
           setStatus("error");
           setErrorMsg(data.error || "Unknown error occurred while updating.");
           setVisible(true);
+          setIsMinimized(false);
           break;
       }
     });
@@ -108,12 +111,60 @@ export function UpdaterOverlay() {
 
   const handleDismiss = () => {
     setVisible(false);
+    setIsMinimized(false);
     if (status === "error" || status === "available") {
       setStatus("idle");
     }
   };
 
   if (!visible || status === "idle") return null;
+
+  if (isMinimized && (status === "downloading" || status === "ready")) {
+    return (
+      <div className="fixed top-4 right-4 z-[9999] w-72 bg-[var(--bg-surface)] border border-[var(--border-light)] rounded-xl shadow-lg p-3 animate-in slide-in-from-top-2 duration-300">
+        <div className="flex items-center justify-between mb-2">
+          <div className="flex items-center gap-2">
+            {status === "downloading" ? (
+              <ArrowDownToLine className="w-4 h-4 text-blue-600 dark:text-blue-400 animate-bounce" />
+            ) : (
+              <CheckCircle2 className="w-4 h-4 text-green-600 dark:text-green-400" />
+            )}
+            <span className="text-sm font-semibold text-[var(--text-primary)]">
+              {status === "downloading" ? "Downloading Update..." : "Update Ready"}
+            </span>
+          </div>
+          <button 
+            onClick={() => setIsMinimized(false)}
+            className="text-[var(--text-secondary)] hover:text-[var(--text-primary)] p-1 rounded-md hover:bg-[var(--bg-muted)] transition-colors"
+          >
+            <Maximize2 className="w-4 h-4" />
+          </button>
+        </div>
+        
+        {status === "downloading" ? (
+          <div className="space-y-1">
+            <div className="w-full bg-[var(--bg-muted)] rounded-full h-1.5 overflow-hidden">
+              <div 
+                className="bg-blue-600 h-full rounded-full transition-all duration-300"
+                style={{ width: `${progress}%` }}
+              />
+            </div>
+            <div className="flex justify-between text-[10px] text-[var(--text-secondary)]">
+              <span>{Math.round(progress)}%</span>
+              <span>{stats?.speed || ""}</span>
+            </div>
+          </div>
+        ) : (
+          <button 
+            onClick={handleInstall}
+            className="w-full mt-2 text-xs bg-blue-600 hover:bg-blue-700 text-white font-medium py-1.5 rounded-lg transition-colors"
+          >
+            Restart to Install
+          </button>
+        )}
+      </div>
+    );
+  }
 
   // We use a centered modal for a "professional software update" feel
   return (
@@ -130,6 +181,16 @@ export function UpdaterOverlay() {
               className="absolute top-4 right-4 text-[var(--text-secondary)] hover:bg-[var(--bg-muted)] p-1.5 rounded-full transition-colors"
             >
               <X className="w-5 h-5" />
+            </button>
+          )}
+
+          {(status === "downloading" || status === "ready") && (
+            <button 
+              onClick={() => setIsMinimized(true)} 
+              className="absolute top-4 right-4 text-[var(--text-secondary)] hover:bg-[var(--bg-muted)] p-1.5 rounded-full transition-colors"
+              title="Minimize to background"
+            >
+              <Minus className="w-5 h-5" />
             </button>
           )}
 

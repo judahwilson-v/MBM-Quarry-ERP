@@ -1,5 +1,12 @@
 # MBM Quarry ERP — Changelog
 
+## v1.12.0 — Phase 14 Sync Reliability & Updater Fixes (2026-08-06)
+- **Supabase Realtime Sync**: Configured the App Shell to listen to `schema-db-changes` via Supabase Realtime websocket channels. Changes committed on PC-A are now instantly pushed to PC-B and trigger a UI refresh without manual intervention.
+- **Duplicate Entry Warning**: Added a duplicate pre-check for Book Number and Page Number collisions on Sales and Boulder purchases forms. Shows a confirmation warning prompt to the user before submitting to prevent accidental double-entry across multiple PCs.
+- **Conflict Resolution**: Upgraded `sync-service.ts` to automatically resolve Book Number collisions from the cloud by honoring the record with the most recent `updatedAt` timestamp.
+- **Updater UI Minimize**: Added a "Minimize" button to the full-screen auto-updater overlay. Users can now minimize the 150MB download progress to a small floating widget in the top right, allowing them to continue using the ERP while the update downloads in the background.
+- **Delta Patches (Blockmap) Fix**: Removed the conflicting `portable` Windows target from `package.json`, ensuring `electron-builder` correctly generates and uploads `.blockmap` files to GitHub. This enables the app to download tiny 2-5MB delta patches for future updates instead of redownloading the entire 150MB file.
+
 ## v1.11.6 — Phase 13 Remediation (2026-08-06)
 - **Input Validation**: Implemented Zod validation schemas (`SaleInputSchema`, `ExpenseInputSchema`, etc.) in `src/lib/validators/schemas.ts` and deployed them across all 5 primary Server Actions (`sales.ts`, `purchases.ts`, `expenses.ts`, `credits.ts`, `weighbridge.ts`).
 - **UI Accessibility**: Added missing `aria-label`, `htmlFor`, and `id` bindings to 55+ form input, textarea, and checkbox controls across transaction and settings forms (KB-009).

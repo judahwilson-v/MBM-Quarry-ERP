@@ -16,6 +16,10 @@ Before cutting a release, you MUST:
 
 > **Failure to do this means users won't know what changed, and future AI agents will lack context.**
 
+### Critical Rule for Auto-Updates (Blockmaps)
+Do **NOT** add the `portable` target to the Windows build configuration in `package.json`. 
+Building both an NSIS installer and a Portable app simultaneously causes `electron-builder` to silently fail to upload the `.exe.blockmap` file to GitHub Releases. 
+Without the `.blockmap` file on GitHub, clients cannot calculate "Delta Patches" and are forced to download the entire 150MB `.exe` for every minor update. Ensure `target` is set **only** to `nsis`.
 ### 2. Run the Release Script
 Ensure your terminal is authenticated with GitHub (if required, though the script uses your local Git credentials).
 Run one of the following commands depending on the size of the update:
