@@ -89,7 +89,7 @@ ipcMain.handle('install-update', async (event, version) => {
   if (typeof performDatabaseBackup === 'function') {
     await performDatabaseBackup(`pre-update-${version || 'manual'}`);
   }
-  autoUpdater.quitAndInstall(false, true);
+  autoUpdater.quitAndInstall(true, true);
 });
 
 // AutoUpdater Event Forwarding
