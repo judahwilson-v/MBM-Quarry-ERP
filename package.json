@@ -141,7 +141,8 @@
       {
         "provider": "github",
         "owner": "judahwilson-v",
-        "repo": "MBM-Quarry-ERP"
+        "repo": "MBM-Quarry-ERP",
+        "releaseType": "release"
       }
     ]
   }
