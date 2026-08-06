@@ -35,11 +35,27 @@ export type SyncModelName = keyof typeof SYNC_MODEL_CONFIG;
 export const REMOTE_CONFLICT_COLUMNS: Partial<Record<SyncModelName, string>> = {
   LedgerEntry: "financial_event_id",
   InventoryStock: "material_name",
+  FinancialEvent: "event_id",
+  DayBook: "business_date",
+  DayBookExpenseEntry: "source_event_id",
+  PartyCollection: "source_event_id",
+  PartyPayment: "source_event_id",
+  Expense: "source_event_id",
+  FuelPurchase: "source_event_id",
+  VehicleStats: "vehicle_id",
 };
 
 export const LOCAL_CONFLICT_FIELDS: Partial<Record<SyncModelName, string>> = {
   LedgerEntry: "financialEventId",
   InventoryStock: "materialName",
+  FinancialEvent: "eventId",
+  DayBook: "businessDate",
+  DayBookExpenseEntry: "sourceEventId",
+  PartyCollection: "sourceEventId",
+  PartyPayment: "sourceEventId",
+  Expense: "sourceEventId",
+  FuelPurchase: "sourceEventId",
+  VehicleStats: "vehicleId",
 };
 
 const AUDIT_ENTITY_ALIASES: Record<string, SyncModelName> = {

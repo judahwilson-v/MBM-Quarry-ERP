@@ -126,22 +126,32 @@ export async function pushSync() {
           const entityData = extractEntityData(JSON.parse(log.payload));
           const snakeData = toSnakeCase(entityData);
           console.log(`[Sync Push] Upserting ${config.table}:${String(snakeData.id ?? log.entityId)}`);
-          const { error } = await supabase.from(config.table).upsert(snakeData);
+          // Use the correct onConflict column if this model has a unique key beyond 'id'
+          const conflictColumn = REMOTE_CONFLICT_COLUMNS[modelName!];
+          const { error } = await supabase.from(config.table).upsert(snakeData, conflictColumn ? { onConflict: conflictColumn } : undefined);
           if (error) {
             if (error.code === '23503' || error.message?.includes('foreign key')) {
               console.warn(`[Sync Push] Skipping ${config.table}:${log.entityId} (FK dep missing, will retry)`);
               continue;
             }
             if (error.code === '23505') {
-              console.warn(`[Sync Push] Unique constraint violation on ${config.table}:${log.entityId}. Appending merge suffix and retrying.`);
+              console.warn(`[Sync Push] Unique constraint violation on ${config.table}:${log.entityId}. Resolving...`);
               if (config.table === 'parties' && snakeData.party_name) {
                 snakeData.party_name = `${snakeData.party_name} (Merge ${log.entityId.slice(-4)})`;
               } else if (config.table === 'vehicles' && snakeData.vehicle_number) {
                 snakeData.vehicle_number = `${snakeData.vehicle_number} (Merge ${log.entityId.slice(-4)})`;
+              } else if (config.table === 'suppliers' && snakeData.supplier_name) {
+                snakeData.supplier_name = `${snakeData.supplier_name} (Merge ${log.entityId.slice(-4)})`;
+              } else if (config.table === 'employees' && snakeData.name) {
+                snakeData.name = `${snakeData.name} (Merge ${log.entityId.slice(-4)})`;
+              } else if (config.table === 'materials' && snakeData.material_name) {
+                snakeData.material_name = `${snakeData.material_name} (Merge ${log.entityId.slice(-4)})`;
+              } else if (config.table === 'weighbridge_tickets' && snakeData.ticket_number) {
+                snakeData.ticket_number = `${snakeData.ticket_number}-${log.entityId.slice(-4)}`;
               } else if (config.table === 'outgoing_sales' && snakeData.serial_number) {
                 snakeData.serial_number = null; // Drop conflicting auto-number
               }
-              const { error: retryError } = await supabase.from(config.table).upsert(snakeData);
+              const { error: retryError } = await supabase.from(config.table).upsert(snakeData, conflictColumn ? { onConflict: conflictColumn } : undefined);
               if (retryError) {
                  throw new Error(`[Sync Push] Upsert retry failed for ${config.table}:${log.entityId}: ${retryError.message}`);
               }
@@ -283,12 +293,64 @@ export async function pullSync() {
            } catch(error: any) {
              const errMsg = error?.message || '';
              if (error?.code === 'P2002' || errMsg.includes('Unique constraint')) {
-               console.warn(`[Sync Pull] Unique constraint violation on ${config.table}:${camelRow.id}. Appending merge suffix and retrying.`);
-               if (config.table === 'parties' && camelRow.partyName) {
-                 camelRow.partyName = `${camelRow.partyName} (Merge ${camelRow.id.slice(-4)})`;
-               } else if (config.table === 'vehicles' && camelRow.vehicleNumber) {
-                 camelRow.vehicleNumber = `${camelRow.vehicleNumber} (Merge ${camelRow.id.slice(-4)})`;
+               console.warn(`[Sync Pull] Unique constraint violation on ${config.table}:${camelRow.id}. Resolving...`);
+
+               // Materials: same name = same entity. Update the existing local record.
+               if (config.table === 'materials' && camelRow.materialName) {
+                 try {
+                   const existing = await delegate.findUnique({ where: { materialName: camelRow.materialName } });
+                   if (existing && existing.id !== camelRow.id) {
+                     await delegate.update({
+                       where: { id: existing.id },
+                       data: { ratePerCft: camelRow.ratePerCft, updatedAt: camelRow.updatedAt }
+                     });
+                     console.log(`[Sync Pull] Material "${camelRow.materialName}" merged into existing local record ${existing.id}`);
+                     successCount++;
+                     const rowDate = getRowTimestamp(camelRow, config.timeField);
+                     if (rowDate > lastProcessedTime) lastProcessedTime = rowDate;
+                     continue;
+                   }
+                 } catch (matErr: any) {
+                   console.warn(`[Sync Pull] Material merge fallback failed: ${matErr?.message}`);
+                 }
                }
+
+               // Sales & Boulders: duplicate serial/book number — latest timestamp wins
+                if ((config.table === 'outgoing_sales' && camelRow.serialNumber != null) || (config.table === 'incoming_boulder' && camelRow.bookNumber != null)) {
+                 try {
+                   const searchField = config.table === 'outgoing_sales' ? { serialNumber: camelRow.serialNumber } : { bookNumber: camelRow.bookNumber };
+                   const existing = await delegate.findFirst({ where: searchField });
+                   if (existing) {
+                     const incomingTime = new Date(camelRow.updatedAt).getTime();
+                     const localTime = new Date(existing.updatedAt).getTime();
+                     if (incomingTime >= localTime) {
+                       await delegate.update({ where: { id: existing.id }, data: { ...camelRow, id: existing.id } });
+                       console.warn(`[Sync Pull] Duplicate record in ${config.table} — remote is newer, updated local record.`);
+                     } else {
+                       console.warn(`[Sync Pull] Duplicate record in ${config.table} — local is newer, skipping remote.`);
+                     }
+                     successCount++;
+                     const rowDate = getRowTimestamp(camelRow, config.timeField);
+                     if (rowDate > lastProcessedTime) lastProcessedTime = rowDate;
+                     continue;
+                   }
+                 } catch (dupErr: any) {
+                   console.warn(`[Sync Pull] Duplicate resolution failed for ${config.table}: ${dupErr?.message}`);
+                 }
+               }
+
+                // Name-based entities: append merge suffix
+                if (config.table === 'parties' && camelRow.partyName) {
+                  camelRow.partyName = `${camelRow.partyName} (Merge ${camelRow.id.slice(-4)})`;
+                } else if (config.table === 'vehicles' && camelRow.vehicleNumber) {
+                  camelRow.vehicleNumber = `${camelRow.vehicleNumber} (Merge ${camelRow.id.slice(-4)})`;
+                } else if (config.table === 'suppliers' && camelRow.supplierName) {
+                  camelRow.supplierName = `${camelRow.supplierName} (Merge ${camelRow.id.slice(-4)})`;
+                } else if (config.table === 'employees' && camelRow.name) {
+                  camelRow.name = `${camelRow.name} (Merge ${camelRow.id.slice(-4)})`;
+                } else if (config.table === 'weighbridge_tickets' && camelRow.ticketNumber) {
+                  camelRow.ticketNumber = `${camelRow.ticketNumber}-${camelRow.id.slice(-4)}`;
+                }
                try {
                  await delegate.upsert({
                    where: { [conflictField]: camelRow[conflictField] },
