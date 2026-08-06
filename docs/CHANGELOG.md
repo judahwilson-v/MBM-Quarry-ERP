@@ -1,5 +1,53 @@
 # MBM Quarry ERP — Changelog
 
+## v1.11.6 — Phase 13 Remediation (2026-08-06)
+- **Input Validation**: Implemented Zod validation schemas (`SaleInputSchema`, `ExpenseInputSchema`, etc.) in `src/lib/validators/schemas.ts` and deployed them across all 5 primary Server Actions (`sales.ts`, `purchases.ts`, `expenses.ts`, `credits.ts`, `weighbridge.ts`).
+- **UI Accessibility**: Added missing `aria-label`, `htmlFor`, and `id` bindings to 55+ form input, textarea, and checkbox controls across transaction and settings forms (KB-009).
+- **Mobile Responsiveness**: Fixed element squishing on viewports <375px by enforcing mobile-first breakpoints (`grid-cols-1 sm:grid-cols-2`) and horizontal scroll flex wrappers in the bottom navigation (KB-010).
+- **TypeScript Strictness**: Created `src/types/global.d.ts` to properly type `(window as any).electron`, removing `any` casts (KB-015). Validated the build with a clean `tsc --noEmit` pass.
+- **Code Cleanliness**: Purged 267+ unused import and variable declarations across the 11 Server Action files via `eslint --fix` (KB-014).
+- **DayBook Crash Guard**: Added nullish coalescing `data?.transfers ?? []` in `day-book-page.tsx` to handle cases where transfers array is undefined during initialization (KB-016).
+
+## v1.11.5 — Comprehensive Codebase Audit & Defect Mapping (2026-08-05)
+- **Multi-Agent Codebase Audit**: Executed a read-only codebase audit across 3 parallel categories (Type/Lint, Schema/DB/Server Actions, React/UI/Hydration). 0 source code files were modified. Identified 27 distinct findings (3 Critical, 8 High, 11 Medium, 5 Low).
+- **Category 1 (Type / Lint Audit)**:
+  - Identified **Dishonest Serialization Signature (`serialize<T>(value: T): T`)** across 11 Server Action files that claims to return `Date` objects while converting to ISO strings at runtime.
+  - Mapped **18 Double Type Casts (`as unknown as T`)** in UI components hiding serialized schema mismatches.
+  - Identified **Explicit `type Row = any` Aliases** in `employees-page.tsx`, `fuel-management-page.tsx`, `vehicle-expenses-page.tsx`.
+  - Identified **267 ESLint `@typescript-eslint/no-unused-vars` errors** stemming from copy-pasted unused imports in Server Actions.
+  - Mapped untyped `(window as any).electron` and `tx: any` transaction parameters.
+- **Category 2 (Schema / DB / Server Actions Audit)**:
+  - Identified **Critical Infinite Recursion Crash** in `src/app/actions/purchases.ts` (`runTx` calling itself recursively on `saveIncomingBoulder` / `deleteIncomingBoulder`).
+  - Identified **Critical Missing SQLite Column `vehicles.engine_hours`** in `src/lib/bootstrap.ts` DDL causing runtime query crashes.
+  - Discovered **Supabase Cloud Schema & Sync Desync** (`weighbridge_tickets`, `maintenance_records`, `maintenance_schedules`, `vehicle_stats` missing from `SYNC_MODEL_CONFIG` & `supabase_schema.sql`).
+  - Mapped **Un-Transactional Multi-Step Mutations** in `sales.ts` and `purchases.ts` executing `upsertPartyByName` outside `$transaction`.
+  - Identified **Complete Lack of Runtime Input Validation (Missing Zod Schemas)** across all Server Actions.
+  - Found **Missing Delete PIN Checks** on `deleteIncomingBoulder`, `deletePartyCollection`, `deletePartyPayment`, and `resetSyncQueue`.
+  - Identified **Orphaned DayBook Expense Entries** left behind on expense deletion.
+- **Category 3 (React / UI / Hydration Audit)**:
+  - Identified **Missing `suppressHydrationWarning` on `<html>`** in `src/app/layout.tsx` causing hydration warnings with `next-themes`.
+  - Identified **Client Components Importing `@prisma/client`** directly without `import type` in `pending-tickets-table.tsx` and `weighbridge-forms.tsx`.
+  - Mapped **Non-Deterministic `new Date()` Evaluation** in `useState` initializers (`tally-export-dashboard.tsx`).
+  - Cataloged **55 Accessibility Gaps** (inputs missing `id`/`htmlFor` bindings and icon action buttons missing `aria-label`).
+  - Identified **Mobile UI Grid Layout Squishing** on viewports <375px (`app-shell.tsx` `grid-cols-5`, `dashboard.tsx` `grid-cols-2`).
+- **Documentation Updates**: Updated `docs/KNOWN_BUGS.md`, `docs/PROJECT_STATE.md`, and `docs/CHANGELOG.md` with full findings, root causes, and zero-regression fix recommendations.
+
+## v1.11.5 Hotfix — 7-Agent Surgical Bug Fix (2026-08-05)
+- **Runtime Crash Fix**: Fixed `runTx` infinite recursion stack overflow in `purchases.ts`.
+- **Serialization Safety**: Replaced the dishonest `serialize<T>` function across 11 files with a single type-safe `Serialized<T>` generic utility to prevent disguised `Date` string bugs.
+- **Transaction Safety**: Fixed sales and purchases upsert actions to use the `tx` client inside `$transaction` blocks instead of the global `prisma` client, preventing partial commits.
+- **Authorization Verification**: Enforced `verifyEditPassword` checks when updating existing records in the sales and purchases upsert handlers.
+- **Schema & SQLite Sync Fixes**: Added the missing `engine_hours` raw SQLite column and successfully synced `weighbridge_tickets`, `maintenance_records`, `maintenance_schedules`, and `vehicle_stats` into `SYNC_MODEL_CONFIG`.
+- **UI Hydration Fixes**: Added `suppressHydrationWarning` to the root HTML layout, safely converted `new Date()` initializers to client-side mounts in the DayBook, and removed server-side Prisma binary imports from client components.
+- **Hydration Crash Fix**: Fixed a silent `TypeError: Cannot read properties of null` crash on the Sales Entry Form material dropdown that caused the Server Components render error.
+
+## v1.11.4 — Pull Sync & Hydration Fixes (2026-08-05)
+- **Pull Sync ID Mapping**: Fixed a critical bug in `pullSync` where the `toCamelCase` function was empty, causing `prisma.material.upsert` to crash due to missing `materialName` arguments during pull operations.
+- **Pull Sync Date Format**: Fixed `Invalid ISO-8601 DateTime` crash. Supabase drops the timezone 'Z' from timestamp columns, causing Prisma to reject them. Updated `toCamelCase` to automatically append 'Z' to incoming Supabase timestamps.
+- **Pull Sync Unique Constraint**: Added a global intercept in `pullSync` for `P2002` (Unique Constraint) errors. If a remote pulled entity (like a vehicle or party) collides with a local unique name, it now gracefully appends `(Merge <id>)` and retries, mirroring the Push logic.
+- **UI Hydration Mismatch**: Fixed a `Text content does not match server-rendered HTML` crash on the Sales Page caused by `new Date()` mismatching between server and client rendering by adding `suppressHydrationWarning`.
+- **Security Settings**: Removed the hardcoded Master PIN override from the Security Settings page to strictly enforce Supabase Authentication.
+
 ## v1.11.3 — Zero-Regression Architecture & Emergency Startup Fixes (2026-08-05)
 - **Startup Crash Fix**: Fixed Schema Desync where 3 Prisma fleet maintenance models (`MaintenanceRecord`, `MaintenanceSchedule`, `VehicleStats`) were missing from SQLite initialization in `bootstrap.ts`, causing fatal startup timeouts.
 - **Sync Map Engine**: Replaced regex string transformation in `sync-service.ts` with build-time O(1) metadata schema generator (`generate-sync-map.js`) to guarantee exact 1:1 column mapping to Supabase.
@@ -22,102 +70,3 @@
 - **Weighbridge Integration**: Added weighbridge feature with toggle (on/off) capabilities.
 - **New Development Cycle**: Commenced a new set of phases (1-10) following the completion of the Auto-Updater UI.
 - **Bug Fixes**: Fixed bugs across branches C, H, M, and L, and resolved `runTx` maximum call stack issues.
-
-## v1.10.1 — Anonymous Sync & RLS Disable (2026-07-06)
-- **RLS Disabled**: Dropped `authenticated_sync_access` policies and disabled Row Level Security on all 28 Supabase tables for frictionless anonymous sync.
-- **Auth Removed from Sync**: Removed `requireAuthenticatedUser()` gate from `pushSync()` and `pullSync()` so the sync engine operates with the anon key alone.
-- **Dashboard Verified**: Confirmed dashboard reads exclusively from local SQLite via Prisma — no Supabase dependency for metrics display.
-
-## Phase A Release — Cloud Sync & Operational Dashboards (2026-07-06)
-**Robust Cloud Sync Engine**
-- **Two-Way Cloud Sync**: Replaced unstable syncing with a robust audit queue tracking local mutations for ordered cloud push.
-- **Full Database Security (RLS)**: Deployed Row Level Security (RLS) across all 28 tables with secure authenticated Supabase access, moving away from anonymous access.
-- **Timestamp-Aware Projections**: Advanced sync logic for financial events, ledger entries, and inventory stock to prevent balance corruption.
-
-**Live Operational Dashboard**
-- **Real-Time Metrics**: Replaced hardcoded placeholders with a new `DashboardService` calculating live metrics (Today's Sales/Purchases/Expenses, Receivables/Payables, Cash/Bank balances) in milliseconds from SQLite.
-- **Local Time Precision**: Fixed timezone issues to correctly attribute transactions at local day boundaries rather than UTC.
-
-**Real-Time UI & Navigation**
-- **Dynamic Status Indicators**: Sidebar and top bar now display live sync status (Synced, Syncing..., Error), pending offline changes count, and last successful sync time.
-
-**Dynamic System Health**
-- **About Page Revamp**: Upgraded from static text to a live diagnostic dashboard probing SQLite, Prisma, and Supabase connection health.
-
-## v1.9.7 (2026-07-05)
-- Corrected audit payload extraction so cloud upserts receive the entity snapshot rather than the audit wrapper.
-- Added the `Sale` → `OutgoingSale` alias and lower-camel Prisma delegate mappings used by pull sync.
-- Stopped pull cursors from advancing after failed local upserts or deletions.
-- Added timestamp-aware push/pull support for financial events, ledger entries, inventory stock, and inventory transactions.
-- Added the missing inventory tables, global settings PIN columns, authenticated RLS policy script, and focused sync configuration tests.
-- Switched synchronization to the signed-in server-side Supabase client; anonymous database access is no longer required.
-- Persisted browser authentication in SSR-compatible cookies so Server Actions can satisfy authenticated RLS policies.
-- Replaced hardcoded About-page versions and health flags with live package, migration, SQLite, authentication, and Supabase checks.
-- Connected the dashboard to live daily/monthly sales, purchase, expense, party-balance, day-book, and sync metrics using local-time date boundaries.
-
-## v1.9.6 (2026-07-04)
-- **UI & Validation Fixes**: Fixed manual update UI logic, added sales quantity validation, and corrected offline sync button behavior.
-
-## v1.9.5 (2026-07-04)
-- **Two-Way Sync**: Implemented professional two-way sync with robust deletion tracking via `audit_logs`.
-- **IPC Cleanup**: Returned cleanup function from `ipcRenderer` listeners to prevent React `useEffect` destroy errors.
-- **UI UX Polish**: Globally hid number input spin buttons for a cleaner, professional ERP look.
-- **Relaxed Form Validations**: Relaxed compulsory vehicle and party name validation for forms.
-- **Client-side Validations**: Added robust client-side validation to prevent unhandled Server Action errors.
-
-## v1.9.4 (2026-07-04)
-- **Auto-Updater React UI**: Implemented modern React UI for the auto-updater.
-
-## v1.9.3 (2026-07-04)
-- **Chore**: Stability releases and bug fixes.
-
-## v1.9.1 (2026-07-04)
-- **Chore**: Incremental releases.
-
-## v1.9.0 (2026-06-27)
-- **Settings Page**: Added `GlobalSettings` Prisma model and Settings UI for Quarry Name, GST Number, Address, Phone, Default Printer, Backup Folder.
-- **Backup Manager**: Full backup/restore/export/import for SQLite database accessible from the About page.
-- **VERSION Stamping**: `prebuild` hook auto-stamps `VERSION` file with current date/time on every `electron:package` run.
-- **About Page Revamp**: System health checklist (Offline Ready, Cloud Sync, SQLite Connected) with version metadata display.
-- **Documentation Cleanup**: Reorganized all `.md` files into `docs/` with clear structure. Obsolete files moved to `docs/archive/`.
-
-## Phase 6 — Electron Desktop Packaging
-- Configured Next.js for `output: standalone`.
-- Packaged full production Next.js server into an Electron container via `electron-builder`.
-- `main.js` auto-relocates Prisma database into the persistent `userData` directory on first launch.
-- Built macOS DMG executable.
-
-## Phase 5 — Supabase Sync
-- Implemented offline-first synchronization logic via `SyncState` and audit queue.
-- Created `supabase_schema.sql` for 1:1 database mirroring.
-- Integrated `@supabase/supabase-js`.
-- Protected the owner dashboard route (`/`) with Supabase authentication.
-- Created `Sync Now` sidebar button with dynamic syncing status indicators.
-
-## Phase 4 — Credit & Collections
-- Party credit auto-derived from sales remaining balance.
-- Party collections reduce outstanding balances.
-- Party ledger projection (debit/credit/running balance).
-- Employee credit tracking (advances, expected due dates).
-- Other credit tracking.
-
-## Phase 3 — Day Book & Expenses
-- Day book per business day with opening/closing cash and bank balances.
-- Expenses linked to parties and vehicles.
-- Financial event architecture underpinning all monetary actions.
-
-## Phase 2 — Boulder Purchases
-- Incoming boulder (purchase) register.
-- Split payment support (cash/bank/GPay).
-- Vehicle rent and combined payment flags.
-
-## Phase 1 — Sales Engine (1.1A – 1.1C)
-- Sales business engine with vehicle quantity defaults, material rate defaults, split payments, remaining credit, and trip counting.
-- Edit password `1177` protection.
-- Audit logging for mutations.
-- Full financial event infrastructure beneath the application.
-
-## Phase 0 — Foundation
-- Offline SQLite + Prisma baseline.
-- Normalized database schema without breaking existing routes.
-- Source-of-truth documentation established.

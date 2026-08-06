@@ -1,7 +1,7 @@
 import { getGlobalSettings } from "@/app/actions/settings";
 import { getPendingTickets } from "@/app/actions/weighbridge";
 import { redirect } from "next/navigation";
-import { Scale, Truck } from "lucide-react";
+import { Scale } from "lucide-react";
 import { PendingTicketsTable } from "./pending-tickets-table";
 import { NewTicketDialog } from "./weighbridge-forms";
 

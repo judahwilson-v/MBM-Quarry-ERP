@@ -10,8 +10,24 @@ import { listVehicles } from "@/app/actions/vehicles";
 import { listExpenses } from "@/app/actions/expenses";
 import { formatCurrency } from "@/lib/utils";
 
-type VehicleRow = any;
-type ExpenseRow = any;
+interface VehicleRow {
+  id: string;
+  vehicleNumber: string;
+  partyName?: string | null;
+  partyId?: string | null;
+}
+
+interface ExpenseRow {
+  id: string;
+  expenseDate: string | Date;
+  expenseType: string;
+  amount: number;
+  paymentMode?: string | null;
+  description?: string | null;
+  vehicleId?: string | null;
+  vehicleNumber?: string | null;
+  createdAt?: string | Date;
+}
 
 export function VehicleExpensesPage() {
   const [vehicles, setVehicles] = useState<VehicleRow[]>([]);
@@ -25,7 +41,7 @@ export function VehicleExpensesPage() {
     try {
       const [v, e] = await Promise.all([listVehicles(), listExpenses()]);
       setVehicles(v);
-      setExpenses(e.filter((exp: any) => exp.vehicleId));
+      setExpenses(e.filter((exp: ExpenseRow) => exp.vehicleId));
     } catch (err) {
       console.error(err);
     }

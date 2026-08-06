@@ -27,11 +27,12 @@ type PartyCreditEntry = {
   saleId: string;
   amount: number;
   status: string;
-  createdAt: string;
+  createdAt: string | Date;
+  updatedAt?: string | Date;
   sale?: {
     bookNumber: number | null;
     pageNumber: number | null;
-    saleDate: string;
+    saleDate: string | Date;
     vehicleNumber: string;
     materialName: string;
     qty: number;
@@ -43,9 +44,10 @@ type EmployeeCreditRow = {
   employeeName: string;
   amount: number;
   reason?: string | null;
-  expectedDueDate?: string | null;
+  expectedDueDate?: string | Date | null;
   status: string;
-  createdAt: string;
+  createdAt: string | Date;
+  updatedAt?: string | Date;
 };
 
 type OtherCreditRow = {
@@ -53,9 +55,10 @@ type OtherCreditRow = {
   name: string;
   amount: number;
   reason?: string | null;
-  expectedDueDate?: string | null;
+  expectedDueDate?: string | Date | null;
   status: string;
-  createdAt: string;
+  createdAt: string | Date;
+  updatedAt?: string | Date;
 };
 
 type PartyCollectionSummary = {
@@ -68,13 +71,14 @@ type PartyCollectionSummary = {
 type PartyCollectionRow = {
   id: string;
   partyName: string;
-  collectionDate: string;
+  collectionDate: string | Date;
   cashPaid: number;
   bankPaid: number;
   gPayPaid: number;
   totalAmount: number;
   remarks?: string | null;
-  createdAt: string;
+  createdAt: string | Date;
+  updatedAt?: string | Date;
 };
 
 function blankEmployeeForm() {
@@ -99,7 +103,7 @@ function blankOtherForm() {
   };
 }
 
-function dateInput(value?: string | null) {
+function dateInput(value?: string | Date | null) {
   if (!value) return "";
   const date = new Date(value);
   const offset = date.getTimezoneOffset() * 60000;
@@ -116,7 +120,7 @@ export function PartyCreditPage() {
 
   const loadSummary = useCallback(async () => {
     try {
-      setSummary((await listPartyCreditSummary()) as unknown as PartySummary[]);
+      setSummary((await listPartyCreditSummary()) as PartySummary[]);
     } catch (err) {
       setError(err instanceof Error ? err.message : "Failed to load party credit.");
     }
@@ -124,7 +128,7 @@ export function PartyCreditPage() {
 
   const loadEntries = useCallback(async (partyName: string) => {
     setSelectedParty(partyName);
-    setEntries((await listPartyCreditEntries(partyName)) as unknown as PartyCreditEntry[]);
+    setEntries((await listPartyCreditEntries(partyName)) as PartyCreditEntry[]);
   }, []);
 
   useEffect(() => {
@@ -189,7 +193,7 @@ export function PartyCreditPage() {
           <div className="flex w-full sm:w-auto gap-2 items-center">
             <div className="relative w-full sm:w-64">
               <Search className="pointer-events-none absolute left-3 top-3 h-4 w-4 text-muted-foreground" />
-              <Input className="pl-9" placeholder="Search party..." value={search} onChange={(event) => setSearch(event.target.value)} />
+              <Input id="partyCreditSearch" aria-label="Search party credit" className="pl-9" placeholder="Search party..." value={search} onChange={(event) => setSearch(event.target.value)} />
             </div>
             <Button variant="outline" size="sm" onClick={handleExportExcel} className="text-xs gap-1.5">
               <Download className="h-3.5 w-3.5" />
@@ -287,7 +291,7 @@ export function EmployeeCreditPage() {
   
 
   const load = useCallback(async () => {
-    setRows((await listEmployeeCredits(search)) as unknown as EmployeeCreditRow[]);
+    setRows((await listEmployeeCredits(search)) as EmployeeCreditRow[]);
   }, [search]);
 
   useEffect(() => {
@@ -416,7 +420,7 @@ export function EmployeeCreditPage() {
         <CardContent className="grid gap-4 pt-5 print:p-0">
           <div className="relative print:hidden">
             <Search className="pointer-events-none absolute left-3 top-3 h-4 w-4 text-muted-foreground" />
-            <Input className="pl-9" placeholder="Search employee credit..." value={search} onChange={(event) => setSearch(event.target.value)} />
+            <Input id="empCreditSearch" aria-label="Search employee credit" className="pl-9" placeholder="Search employee credit..." value={search} onChange={(event) => setSearch(event.target.value)} />
           </div>
 
           {showForm ? (
@@ -428,11 +432,12 @@ export function EmployeeCreditPage() {
                 </Button>
               </div>
               <div className="grid gap-3 md:grid-cols-2 xl:grid-cols-4">
-                <Field label="Employee Name">
-                  <Input value={form.employeeName} onChange={(event) => setForm((current) => ({ ...current, employeeName: event.target.value }))} />
+                <Field label="Employee Name" htmlFor="employeeName">
+                  <Input id="employeeName" value={form.employeeName} onChange={(event) => setForm((current) => ({ ...current, employeeName: event.target.value }))} />
                 </Field>
-                <Field label="Amount">
+                <Field label="Amount" htmlFor="empAmount">
                   <Input
+                    id="empAmount"
                     className="text-right tabular-nums"
                     type="number"
                     step="0.01"
@@ -440,15 +445,18 @@ export function EmployeeCreditPage() {
                     onChange={(event) => setForm((current) => ({ ...current, amount: event.target.value }))}
                   />
                 </Field>
-                <Field label="Expected Due Date">
+                <Field label="Expected Due Date" htmlFor="empExpectedDueDate">
                   <Input
+                    id="empExpectedDueDate"
                     type="date"
                     value={form.expectedDueDate}
                     onChange={(event) => setForm((current) => ({ ...current, expectedDueDate: event.target.value }))}
                   />
                 </Field>
-                <Field label="Status">
+                <Field label="Status" htmlFor="empStatus">
                   <select
+                    id="empStatus"
+                    aria-label="Status"
                     className="h-10 rounded-md border bg-background px-3 text-sm"
                     value={form.status}
                     onChange={(event) => setForm((current) => ({ ...current, status: event.target.value }))}
@@ -458,8 +466,8 @@ export function EmployeeCreditPage() {
                     <option value="cancelled">Cancelled</option>
                   </select>
                 </Field>
-                <Field label="Reason" className="md:col-span-2 xl:col-span-4">
-                  <Textarea value={form.reason} onChange={(event) => setForm((current) => ({ ...current, reason: event.target.value }))} />
+                <Field label="Reason" className="md:col-span-2 xl:col-span-4" htmlFor="empReason">
+                  <Textarea id="empReason" value={form.reason} onChange={(event) => setForm((current) => ({ ...current, reason: event.target.value }))} />
                 </Field>
               </div>
               <div className="mt-4">
@@ -545,15 +553,15 @@ export function PartyCollectionPage() {
 
   const loadSummary = useCallback(async () => {
     try {
-      setSummary((await listPartyCollectionSummary()) as unknown as PartyCollectionSummary[]);
+      setSummary((await listPartyCollectionSummary()) as PartyCollectionSummary[]);
     } catch (err) {
-      setError(err instanceof Error ? err.message : "Failed to load collections.");
+      setError(err instanceof Error ? err.message : "Failed to load collection summary.");
     }
   }, []);
 
   const loadHistory = useCallback(async (partyName: string) => {
     setSelectedParty(partyName);
-    setHistory((await listPartyCollectionHistory(partyName)) as unknown as PartyCollectionRow[]);
+    setHistory((await listPartyCollectionHistory(partyName)) as PartyCollectionRow[]);
     setForm((current) => ({ ...current, partyName }));
   }, []);
 
@@ -595,7 +603,7 @@ export function PartyCollectionPage() {
           <CardTitle>Party Outstanding</CardTitle>
           <div className="relative w-full sm:w-80">
             <Search className="pointer-events-none absolute left-3 top-3 h-4 w-4 text-muted-foreground" />
-            <Input className="pl-9" placeholder="Search party..." value={search} onChange={(event) => setSearch(event.target.value)} />
+            <Input id="partyCollectionSearch" aria-label="Search party collection" className="pl-9" placeholder="Search party..." value={search} onChange={(event) => setSearch(event.target.value)} />
           </div>
         </CardHeader>
         <CardContent>
@@ -633,23 +641,23 @@ export function PartyCollectionPage() {
           <CardTitle>Record Collection</CardTitle>
         </CardHeader>
         <CardContent className="grid gap-4 md:grid-cols-2">
-          <Field label="Party Name">
-            <Input value={form.partyName} onChange={(event) => setForm({ ...form, partyName: event.target.value })} />
+          <Field label="Party Name" htmlFor="collectionPartyName">
+            <Input id="collectionPartyName" value={form.partyName} onChange={(event) => setForm({ ...form, partyName: event.target.value })} />
           </Field>
-          <Field label="Collection Date">
-            <Input type="date" value={form.collectionDate} onChange={(event) => setForm({ ...form, collectionDate: event.target.value })} />
+          <Field label="Collection Date" htmlFor="collectionDate">
+            <Input id="collectionDate" type="date" value={form.collectionDate} onChange={(event) => setForm({ ...form, collectionDate: event.target.value })} />
           </Field>
-          <Field label="Cash">
-            <Input value={form.cashPaid} onChange={(event) => setForm({ ...form, cashPaid: event.target.value })} />
+          <Field label="Cash" htmlFor="collectionCashPaid">
+            <Input id="collectionCashPaid" value={form.cashPaid} onChange={(event) => setForm({ ...form, cashPaid: event.target.value })} />
           </Field>
-          <Field label="Bank">
-            <Input value={form.bankPaid} onChange={(event) => setForm({ ...form, bankPaid: event.target.value })} />
+          <Field label="Bank" htmlFor="collectionBankPaid">
+            <Input id="collectionBankPaid" value={form.bankPaid} onChange={(event) => setForm({ ...form, bankPaid: event.target.value })} />
           </Field>
-          <Field label="GPay">
-            <Input value={form.gPayPaid} onChange={(event) => setForm({ ...form, gPayPaid: event.target.value })} />
+          <Field label="GPay" htmlFor="collectionGPayPaid">
+            <Input id="collectionGPayPaid" value={form.gPayPaid} onChange={(event) => setForm({ ...form, gPayPaid: event.target.value })} />
           </Field>
-          <Field label="Remarks" className="md:col-span-2">
-            <Textarea value={form.remarks} onChange={(event) => setForm({ ...form, remarks: event.target.value })} />
+          <Field label="Remarks" className="md:col-span-2" htmlFor="collectionRemarks">
+            <Textarea id="collectionRemarks" value={form.remarks} onChange={(event) => setForm({ ...form, remarks: event.target.value })} />
           </Field>
           <div className="md:col-span-2">
             <Button onClick={() => void submit()}>
@@ -706,7 +714,7 @@ export function OtherCreditPage() {
   
 
   const load = useCallback(async () => {
-    setRows((await listOtherCredits(search)) as unknown as OtherCreditRow[]);
+    setRows((await listOtherCredits(search)) as OtherCreditRow[]);
   }, [search]);
 
   useEffect(() => {
@@ -835,7 +843,7 @@ export function OtherCreditPage() {
         <CardContent className="grid gap-4 pt-5 print:p-0">
           <div className="relative print:hidden">
             <Search className="pointer-events-none absolute left-3 top-3 h-4 w-4 text-muted-foreground" />
-            <Input className="pl-9" placeholder="Search other credit..." value={search} onChange={(event) => setSearch(event.target.value)} />
+            <Input id="otherCreditSearch" aria-label="Search other credit" className="pl-9" placeholder="Search other credit..." value={search} onChange={(event) => setSearch(event.target.value)} />
           </div>
 
           {showForm ? (
@@ -847,11 +855,12 @@ export function OtherCreditPage() {
                 </Button>
               </div>
               <div className="grid gap-3 md:grid-cols-2 xl:grid-cols-4">
-                <Field label="Name">
-                  <Input value={form.name} onChange={(event) => setForm((current) => ({ ...current, name: event.target.value }))} />
+                <Field label="Name" htmlFor="otherCreditName">
+                  <Input id="otherCreditName" value={form.name} onChange={(event) => setForm((current) => ({ ...current, name: event.target.value }))} />
                 </Field>
-                <Field label="Amount">
+                <Field label="Amount" htmlFor="otherCreditAmount">
                   <Input
+                    id="otherCreditAmount"
                     className="text-right tabular-nums"
                     type="number"
                     step="0.01"
@@ -859,15 +868,18 @@ export function OtherCreditPage() {
                     onChange={(event) => setForm((current) => ({ ...current, amount: event.target.value }))}
                   />
                 </Field>
-                <Field label="Expected Due Date">
+                <Field label="Expected Due Date" htmlFor="otherCreditDueDate">
                   <Input
+                    id="otherCreditDueDate"
                     type="date"
                     value={form.expectedDueDate}
                     onChange={(event) => setForm((current) => ({ ...current, expectedDueDate: event.target.value }))}
                   />
                 </Field>
-                <Field label="Status">
+                <Field label="Status" htmlFor="otherCreditStatus">
                   <select
+                    id="otherCreditStatus"
+                    aria-label="Status"
                     className="h-10 rounded-md border bg-background px-3 text-sm"
                     value={form.status}
                     onChange={(event) => setForm((current) => ({ ...current, status: event.target.value }))}
@@ -877,8 +889,8 @@ export function OtherCreditPage() {
                     <option value="cancelled">Cancelled</option>
                   </select>
                 </Field>
-                <Field label="Reason" className="md:col-span-2 xl:col-span-4">
-                  <Textarea value={form.reason} onChange={(event) => setForm((current) => ({ ...current, reason: event.target.value }))} />
+                <Field label="Reason" className="md:col-span-2 xl:col-span-4" htmlFor="otherCreditReason">
+                  <Textarea id="otherCreditReason" value={form.reason} onChange={(event) => setForm((current) => ({ ...current, reason: event.target.value }))} />
                 </Field>
               </div>
               <div className="mt-4">

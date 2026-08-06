@@ -2,67 +2,32 @@
 
 
 
+import { Prisma } from "@prisma/client";
 import { getDb } from "@/lib/prisma";
 import { triggerAutoSync } from "@/lib/sync/auto-sync";
-import { deriveSalesEngine, type SalesDraft } from "@/lib/sales-engine";
-import { calculateRemainingCredit, decrementVehicleTrips, incrementVehicleTrips, writeAuditEvent } from "@/lib/domain";
+import { writeAuditEvent } from "@/lib/domain";
 import { emitFinancialEvent } from "@/lib/domain/financial-events";
-import { addDayBookExpense, rebuildDayBook, setDayBookOpeningBalances, projectDayBookExpense, recalculateDayBook, getOrCreateDayBook } from "@/lib/domain/daybook";
 import { recalculatePartyLedger } from "@/lib/domain/ledger/party-ledger-service";
-import { txAdjustInventoryStock } from "@/lib/domain/inventory/service";
 import { verifyEditPassword } from "@/app/actions/auth";
+import {
+  validateWithSchema,
+  PartyCollectionInputSchema,
+  PartyPaymentInputSchema,
+  DeletePartyCollectionSchema,
+  DeletePartyPaymentSchema,
+  OtherCreditInputSchema,
+  DeleteOtherCreditSchema,
+} from "@/lib/validators/schemas";
+import { sanitizeError } from "@/lib/utils/sanitize-error";
 
-type VehicleInput = {
-  id?: string;
-  vehicleNumber: string;
-  partyName?: string | null;
-  companyBodyQty?: string | number | null;
-  extraBodyQty?: string | number | null;
-};
-
-type PartyInput = {
-  id?: string;
-  partyName: string;
-  phone?: string | null;
-  address?: string | null;
-};
-
-type SaleInput = SalesDraft & {
-  id?: string;
-  vehicleId?: string;
-};
-
-type IncomingBoulderInput = {
-  id?: string;
-  date: string;
-  bookNumber?: string;
-  pageNumber?: string;
-  vehicleNumber: string;
-  partyName: string;
-  qty: string | number;
-  rockRate?: string | number | null;
-  cashPaid?: string | number | null;
-  bankPaid?: string | number | null;
-  gPayPaid?: string | number | null;
-  vehicleRent?: string | number | null;
-  combinedPayment?: boolean | null;
-  time?: string | null;
-  remarks?: string | null;
-};
-
-type EmployeeCreditInput = {
-  id?: string;
-  employeeName: string;
-  amount: string | number;
-  reason?: string | null;
-  expectedDueDate?: string | null;
-  status: string;
-};
+function roundMoney(value: number) {
+  return Math.round((value + Number.EPSILON) * 100) / 100;
+}
 
 const dateTimeKeys = new Set(["createdAt", "updatedAt", "saleDate", "date", "expectedDueDate"]);
 
 function serialize<T>(value: T): T {
-  if (value instanceof Date) return value.toISOString() as T;
+  if (value instanceof Date) { try { return value.toISOString() as T; } catch { return null as unknown as T; } }
   if (Array.isArray(value)) return value.map((item) => serialize(item)) as T;
   if (value && typeof value === "object") {
     return Object.fromEntries(
@@ -75,104 +40,15 @@ function serialize<T>(value: T): T {
   return value;
 }
 
-function normalizeVehicleNumber(value: string) {
-  return value.trim().replace(/\s+/g, " ").toUpperCase();
-}
-
-function roundMoney(value: number) {
-  return Math.round((value + Number.EPSILON) * 100) / 100;
-}
-
-function cleanText(value?: string | null) {
-  const text = value?.trim() ?? "";
-  return text || null;
-}
-
-function requiredText(value: string | null | undefined, label: string) {
-  const text = value?.trim();
-  if (!text) throw new Error(`${label} is required.`);
-  return text;
-}
-
-function parseNumber(value: string | number | null | undefined, label: string, required = true) {
-  if (value === null || value === undefined || value === "") {
-    if (required) throw new Error(`${label} is required.`);
-    return null;
-  }
-  const number = Number(value);
-  if (!Number.isFinite(number)) throw new Error(`${label} must be a valid number.`);
-  return number;
-}
-
-function parseDateInput(value?: string | null) {
-  if (!value) return new Date();
-  const date = new Date(`${value}T00:00:00`);
-  if (Number.isNaN(date.getTime())) throw new Error("Date is invalid.");
-  return date;
-}
-
-function dateOnly(value: Date | string) {
-  const date = value instanceof Date ? value : new Date(value);
-  const offset = date.getTimezoneOffset() * 60000;
-  return new Date(date.getTime() - offset).toISOString().slice(0, 10);
-}
-
 function containsSearch(row: Record<string, unknown>, search?: string) {
   const query = search?.trim().toLowerCase();
   if (!query) return true;
   return Object.values(row).some((value) => String(value ?? "").toLowerCase().includes(query));
 }
 
-async function upsertPartyByName(partyName: string) {
-  const db = await getDb();
-  const name = partyName.trim();
-  if (!name) return;
-  const existing = await db.party.findFirst({
-    where: { partyName: { equals: name } },
-    select: { id: true },
-  });
-  if (!existing) {
-    return await db.party.create({ data: { partyName: name } });
-  }
-  return existing;
-}
-
-async function upsertVehicleByNumber(vehicleNumber: string, partyName?: string, partyId?: string | null, qty?: number | null) {
-  const db = await getDb();
-  const normalized = normalizeVehicleNumber(vehicleNumber);
-  if (!normalized) return null;
-
-  let existing = await db.vehicle.findUnique({
-    where: { vehicleNumber: normalized },
-  });
-
-  if (!existing) {
-    existing = await db.vehicle.create({
-      data: {
-        vehicleNumber: normalized,
-        partyName: partyName || null,
-        partyId: partyId || null,
-        companyBodyQty: qty || null,
-      },
-    });
-  } else {
-    const updateData: any = {};
-    if (partyName && !existing.partyName) updateData.partyName = partyName;
-    if (partyId && !existing.partyId) updateData.partyId = partyId;
-    if (qty && !existing.companyBodyQty && !existing.extraBodyQty) updateData.companyBodyQty = qty;
-
-    if (Object.keys(updateData).length > 0) {
-      existing = await db.vehicle.update({
-        where: { id: existing.id },
-        data: updateData,
-      });
-    }
-  }
-  return existing;
-}
 
 
-async function runTx<T>(txFn: (tx: any) => Promise<T>): Promise<T> {
+async function runTx<T>(txFn: (tx: Prisma.TransactionClient) => Promise<T>): Promise<T> {
   const db = await getDb();
   try {
     return await db.$transaction(txFn);
@@ -236,63 +112,67 @@ export async function listPartyCollectionHistory(partyName: string) {
 
 
 export async function savePartyCollection(input: any) {
-  const db = await getDb();
-  const partyName = (input.partyName || "").trim();
-  const cashPaid = parseNumber(input.cashPaid ?? 0, "Cash paid", false) ?? 0;
-  const bankPaid = parseNumber(input.bankPaid ?? 0, "Bank paid", false) ?? 0;
-  const gPayPaid = parseNumber(input.gPayPaid ?? 0, "GPay paid", false) ?? 0;
-  const totalAmount = roundMoney(cashPaid + bankPaid + gPayPaid);
-  if (totalAmount <= 0) throw new Error("Collection amount must be greater than 0.");
-  const collectionDate = input.collectionDate ? new Date(input.collectionDate) : new Date();
+  try {
+    const validated = validateWithSchema(PartyCollectionInputSchema, input);
+    const partyName = validated.partyName.trim();
+    const cashPaid = validated.cashPaid ?? 0;
+    const bankPaid = validated.bankPaid ?? 0;
+    const gPayPaid = validated.gPayPaid ?? 0;
+    const totalAmount = roundMoney(cashPaid + bankPaid + gPayPaid);
+    if (totalAmount <= 0) throw new Error("Collection amount must be greater than 0.");
+    const collectionDate = validated.collectionDate ? new Date(validated.collectionDate) : new Date();
 
-  return serialize(
-    await runTx(async (tx: any) => {
-      const party = await tx.party.findFirst({ where: { partyName: { equals: partyName } } });
-      if (!party) throw new Error("Party not found.");
-      
-      const collection = await tx.partyCollection.create({
-        data: {
-          partyId: party.id,
-          partyName,
-          collectionDate,
-          cashPaid,
-          bankPaid,
-          gPayPaid,
-          totalAmount,
-          remarks: input.remarks,
-          sourceEventId: "temp-" + Date.now() + "-" + Math.random(),
-        }
-      });
-      
-      const financialEvent = await emitFinancialEvent(tx, {
-        correlationId: collection.id,
-        eventType: "PARTY_COLLECTION_CREATED",
-        entityType: "PartyCollection",
-        entityId: collection.id,
-        payload: {
-          partyId: party.id,
-          partyName,
-          collectionDate: collectionDate.toISOString(),
-          cashPaid,
-          bankPaid,
-          gPayPaid,
-          totalAmount,
-          remarks: input.remarks,
-        },
-      });
-      
-      await tx.partyCollection.update({
-        where: { id: collection.id },
-        data: { sourceEventId: financialEvent.eventId }
-      });
-      
-      await recalculatePartyLedger(tx, party.id);
-      return financialEvent;
-    }),
-  );
+    return serialize(
+      await runTx(async (tx: Prisma.TransactionClient) => {
+        const party = await tx.party.findFirst({ where: { partyName: { equals: partyName } } });
+        if (!party) throw new Error("Party not found.");
+        
+        const collection = await tx.partyCollection.create({
+          data: {
+            partyId: party.id,
+            partyName,
+            collectionDate,
+            cashPaid,
+            bankPaid,
+            gPayPaid,
+            totalAmount,
+            remarks: validated.remarks ?? null,
+            sourceEventId: "temp-" + Date.now() + "-" + Math.random(),
+          }
+        });
+        
+        const financialEvent = await emitFinancialEvent(tx, {
+          correlationId: collection.id,
+          eventType: "PARTY_COLLECTION_CREATED",
+          entityType: "PartyCollection",
+          entityId: collection.id,
+          payload: {
+            partyId: party.id,
+            partyName,
+            collectionDate: collectionDate.toISOString(),
+            cashPaid,
+            bankPaid,
+            gPayPaid,
+            totalAmount,
+            remarks: validated.remarks ?? null,
+          },
+        });
+        
+        await tx.partyCollection.update({
+          where: { id: collection.id },
+          data: { sourceEventId: financialEvent.eventId }
+        });
+        
+        await recalculatePartyLedger(tx, party.id);
+        return financialEvent;
+      }),
+    );
+  } catch (error) {
+    throw new Error(sanitizeError(error));
+  }
 }
 
-async function getPartyOutstandingBalance(tx: any, partyId: string) {
+async function getPartyOutstandingBalance(tx: Prisma.TransactionClient, partyId: string) {
   const ledger = await tx.partyLedger.findFirst({
     where: { partyId },
     orderBy: [{ date: "desc" }, { createdAt: "desc" }]
@@ -302,109 +182,154 @@ async function getPartyOutstandingBalance(tx: any, partyId: string) {
 
 
 export async function savePartyPayment(input: any) {
-  const db = await getDb();
-  const partyName = (input.partyName || "").trim();
-  const cashPaid = parseNumber(input.cashPaid ?? 0, "Cash paid", false) ?? 0;
-  const bankPaid = parseNumber(input.bankPaid ?? 0, "Bank paid", false) ?? 0;
-  const gPayPaid = parseNumber(input.gPayPaid ?? 0, "GPay paid", false) ?? 0;
-  const totalAmount = roundMoney(cashPaid + bankPaid + gPayPaid);
-  if (totalAmount <= 0) throw new Error("Payment amount must be greater than 0.");
-  const paymentDate = input.paymentDate ? new Date(input.paymentDate) : new Date();
+  try {
+    const validated = validateWithSchema(PartyPaymentInputSchema, input);
+    const partyName = validated.partyName.trim();
+    const cashPaid = validated.cashPaid ?? 0;
+    const bankPaid = validated.bankPaid ?? 0;
+    const gPayPaid = validated.gPayPaid ?? 0;
+    const totalAmount = roundMoney(cashPaid + bankPaid + gPayPaid);
+    if (totalAmount <= 0) throw new Error("Payment amount must be greater than 0.");
+    const paymentDate = validated.paymentDate ? new Date(validated.paymentDate) : new Date();
 
-  return serialize(
-    await runTx(async (tx: any) => {
-      const party = await tx.party.findFirst({ where: { partyName: { equals: partyName } } });
-      if (!party) throw new Error("Party not found.");
-      
-      const payment = await tx.partyPayment.create({
-        data: {
-          partyId: party.id,
-          partyName,
-          paymentDate,
-          cashPaid,
-          bankPaid,
-          gPayPaid,
-          totalAmount,
-          remarks: input.remarks,
-          sourceEventId: "temp-" + Date.now() + "-" + Math.random(),
-        }
-      });
-      
-      const financialEvent = await emitFinancialEvent(tx, {
-        correlationId: payment.id,
-        eventType: "PARTY_PAYMENT_CREATED",
-        entityType: "PartyPayment",
-        entityId: payment.id,
-        payload: {
-          partyId: party.id,
-          partyName,
-          paymentDate: paymentDate.toISOString(),
-          cashPaid,
-          bankPaid,
-          gPayPaid,
-          totalAmount,
-          remarks: input.remarks,
-        },
-      });
-      
-      await tx.partyPayment.update({
-        where: { id: payment.id },
-        data: { sourceEventId: financialEvent.eventId }
-      });
-      
-      await recalculatePartyLedger(tx, party.id);
-      return financialEvent;
-    }),
-  );
+    return serialize(
+      await runTx(async (tx: Prisma.TransactionClient) => {
+        const party = await tx.party.findFirst({ where: { partyName: { equals: partyName } } });
+        if (!party) throw new Error("Party not found.");
+        
+        const payment = await tx.partyPayment.create({
+          data: {
+            partyId: party.id,
+            partyName,
+            paymentDate,
+            cashPaid,
+            bankPaid,
+            gPayPaid,
+            totalAmount,
+            remarks: validated.remarks ?? null,
+            sourceEventId: "temp-" + Date.now() + "-" + Math.random(),
+          }
+        });
+        
+        const financialEvent = await emitFinancialEvent(tx, {
+          correlationId: payment.id,
+          eventType: "PARTY_PAYMENT_CREATED",
+          entityType: "PartyPayment",
+          entityId: payment.id,
+          payload: {
+            partyId: party.id,
+            partyName,
+            paymentDate: paymentDate.toISOString(),
+            cashPaid,
+            bankPaid,
+            gPayPaid,
+            totalAmount,
+            remarks: validated.remarks ?? null,
+          },
+        });
+        
+        await tx.partyPayment.update({
+          where: { id: payment.id },
+          data: { sourceEventId: financialEvent.eventId }
+        });
+        
+        await recalculatePartyLedger(tx, party.id);
+        return financialEvent;
+      }),
+    );
+  } catch (error) {
+    throw new Error(sanitizeError(error));
+  }
 }
 
 
-export async function deletePartyCollection(id: string) {
-  const db = await getDb();
-  await runTx(async (tx: any) => {
-    const collection = await tx.partyCollection.findUnique({ where: { id } });
-    if (!collection) return;
-    await tx.partyCollection.delete({ where: { id } });
-    
-    // Cascade delete events
-    await tx.financialEvent.deleteMany({ where: { entityId: id } });
-    
-    if (collection.partyId) await recalculatePartyLedger(tx, collection.partyId);
-  });
+export async function deletePartyCollection(id: string, pin?: string) {
+  try {
+    validateWithSchema(DeletePartyCollectionSchema, { id, pin });
+    if (!pin) {
+      throw new Error("Admin/Delete PIN is required to delete records.");
+    }
+    const isAuth = await verifyEditPassword(pin, "delete");
+    if (!isAuth) {
+      throw new Error("Invalid PIN");
+    }
+
+    await runTx(async (tx: Prisma.TransactionClient) => {
+      const collection = await tx.partyCollection.findUnique({ where: { id } });
+      if (!collection) return;
+      await tx.partyCollection.delete({ where: { id } });
+      
+      // Cascade delete events
+      await tx.financialEvent.deleteMany({ where: { entityId: id } });
+      
+      if (collection.partyId) await recalculatePartyLedger(tx, collection.partyId);
+    });
+  } catch (error) {
+    throw new Error(sanitizeError(error));
+  }
 }
 
 
-export async function deletePartyPayment(id: string) {
-  const db = await getDb();
-  await runTx(async (tx: any) => {
-    const payment = await tx.partyPayment.findUnique({ where: { id } });
-    if (!payment) return;
-    await tx.partyPayment.delete({ where: { id } });
-    
-    // Cascade delete events
-    await tx.financialEvent.deleteMany({ where: { entityId: id } });
-    
-    if (payment.partyId) await recalculatePartyLedger(tx, payment.partyId);
-  });
+export async function deletePartyPayment(id: string, pin?: string) {
+  try {
+    validateWithSchema(DeletePartyPaymentSchema, { id, pin });
+    if (!pin) {
+      throw new Error("Admin/Delete PIN is required to delete records.");
+    }
+    const isAuth = await verifyEditPassword(pin, "delete");
+    if (!isAuth) {
+      throw new Error("Invalid PIN");
+    }
+
+    await runTx(async (tx: Prisma.TransactionClient) => {
+      const payment = await tx.partyPayment.findUnique({ where: { id } });
+      if (!payment) return;
+      await tx.partyPayment.delete({ where: { id } });
+      
+      // Cascade delete events
+      await tx.financialEvent.deleteMany({ where: { entityId: id } });
+      
+      if (payment.partyId) await recalculatePartyLedger(tx, payment.partyId);
+    });
+  } catch (error) {
+    throw new Error(sanitizeError(error));
+  }
 }
 
 
 export async function listPartiesWithBalances() {
   const db = await getDb();
-  const parties = await db.party.findMany({ orderBy: { partyName: 'asc' } });
-  const result = [];
-  for (const p of parties) {
-    const ledger = await db.partyLedger.findFirst({
-      where: { partyId: p.id },
-      orderBy: [{ date: "desc" }, { createdAt: "desc" }]
-    });
-    result.push({
-      id: p.id,
-      partyName: p.partyName,
-      balance: ledger ? ledger.balance : 0,
-    });
+  
+  // Efficiently fetch the latest ledger balance for all parties in a single query
+  // using SQLite window function ROW_NUMBER()
+  const rawLedgers: any[] = await db.$queryRaw`
+    SELECT party_id, balance
+    FROM (
+      SELECT party_id, balance,
+             ROW_NUMBER() OVER (PARTITION BY party_id ORDER BY date DESC, created_at DESC) as rn
+      FROM party_ledger
+      WHERE party_id IS NOT NULL
+    )
+    WHERE rn = 1 AND balance != 0
+  `;
+  
+  const balanceMap = new Map<string, number>();
+  for (const row of rawLedgers) {
+    balanceMap.set(row.party_id, row.balance);
   }
-  return result.filter(p => p.balance !== 0);
+
+  const parties = await db.party.findMany({ 
+    where: { id: { in: Array.from(balanceMap.keys()) } },
+    orderBy: { partyName: 'asc' } 
+  });
+  
+  const result = parties.map(p => ({
+    id: p.id,
+    partyName: p.partyName,
+    balance: balanceMap.get(p.id) || 0,
+  }));
+  
+  return result;
 }
 
 
@@ -426,38 +351,46 @@ export async function listOtherCredits(search = "") {
 
 
 export async function saveOtherCredit(input: any) {
-  const db = await getDb();
-  const data = {
-    name: input.name,
-    amount: parseNumber(input.amount, "Amount") ?? 0,
-    reason: input.reason,
-    expectedDueDate: input.expectedDueDate ? new Date(input.expectedDueDate) : null,
-    status: (input.status || "pending").toLowerCase(),
-  };
-  if (data.amount <= 0) throw new Error("Amount must be greater than 0.");
-  if (input.id) {
-    return serialize(await runTx(async (tx: any) => {
-      const before = await tx.otherCredit.findUnique({ where: { id: input.id } });
-      const row = await tx.otherCredit.update({ where: { id: input.id }, data });
-      await writeAuditEvent(tx, { entityName: "OtherCredit", entityId: row.id, action: "update", role: "system", before, after: row });
+  try {
+    const validated = validateWithSchema(OtherCreditInputSchema, input);
+    const data = {
+      name: validated.name,
+      amount: validated.amount,
+      reason: validated.reason ?? null,
+      expectedDueDate: validated.expectedDueDate ? new Date(validated.expectedDueDate) : null,
+      status: (validated.status || "pending").toLowerCase(),
+    };
+    if (data.amount <= 0) throw new Error("Amount must be greater than 0.");
+    if (validated.id) {
+      return serialize(await runTx(async (tx: Prisma.TransactionClient) => {
+        const before = await tx.otherCredit.findUnique({ where: { id: validated.id! } });
+        const row = await tx.otherCredit.update({ where: { id: validated.id! }, data });
+        await writeAuditEvent(tx, { entityName: "OtherCredit", entityId: row.id, action: "update", role: "system", before, after: row });
+        return row;
+      }));
+    }
+    return serialize(await runTx(async (tx: Prisma.TransactionClient) => {
+      const row = await tx.otherCredit.create({ data });
+      await writeAuditEvent(tx, { entityName: "OtherCredit", entityId: row.id, action: "create", role: "system", after: row });
       return row;
     }));
+  } catch (error) {
+    throw new Error(sanitizeError(error));
   }
-  return serialize(await runTx(async (tx: any) => {
-    const row = await tx.otherCredit.create({ data });
-    await writeAuditEvent(tx, { entityName: "OtherCredit", entityId: row.id, action: "create", role: "system", after: row });
-    return row;
-  }));
 }
 
 
 export async function deleteOtherCredit(id: string) {
-  const db = await getDb();
-  await runTx(async (tx: any) => {
-    const before = await tx.otherCredit.findUnique({ where: { id } });
-    await tx.otherCredit.delete({ where: { id } });
-    if (before) await writeAuditEvent(tx, { entityName: "OtherCredit", entityId: id, action: "delete", role: "system", before });
-  });
+  try {
+    validateWithSchema(DeleteOtherCreditSchema, { id });
+    await runTx(async (tx: Prisma.TransactionClient) => {
+      const before = await tx.otherCredit.findUnique({ where: { id } });
+      await tx.otherCredit.delete({ where: { id } });
+      if (before) await writeAuditEvent(tx, { entityName: "OtherCredit", entityId: id, action: "delete", role: "system", before });
+    });
+  } catch (error) {
+    throw new Error(sanitizeError(error));
+  }
 }
 
 

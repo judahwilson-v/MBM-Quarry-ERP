@@ -1,7 +1,7 @@
 "use client";
 
 import React, { useEffect, useState } from "react";
-import { Download, RefreshCcw, X, CheckCircle2, AlertCircle, Loader2, ArrowDownToLine, Zap } from "lucide-react";
+import { Download, RefreshCcw, X, CheckCircle2, AlertCircle, ArrowDownToLine, Zap } from "lucide-react";
 
 type UpdaterStatus = "idle" | "checking" | "available" | "downloading" | "ready" | "error";
 
@@ -31,7 +31,7 @@ export function UpdaterOverlay() {
   };
 
   useEffect(() => {
-    const electron = (window as any).electron;
+    const electron = window.electron;
     if (!electron) return;
 
     const cleanup = electron.onUpdaterEvent((data: any) => {
@@ -89,7 +89,7 @@ export function UpdaterOverlay() {
   }, [status]);
 
   const handleDownload = async () => {
-    const electron = (window as any).electron;
+    const electron = window.electron;
     if (electron && electron.downloadUpdate) {
       setStatus("downloading");
       setProgress(0);
@@ -98,7 +98,7 @@ export function UpdaterOverlay() {
   };
 
   const handleInstall = async () => {
-    const electron = (window as any).electron;
+    const electron = window.electron;
     if (electron && electron.installUpdate) {
       // Show checking to prevent multiple clicks
       setStatus("checking"); 

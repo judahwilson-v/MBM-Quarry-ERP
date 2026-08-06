@@ -8,7 +8,7 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Field } from "@/components/ui/field";
 import { Input } from "@/components/ui/input";
 import { SearchableSelect } from "@/components/ui/searchable-select";
-import { Textarea } from "@/components/ui/textarea";
+
 import { listMaterials } from "@/app/actions/materials";
 import { listVehicles } from "@/app/actions/vehicles";
 import { saveSale, getLastBookPage } from "@/app/actions/sales";
@@ -122,9 +122,9 @@ export function SalesEntryForm({
   const loadMasters = useCallback(async () => {
     try {
       const [vehicleRows, materialRows] = await Promise.all([listVehicles(), listMaterials()]);
-      setVehicles(vehicleRows as unknown as VehicleRow[]);
-      setMaterials((materialRows as unknown as MaterialRow[]).filter(
-        (row) => !HIDDEN_MATERIALS.has(row.materialName)
+      setVehicles(vehicleRows as VehicleRow[]);
+      setMaterials((materialRows as MaterialRow[]).filter(
+        (row) => row && !HIDDEN_MATERIALS.has(row?.materialName ?? "")
       ));
     } catch (err) {
       setError(err instanceof Error ? err.message : "Failed to load materials/vehicles.");
@@ -140,7 +140,7 @@ export function SalesEntryForm({
       setForm(blankSale());
       return;
     }
-    const matchedMaterial = materials.find((material) => material.materialName === editingSale.materialName);
+    const matchedMaterial = materials.find((material) => material?.materialName === editingSale?.materialName);
     const matchedVehicle = vehicles.find((vehicle) => vehicle.vehicleNumber === editingSale.vehicleNumber);
     setForm({
       id: editingSale.id,
@@ -293,11 +293,12 @@ export function SalesEntryForm({
       <CardContent className="grid gap-4">
         <div className="grid gap-4 grid-cols-1 md:grid-cols-2 xl:grid-cols-4 items-start">
           {/* Row 1: Document & Vehicle Info */}
-          <Field label="Date">
-            <Input type="date" value={form.saleDate} onChange={(e) => updateForm("saleDate", e.target.value)} />
+          <Field label="Date" htmlFor="saleDate">
+            <Input id="saleDate" type="date" value={form.saleDate} onChange={(e) => updateForm("saleDate", e.target.value)} />
           </Field>
-          <Field label="Book #">
+          <Field label="Book #" htmlFor="bookNumber">
             <Input
+              id="bookNumber"
               className="text-right tabular-nums"
               type="number"
               min="1"
@@ -307,8 +308,9 @@ export function SalesEntryForm({
               placeholder="1"
             />
           </Field>
-          <Field label="Page # (1–50)">
+          <Field label="Page # (1–50)" htmlFor="pageNumber">
             <Input
+              id="pageNumber"
               className="text-right tabular-nums"
               type="number"
               min="1"
@@ -319,8 +321,10 @@ export function SalesEntryForm({
               placeholder="1"
             />
           </Field>
-          <Field label="Vehicle Number">
+          <Field label="Vehicle Number" htmlFor="saleVehicleNumber">
             <SearchableSelect
+              id="saleVehicleNumber"
+              aria-label="Vehicle Number"
               value={form.vehicleId}
               customValue={form.vehicleNumber}
               allowCustom
@@ -345,23 +349,26 @@ export function SalesEntryForm({
           </Field>
 
           {/* Row 2: Customer, Material & Rates */}
-          <Field label="Party Name">
-            <Input value={form.partyName} onChange={(e) => updateForm("partyName", e.target.value)} placeholder="Customer name" />
+          <Field label="Party Name" htmlFor="partyName">
+            <Input id="partyName" value={form.partyName} onChange={(e) => updateForm("partyName", e.target.value)} placeholder="Customer name" />
           </Field>
-          <Field label="Material">
+          <Field label="Material" htmlFor="saleMaterial">
             <SearchableSelect
+              id="saleMaterial"
+              aria-label="Material"
               value={form.materialId}
               placeholder="Select material"
               options={materials.map((material) => ({
-                value: material.id,
-                label: material.materialName,
-                description: `₹${material.ratePerCft}/CFT`,
+                value: material?.id ?? "",
+                label: material?.materialName ?? "",
+                description: `₹${material?.ratePerCft ?? 0}/CFT`,
               }))}
               onChange={selectMaterial}
             />
           </Field>
-          <Field label="Rate (₹/CFT)">
+          <Field label="Rate (₹/CFT)" htmlFor="ratePerCft">
             <Input
+              id="ratePerCft"
               className="text-right tabular-nums"
               type="number"
               step="0.01"
@@ -370,8 +377,9 @@ export function SalesEntryForm({
               placeholder="0"
             />
           </Field>
-          <Field label="Qty (CFT)">
+          <Field label="Qty (CFT)" htmlFor="qty">
             <Input
+              id="qty"
               className="text-right tabular-nums"
               type="number"
               step="0.001"
@@ -387,8 +395,9 @@ export function SalesEntryForm({
             const isChanged = defaultQty !== null && defaultQty > 0 && Number(form.qty) !== defaultQty;
             if (!isChanged) return null;
             return (
-              <Field label="Quantity Reason (Required)" className="xl:col-span-4">
+              <Field label="Quantity Reason (Required)" className="xl:col-span-4" htmlFor="quantityReason">
                 <Input 
+                  id="quantityReason"
                   value={form.quantityReason} 
                   onChange={(e) => updateForm("quantityReason", e.target.value)} 
                   placeholder="Why did qty change?"
@@ -398,8 +407,9 @@ export function SalesEntryForm({
           })()}
 
           {/* Row 3: Discount & GST */}
-          <Field label="Discount Type">
+          <Field label="Discount Type" htmlFor="discountType">
             <select
+              id="discountType"
               className="flex h-10 w-full rounded-lg border border-input bg-background px-3 py-2 text-sm text-foreground shadow-[var(--shadow-card)] transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:border-accent"
               value={form.discountType}
               onChange={(event) => updateForm("discountType", event.target.value as "percentage" | "fixed")}
@@ -408,8 +418,9 @@ export function SalesEntryForm({
               <option value="percentage">Percentage</option>
             </select>
           </Field>
-          <Field label={form.discountType === "percentage" ? "Discount (%)" : "Discount Amount"}>
+          <Field label={form.discountType === "percentage" ? "Discount (%)" : "Discount Amount"} htmlFor="discountValue">
             <Input
+              id="discountValue"
               className="text-right tabular-nums"
               type="number"
               step="0.01"
@@ -417,11 +428,13 @@ export function SalesEntryForm({
               onChange={(e) => updateForm("discountValue", e.target.value)}
             />
           </Field>
-          <Field label="GST (5%)" className="xl:col-span-2">
+          <Field label="GST (5%)" className="xl:col-span-2" htmlFor="saleGstEnabled">
             <div className="flex items-center gap-3 h-10">
-              <label className="relative inline-flex items-center cursor-pointer">
+              <label className="relative inline-flex items-center cursor-pointer" htmlFor="saleGstEnabled">
                 <input
                   type="checkbox"
+                  id="saleGstEnabled"
+                  aria-label="Enable 5% GST"
                   className="sr-only peer"
                   checked={form.gstEnabled}
                   onChange={(e) => updateForm("gstEnabled", e.target.checked)}
@@ -442,8 +455,9 @@ export function SalesEntryForm({
           </Field>
 
           {/* Row 4: Payments & Credit (4 Columns Aligned) */}
-          <Field label="Cash Paid (₹)">
+          <Field label="Cash Paid (₹)" htmlFor="cashPaid">
             <Input
+              id="cashPaid"
               className="text-right tabular-nums"
               type="number"
               step="0.01"
@@ -453,8 +467,9 @@ export function SalesEntryForm({
               placeholder="0"
             />
           </Field>
-          <Field label="Bank Paid (₹)">
+          <Field label="Bank Paid (₹)" htmlFor="bankPaid">
             <Input
+              id="bankPaid"
               className="text-right tabular-nums"
               type="number"
               step="0.01"
@@ -464,8 +479,9 @@ export function SalesEntryForm({
               placeholder="0"
             />
           </Field>
-          <Field label="GPay Paid (₹)">
+          <Field label="GPay Paid (₹)" htmlFor="gPayPaid">
             <Input
+              id="gPayPaid"
               className="text-right tabular-nums"
               type="number"
               step="0.01"
@@ -475,20 +491,22 @@ export function SalesEntryForm({
               placeholder="0"
             />
           </Field>
-          <Field label="Remaining Credit (₹)">
-            <Input className="text-right tabular-nums font-semibold text-amber-500 bg-amber-500/5 border-amber-500/20" readOnly value={formatCurrency(totals.remainingCredit)} />
+          <Field label="Remaining Credit (₹)" htmlFor="saleRemainingCredit">
+            <Input id="saleRemainingCredit" className="text-right tabular-nums font-semibold text-amber-500 bg-amber-500/5 border-amber-500/20" readOnly value={formatCurrency(totals.remainingCredit)} />
           </Field>
 
           {/* Row 5: Summary & Remarks */}
-          <Field label="Final Amount (₹)" className="xl:col-span-2">
+          <Field label="Final Amount (₹)" className="xl:col-span-2" htmlFor="finalAmount">
             <Input
+              id="finalAmount"
               className="text-right tabular-nums font-bold text-xl text-emerald-500 bg-emerald-500/5 border-emerald-500/20 h-10"
               readOnly
               value={formatCurrency(totals.finalAmount)}
             />
           </Field>
-          <Field label="Remarks" className="xl:col-span-2">
+          <Field label="Remarks" className="xl:col-span-2" htmlFor="remarks">
             <Input
+              id="remarks"
               value={form.remarks}
               onChange={(e) => updateForm("remarks", e.target.value)}
               placeholder="Optional notes or remarks"

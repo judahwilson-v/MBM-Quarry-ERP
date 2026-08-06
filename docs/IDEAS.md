@@ -38,3 +38,13 @@ Format each entry as:
 - Summary: Direct RS-232/Ethernet integration with physical weighbridge indicators.
 - Why it matters: Prevents manual entry errors and speeds up the ticketing process.
 - Status: paused — put on hold per user request.
+
+### 2026-06-27 — Prompt-based Idea Capture
+- Summary: Allow the user to paste an idea in chat and have the AI store it in this inbox automatically.
+- Why it matters: Keeps unconfirmed chat ideas out of the roadmap until explicitly approved.
+- Status: approved — active governance rule for repository idea capture.
+
+### 2026-06-27 — Future Phase Planning Notes
+- Summary: Use this file as the official repository inbox for phase suggestions that are not yet committed.
+- Why it matters: Prevents speculative feature ideas from mixing with approved phase implementation plans.
+- Status: approved — active governance rule.

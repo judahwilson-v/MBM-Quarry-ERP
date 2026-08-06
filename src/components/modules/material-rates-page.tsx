@@ -30,8 +30,8 @@ export function MaterialRatesPage() {
   const [error, setError] = useState("");
 
   const load = useCallback(async () => {
-    const rows = ((await listMaterials()) as unknown as MaterialRow[]).filter(
-      (row) => !HIDDEN_MATERIALS.has(row.materialName)
+    const rows = ((await listMaterials()) as MaterialRow[]).filter(
+      (row) => row && !HIDDEN_MATERIALS.has(row?.materialName ?? "")
     );
     setMaterials(rows);
     setDraftRates(Object.fromEntries(rows.map((row) => [row.id, String(row.ratePerCft)])));

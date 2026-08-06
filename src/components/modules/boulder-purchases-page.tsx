@@ -74,7 +74,7 @@ export function BoulderPurchasesPage() {
   const [search, setSearch] = useState("");
   const [message, setMessage] = useState("");
   const [error, setError] = useState("");
-  const { confirmAction } = usePrompt();
+  const { confirmAction, promptPassword } = usePrompt();
 
   useEffect(() => {
     listVehicles("").then((v) => setVehicles(v as any[]));
@@ -97,7 +97,7 @@ export function BoulderPurchasesPage() {
   }, []);
 
   const load = useCallback(async () => {
-    const data = (await listIncomingBoulder(search)) as unknown as BoulderRow[];
+    const data = (await listIncomingBoulder(search)) as BoulderRow[];
     setRows(data);
   }, [search]);
 
@@ -157,10 +157,13 @@ export function BoulderPurchasesPage() {
   }
 
   async function remove(id: string) {
+    const password = await promptPassword("Enter Admin/Delete PIN to remove this boulder entry:");
+    if (!password) return;
+    
     if (!(await confirmAction("Delete this boulder entry?"))) return;
     setError("");
     try {
-      await deleteIncomingBoulder(id);
+      await deleteIncomingBoulder(id, password);
       if (form.id === id) setForm(blankForm());
       await load();
     } catch (err) {
@@ -247,20 +250,22 @@ export function BoulderPurchasesPage() {
         </CardHeader>
         <CardContent className="grid gap-4">
           <div className="grid gap-3 md:grid-cols-2 xl:grid-cols-4">
-            <Field label="Date">
-              <Input type="date" value={form.date} onChange={(event) => setForm((current) => ({ ...current, date: event.target.value }))} />
+            <Field label="Date" htmlFor="date">
+              <Input id="date" type="date" value={form.date} onChange={(event) => setForm((current) => ({ ...current, date: event.target.value }))} />
             </Field>
-            <Field label="Time">
-              <Input type="time" value={form.time} onChange={(event) => setForm((current) => ({ ...current, time: event.target.value }))} />
+            <Field label="Time" htmlFor="time">
+              <Input id="time" type="time" value={form.time} onChange={(event) => setForm((current) => ({ ...current, time: event.target.value }))} />
             </Field>
-            <Field label="Book No">
-              <Input type="number" min="1" value={form.bookNumber} onChange={(event) => setForm((current) => ({ ...current, bookNumber: event.target.value }))} />
+            <Field label="Book No" htmlFor="bookNumber">
+              <Input id="bookNumber" type="number" min="1" value={form.bookNumber} onChange={(event) => setForm((current) => ({ ...current, bookNumber: event.target.value }))} />
             </Field>
-            <Field label="Page No">
-              <Input type="number" min="1" max="100" value={form.pageNumber} onChange={(event) => setForm((current) => ({ ...current, pageNumber: event.target.value }))} />
+            <Field label="Page No" htmlFor="pageNumber">
+              <Input id="pageNumber" type="number" min="1" max="100" value={form.pageNumber} onChange={(event) => setForm((current) => ({ ...current, pageNumber: event.target.value }))} />
             </Field>
-            <Field label="Vehicle Number">
+            <Field label="Vehicle Number" htmlFor="boulderVehicleNumber">
               <SearchableSelect
+                id="boulderVehicleNumber"
+                aria-label="Vehicle Number"
                 value={form.vehicleId}
                 customValue={form.vehicleNumber}
                 allowCustom
@@ -270,11 +275,12 @@ export function BoulderPurchasesPage() {
                 onCustomValueChange={(vehicleNumber) => setForm((current) => ({ ...current, vehicleNumber, vehicleId: "" }))}
               />
             </Field>
-            <Field label="Party Name">
-              <Input value={form.partyName} onChange={(event) => setForm((current) => ({ ...current, partyName: event.target.value }))} />
+            <Field label="Party Name" htmlFor="partyName">
+              <Input id="partyName" value={form.partyName} onChange={(event) => setForm((current) => ({ ...current, partyName: event.target.value }))} />
             </Field>
-            <Field label="Qty">
+            <Field label="Qty" htmlFor="qty">
               <Input
+                id="qty"
                 className="text-right tabular-nums"
                 type="number"
                 step="0.001"
@@ -282,8 +288,9 @@ export function BoulderPurchasesPage() {
                 onChange={(event) => setForm((current) => ({ ...current, qty: event.target.value }))}
               />
             </Field>
-            <Field label="Rock Rate (₹)">
+            <Field label="Rock Rate (₹)" htmlFor="rockRate">
               <Input
+                id="rockRate"
                 className="text-right tabular-nums"
                 type="number"
                 step="0.01"
@@ -291,32 +298,36 @@ export function BoulderPurchasesPage() {
                 onChange={(event) => setForm((current) => ({ ...current, rockRate: event.target.value }))}
               />
             </Field>
-            <Field label="Cash Paid">
+            <Field label="Cash Paid" htmlFor="cashPaid">
               <Input
+                id="cashPaid"
                 className="text-right tabular-nums"
                 type="number"
                 value={form.cashPaid}
                 onChange={(event) => setForm((current) => ({ ...current, cashPaid: event.target.value }))}
               />
             </Field>
-            <Field label="Bank Paid">
+            <Field label="Bank Paid" htmlFor="bankPaid">
               <Input
+                id="bankPaid"
                 className="text-right tabular-nums"
                 type="number"
                 value={form.bankPaid}
                 onChange={(event) => setForm((current) => ({ ...current, bankPaid: event.target.value }))}
               />
             </Field>
-            <Field label="GPay Paid">
+            <Field label="GPay Paid" htmlFor="gPayPaid">
               <Input
+                id="gPayPaid"
                 className="text-right tabular-nums"
                 type="number"
                 value={form.gPayPaid}
                 onChange={(event) => setForm((current) => ({ ...current, gPayPaid: event.target.value }))}
               />
             </Field>
-            <Field label="Vehicle Rent">
+            <Field label="Vehicle Rent" htmlFor="vehicleRent">
               <Input
+                id="vehicleRent"
                 className="text-right tabular-nums"
                 type="number"
                 value={form.vehicleRent}
@@ -335,8 +346,8 @@ export function BoulderPurchasesPage() {
                 Rent included in Payment
               </label>
             </div>
-            <Field label="Remarks" className="md:col-span-2">
-              <Textarea value={form.remarks} onChange={(event) => setForm((current) => ({ ...current, remarks: event.target.value }))} />
+            <Field label="Remarks" className="md:col-span-2" htmlFor="remarks">
+              <Textarea id="remarks" value={form.remarks} onChange={(event) => setForm((current) => ({ ...current, remarks: event.target.value }))} />
             </Field>
           </div>
           <div className="flex gap-4 p-3 bg-muted/50 rounded-lg">
@@ -374,7 +385,7 @@ export function BoulderPurchasesPage() {
           <div className="flex w-full sm:w-auto gap-2 items-center">
             <div className="relative w-full sm:w-64">
               <Search className="pointer-events-none absolute left-3 top-3 h-4 w-4 text-muted-foreground" />
-              <Input className="pl-9" placeholder="Search boulder entries..." value={search} onChange={(event) => setSearch(event.target.value)} />
+              <Input id="boulderSearch" aria-label="Search boulder entries" className="pl-9" placeholder="Search boulder entries..." value={search} onChange={(event) => setSearch(event.target.value)} />
             </div>
             <Button variant="outline" size="sm" onClick={handleExportExcel} className="text-xs gap-1.5">
               <Download className="h-3.5 w-3.5" />

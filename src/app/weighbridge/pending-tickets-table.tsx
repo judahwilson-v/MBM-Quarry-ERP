@@ -1,7 +1,7 @@
 "use client";
 
 import { useState } from "react";
-import { WeighbridgeTicket } from "@prisma/client";
+import type { WeighbridgeTicket } from "@prisma/client";
 import { format } from "date-fns";
 import { Badge } from "@/components/ui/badge";
 import { CompleteTicketDialog } from "./weighbridge-forms";

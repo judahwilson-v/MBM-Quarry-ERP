@@ -68,7 +68,7 @@ function NavLink({ item, active, onClick }: { item: typeof navItems[0], active: 
 export function AppShell({ children }: { children: React.ReactNode }) {
   const pathname = usePathname();
   const [sidebarOpen, setSidebarOpen] = useState(false);
-  const [features, setFeatures] = useState<any>({ enableWeighbridge: false });
+  const [, setFeatures] = useState<any>({ enableWeighbridge: false });
   const [dynamicNavItems, setDynamicNavItems] = useState([...navItems]);
 
   useEffect(() => {
@@ -138,7 +138,7 @@ export function AppShell({ children }: { children: React.ReactNode }) {
         <main className="pb-20 lg:pb-0">{children}</main>
       </div>
 
-      <nav className="fixed inset-x-0 bottom-0 z-40 grid grid-cols-5 border-t bg-card lg:hidden">
+      <nav className="fixed inset-x-0 bottom-0 z-40 grid grid-cols-5 h-14 w-full border-t bg-card lg:hidden shadow-[0_-4px_6px_-1px_rgba(0,0,0,0.05)]">
         {mobileItems.map((item) => {
           const Icon = item.icon;
           const active = isActivePath(pathname, item.href);
@@ -147,12 +147,12 @@ export function AppShell({ children }: { children: React.ReactNode }) {
               key={item.href}
               href={item.href}
               className={cn(
-                "flex h-14 flex-col items-center justify-center gap-1 text-[11px] text-muted-foreground",
-                active && "text-primary",
+                "w-full min-w-0 flex flex-col items-center justify-center gap-0.5 px-1 text-[10px] sm:text-[11px] text-muted-foreground transition-colors",
+                active ? "text-primary font-medium" : "hover:text-foreground/80",
               )}
             >
-              <Icon className="h-4 w-4" />
-              {item.label}
+              <Icon className="h-4 w-4 flex-shrink-0" />
+              <span className="truncate w-full text-center">{item.label}</span>
             </Link>
           );
         })}

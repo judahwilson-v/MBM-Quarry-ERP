@@ -183,9 +183,11 @@ export async function initializeDatabase(prisma: PrismaClient) {
       extra_body_qty REAL,
       vehicle_type TEXT,
       trip_count INTEGER NOT NULL DEFAULT 0,
+      engine_hours REAL,
       created_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
       updated_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP
     )`,
+    `CREATE INDEX IF NOT EXISTS vehicles_party_id_idx ON vehicles (party_id)`,
     `CREATE TABLE IF NOT EXISTS parties (
       id TEXT PRIMARY KEY NOT NULL,
       party_name TEXT NOT NULL UNIQUE,
@@ -264,6 +266,9 @@ export async function initializeDatabase(prisma: PrismaClient) {
       created_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
       updated_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP
     )`,
+    `CREATE INDEX IF NOT EXISTS employee_credit_employee_name_idx ON employee_credit (employee_name)`,
+    `CREATE INDEX IF NOT EXISTS employee_credit_status_idx ON employee_credit (status)`,
+    `CREATE INDEX IF NOT EXISTS employee_credit_created_at_idx ON employee_credit (created_at)`,
     `CREATE TABLE IF NOT EXISTS suppliers (
       id TEXT PRIMARY KEY NOT NULL,
       supplier_name TEXT NOT NULL UNIQUE,
@@ -283,6 +288,7 @@ export async function initializeDatabase(prisma: PrismaClient) {
       created_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
       updated_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP
     )`,
+    `CREATE INDEX IF NOT EXISTS day_book_entries_entry_date_idx ON day_book_entries (entry_date)`,
     `CREATE TABLE IF NOT EXISTS financial_events (
       id TEXT PRIMARY KEY NOT NULL,
       event_id TEXT NOT NULL UNIQUE,
@@ -394,6 +400,7 @@ export async function initializeDatabase(prisma: PrismaClient) {
     `CREATE INDEX IF NOT EXISTS party_ledger_party_id_idx ON party_ledger (party_id)`,
     `CREATE INDEX IF NOT EXISTS party_ledger_party_name_idx ON party_ledger (party_name)`,
     `CREATE INDEX IF NOT EXISTS party_ledger_date_idx ON party_ledger (date)`,
+    `CREATE INDEX IF NOT EXISTS party_ledger_ref_id_idx ON party_ledger (ref_id)`,
     `CREATE TABLE IF NOT EXISTS audit_logs (
       id TEXT PRIMARY KEY NOT NULL,
       entity_name TEXT NOT NULL,
@@ -402,6 +409,9 @@ export async function initializeDatabase(prisma: PrismaClient) {
       payload TEXT,
       created_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP
     )`,
+    `CREATE INDEX IF NOT EXISTS audit_logs_entity_name_entity_id_idx ON audit_logs (entity_name, entity_id)`,
+    `CREATE INDEX IF NOT EXISTS audit_logs_created_at_idx ON audit_logs (created_at)`,
+    `CREATE INDEX IF NOT EXISTS audit_logs_action_idx ON audit_logs (action)`,
     `CREATE TABLE IF NOT EXISTS roles (
       id TEXT PRIMARY KEY NOT NULL,
       role_name TEXT NOT NULL UNIQUE,
@@ -418,10 +428,20 @@ export async function initializeDatabase(prisma: PrismaClient) {
       created_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
       updated_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP
     )`,
+    `CREATE INDEX IF NOT EXISTS other_credits_name_idx ON other_credits (name)`,
+    `CREATE INDEX IF NOT EXISTS other_credits_status_idx ON other_credits (status)`,
+    `CREATE INDEX IF NOT EXISTS other_credits_created_at_idx ON other_credits (created_at)`,
     `CREATE INDEX IF NOT EXISTS outgoing_sales_sale_date_idx ON outgoing_sales (sale_date)`,
     `CREATE INDEX IF NOT EXISTS outgoing_sales_vehicle_number_idx ON outgoing_sales (vehicle_number)`,
     `CREATE INDEX IF NOT EXISTS outgoing_sales_party_name_idx ON outgoing_sales (party_name)`,
+    `CREATE INDEX IF NOT EXISTS outgoing_sales_vehicle_id_idx ON outgoing_sales (vehicle_id)`,
+    `CREATE INDEX IF NOT EXISTS outgoing_sales_party_id_idx ON outgoing_sales (party_id)`,
+    `CREATE INDEX IF NOT EXISTS outgoing_sales_material_id_idx ON outgoing_sales (material_id)`,
     `CREATE INDEX IF NOT EXISTS incoming_boulder_date_idx ON incoming_boulder (date)`,
+    `CREATE INDEX IF NOT EXISTS incoming_boulder_vehicle_id_idx ON incoming_boulder (vehicle_id)`,
+    `CREATE INDEX IF NOT EXISTS incoming_boulder_party_id_idx ON incoming_boulder (party_id)`,
+    `CREATE INDEX IF NOT EXISTS incoming_boulder_material_id_idx ON incoming_boulder (material_id)`,
+    `CREATE INDEX IF NOT EXISTS party_credit_party_id_idx ON party_credit (party_id)`,
     `CREATE INDEX IF NOT EXISTS party_credit_party_name_idx ON party_credit (party_name)`,
     `CREATE INDEX IF NOT EXISTS party_credit_sale_id_idx ON party_credit (sale_id)`,
     // --- Tables added in later phases ---
@@ -504,6 +524,7 @@ export async function initializeDatabase(prisma: PrismaClient) {
       backup_folder TEXT NOT NULL DEFAULT '',
       admin_pin TEXT NOT NULL DEFAULT '8888',
       delete_pin TEXT NOT NULL DEFAULT '7711',
+      enable_credit_locks BOOLEAN NOT NULL DEFAULT 0,
       updated_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP
     )`,
     `CREATE TABLE IF NOT EXISTS sync_state (
@@ -554,6 +575,9 @@ export async function initializeDatabase(prisma: PrismaClient) {
     )`,
     `CREATE INDEX IF NOT EXISTS weighbridge_tickets_vehicle_number_idx ON weighbridge_tickets (vehicle_number)`,
     `CREATE INDEX IF NOT EXISTS weighbridge_tickets_status_idx ON weighbridge_tickets (status)`,
+    `CREATE INDEX IF NOT EXISTS weighbridge_tickets_created_at_idx ON weighbridge_tickets (created_at)`,
+    `CREATE INDEX IF NOT EXISTS weighbridge_tickets_vehicle_id_idx ON weighbridge_tickets (vehicle_id)`,
+    `CREATE INDEX IF NOT EXISTS weighbridge_tickets_party_id_idx ON weighbridge_tickets (party_id)`,
     // --- Fleet Maintenance tables (added v1.11.2) ---
     `CREATE TABLE IF NOT EXISTS maintenance_records (
       id TEXT PRIMARY KEY NOT NULL,
@@ -609,6 +633,7 @@ export async function initializeDatabase(prisma: PrismaClient) {
   await ensureSQLiteColumn(prisma, "vehicles", "trip_count", "INTEGER NOT NULL DEFAULT 0");
   await ensureSQLiteColumn(prisma, "vehicles", "updated_at", "DATETIME");
   await ensureSQLiteColumn(prisma, "vehicles", "vehicle_type", "TEXT");
+  await ensureSQLiteColumn(prisma, "vehicles", "engine_hours", "REAL");
   await ensureSQLiteColumn(prisma, "parties", "updated_at", "DATETIME");
   await ensureSQLiteColumn(prisma, "parties", "party_group", "TEXT");
   await ensureSQLiteColumn(prisma, "outgoing_sales", "vehicle_id", "TEXT");

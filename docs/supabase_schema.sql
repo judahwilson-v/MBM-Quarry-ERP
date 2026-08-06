@@ -737,3 +737,57 @@ CREATE UNIQUE INDEX "vehicle_stats_vehicle_id_key" ON "vehicle_stats"("vehicle_i
 ALTER TABLE "maintenance_records" ADD CONSTRAINT "maintenance_records_vehicle_id_fkey" FOREIGN KEY ("vehicle_id") REFERENCES "vehicles"("id") ON DELETE CASCADE ON UPDATE CASCADE;
 ALTER TABLE "maintenance_schedules" ADD CONSTRAINT "maintenance_schedules_vehicle_id_fkey" FOREIGN KEY ("vehicle_id") REFERENCES "vehicles"("id") ON DELETE CASCADE ON UPDATE CASCADE;
 ALTER TABLE "vehicle_stats" ADD CONSTRAINT "vehicle_stats_vehicle_id_fkey" FOREIGN KEY ("vehicle_id") REFERENCES "vehicles"("id") ON DELETE CASCADE ON UPDATE CASCADE;
+
+-- Missing Supabase Sync Tables
+CREATE TABLE IF NOT EXISTS weighbridge_tickets (
+  id TEXT PRIMARY KEY DEFAULT gen_random_uuid(),
+  ticket_number INTEGER UNIQUE NOT NULL,
+  vehicle_number TEXT NOT NULL,
+  vehicle_id TEXT,
+  party_id TEXT,
+  material_id TEXT,
+  ticket_type TEXT NOT NULL DEFAULT 'OUTGOING',
+  status TEXT NOT NULL DEFAULT 'FIRST_WEIGHT',
+  gross_weight DOUBLE PRECISION,
+  gross_time TIMESTAMPTZ,
+  tare_weight DOUBLE PRECISION,
+  tare_time TIMESTAMPTZ,
+  net_weight DOUBLE PRECISION,
+  linked_sale_id TEXT UNIQUE,
+  linked_boulder_id TEXT UNIQUE,
+  remarks TEXT,
+  created_at TIMESTAMPTZ NOT NULL DEFAULT now(),
+  updated_at TIMESTAMPTZ NOT NULL DEFAULT now()
+);
+
+CREATE TABLE IF NOT EXISTS maintenance_records (
+  id TEXT PRIMARY KEY DEFAULT gen_random_uuid(),
+  vehicle_id TEXT NOT NULL,
+  date TIMESTAMPTZ NOT NULL,
+  engine_hours DOUBLE PRECISION NOT NULL,
+  service_type TEXT NOT NULL,
+  description TEXT,
+  cost DOUBLE PRECISION NOT NULL DEFAULT 0,
+  created_at TIMESTAMPTZ NOT NULL DEFAULT now(),
+  updated_at TIMESTAMPTZ NOT NULL DEFAULT now()
+);
+
+CREATE TABLE IF NOT EXISTS maintenance_schedules (
+  id TEXT PRIMARY KEY DEFAULT gen_random_uuid(),
+  vehicle_id TEXT NOT NULL,
+  service_type TEXT NOT NULL,
+  interval_hours DOUBLE PRECISION,
+  interval_days INTEGER,
+  next_due_hours DOUBLE PRECISION,
+  next_due_date TIMESTAMPTZ,
+  created_at TIMESTAMPTZ NOT NULL DEFAULT now(),
+  updated_at TIMESTAMPTZ NOT NULL DEFAULT now()
+);
+
+CREATE TABLE IF NOT EXISTS vehicle_stats (
+  id TEXT PRIMARY KEY DEFAULT gen_random_uuid(),
+  vehicle_id TEXT UNIQUE NOT NULL,
+  engine_hours DOUBLE PRECISION NOT NULL DEFAULT 0,
+  created_at TIMESTAMPTZ NOT NULL DEFAULT now(),
+  updated_at TIMESTAMPTZ NOT NULL DEFAULT now()
+);

@@ -16,7 +16,7 @@ export function DayBookPage() {
   const [userName, setUserName] = useState<string>("");
   const [data, setData] = useState<any>(null);
   const [loading, setLoading] = useState(true);
-  const { promptPassword, promptNumber, confirmAction } = usePrompt();
+  const { promptNumber, confirmAction } = usePrompt();
 
   const loadData = useCallback(async () => {
     setLoading(true);
@@ -46,7 +46,7 @@ export function DayBookPage() {
       alert("Please enter your name in the User field to track edits.");
       return;
     }
-    const currentVal = type === "cash" ? data.openingCash : data.openingBank;
+    const currentVal = type === "cash" ? (data?.openingCash ?? 0) : (data?.openingBank ?? 0);
     const newVal = await promptNumber(`Enter new Opening ${type === "cash" ? "Cash" : "Bank"} Balance:`);
     if (!newVal || isNaN(Number(newVal))) return;
 
@@ -59,8 +59,8 @@ export function DayBookPage() {
     try {
       const payload = {
         businessDate: date,
-        openingCashBalance: type === "cash" ? numVal : data.openingCash,
-        openingBankBalance: type === "bank" ? numVal : data.openingBank,
+        openingCashBalance: type === "cash" ? numVal : (data?.openingCash ?? 0),
+        openingBankBalance: type === "bank" ? numVal : (data?.openingBank ?? 0),
       };
       
       await saveDayBookOpeningBalances(payload);
@@ -108,6 +108,8 @@ export function DayBookPage() {
   };
 
   if (loading && !data) return <div className="p-6">Loading Day Book...</div>;
+
+  const transfers = data?.transfers ?? [];
 
   return (
     <div className="space-y-6 p-4 lg:p-6 print:p-0">
@@ -270,11 +272,11 @@ export function DayBookPage() {
               <CardTitle>Today&apos;s Transfers</CardTitle>
             </CardHeader>
             <CardContent>
-              {data?.transfers?.length === 0 ? (
+              {transfers.length === 0 ? (
                 <p className="text-sm text-muted-foreground">No transfers recorded.</p>
               ) : (
                 <div className="space-y-3">
-                  {data?.transfers?.map((t: any) => (
+                  {transfers.map((t: any) => (
                     <div key={t.id} className="flex justify-between items-center border-b pb-2">
                       <div>
                         <p className="text-sm font-medium">{t.type === "CASH_TO_BANK" ? "Cash → Bank" : "Bank → Cash"}</p>

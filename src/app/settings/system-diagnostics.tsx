@@ -21,8 +21,8 @@ export function SystemDiagnostics({
   const [updateDownloaded, setUpdateDownloaded] = useState(false);
 
   useEffect(() => {
-    if (typeof window !== "undefined" && (window as any).electron) {
-    const cleanup = (window as any).electron.onUpdaterEvent((data: any) => {
+    if (typeof window !== "undefined" && window.electron) {
+      const cleanup = window.electron.onUpdaterEvent((data: any) => {
       console.log("✓ IPC received updater-event:", data.type);
       
       switch(data.type) {
@@ -69,10 +69,10 @@ export function SystemDiagnostics({
     setUpdateStatus("Searching for updates...");
     
     // Send IPC message to the Electron main process
-    if (typeof window !== "undefined" && (window as any).electron) {
+    if (typeof window !== "undefined" && window.electron) {
       try {
         console.log("✓ IPC sent: check-updates");
-        await (window as any).electron.checkUpdates();
+        await window.electron.checkUpdates();
       } catch (err: any) {
         console.error("Failed to check for updates", err);
         setIsChecking(false);
@@ -97,11 +97,11 @@ export function SystemDiagnostics({
   };
 
   const handleDownloadUpdate = async () => {
-    if (typeof window !== "undefined" && (window as any).electron) {
+    if (typeof window !== "undefined" && window.electron) {
       setUpdateStatus("Starting download...");
       setUpdateAvailable(false);
       try {
-        await (window as any).electron.downloadUpdate();
+        await window.electron.downloadUpdate();
       } catch (err: any) {
         console.error("Failed to download update", err);
         setUpdateStatus("Download failed");
@@ -115,10 +115,10 @@ export function SystemDiagnostics({
   };
 
   const handleInstallUpdate = async () => {
-    if (typeof window !== "undefined" && (window as any).electron) {
+    if (typeof window !== "undefined" && window.electron) {
       setUpdateStatus("Installing...");
       try {
-        await (window as any).electron.installUpdate();
+        await window.electron.installUpdate();
       } catch (err: any) {
         console.error("Failed to install update", err);
       }

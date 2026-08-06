@@ -28,16 +28,7 @@ export function SecuritySettings({ initialSettings }: { initialSettings: any }) 
     e.preventDefault();
     setIsLoading(true);
     setAuthError("");
-    if (email === "master" && password === "mbm@admin2024") {
-      setAuthError("");
-      setIsLoading(false);
-      toast({
-        title: "Access Granted (Offline Master)",
-        description: "You have unlocked the security settings via Master Override.",
-      });
-      setIsAuthenticated(true);
-      return;
-    }
+
     
     const { error } = await supabase.auth.signInWithPassword({
       email,
@@ -98,7 +89,7 @@ export function SecuritySettings({ initialSettings }: { initialSettings: any }) 
             <Lock className="w-5 h-5 mr-2" />
             Super User Access Required
           </h3>
-          <p className="text-sm text-muted-foreground mt-1">Sign in with your Supabase account (or use Master Override) to manage security PINs.</p>
+          <p className="text-sm text-muted-foreground mt-1">Sign in with your Supabase account to manage security PINs.</p>
         </div>
         <div className="p-6">
           {authError && (
@@ -108,6 +99,8 @@ export function SecuritySettings({ initialSettings }: { initialSettings: any }) 
           )}
           <form onSubmit={handleLogin} className="space-y-4 max-w-sm">
             <Input 
+              id="secEmail"
+              aria-label="Email address"
               type="email" 
               placeholder="Email address" 
               value={email}
@@ -115,6 +108,8 @@ export function SecuritySettings({ initialSettings }: { initialSettings: any }) 
               required
             />
             <Input 
+              id="secPassword"
+              aria-label="Password"
               type="password" 
               placeholder="Password" 
               value={password}
@@ -142,11 +137,13 @@ export function SecuritySettings({ initialSettings }: { initialSettings: any }) 
       <div className="p-6">
         <form onSubmit={handleSavePins} className="space-y-4 max-w-sm">
           <div className="space-y-2">
-            <label className="text-sm font-medium flex items-center">
+            <label htmlFor="adminPin" className="text-sm font-medium flex items-center">
               <KeyRound className="w-4 h-4 mr-2 text-muted-foreground"/>
               Admin Dashboard PIN
             </label>
             <Input 
+              id="adminPin"
+              aria-label="Admin Dashboard PIN"
               type="text" 
               value={adminPin}
               onChange={(e) => setAdminPin(e.target.value)}
@@ -158,11 +155,13 @@ export function SecuritySettings({ initialSettings }: { initialSettings: any }) 
           </div>
           
           <div className="space-y-2 pt-2">
-            <label className="text-sm font-medium flex items-center">
+            <label htmlFor="deletePin" className="text-sm font-medium flex items-center">
               <KeyRound className="w-4 h-4 mr-2 text-muted-foreground"/>
               Settlement / Delete PIN
             </label>
             <Input 
+              id="deletePin"
+              aria-label="Settlement / Delete PIN"
               type="text" 
               value={deletePin}
               onChange={(e) => setDeletePin(e.target.value)}

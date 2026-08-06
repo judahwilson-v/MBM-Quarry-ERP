@@ -136,28 +136,28 @@ export function SettingsForm({ initialData }: { initialData: any }) {
           <p className="text-sm text-[var(--text-secondary)] mb-6">Enable or disable advanced enterprise modules. When toggled on, new pages and workflows will appear.</p>
           
           <div className="space-y-4">
-            <label className="flex items-center justify-between p-4 rounded-lg border border-[var(--border-light)] hover:bg-[var(--bg-muted)] cursor-pointer transition-colors">
+            <label htmlFor="enableWeighbridge" className="flex items-center justify-between p-4 rounded-lg border border-[var(--border-light)] hover:bg-[var(--bg-muted)] cursor-pointer transition-colors">
               <div>
                 <div className="font-medium">IoT Weighbridge Integration</div>
                 <div className="text-xs text-[var(--text-secondary)]">Direct RS-232/Ethernet integration with physical weighbridge indicators.</div>
               </div>
-              <input type="checkbox" name="enableWeighbridge" checked={formData.enableWeighbridge} onChange={handleChange} className="w-5 h-5 accent-blue-600 rounded" />
+              <input type="checkbox" id="enableWeighbridge" aria-label="IoT Weighbridge Integration" name="enableWeighbridge" checked={formData.enableWeighbridge} onChange={handleChange} className="w-5 h-5 accent-blue-600 rounded" />
             </label>
 
-            <label className="flex items-center justify-between p-4 rounded-lg border border-[var(--border-light)] hover:bg-[var(--bg-muted)] cursor-pointer transition-colors">
+            <label htmlFor="enableFleetMaintenance" className="flex items-center justify-between p-4 rounded-lg border border-[var(--border-light)] hover:bg-[var(--bg-muted)] cursor-pointer transition-colors">
               <div>
                 <div className="font-medium">Fleet & Heavy Machinery Maintenance</div>
                 <div className="text-xs text-[var(--text-secondary)]">Track engine hours, PM schedules, and fuel consumption for assets.</div>
               </div>
-              <input type="checkbox" name="enableFleetMaintenance" checked={formData.enableFleetMaintenance} onChange={handleChange} className="w-5 h-5 accent-blue-600 rounded" />
+              <input type="checkbox" id="enableFleetMaintenance" aria-label="Fleet & Heavy Machinery Maintenance" name="enableFleetMaintenance" checked={formData.enableFleetMaintenance} onChange={handleChange} className="w-5 h-5 accent-blue-600 rounded" />
             </label>
 
-            <label className="flex items-center justify-between p-4 rounded-lg border border-[var(--border-light)] hover:bg-[var(--bg-muted)] cursor-pointer transition-colors">
+            <label htmlFor="enableCustomerPortal" className="flex items-center justify-between p-4 rounded-lg border border-[var(--border-light)] hover:bg-[var(--bg-muted)] cursor-pointer transition-colors">
               <div>
                 <div className="font-medium">Customer Self-Service Portal</div>
                 <div className="text-xs text-[var(--text-secondary)]">Allow parties to log in, view live ledger balances, and download invoices.</div>
               </div>
-              <input type="checkbox" name="enableCustomerPortal" checked={formData.enableCustomerPortal} onChange={handleChange} className="w-5 h-5 accent-blue-600 rounded" />
+              <input type="checkbox" id="enableCustomerPortal" aria-label="Customer Self-Service Portal" name="enableCustomerPortal" checked={formData.enableCustomerPortal} onChange={handleChange} className="w-5 h-5 accent-blue-600 rounded" />
             </label>
           </div>
         </div>

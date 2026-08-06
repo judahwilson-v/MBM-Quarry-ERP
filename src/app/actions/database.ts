@@ -3,6 +3,7 @@
 import fs from "fs";
 import path from "path";
 import { getDatabaseFilePath } from "@/lib/prisma";
+import { sanitizeError } from "@/lib/utils/sanitize-error";
 
 function getActiveDbPath() {
   return getDatabaseFilePath();
@@ -33,7 +34,7 @@ export async function createLocalBackup() {
     fs.copyFileSync(dbPath, backupPath);
     return { success: true, message: `Backup created: ${backupFilename}` };
   } catch (error: any) {
-    return { success: false, message: error.message };
+    return { success: false, message: sanitizeError(error) };
   }
 }
 
@@ -70,6 +71,6 @@ export async function restoreLocalBackup(filename: string) {
     fs.copyFileSync(backupPath, dbPath);
     return { success: true, message: "Database restored successfully. Please restart the application." };
   } catch (error: any) {
-    return { success: false, message: error.message };
+    return { success: false, message: sanitizeError(error) };
   }
 }

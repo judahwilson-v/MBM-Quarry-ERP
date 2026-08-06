@@ -49,7 +49,7 @@ export function MasterDataPage({ resource, title, description, fields, columns }
   const load = useCallback(async () => {
     setLoading(true);
     const data = resource === "vehicles" ? await listVehicles(search) : await listParties(search);
-    setRows(data as unknown as MasterRecord[]);
+    setRows(data as MasterRecord[]);
     setLoading(false);
   }, [resource, search]);
 
@@ -67,7 +67,7 @@ export function MasterDataPage({ resource, title, description, fields, columns }
 
   function startEdit(row: MasterRecord) {
     setEditing(row);
-    setForm(row as unknown as Record<string, MasterFormValue>);
+    setForm(row as Record<string, MasterFormValue>);
     setMessage("");
     setError("");
   }

@@ -6,16 +6,22 @@
 - **Desktop Shell**: Electron (wraps the Next.js standalone server)
 - **Cloud Sync**: Supabase (secondary, offline-first queue)
 
-## Source Layout
-```
-src/app/           Route layer and page composition
-src/components/    Shared and feature-specific UI
-src/lib/           Core services (prisma.ts, offline-actions.ts, sync engine)
-prisma/            Schema, migrations, seed
-scripts/           Build-time tooling (stamp-version.js)
-main.js            Electron main process
-docs/              All project documentation
-```
+## Source Layout & Folder Structure
+
+*   **desktop/**: Contains the Electron wrapper code (e.g., `main.js`). Responsible for launching the Next.js server locally, managing application window lifecycle, handling database file operations, and managing database persistence/fallback operations (like the Factory Reset fallback).
+*   **prisma/**: Contains the Prisma schema (`schema.prisma`), migrations, seed scripts (`seed.ts`), and development/bundled local SQLite database files (`dev.db`).
+*   **scripts/**: Utility and build-time tooling scripts (e.g., manual database migration script `migrate.js`, version stamping `stamp-version.js`).
+*   **src/**: The core Next.js application codebase.
+    *   **src/app/**: Next.js 14 App Router definitions, routes, pages, RSCs, layouts, and server action endpoints (`src/app/actions/`).
+    *   **src/components/**: Reusable React components (UI elements, domain module forms, layout shells).
+    *   **src/lib/**: Core business logic, database access, utilities, and background cloud sync engine.
+        *   **src/lib/domain/**: Domain-driven service modules (e.g., inventory, daybook, ledger) isolating business rules from UI components.
+        *   **src/lib/prisma.ts**: Prisma client instantiation and raw SQLite fallback initialization.
+        *   **src/lib/sales-engine.ts**: Business engine for pricing, GST, rate calculations, and invoice totals.
+        *   **src/lib/offline-actions.ts**: Core server actions for local database operations.
+*   **main.js**: Electron main process entry point handling server spawning and IPC.
+*   **package.json**: Defines project dependencies, Next.js standalone build scripts, and electron-builder packaging configurations.
+*   **docs/**: Master system documentation, business rules, architectural specs, and ADR logs.
 
 ## Data Flow
 ```

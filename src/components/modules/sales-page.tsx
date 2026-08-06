@@ -43,7 +43,7 @@ export function SalesPage() {
   const { promptPassword, confirmAction } = usePrompt();
 
   const loadSales = useCallback(async () => {
-    const rows = (await listSales()) as unknown as SaleRow[];
+    const rows = (await listSales()) as SaleRow[];
     setSales(rows);
   }, []);
 
@@ -63,7 +63,7 @@ export function SalesPage() {
         row.saleDate,
             row.vehicleNumber,
             row.partyName,
-            row.materialName,
+            row?.materialName,
             row.qty,
             row.ratePerCft,
             row.finalAmount,
@@ -91,7 +91,7 @@ export function SalesPage() {
     for (const material of materialTotals) result[material] = 0;
     for (const row of visibleRows) {
       result.totalRevenue += Number(row.finalAmount ?? 0);
-      if (row.materialName in result) result[row.materialName] += Number(row.qty ?? 0);
+      if (row?.materialName && row.materialName in result) result[row.materialName] += Number(row.qty ?? 0);
     }
     return result;
   }, [visibleRows]);
@@ -201,11 +201,11 @@ export function SalesPage() {
         <div className="mt-6 flex justify-between items-end text-left">
           <div>
             <p className="text-sm text-muted-foreground">Report Date</p>
-            <h2 className="text-xl font-bold">{new Date().toLocaleDateString('en-IN')}</h2>
+            <h2 className="text-xl font-bold" suppressHydrationWarning>{new Date().toLocaleDateString('en-IN')}</h2>
           </div>
           <div className="text-right">
             <p className="text-sm text-muted-foreground">Generated On</p>
-            <p className="font-medium">{new Date().toLocaleString('en-IN')}</p>
+            <p className="font-medium" suppressHydrationWarning>{new Date().toLocaleString('en-IN')}</p>
           </div>
         </div>
       </div>

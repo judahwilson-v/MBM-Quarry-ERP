@@ -9,7 +9,16 @@ import { listEmployees, saveEmployee, deleteEmployee } from "@/app/actions/emplo
 import { formatCurrency } from "@/lib/utils";
 import Link from "next/link";
 
-type EmployeeRow = any;
+interface EmployeeRow {
+  id: string;
+  name: string;
+  phone?: string | null;
+  address?: string | null;
+  role?: string | null;
+  balance?: number;
+  createdAt?: string | Date;
+  updatedAt?: string | Date;
+}
 
 function blankForm() {
   return {
@@ -178,10 +187,10 @@ export function EmployeesPage() {
                           <td className="p-4 text-muted-foreground">{row.role}</td>
                           <td className="p-4 text-muted-foreground">{row.phone || "-"}</td>
                           <td className="p-4 text-right tabular-nums font-medium">
-                            {row.balance > 0 ? (
-                              <span className="text-emerald-600">+{formatCurrency(row.balance)}</span>
-                            ) : row.balance < 0 ? (
-                              <span className="text-rose-600">{formatCurrency(row.balance)}</span>
+                            {(row.balance ?? 0) > 0 ? (
+                              <span className="text-emerald-600">+{formatCurrency(row.balance ?? 0)}</span>
+                            ) : (row.balance ?? 0) < 0 ? (
+                              <span className="text-rose-600">{formatCurrency(row.balance ?? 0)}</span>
                             ) : (
                               <span className="text-muted-foreground">{formatCurrency(0)}</span>
                             )}

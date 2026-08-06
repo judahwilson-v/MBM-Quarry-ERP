@@ -4,6 +4,7 @@ import { getDb } from "@/lib/prisma";
 import { revalidatePath } from "next/cache";
 import { writeAuditEvent } from "@/lib/domain";
 import { triggerAutoSync } from "@/lib/sync/auto-sync";
+import { sanitizeError } from "@/lib/utils/sanitize-error";
 
 export async function getGlobalSettings() {
   const prisma = await getDb();
@@ -16,13 +17,14 @@ export async function getGlobalSettings() {
       settings = await prisma.globalSettings.create({
         data: { id: "default" }
       });
-    } catch (e) {
+    } catch {
       // Fallback for read-only environments (e.g. Vercel dashboard)
       settings = {
         id: "default",
         quarryName: "MBM Quarry",
         adminPin: "8888",
         deletePin: "7711",
+        enableCreditLocks: false,
       } as any;
     }
   }
@@ -50,6 +52,7 @@ export async function updateGlobalSettings(data: any) {
         enableWeighbridge: data.enableWeighbridge ?? before?.enableWeighbridge ?? false,
         enableFleetMaintenance: data.enableFleetMaintenance ?? before?.enableFleetMaintenance ?? false,
         enableCustomerPortal: data.enableCustomerPortal ?? before?.enableCustomerPortal ?? false,
+        enableCreditLocks: data.enableCreditLocks ?? before?.enableCreditLocks ?? false,
       },
       create: {
         id: "default",
@@ -64,6 +67,7 @@ export async function updateGlobalSettings(data: any) {
         enableWeighbridge: data.enableWeighbridge ?? false,
         enableFleetMaintenance: data.enableFleetMaintenance ?? false,
         enableCustomerPortal: data.enableCustomerPortal ?? false,
+        enableCreditLocks: data.enableCreditLocks ?? false,
       }
     });
     await writeAuditEvent(prisma, {
@@ -79,6 +83,6 @@ export async function updateGlobalSettings(data: any) {
     revalidatePath("/");
     return { success: true, settings };
   } catch (error: any) {
-    return { success: false, message: error.message };
+    return { success: false, message: sanitizeError(error) };
   }
 }

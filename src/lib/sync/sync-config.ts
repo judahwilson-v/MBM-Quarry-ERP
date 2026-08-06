@@ -24,6 +24,10 @@ export const SYNC_MODEL_CONFIG = {
   LedgerEntry: { table: "ledger_entries", delegate: "ledgerEntry", timeColumn: "created_at", timeField: "createdAt" },
   InventoryStock: { table: "inventory_stock", delegate: "inventoryStock", timeColumn: "last_updated", timeField: "lastUpdated" },
   InventoryTransaction: { table: "inventory_transactions", delegate: "inventoryTransaction", timeColumn: "created_at", timeField: "createdAt" },
+  WeighbridgeTicket: { table: "weighbridge_tickets", delegate: "weighbridgeTicket", timeColumn: "updated_at", timeField: "updatedAt" },
+  MaintenanceRecord: { table: "maintenance_records", delegate: "maintenanceRecord", timeColumn: "updated_at", timeField: "updatedAt" },
+  MaintenanceSchedule: { table: "maintenance_schedules", delegate: "maintenanceSchedule", timeColumn: "updated_at", timeField: "updatedAt" },
+  VehicleStats: { table: "vehicle_stats", delegate: "vehicleStats", timeColumn: "updated_at", timeField: "updatedAt" },
 } as const;
 
 export type SyncModelName = keyof typeof SYNC_MODEL_CONFIG;
@@ -68,6 +72,10 @@ export const PULL_ORDER: SyncModelName[] = [
   "CashTransfer",
   "InventoryStock",
   "InventoryTransaction",
+  "WeighbridgeTicket",
+  "MaintenanceRecord",
+  "MaintenanceSchedule",
+  "VehicleStats",
 ];
 
 // These projection tables do not create audit rows of their own, so they must

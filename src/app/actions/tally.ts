@@ -2,6 +2,7 @@
 
 import { getDb } from "@/lib/prisma";
 import { generateTallyXML, TallySaleData } from "@/lib/tally-exporter";
+import { sanitizeError } from "@/lib/utils/sanitize-error";
 
 export async function exportSalesToTallyXML(
   startDate: Date, 
@@ -77,6 +78,6 @@ export async function exportSalesToTallyXML(
     return { success: true, xml: xmlString };
   } catch (error: any) {
     console.error("Tally Export Error:", error);
-    return { success: false, error: error.message || "Failed to generate XML" };
+    return { success: false, error: sanitizeError(error, "Failed to generate XML") };
   }
 }

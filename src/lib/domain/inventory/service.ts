@@ -2,6 +2,7 @@
 
 import { getDb } from "@/lib/prisma";
 import { revalidatePath } from "next/cache";
+import { Prisma } from "@prisma/client";
 
 export async function getInventoryStock() {
   const db = await getDb();
@@ -63,7 +64,7 @@ export async function adjustInventoryStock(
 }
 
 export async function txAdjustInventoryStock(
-  tx: any,
+  tx: Prisma.TransactionClient,
   materialName: string,
   quantityChange: number,
   type: 'PRODUCTION_IN' | 'SALE_OUT' | 'MANUAL_ADJUST',

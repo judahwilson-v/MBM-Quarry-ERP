@@ -2,55 +2,14 @@
 
 
 
+import { Prisma } from "@prisma/client";
 import { getDb } from "@/lib/prisma";
 import { triggerAutoSync } from "@/lib/sync/auto-sync";
-import { deriveSalesEngine, type SalesDraft } from "@/lib/sales-engine";
-import { calculateRemainingCredit, decrementVehicleTrips, incrementVehicleTrips, writeAuditEvent } from "@/lib/domain";
+import { writeAuditEvent } from "@/lib/domain";
 import { emitFinancialEvent } from "@/lib/domain/financial-events";
-import { addDayBookExpense, rebuildDayBook, setDayBookOpeningBalances, projectDayBookExpense, recalculateDayBook, getOrCreateDayBook } from "@/lib/domain/daybook";
-import { recalculatePartyLedger } from "@/lib/domain/ledger/party-ledger-service";
-import { txAdjustInventoryStock } from "@/lib/domain/inventory/service";
-import { verifyEditPassword } from "@/app/actions/auth";
+import { projectDayBookExpense, recalculateDayBook } from "@/lib/domain/daybook";
 
-type VehicleInput = {
-  id?: string;
-  vehicleNumber: string;
-  partyName?: string | null;
-  companyBodyQty?: string | number | null;
-  extraBodyQty?: string | number | null;
-};
-
-type PartyInput = {
-  id?: string;
-  partyName: string;
-  phone?: string | null;
-  address?: string | null;
-};
-
-type SaleInput = SalesDraft & {
-  id?: string;
-  vehicleId?: string;
-};
-
-type IncomingBoulderInput = {
-  id?: string;
-  date: string;
-  bookNumber?: string;
-  pageNumber?: string;
-  vehicleNumber: string;
-  partyName: string;
-  qty: string | number;
-  rockRate?: string | number | null;
-  cashPaid?: string | number | null;
-  bankPaid?: string | number | null;
-  gPayPaid?: string | number | null;
-  vehicleRent?: string | number | null;
-  combinedPayment?: boolean | null;
-  time?: string | null;
-  remarks?: string | null;
-};
-
-type EmployeeCreditInput = {
+export type EmployeeCreditInput = {
   id?: string;
   employeeName: string;
   amount: string | number;
@@ -62,7 +21,7 @@ type EmployeeCreditInput = {
 const dateTimeKeys = new Set(["createdAt", "updatedAt", "saleDate", "date", "expectedDueDate"]);
 
 function serialize<T>(value: T): T {
-  if (value instanceof Date) return value.toISOString() as T;
+  if (value instanceof Date) { try { return value.toISOString() as T; } catch { return null as unknown as T; } }
   if (Array.isArray(value)) return value.map((item) => serialize(item)) as T;
   if (value && typeof value === "object") {
     return Object.fromEntries(
@@ -73,14 +32,6 @@ function serialize<T>(value: T): T {
     ) as T;
   }
   return value;
-}
-
-function normalizeVehicleNumber(value: string) {
-  return value.trim().replace(/\s+/g, " ").toUpperCase();
-}
-
-function roundMoney(value: number) {
-  return Math.round((value + Number.EPSILON) * 100) / 100;
 }
 
 function cleanText(value?: string | null) {
@@ -111,68 +62,13 @@ function parseDateInput(value?: string | null) {
   return date;
 }
 
-function dateOnly(value: Date | string) {
-  const date = value instanceof Date ? value : new Date(value);
-  const offset = date.getTimezoneOffset() * 60000;
-  return new Date(date.getTime() - offset).toISOString().slice(0, 10);
-}
-
 function containsSearch(row: Record<string, unknown>, search?: string) {
   const query = search?.trim().toLowerCase();
   if (!query) return true;
   return Object.values(row).some((value) => String(value ?? "").toLowerCase().includes(query));
 }
 
-async function upsertPartyByName(partyName: string) {
-  const db = await getDb();
-  const name = partyName.trim();
-  if (!name) return;
-  const existing = await db.party.findFirst({
-    where: { partyName: { equals: name } },
-    select: { id: true },
-  });
-  if (!existing) {
-    return await db.party.create({ data: { partyName: name } });
-  }
-  return existing;
-}
-
-async function upsertVehicleByNumber(vehicleNumber: string, partyName?: string, partyId?: string | null, qty?: number | null) {
-  const db = await getDb();
-  const normalized = normalizeVehicleNumber(vehicleNumber);
-  if (!normalized) return null;
-
-  let existing = await db.vehicle.findUnique({
-    where: { vehicleNumber: normalized },
-  });
-
-  if (!existing) {
-    existing = await db.vehicle.create({
-      data: {
-        vehicleNumber: normalized,
-        partyName: partyName || null,
-        partyId: partyId || null,
-        companyBodyQty: qty || null,
-      },
-    });
-  } else {
-    const updateData: any = {};
-    if (partyName && !existing.partyName) updateData.partyName = partyName;
-    if (partyId && !existing.partyId) updateData.partyId = partyId;
-    if (qty && !existing.companyBodyQty && !existing.extraBodyQty) updateData.companyBodyQty = qty;
-
-    if (Object.keys(updateData).length > 0) {
-      existing = await db.vehicle.update({
-        where: { id: existing.id },
-        data: updateData,
-      });
-    }
-  }
-  return existing;
-}
-
-
-async function runTx<T>(txFn: (tx: any) => Promise<T>): Promise<T> {
+async function runTx<T>(txFn: (tx: Prisma.TransactionClient) => Promise<T>): Promise<T> {
   const db = await getDb();
   try {
     return await db.$transaction(txFn);
@@ -190,7 +86,6 @@ export async function listEmployeeCredits(search = "") {
 
 
 export async function saveEmployeeCredit(input: EmployeeCreditInput) {
-  const db = await getDb();
   const data = {
     employeeName: requiredText(input.employeeName, "Employee name"),
     amount: parseNumber(input.amount, "Amount") ?? 0,
@@ -216,7 +111,6 @@ export async function saveEmployeeCredit(input: EmployeeCreditInput) {
 
 
 export async function deleteEmployeeCredit(id: string) {
-  const db = await getDb();
   await runTx(async (tx) => {
     const before = await tx.employeeCredit.findUnique({ where: { id } });
     await tx.employeeCredit.delete({ where: { id } });
@@ -270,7 +164,6 @@ export type EmployeeLedgerInput = {
 
 
 export async function saveEmployeeLedgerEntry(input: EmployeeLedgerInput) {
-  const db = await getDb();
   const amount = parseNumber(input.amount, "Amount") || 0;
   const cashPaid = parseNumber(input.cashPaid, "Cash Paid", false) || 0;
   const date = parseDateInput(input.date);

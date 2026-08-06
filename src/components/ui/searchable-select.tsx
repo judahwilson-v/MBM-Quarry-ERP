@@ -20,6 +20,8 @@ export function SearchableSelect({
   onCreate,
   createLabel,
   allowCustom = false,
+  id,
+  "aria-label": ariaLabel,
 }: {
   value?: string;
   customValue?: string;
@@ -30,6 +32,8 @@ export function SearchableSelect({
   onCreate?: (query: string) => void;
   createLabel?: string;
   allowCustom?: boolean;
+  id?: string;
+  "aria-label"?: string;
 }) {
   const [open, setOpen] = useState(false);
   const [query, setQuery] = useState("");
@@ -55,6 +59,8 @@ export function SearchableSelect({
   return (
     <div className="relative">
       <input
+        id={id}
+        aria-label={ariaLabel ?? placeholder}
         className="flex h-10 w-full rounded-lg border border-input bg-background px-3 pr-9 py-2 text-sm text-foreground shadow-[var(--shadow-card)] transition-colors placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:border-accent"
         placeholder={placeholder}
         value={inputValue}

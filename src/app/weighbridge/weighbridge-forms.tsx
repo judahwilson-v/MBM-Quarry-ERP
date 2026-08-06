@@ -15,7 +15,7 @@ import {
 } from "@/components/ui/dialog";
 import { createWeighbridgeTicket, completeWeighbridgeTicket } from "@/app/actions/weighbridge";
 import { Plus, Scale, Truck } from "lucide-react";
-import { WeighbridgeTicket } from "@prisma/client";
+import type { WeighbridgeTicket } from "@prisma/client";
 
 export function NewTicketDialog() {
   const [open, setOpen] = useState(false);

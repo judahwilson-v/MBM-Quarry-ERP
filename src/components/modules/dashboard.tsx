@@ -34,7 +34,7 @@ export function Dashboard({ metrics }: { metrics: Metrics }) {
         <p className="text-muted-foreground">Overview of quarry operations and financials.</p>
       </div>
 
-      <div className="grid gap-4 md:grid-cols-3">
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
         <MetricCard
           title="Today's Sales"
           amount={metrics.today.sales}
@@ -99,7 +99,7 @@ export function Dashboard({ metrics }: { metrics: Metrics }) {
             trend="Total owed to suppliers/boulders"
             color="text-rose-500"
           />
-          <div className="grid grid-cols-2 gap-4">
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
             <Card className="bg-primary/5 border-primary/20">
               <CardContent className="p-4 flex flex-col justify-center items-center text-center">
                 <Banknote className="h-6 w-6 text-emerald-600 mb-2" />
@@ -122,7 +122,7 @@ export function Dashboard({ metrics }: { metrics: Metrics }) {
         </div>
       </div>
 
-      <div className="grid gap-4 md:grid-cols-3">
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
         <QuickLink href="/sales" icon={Factory} label="Go to Sales" />
         <QuickLink href="/purchases/boulder" icon={TrendingDown} label="Go to Purchases" />
         <QuickLink href="/daybook" icon={PieChart} label="View Day Book" />

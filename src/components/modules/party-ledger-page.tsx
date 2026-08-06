@@ -21,18 +21,18 @@ type PartySummary = {
 
 type PartyLedgerEntry = {
   id: string;
-  partyId: string;
+  partyId?: string | null;
   partyName: string;
-  date: string;
-  time?: string;
+  date: string | Date;
+  time?: string | null;
   type: string;
   refId: string;
   description: string;
-  paymentMethod?: string;
+  paymentMethod?: string | null;
   debitAmount: number;
   creditAmount: number;
   balance: number;
-  createdAt: string;
+  createdAt?: string | Date;
 };
 
 export function PartyLedgerPage() {
@@ -41,7 +41,7 @@ export function PartyLedgerPage() {
   const [entries, setEntries] = useState<PartyLedgerEntry[]>([]);
   const [search, setSearch] = useState("");
   const [error, setError] = useState("");
-  const { confirmAction } = usePrompt();
+  const { confirmAction, promptPassword } = usePrompt();
 
   const [paymentMode, setPaymentMode] = useState<"collection" | "payment" | null>(null);
   const [paymentForm, setPaymentForm] = useState({
@@ -54,7 +54,7 @@ export function PartyLedgerPage() {
 
   const loadSummary = useCallback(async () => {
     try {
-      setSummary((await listPartiesWithBalances()) as unknown as PartySummary[]);
+      setSummary((await listPartiesWithBalances()) as PartySummary[]);
     } catch (err) {
       setError(err instanceof Error ? err.message : "Failed to load party balances.");
     }
@@ -62,7 +62,7 @@ export function PartyLedgerPage() {
 
   const loadEntries = useCallback(async (party: PartySummary) => {
     setSelectedParty(party);
-    setEntries((await listPartyLedgerEntries(party.id)) as unknown as PartyLedgerEntry[]);
+    setEntries((await listPartyLedgerEntries(party.id)) as PartyLedgerEntry[]);
   }, []);
 
   useEffect(() => {
@@ -124,13 +124,17 @@ export function PartyLedgerPage() {
     if (entry.type !== "PAYMENT_RECEIVED" && entry.type !== "PAYMENT_GIVEN") return;
     
     const typeLabel = entry.type === "PAYMENT_RECEIVED" ? "Collection" : "Payment";
+    
+    const password = await promptPassword(`Enter Admin/Delete PIN to remove this ${typeLabel}:`);
+    if (!password) return;
+    
     if (!(await confirmAction(`Delete this ${typeLabel} of ${formatCurrency(entry.creditAmount || entry.debitAmount)}?`))) return;
     
     try {
       if (entry.type === "PAYMENT_RECEIVED") {
-        await deletePartyCollection(entry.refId);
+        await deletePartyCollection(entry.refId, password);
       } else {
-        await deletePartyPayment(entry.refId);
+        await deletePartyPayment(entry.refId, password);
       }
       await loadSummary();
       await loadEntries(selectedParty);

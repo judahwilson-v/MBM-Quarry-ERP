@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { format, startOfMonth, endOfMonth, subMonths } from "date-fns";
 import { Button } from "@/components/ui/button";
 import { useToast } from "@/components/ui/use-toast";
@@ -8,8 +8,13 @@ import { exportSalesToTallyXML } from "@/app/actions/tally";
 import { CalendarIcon, Download, FileJson, Info } from "lucide-react";
 
 export function TallyExportDashboard() {
-  const [startDate, setStartDate] = useState(format(startOfMonth(new Date()), "yyyy-MM-dd"));
-  const [endDate, setEndDate] = useState(format(endOfMonth(new Date()), "yyyy-MM-dd"));
+  const [startDate, setStartDate] = useState("");
+  const [endDate, setEndDate] = useState("");
+
+  useEffect(() => {
+    setStartDate(format(startOfMonth(new Date()), "yyyy-MM-dd"));
+    setEndDate(format(endOfMonth(new Date()), "yyyy-MM-dd"));
+  }, []);
   const [gstOnly, setGstOnly] = useState(true);
   const [isExporting, setIsExporting] = useState(false);
   const { toast } = useToast();

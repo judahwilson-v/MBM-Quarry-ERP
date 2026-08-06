@@ -29,7 +29,7 @@ export function ExpensesPage() {
 
   const loadExpenses = useCallback(async () => {
     try {
-      const rows = (await listExpenses()) as unknown as ExpenseRow[];
+      const rows = (await listExpenses()) as ExpenseRow[];
       setExpenses(rows);
     } catch (err) {
       console.error(err);

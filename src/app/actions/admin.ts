@@ -2,6 +2,7 @@
 
 import { getDb } from "@/lib/prisma";
 import { pushSync, pullSync } from "@/lib/sync/sync-service";
+import { sanitizeError } from "@/lib/utils/sanitize-error";
 
 export async function forceSync() {
   try {
@@ -9,7 +10,7 @@ export async function forceSync() {
     const pullResult = await pullSync();
     return { success: true, message: `Sync triggered. Pushed: ${pushResult.pushed}, Pulled: ${pullResult.pulled}` };
   } catch (error: any) {
-    return { success: false, message: error.message };
+    return { success: false, message: sanitizeError(error) };
   }
 }
 
@@ -22,7 +23,7 @@ export async function resetSyncQueue() {
     
     return { success: true, message: "Sync cursor reset to origin. Next sync will be a full pull." };
   } catch (error: any) {
-    return { success: false, message: error.message };
+    return { success: false, message: sanitizeError(error) };
   }
 }
 
@@ -46,6 +47,6 @@ export async function getDatabaseInfo() {
       }
     };
   } catch (error: any) {
-    return { success: false, message: error.message };
+    return { success: false, message: sanitizeError(error) };
   }
 }

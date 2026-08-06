@@ -11,17 +11,37 @@ import { listVehicles } from "@/app/actions/vehicles";
 import { formatCurrency } from "@/lib/utils";
 import { SearchableSelect } from "@/components/ui/searchable-select";
 
-type FuelPurchaseRow = any;
-type VehicleRow = any;
+interface FuelPurchaseRow {
+  id: string;
+  date: string | Date;
+  fuelType: string;
+  pricePerLitre: number | null;
+  qtyLitre: number | null;
+  amount: number;
+  paidAmount: number;
+  isCan: boolean;
+  vehicleId?: string | null;
+  vehicleNumber?: string | null;
+  vehicle?: VehicleRow | null;
+  createdAt?: string | Date;
+}
+
+interface VehicleRow {
+  id: string;
+  vehicleNumber: string;
+  partyName?: string | null;
+  partyId?: string | null;
+}
 
 function todayInputValue() {
   const offset = new Date().getTimezoneOffset() * 60000;
   return new Date(Date.now() - offset).toISOString().slice(0, 10);
 }
 
-function dateInput(value: string) {
+function dateInput(value: string | Date) {
   if (!value) return todayInputValue();
-  return value.split("T")[0];
+  const iso = value instanceof Date ? value.toISOString() : String(value);
+  return iso.split("T")[0];
 }
 
 function blankForm() {
@@ -171,7 +191,7 @@ export function FuelManagementPage() {
               </div>
             )}
 
-            <div className="grid grid-cols-2 gap-4">
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
               <div className="space-y-2">
                 <label className="text-sm font-medium">Price / Litre (Opt)</label>
                 <Input type="number" step="0.01" value={form.pricePerLitre} onChange={e => setForm({ ...form, pricePerLitre: e.target.value })} />
@@ -207,11 +227,11 @@ export function FuelManagementPage() {
         </Card>
 
         <Card className="md:col-span-2">
-          <CardHeader className="flex flex-row items-center justify-between pb-2">
+          <CardHeader className="flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between pb-2">
             <CardTitle>Recent Fuel Purchases</CardTitle>
-            <div className="relative w-64">
+            <div className="relative w-full sm:w-64">
               <Search className="absolute left-2.5 top-2.5 h-4 w-4 text-muted-foreground" />
-              <Input placeholder="Search vehicle or CAN..." className="pl-8" value={search} onChange={(e) => setSearch(e.target.value)} />
+              <Input placeholder="Search vehicle or CAN..." className="pl-8" value={search} onChange={(e) => setSearch(e.target.value)} aria-label="Search fuel purchases" />
             </div>
           </CardHeader>
           <CardContent>
