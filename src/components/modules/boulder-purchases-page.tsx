@@ -10,9 +10,9 @@ import { Input } from "@/components/ui/input";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { Textarea } from "@/components/ui/textarea";
 import { SearchableSelect } from "@/components/ui/searchable-select";
-import { deleteIncomingBoulder, listIncomingBoulder, saveIncomingBoulder } from "@/app/actions/purchases";
+import { listIncomingBoulder, saveIncomingBoulder, deleteIncomingBoulder } from "@/app/actions/purchases";
+import { checkDuplicateSaleBookNumber as checkDuplicateBookNumber, getLastBookPage } from "@/app/actions/sales";
 import { listVehicles } from "@/app/actions/vehicles";
-import { getLastBookPage } from "@/app/actions/sales";
 import { formatCurrency, formatDate, formatQty, todayInputValue } from "@/lib/utils";
 import { exportToExcel } from "@/lib/export";
 
@@ -74,6 +74,7 @@ export function BoulderPurchasesPage() {
   const [search, setSearch] = useState("");
   const [message, setMessage] = useState("");
   const [error, setError] = useState("");
+  const [isSubmitting, setIsSubmitting] = useState(false);
   const { confirmAction, promptPassword } = usePrompt();
 
   useEffect(() => {
@@ -141,11 +142,31 @@ export function BoulderPurchasesPage() {
   }
 
   async function submit() {
+    if (isSubmitting) return;
     setError("");
     setMessage("");
+    setIsSubmitting(true);
     try {
       if (!form.qty || Number(form.qty) <= 0) throw new Error("Quantity must be greater than 0.");
       if (!form.rockRate || Number(form.rockRate) < 0) throw new Error("Rock Rate must be a valid number.");
+
+      if (form.bookNumber && form.pageNumber) {
+        const isDuplicate = await checkDuplicateBookNumber(
+          Number(form.bookNumber),
+          Number(form.pageNumber),
+          form.id
+        );
+        
+        if (isDuplicate) {
+          const proceed = window.confirm(
+            `Warning: Book Number ${form.bookNumber} / Page ${form.pageNumber} already exists in the database!\n\nAre you sure you want to proceed and save a duplicate or overwrite?`
+          );
+          if (!proceed) {
+             setIsSubmitting(false);
+             return;
+          }
+        }
+      }
 
       await saveIncomingBoulder(form);
       setMessage(form.id ? "Boulder entry updated." : "Boulder entry saved.");
@@ -153,6 +174,8 @@ export function BoulderPurchasesPage() {
       await load();
     } catch (err) {
       setError(err instanceof Error ? err.message : "Save failed.");
+    } finally {
+      setIsSubmitting(false);
     }
   }
 

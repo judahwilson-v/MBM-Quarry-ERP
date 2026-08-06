@@ -11,7 +11,7 @@ import { SearchableSelect } from "@/components/ui/searchable-select";
 
 import { listMaterials } from "@/app/actions/materials";
 import { listVehicles } from "@/app/actions/vehicles";
-import { saveSale, getLastBookPage } from "@/app/actions/sales";
+import { saveSale, getLastBookPage, checkDuplicateSaleBookNumber } from "@/app/actions/sales";
 import { deriveSalesEngine } from "@/lib/sales-engine";
 import { verifyEditPassword } from "@/app/actions/auth";
 import { formatCurrency, todayInputValue } from "@/lib/utils";
@@ -117,6 +117,7 @@ export function SalesEntryForm({
   const [materials, setMaterials] = useState<MaterialRow[]>([]);
   const [message, setMessage] = useState("");
   const [error, setError] = useState("");
+  const [isSubmitting, setIsSubmitting] = useState(false);
   const { promptPassword } = usePrompt();
 
   const loadMasters = useCallback(async () => {
@@ -240,12 +241,33 @@ export function SalesEntryForm({
   }
 
   async function submit() {
+    if (isSubmitting) return;
     setError("");
     setMessage("");
+    setIsSubmitting(true);
     try {
       if (!form.materialId) throw new Error("Material is required.");
       if (!form.qty || Number(form.qty) <= 0) throw new Error("Quantity must be greater than 0.");
       if (!form.ratePerCft || Number(form.ratePerCft) < 0) throw new Error("Rate must be a valid number.");
+
+      // Check for duplicate book/page number before saving
+      if (form.bookNumber && form.pageNumber) {
+        const isDuplicate = await checkDuplicateSaleBookNumber(
+          Number(form.bookNumber),
+          Number(form.pageNumber),
+          form.id
+        );
+        
+        if (isDuplicate) {
+          const proceed = window.confirm(
+            `Warning: Book Number ${form.bookNumber} / Page ${form.pageNumber} already exists in the database!\n\nAre you sure you want to proceed and save a duplicate or overwrite?`
+          );
+          if (!proceed) {
+             setIsSubmitting(false);
+             return;
+          }
+        }
+      }
 
       if (form.id) {
         const password = await promptPassword("Enter edit password:");
@@ -277,6 +299,8 @@ export function SalesEntryForm({
       onSaved?.();
     } catch (err) {
       setError(err instanceof Error ? err.message : "Could not save sale.");
+    } finally {
+      setIsSubmitting(false);
     }
   }
 

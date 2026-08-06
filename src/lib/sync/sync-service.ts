@@ -6,6 +6,7 @@ import {
   getRowTimestamp,
   LOCAL_CONFLICT_FIELDS,
   PULL_ORDER,
+  PUSH_PRIORITY,
   REMOTE_CONFLICT_COLUMNS,
   resolveSyncModel,
   SYNC_MODEL_CONFIG,
@@ -47,8 +48,12 @@ function toCamelCase(obj: any): any {
   if (obj instanceof Date) {
     return obj;
   }
-  if (typeof obj === 'string' && /^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}(\.\d+)?$/.test(obj)) {
-    return new Date(obj + 'Z');
+  if (typeof obj === 'string' && /^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}(\.\d+)?(Z|[+-]\d{2}:\d{2})?$/i.test(obj)) {
+    const hasTz = /Z|[+-]\d{2}:\d{2}$/i.test(obj);
+    const parsedDate = new Date(hasTz ? obj : obj + 'Z');
+    if (!Number.isNaN(parsedDate.getTime())) {
+      return parsedDate;
+    }
   }
   if (Array.isArray(obj)) {
     return obj.map((v) => toCamelCase(v));
@@ -62,76 +67,116 @@ function toCamelCase(obj: any): any {
   return obj;
 }
 
-export async function pushSync() {
+export interface SyncErrorItem {
+  table: string;
+  rowId?: string;
+  error: string;
+}
+
+export interface SyncResult {
+  pushed: number;
+  pulled: number;
+  skipped: number;
+  errors: SyncErrorItem[];
+  status: "IDLE" | "ERROR" | "PARTIAL_SUCCESS";
+}
+
+export async function pushSync(): Promise<SyncResult> {
+  let pushedCount = 0;
+  const pulledCount = 0;
+  let skippedCount = 0;
+  const errorsList: SyncErrorItem[] = [];
+
   const db = await getDb();
   const supabase = createClient();
-  
-  // 1. Get sync state
-  let syncState = await db.syncState.findUnique({ where: { id: "default" } });
-  if (!syncState) {
-    syncState = await db.syncState.create({
-      data: { id: "default", lastSyncedAt: new Date(0) }
-    });
-  }
-
-  // Push priority — lower = pushed first (parents before FK-dependent children)
-  const PUSH_PRIORITY: Record<string, number> = {
-    GlobalSettings: 0, Material: 1, Party: 1, Supplier: 1, Vehicle: 1,
-    Employee: 1, OutgoingSale: 2, IncomingBoulder: 2, PartyCredit: 2,
-    PartyCollection: 2, PartyPayment: 2, Expense: 2, EmployeeCredit: 2,
-    OtherCredit: 2, FuelPurchase: 2, DayBook: 2, DayBookEntry: 3,
-    DayBookExpenseEntry: 3, PartyLedger: 3, EmployeeLedger: 3, CashTransfer: 3,
-  };
-
-  // 2. Fetch new audit logs since last sync
-  const unsyncedLogs = await db.auditLog.findMany({
-    where: { createdAt: { gt: syncState.lastSyncedAt } },
-    orderBy: { createdAt: 'asc' }
-  });
-
-  // Sort by dependency order: parent entities first, then by time
-  unsyncedLogs.sort((a, b) => {
-    const aModel = resolveSyncModel(a.entityName);
-    const bModel = resolveSyncModel(b.entityName);
-    const aPri = aModel ? (PUSH_PRIORITY[aModel] ?? 5) : 5;
-    const bPri = bModel ? (PUSH_PRIORITY[bModel] ?? 5) : 5;
-    if (aPri !== bPri) return aPri - bPri;
-    return a.createdAt.getTime() - b.createdAt.getTime();
-  });
-
-  let lastProcessedTime = syncState.lastSyncedAt;
-  let successCount = 0;
-
-  await db.syncState.update({ where: { id: "default" }, data: { status: "SYNCING" } });
 
   try {
+    // 1. Get sync state
+    let syncState = await db.syncState.findUnique({ where: { id: "default" } });
+    if (!syncState) {
+      syncState = await db.syncState.create({
+        data: { id: "default", lastSyncedAt: new Date(0) }
+      });
+    }
 
+    // 2. Fetch new audit logs since last sync
+    let unsyncedLogs: any[] = [];
+    try {
+      unsyncedLogs = await db.auditLog.findMany({
+        where: { createdAt: { gt: syncState.lastSyncedAt } },
+        orderBy: { createdAt: 'asc' }
+      });
+    } catch (fetchErr: any) {
+      console.error("[Sync Push] Failed to fetch audit logs:", fetchErr);
+      errorsList.push({ table: "audit_logs", error: fetchErr?.message || String(fetchErr) });
+    }
+
+    // Sort by dependency order: parent entities first, then by time
+    unsyncedLogs.sort((a, b) => {
+      const aModel = resolveSyncModel(a.entityName);
+      const bModel = resolveSyncModel(b.entityName);
+      const aPri = aModel ? (PUSH_PRIORITY[aModel] ?? 99) : 99;
+      const bPri = bModel ? (PUSH_PRIORITY[bModel] ?? 99) : 99;
+      if (aPri !== bPri) return aPri - bPri;
+      return a.createdAt.getTime() - b.createdAt.getTime();
+    });
+
+    let lastProcessedTime = syncState.lastSyncedAt;
+    const heldLogs: any[] = [];
+    let earliestSkippedTime: Date | null = null;
+
+    const recordSkippedTime = (date: Date) => {
+      if (!earliestSkippedTime || date < earliestSkippedTime) {
+        earliestSkippedTime = date;
+      }
+    };
+
+    await db.syncState.update({ where: { id: "default" }, data: { status: "SYNCING" } });
 
     for (const log of unsyncedLogs) {
       const modelName = resolveSyncModel(log.entityName);
       const config = modelName ? SYNC_MODEL_CONFIG[modelName] : null;
-      
-      if (config) {
+
+      if (!config) {
+        if (log.createdAt > lastProcessedTime) lastProcessedTime = log.createdAt;
+        continue;
+      }
+
+      try {
         if (log.action === "delete") {
           console.log(`[Sync Push] Deleting ${config.table}:${log.entityId}`);
           const { error } = await supabase.from(config.table).delete().eq("id", log.entityId);
           if (error) {
             if (error.code === '23503' || error.message?.includes('foreign key')) {
-              console.warn(`[Sync Push] Skipping delete ${config.table}:${log.entityId} (FK dep, will retry)`);
+              console.warn(`[Sync Push] Holding delete ${config.table}:${log.entityId} (FK dep, will retry)`);
+              heldLogs.push(log);
               continue;
             }
             throw new Error(`[Sync Push] Delete failed for ${config.table}:${log.entityId}: ${error.message}`);
           }
         } else if ((log.action === "create" || log.action === "update") && log.payload) {
-          const entityData = extractEntityData(JSON.parse(log.payload));
+          let entityData: any;
+          try {
+            entityData = extractEntityData(JSON.parse(log.payload));
+          } catch (jsonErr: any) {
+            console.error(`[Sync Push] JSON parse failed for log ${log.id} (${config.table}:${log.entityId}):`, jsonErr);
+            errorsList.push({ table: config.table, rowId: log.entityId, error: `JSON parse error: ${jsonErr?.message || jsonErr}` });
+            skippedCount++;
+            recordSkippedTime(log.createdAt);
+            if (log.createdAt > lastProcessedTime) lastProcessedTime = log.createdAt;
+            continue;
+          }
+
           const snakeData = toSnakeCase(entityData);
           console.log(`[Sync Push] Upserting ${config.table}:${String(snakeData.id ?? log.entityId)}`);
           // Use the correct onConflict column if this model has a unique key beyond 'id'
-          const conflictColumn = REMOTE_CONFLICT_COLUMNS[modelName!];
+          const rawConflictCol = REMOTE_CONFLICT_COLUMNS[modelName!];
+          const conflictColumn = (rawConflictCol && rawConflictCol !== "id" && snakeData[rawConflictCol] != null) ? rawConflictCol : undefined;
           const { error } = await supabase.from(config.table).upsert(snakeData, conflictColumn ? { onConflict: conflictColumn } : undefined);
           if (error) {
             if (error.code === '23503' || error.message?.includes('foreign key')) {
-              console.warn(`[Sync Push] Skipping ${config.table}:${log.entityId} (FK dep missing, will retry)`);
+              console.warn(`[Sync Push] Holding ${config.table}:${log.entityId} (FK dep missing, will retry)`);
+              heldLogs.push(log);
               continue;
             }
             if (error.code === '23505') {
@@ -146,249 +191,490 @@ export async function pushSync() {
                 snakeData.name = `${snakeData.name} (Merge ${log.entityId.slice(-4)})`;
               } else if (config.table === 'materials' && snakeData.material_name) {
                 snakeData.material_name = `${snakeData.material_name} (Merge ${log.entityId.slice(-4)})`;
-              } else if (config.table === 'weighbridge_tickets' && snakeData.ticket_number) {
-                snakeData.ticket_number = `${snakeData.ticket_number}-${log.entityId.slice(-4)}`;
+              } else if (config.table === 'weighbridge_tickets' && snakeData.ticket_number !== undefined && snakeData.ticket_number !== null) {
+                const currentNum = typeof snakeData.ticket_number === 'number' ? snakeData.ticket_number : (parseInt(String(snakeData.ticket_number), 10) || 0);
+                snakeData.ticket_number = currentNum + 900000;
               } else if (config.table === 'outgoing_sales' && snakeData.serial_number) {
                 snakeData.serial_number = null; // Drop conflicting auto-number
               }
               const { error: retryError } = await supabase.from(config.table).upsert(snakeData, conflictColumn ? { onConflict: conflictColumn } : undefined);
               if (retryError) {
-                 throw new Error(`[Sync Push] Upsert retry failed for ${config.table}:${log.entityId}: ${retryError.message}`);
+                throw new Error(`[Sync Push] Upsert retry failed for ${config.table}:${log.entityId}: ${retryError.message}`);
               }
             } else {
               throw new Error(`[Sync Push] Upsert failed for ${config.table}:${log.entityId}: ${error.message}`);
             }
           }
         }
-      }
-      
-      // Push the audit log itself to Supabase so other PCs know about deletions
-      const { error: auditError } = await supabase.from("audit_logs").upsert(toSnakeCase(log));
-      if (auditError) throw auditError;
 
-      lastProcessedTime = log.createdAt;
-      successCount++;
+        // Push the audit log itself to Supabase so other PCs know about deletions
+        try {
+          const { error: auditError } = await supabase.from("audit_logs").upsert(toSnakeCase(log));
+          if (auditError) {
+            console.warn(`[Sync Push] Audit log push failed for ${log.id}: ${auditError.message}`);
+          }
+        } catch (auditErr: any) {
+          console.warn(`[Sync Push] Audit log push exception:`, auditErr);
+        }
+
+        if (log.createdAt > lastProcessedTime) {
+          lastProcessedTime = log.createdAt;
+        }
+        pushedCount++;
+      } catch (rowErr: any) {
+        const errorMsg = rowErr?.message || String(rowErr);
+        console.error(`[Sync Push] Row push failed for ${config?.table || log.entityName}:${log.entityId}:`, errorMsg);
+        errorsList.push({
+          table: config?.table || log.entityName,
+          rowId: log.entityId,
+          error: errorMsg,
+        });
+        skippedCount++;
+        recordSkippedTime(log.createdAt);
+        if (log.createdAt > lastProcessedTime) {
+          lastProcessedTime = log.createdAt;
+        }
+      }
     }
 
-    // Event, ledger, and inventory projections are not represented by their
-    // own audit rows. Scan their timestamps so they are not silently omitted.
+    // FK Holding Queue Retry Pass (up to 3 passes for held logs)
+    let currentHeld = [...heldLogs];
+    let retryPass = 0;
+    while (currentHeld.length > 0 && retryPass < 3) {
+      retryPass++;
+      console.log(`[Sync Push] Retrying ${currentHeld.length} held logs (pass ${retryPass})...`);
+      const nextHeld: any[] = [];
+      for (const log of currentHeld) {
+        const modelName = resolveSyncModel(log.entityName);
+        const config = modelName ? SYNC_MODEL_CONFIG[modelName] : null;
+        if (!config) continue;
+        try {
+          if (log.action === "delete") {
+            const { error } = await supabase.from(config.table).delete().eq("id", log.entityId);
+            if (error) {
+              if (error.code === '23503' || error.message?.includes('foreign key')) {
+                nextHeld.push(log);
+                continue;
+              }
+              throw new Error(`Delete failed for ${config.table}:${log.entityId}: ${error.message}`);
+            }
+          } else if ((log.action === "create" || log.action === "update") && log.payload) {
+            const entityData = extractEntityData(JSON.parse(log.payload));
+            const snakeData = toSnakeCase(entityData);
+            const rawConflictCol = REMOTE_CONFLICT_COLUMNS[modelName!];
+            const conflictColumn = (rawConflictCol && rawConflictCol !== "id" && snakeData[rawConflictCol] != null) ? rawConflictCol : undefined;
+            const { error } = await supabase.from(config.table).upsert(snakeData, conflictColumn ? { onConflict: conflictColumn } : undefined);
+            if (error) {
+              if (error.code === '23503' || error.message?.includes('foreign key')) {
+                nextHeld.push(log);
+                continue;
+              }
+              throw new Error(`Upsert failed for ${config.table}:${log.entityId}: ${error.message}`);
+            }
+          }
+          try {
+            await supabase.from("audit_logs").upsert(toSnakeCase(log));
+          } catch {}
+          pushedCount++;
+          if (log.createdAt > lastProcessedTime) {
+            lastProcessedTime = log.createdAt;
+          }
+        } catch (retryErr: any) {
+          console.warn(`[Sync Push] Held log retry failed for ${config.table}:${log.entityId}:`, retryErr?.message);
+          nextHeld.push(log);
+        }
+      }
+      currentHeld = nextHeld;
+    }
+
+    if (currentHeld.length > 0) {
+      skippedCount += currentHeld.length;
+      for (const heldLog of currentHeld) {
+        recordSkippedTime(heldLog.createdAt);
+      }
+      console.warn(`[Sync Push] ${currentHeld.length} logs remain held due to missing parent foreign keys.`);
+    }
+
+    // Event, ledger, and inventory projections
     for (const modelName of DIRECT_PUSH_MODELS) {
       const config = SYNC_MODEL_CONFIG[modelName];
-      const delegate = (db as any)[config.delegate];
-      const rows = await delegate.findMany({
-        where: { [config.timeField]: { gt: syncState.lastSyncedAt } },
-        orderBy: { [config.timeField]: "asc" },
-      });
+      if (!config) continue;
+      try {
+        const delegate = (db as any)[config.delegate];
+        const rows = await delegate.findMany({
+          where: { [config.timeField]: { gt: syncState.lastSyncedAt } },
+          orderBy: { [config.timeField]: "asc" },
+        });
 
-      for (const row of rows as Record<string, unknown>[]) {
-        const snakeData = toSnakeCase(row);
-        console.log(`[Sync Push] Upserting projection ${config.table}:${String(snakeData.id)}`);
-        const conflictColumn = REMOTE_CONFLICT_COLUMNS[modelName];
-        const { error } = await supabase
-          .from(config.table)
-          .upsert(snakeData, conflictColumn ? { onConflict: conflictColumn } : undefined);
-        if (error) {
-          throw new Error(`[Sync Push] Projection upsert failed for ${config.table}:${String(snakeData.id)}: ${error.message}`);
+        for (const row of rows as Record<string, unknown>[]) {
+          try {
+            const snakeData = toSnakeCase(row);
+            console.log(`[Sync Push] Upserting projection ${config.table}:${String(snakeData.id)}`);
+            const rawConflictCol = REMOTE_CONFLICT_COLUMNS[modelName];
+            const conflictColumn = (rawConflictCol && rawConflictCol !== "id" && snakeData[rawConflictCol] != null) ? rawConflictCol : undefined;
+            const { error } = await supabase
+              .from(config.table)
+              .upsert(snakeData, conflictColumn ? { onConflict: conflictColumn } : undefined);
+            if (error) {
+              throw new Error(`[Sync Push] Projection upsert failed for ${config.table}:${String(snakeData.id)}: ${error.message}`);
+            }
+            const rowDate = getRowTimestamp(row, config.timeField);
+            if (rowDate > lastProcessedTime) lastProcessedTime = rowDate;
+            pushedCount++;
+          } catch (projRowErr: any) {
+            const errorMsg = projRowErr?.message || String(projRowErr);
+            console.error(`[Sync Push] Projection row push failed for ${config.table}:${String((row as any).id)}:`, errorMsg);
+            errorsList.push({
+              table: config.table,
+              rowId: String((row as any).id),
+              error: errorMsg,
+            });
+            skippedCount++;
+            const rowDate = getRowTimestamp(row, config.timeField);
+            recordSkippedTime(rowDate);
+            if (rowDate > lastProcessedTime) lastProcessedTime = rowDate;
+          }
         }
-        const rowDate = getRowTimestamp(row, config.timeField);
-        if (rowDate > lastProcessedTime) lastProcessedTime = rowDate;
-        successCount++;
+      } catch (projModelErr: any) {
+        console.error(`[Sync Push] Projection model fetch/push failed for ${config.table}:`, projModelErr);
+        errorsList.push({
+          table: config.table,
+          error: projModelErr?.message || String(projModelErr),
+        });
+      }
+    }
+
+    const finalStatus: "IDLE" | "ERROR" | "PARTIAL_SUCCESS" =
+      errorsList.length === 0 ? "IDLE" : (pushedCount > 0 ? "PARTIAL_SUCCESS" : "ERROR");
+    const lastErrorMessage = errorsList.length > 0 ? errorsList.map(e => `${e.table}${e.rowId ? `:${e.rowId}` : ''}: ${e.error}`).join("; ") : null;
+
+    // Cursor Management with 10-second Safety Window & Skipped Log Protection
+    const SAFETY_WINDOW_MS = 10000;
+    let finalPushCursor = syncState.lastSyncedAt;
+
+    if (lastProcessedTime > syncState.lastSyncedAt) {
+      finalPushCursor = new Date(Math.max(syncState.lastSyncedAt.getTime(), lastProcessedTime.getTime() - SAFETY_WINDOW_MS));
+    }
+
+    if (earliestSkippedTime) {
+      const maxAllowedCursor = new Date(Math.max(0, (earliestSkippedTime as Date).getTime() - 1));
+      if (maxAllowedCursor < finalPushCursor) {
+        finalPushCursor = maxAllowedCursor;
       }
     }
 
     await db.syncState.update({
       where: { id: "default" },
-      data: { lastSyncedAt: lastProcessedTime, status: "IDLE", lastError: null }
+      data: {
+        lastSyncedAt: finalPushCursor,
+        status: finalStatus === "ERROR" ? "ERROR" : "IDLE",
+        lastError: lastErrorMessage,
+      }
     });
 
+    purgeOldSupabaseData().catch((e) =>
+      console.warn("[Retention] Background purge failed:", e?.message)
+    );
+
+    return {
+      pushed: pushedCount,
+      pulled: pulledCount,
+      skipped: skippedCount,
+      errors: errorsList,
+      status: finalStatus,
+    };
   } catch (e: any) {
-    console.error(`Sync error on log:`, e);
-    await db.syncState.update({
-      where: { id: "default" },
-      data: { status: "ERROR", lastError: e.message || "Unknown sync error" }
-    });
-    // Stop syncing on first error to maintain ordering and let the UI report it.
-    throw e;
-  }
+    const topErrorMsg = e?.message || String(e);
+    console.error(`[Sync Push] Top-level error:`, topErrorMsg);
+    errorsList.push({ table: "global", error: topErrorMsg });
 
-  return { pushed: successCount };
+    try {
+      await db.syncState.update({
+        where: { id: "default" },
+        data: { status: "ERROR", lastError: topErrorMsg }
+      });
+    } catch (dbErr) {
+      console.error("[Sync Push] Failed to update syncState on error:", dbErr);
+    }
+
+    return {
+      pushed: pushedCount,
+      pulled: pulledCount,
+      skipped: skippedCount,
+      errors: errorsList,
+      status: "ERROR",
+    };
+  }
 }
 
-export async function pullSync() {
+export async function pullSync(): Promise<SyncResult> {
+  const pushedCount = 0;
+  let pulledCount = 0;
+  let skippedCount = 0;
+  const errorsList: SyncErrorItem[] = [];
+
   const db = await getDb();
   const supabase = createClient();
-  
-  // 1. Get pull state
-  let pullState = await db.syncState.findUnique({ where: { id: "pull_state" } });
-  if (!pullState) {
-    pullState = await db.syncState.create({
-      data: { id: "pull_state", lastSyncedAt: new Date(0) }
-    });
-  }
-
-  let lastProcessedTime = pullState.lastSyncedAt;
-  let successCount = 0;
-
-  await db.syncState.update({ where: { id: "pull_state" }, data: { status: "SYNCING" } });
 
   try {
+    // 1. Get pull state
+    let pullState = await db.syncState.findUnique({ where: { id: "pull_state" } });
+    if (!pullState) {
+      pullState = await db.syncState.create({
+        data: { id: "pull_state", lastSyncedAt: new Date(0) }
+      });
+    }
 
+    let lastProcessedTime = pullState.lastSyncedAt;
+
+    await db.syncState.update({ where: { id: "pull_state" }, data: { status: "SYNCING" } });
 
     // 2. Fetch deletions from audit_logs
-    const { data: deleteLogs, error: deleteError } = await supabase
-      .from('audit_logs')
-      .select('*')
-      .eq('action', 'delete')
-      .gt('created_at', pullState.lastSyncedAt.toISOString())
-      .order('created_at', { ascending: true });
+    try {
+      const { data: deleteLogs, error: deleteError } = await supabase
+        .from('audit_logs')
+        .select('*')
+        .eq('action', 'delete')
+        .gt('created_at', pullState.lastSyncedAt.toISOString())
+        .order('created_at', { ascending: true });
 
-    if (deleteError) throw deleteError;
-
-    if (deleteLogs && deleteLogs.length > 0) {
-      for (const log of deleteLogs) {
-        const camelLog = toCamelCase(log);
-        const modelName = resolveSyncModel(camelLog.entityName);
-        if (modelName) {
-           const config = SYNC_MODEL_CONFIG[modelName];
-           const delegate = (db as any)[config.delegate];
-           try {
-             await delegate.delete({ where: { id: camelLog.entityId } });
-             successCount++;
-           } catch (error: any) {
-             // P2025 means the row was already absent locally; other failures
-             // must stop the cursor from moving past an unapplied deletion.
-             if (error?.code !== "P2025") throw error;
-           }
+      if (deleteError) {
+        console.warn(`[Sync Pull] Delete logs fetch failed: ${deleteError.message}`);
+        errorsList.push({ table: "audit_logs", error: deleteError.message });
+      } else if (deleteLogs && deleteLogs.length > 0) {
+        for (const log of deleteLogs) {
+          try {
+            const camelLog = toCamelCase(log);
+            const modelName = resolveSyncModel(camelLog.entityName);
+            if (modelName) {
+              const config = SYNC_MODEL_CONFIG[modelName];
+              const delegate = (db as any)[config.delegate];
+              try {
+                await delegate.delete({ where: { id: camelLog.entityId } });
+                pulledCount++;
+              } catch (error: any) {
+                if (error?.code !== "P2025") {
+                  console.warn(`[Sync Pull] Delete local entity failed for ${config?.table || modelName}:${camelLog.entityId}: ${error?.message}`);
+                  errorsList.push({ table: config?.table || modelName, rowId: camelLog.entityId, error: error?.message || String(error) });
+                  skippedCount++;
+                }
+              }
+            }
+            const logDate = new Date(camelLog.createdAt);
+            if (logDate > lastProcessedTime) lastProcessedTime = logDate;
+          } catch (rowDelErr: any) {
+            console.warn(`[Sync Pull] Exception processing delete log:`, rowDelErr);
+            skippedCount++;
+          }
         }
-        const logDate = new Date(camelLog.createdAt);
-        if (logDate > lastProcessedTime) lastProcessedTime = logDate;
       }
+    } catch (delFetchErr: any) {
+      console.error(`[Sync Pull] Deletion handling exception:`, delFetchErr);
+      errorsList.push({ table: "audit_logs", error: delFetchErr?.message || String(delFetchErr) });
     }
 
-    // 3. Fetch creations/updates from actual tables
+    // 3. Fetch creations/updates from actual tables (Table-Level Isolation)
     for (const modelName of PULL_ORDER) {
       const config = SYNC_MODEL_CONFIG[modelName];
+      if (!config) continue;
 
-      const { data: rows, error: rowsError } = await supabase
-        .from(config.table)
-        .select('*')
-        .gt(config.timeColumn, pullState.lastSyncedAt.toISOString())
-        .order(config.timeColumn, { ascending: true });
+      try {
+        const { data: rows, error: rowsError } = await supabase
+          .from(config.table)
+          .select('*')
+          .gt(config.timeColumn, pullState.lastSyncedAt.toISOString())
+          .order(config.timeColumn, { ascending: true });
 
-      if (rowsError) throw new Error(`[Sync Pull] Fetch failed for ${config.table}: ${rowsError.message}`);
-
-      if (rows && rows.length > 0) {
-        console.log(`[Sync Pull] Fetched ${rows.length} rows for ${config.table}`);
-        for (const row of rows) {
-           const camelRow = toCamelCase(row);
-           const delegate = (db as any)[config.delegate];
-           const conflictField = LOCAL_CONFLICT_FIELDS[modelName] ?? "id";
-           try {
-             await delegate.upsert({
-               where: { [conflictField]: camelRow[conflictField] },
-               update: camelRow,
-               create: camelRow
-             });
-             successCount++;
-           } catch(error: any) {
-             const errMsg = error?.message || '';
-             if (error?.code === 'P2002' || errMsg.includes('Unique constraint')) {
-               console.warn(`[Sync Pull] Unique constraint violation on ${config.table}:${camelRow.id}. Resolving...`);
-
-               // Materials: same name = same entity. Update the existing local record.
-               if (config.table === 'materials' && camelRow.materialName) {
-                 try {
-                   const existing = await delegate.findUnique({ where: { materialName: camelRow.materialName } });
-                   if (existing && existing.id !== camelRow.id) {
-                     await delegate.update({
-                       where: { id: existing.id },
-                       data: { ratePerCft: camelRow.ratePerCft, updatedAt: camelRow.updatedAt }
-                     });
-                     console.log(`[Sync Pull] Material "${camelRow.materialName}" merged into existing local record ${existing.id}`);
-                     successCount++;
-                     const rowDate = getRowTimestamp(camelRow, config.timeField);
-                     if (rowDate > lastProcessedTime) lastProcessedTime = rowDate;
-                     continue;
-                   }
-                 } catch (matErr: any) {
-                   console.warn(`[Sync Pull] Material merge fallback failed: ${matErr?.message}`);
-                 }
-               }
-
-               // Sales & Boulders: duplicate serial/book number — latest timestamp wins
-                if ((config.table === 'outgoing_sales' && camelRow.serialNumber != null) || (config.table === 'incoming_boulder' && camelRow.bookNumber != null)) {
-                 try {
-                   const searchField = config.table === 'outgoing_sales' ? { serialNumber: camelRow.serialNumber } : { bookNumber: camelRow.bookNumber };
-                   const existing = await delegate.findFirst({ where: searchField });
-                   if (existing) {
-                     const incomingTime = new Date(camelRow.updatedAt).getTime();
-                     const localTime = new Date(existing.updatedAt).getTime();
-                     if (incomingTime >= localTime) {
-                       await delegate.update({ where: { id: existing.id }, data: { ...camelRow, id: existing.id } });
-                       console.warn(`[Sync Pull] Duplicate record in ${config.table} — remote is newer, updated local record.`);
-                     } else {
-                       console.warn(`[Sync Pull] Duplicate record in ${config.table} — local is newer, skipping remote.`);
-                     }
-                     successCount++;
-                     const rowDate = getRowTimestamp(camelRow, config.timeField);
-                     if (rowDate > lastProcessedTime) lastProcessedTime = rowDate;
-                     continue;
-                   }
-                 } catch (dupErr: any) {
-                   console.warn(`[Sync Pull] Duplicate resolution failed for ${config.table}: ${dupErr?.message}`);
-                 }
-               }
-
-                // Name-based entities: append merge suffix
-                if (config.table === 'parties' && camelRow.partyName) {
-                  camelRow.partyName = `${camelRow.partyName} (Merge ${camelRow.id.slice(-4)})`;
-                } else if (config.table === 'vehicles' && camelRow.vehicleNumber) {
-                  camelRow.vehicleNumber = `${camelRow.vehicleNumber} (Merge ${camelRow.id.slice(-4)})`;
-                } else if (config.table === 'suppliers' && camelRow.supplierName) {
-                  camelRow.supplierName = `${camelRow.supplierName} (Merge ${camelRow.id.slice(-4)})`;
-                } else if (config.table === 'employees' && camelRow.name) {
-                  camelRow.name = `${camelRow.name} (Merge ${camelRow.id.slice(-4)})`;
-                } else if (config.table === 'weighbridge_tickets' && camelRow.ticketNumber) {
-                  camelRow.ticketNumber = `${camelRow.ticketNumber}-${camelRow.id.slice(-4)}`;
-                }
-               try {
-                 await delegate.upsert({
-                   where: { [conflictField]: camelRow[conflictField] },
-                   update: camelRow,
-                   create: camelRow
-                 });
-                 successCount++;
-                 const rowDate = getRowTimestamp(camelRow, config.timeField);
-                 if (rowDate > lastProcessedTime) lastProcessedTime = rowDate;
-                 continue;
-               } catch(retryError: any) {
-                 throw new Error(`[Sync Pull] Local upsert retry failed for ${config.table}:${camelRow.id}: ${retryError?.message ?? retryError}`);
-               }
-             }
-             throw new Error(`[Sync Pull] Local upsert failed for ${config.table}:${camelRow.id}: ${error?.message ?? error}`);
-           }
-           
-           const rowDate = getRowTimestamp(camelRow, config.timeField);
-           if (rowDate > lastProcessedTime) lastProcessedTime = rowDate;
+        if (rowsError) {
+          console.warn(`[Sync Pull] Fetch failed for ${config.table}: ${rowsError.message}. Skipping table.`);
+          errorsList.push({ table: config.table, error: `Fetch failed: ${rowsError.message}` });
+          skippedCount++;
+          continue; // Continue loop for remaining tables in PULL_ORDER!
         }
+
+        if (rows && rows.length > 0) {
+          console.log(`[Sync Pull] Fetched ${rows.length} rows for ${config.table}`);
+          for (const row of rows) {
+            try {
+              const camelRow = toCamelCase(row);
+              const delegate = (db as any)[config.delegate];
+              const rawConflictField = LOCAL_CONFLICT_FIELDS[modelName] ?? "id";
+              const conflictField = (camelRow[rawConflictField] != null) ? rawConflictField : "id";
+
+              let upserted = false;
+              try {
+                await delegate.upsert({
+                  where: { [conflictField]: camelRow[conflictField] },
+                  update: camelRow,
+                  create: camelRow
+                });
+                upserted = true;
+                pulledCount++;
+              } catch (error: any) {
+                const errMsg = error?.message || '';
+                if (error?.code === 'P2002' || errMsg.includes('Unique constraint')) {
+                  console.warn(`[Sync Pull] Unique constraint violation on ${config.table}:${camelRow.id}. Resolving...`);
+
+                  // Materials: same name = same entity
+                  if (config.table === 'materials' && camelRow.materialName) {
+                    try {
+                      const existing = await delegate.findUnique({ where: { materialName: camelRow.materialName } });
+                      if (existing && existing.id !== camelRow.id) {
+                        await delegate.update({
+                          where: { id: existing.id },
+                          data: { ratePerCft: camelRow.ratePerCft, updatedAt: camelRow.updatedAt }
+                        });
+                        console.log(`[Sync Pull] Material "${camelRow.materialName}" merged into existing local record ${existing.id}`);
+                        pulledCount++;
+                        const rowDate = getRowTimestamp(camelRow, config.timeField);
+                        if (rowDate > lastProcessedTime) lastProcessedTime = rowDate;
+                        continue;
+                      }
+                    } catch (matErr: any) {
+                      console.warn(`[Sync Pull] Material merge fallback failed: ${matErr?.message}`);
+                    }
+                  }
+
+                  // Sales & Boulders: duplicate serial/book number
+                  if ((config.table === 'outgoing_sales' && camelRow.serialNumber != null) || (config.table === 'incoming_boulder' && camelRow.bookNumber != null)) {
+                    try {
+                      const searchField = config.table === 'outgoing_sales' ? { serialNumber: camelRow.serialNumber } : { bookNumber: camelRow.bookNumber };
+                      const existing = await delegate.findFirst({ where: searchField });
+                      if (existing) {
+                        const incomingTime = new Date(camelRow.updatedAt).getTime();
+                        const localTime = new Date(existing.updatedAt).getTime();
+                        if (incomingTime >= localTime) {
+                          await delegate.update({ where: { id: existing.id }, data: { ...camelRow, id: existing.id } });
+                          console.warn(`[Sync Pull] Duplicate record in ${config.table} — remote is newer, updated local record.`);
+                        } else {
+                          console.warn(`[Sync Pull] Duplicate record in ${config.table} — local is newer, skipping remote.`);
+                        }
+                        pulledCount++;
+                        const rowDate = getRowTimestamp(camelRow, config.timeField);
+                        if (rowDate > lastProcessedTime) lastProcessedTime = rowDate;
+                        continue;
+                      }
+                    } catch (dupErr: any) {
+                      console.warn(`[Sync Pull] Duplicate resolution failed for ${config.table}: ${dupErr?.message}`);
+                    }
+                  }
+
+                  // Name-based entities: append merge suffix
+                  if (config.table === 'parties' && camelRow.partyName) {
+                    camelRow.partyName = `${camelRow.partyName} (Merge ${camelRow.id.slice(-4)})`;
+                  } else if (config.table === 'vehicles' && camelRow.vehicleNumber) {
+                    camelRow.vehicleNumber = `${camelRow.vehicleNumber} (Merge ${camelRow.id.slice(-4)})`;
+                  } else if (config.table === 'suppliers' && camelRow.supplierName) {
+                    camelRow.supplierName = `${camelRow.supplierName} (Merge ${camelRow.id.slice(-4)})`;
+                  } else if (config.table === 'employees' && camelRow.name) {
+                    camelRow.name = `${camelRow.name} (Merge ${camelRow.id.slice(-4)})`;
+                  } else if (config.table === 'weighbridge_tickets' && camelRow.ticketNumber !== undefined && camelRow.ticketNumber !== null) {
+                    const currentNum = typeof camelRow.ticketNumber === 'number' ? camelRow.ticketNumber : (parseInt(String(camelRow.ticketNumber), 10) || 0);
+                    camelRow.ticketNumber = currentNum + 900000;
+                  }
+
+                  try {
+                    await delegate.upsert({
+                      where: { [conflictField]: camelRow[conflictField] },
+                      update: camelRow,
+                      create: camelRow
+                    });
+                    pulledCount++;
+                    const rowDate = getRowTimestamp(camelRow, config.timeField);
+                    if (rowDate > lastProcessedTime) lastProcessedTime = rowDate;
+                    continue;
+                  } catch (retryError: any) {
+                    const retryMsg = retryError?.message || String(retryError);
+                    console.error(`[Sync Pull] Local upsert retry failed for ${config.table}:${camelRow.id}: ${retryMsg}`);
+                    errorsList.push({ table: config.table, rowId: camelRow.id, error: retryMsg });
+                    skippedCount++;
+                    const rowDate = getRowTimestamp(camelRow, config.timeField);
+                    if (rowDate > lastProcessedTime) lastProcessedTime = rowDate;
+                    continue;
+                  }
+                }
+                
+                // Non-unique constraint upsert error
+                console.error(`[Sync Pull] Local upsert failed for ${config.table}:${camelRow.id}: ${errMsg}`);
+                errorsList.push({ table: config.table, rowId: camelRow.id, error: errMsg });
+                skippedCount++;
+                const rowDate = getRowTimestamp(camelRow, config.timeField);
+                if (rowDate > lastProcessedTime) lastProcessedTime = rowDate;
+                continue;
+              }
+
+              if (upserted) {
+                const rowDate = getRowTimestamp(camelRow, config.timeField);
+                if (rowDate > lastProcessedTime) lastProcessedTime = rowDate;
+              }
+            } catch (rowErr: any) {
+              const rowErrMsg = rowErr?.message || String(rowErr);
+              console.error(`[Sync Pull] Row processing error for ${config.table}:`, rowErrMsg);
+              errorsList.push({ table: config.table, rowId: (row as any)?.id, error: rowErrMsg });
+              skippedCount++;
+              const rowDate = getRowTimestamp(row, config.timeField);
+              if (rowDate > lastProcessedTime) lastProcessedTime = rowDate;
+            }
+          }
+        }
+      } catch (tableErr: any) {
+        const tableErrMsg = tableErr?.message || String(tableErr);
+        console.error(`[Sync Pull] Table processing exception for ${config.table}:`, tableErrMsg);
+        errorsList.push({ table: config.table, error: tableErrMsg });
+        skippedCount++;
+        // Continue loop for remaining tables!
       }
+    }
+
+    const finalStatus: "IDLE" | "ERROR" | "PARTIAL_SUCCESS" =
+      errorsList.length === 0 ? "IDLE" : (pulledCount > 0 ? "PARTIAL_SUCCESS" : "ERROR");
+    const lastErrorMessage = errorsList.length > 0 ? errorsList.map(e => `${e.table}${e.rowId ? `:${e.rowId}` : ''}: ${e.error}`).join("; ") : null;
+
+    const SAFETY_WINDOW_MS = 10000;
+    let finalPullCursor = pullState.lastSyncedAt;
+
+    if (lastProcessedTime > pullState.lastSyncedAt) {
+      finalPullCursor = new Date(Math.max(pullState.lastSyncedAt.getTime(), lastProcessedTime.getTime() - SAFETY_WINDOW_MS));
     }
 
     await db.syncState.update({
       where: { id: "pull_state" },
-      data: { lastSyncedAt: lastProcessedTime, status: "IDLE", lastError: null }
+      data: {
+        lastSyncedAt: finalPullCursor,
+        status: finalStatus === "ERROR" ? "ERROR" : "IDLE",
+        lastError: lastErrorMessage,
+      }
     });
 
+    return {
+      pushed: pushedCount,
+      pulled: pulledCount,
+      skipped: skippedCount,
+      errors: errorsList,
+      status: finalStatus,
+    };
   } catch (e: any) {
-    console.error(`Pull sync error:`, e);
-    await db.syncState.update({
-      where: { id: "pull_state" },
-      data: { status: "ERROR", lastError: e.message || "Unknown pull error" }
-    });
-    throw e;
-  }
+    const topErrorMsg = e?.message || String(e);
+    console.error(`[Sync Pull] Top-level error:`, topErrorMsg);
+    errorsList.push({ table: "global", error: topErrorMsg });
 
-  return { pulled: successCount };
+    try {
+      await db.syncState.update({
+        where: { id: "pull_state" },
+        data: { status: "ERROR", lastError: topErrorMsg }
+      });
+    } catch (dbErr) {
+      console.error("[Sync Pull] Failed to update pull syncState on error:", dbErr);
+    }
+
+    return {
+      pushed: pushedCount,
+      pulled: pulledCount,
+      skipped: skippedCount,
+      errors: errorsList,
+      status: "ERROR",
+    };
+  }
 }
 
 export async function getSyncStatus() {
@@ -415,5 +701,146 @@ export async function getSyncStatus() {
             pushState?.status === "SYNCING" || pullState?.status === "SYNCING" ? "SYNCING" : "IDLE",
     lastError: pushState?.lastError || pullState?.lastError || null,
     pendingCount
+  };
+}
+
+// ---------- Data Retention ----------
+
+/** Per-table retention policies (days). Audit logs are ephemeral (3 days),
+ *  other event/log tables keep 30 days. Local SQLite is never touched. */
+const RETENTION_POLICY: { table: string; days: number }[] = [
+  { table: "audit_logs",              days: 3  },
+  { table: "financial_events",        days: 30 },
+  { table: "ledger_entries",          days: 30 },
+  { table: "inventory_transactions",  days: 30 },
+];
+
+/**
+ * Deletes rows older than their retention period from Supabase.
+ * Only affects Supabase — local SQLite keeps full history forever.
+ * Safe to run repeatedly; idempotent.
+ */
+export async function purgeOldSupabaseData(): Promise<{ purged: Record<string, number> }> {
+  const supabase = createClient();
+
+  const purged: Record<string, number> = {};
+
+  for (const { table, days } of RETENTION_POLICY) {
+    try {
+      const cutoff = new Date();
+      cutoff.setDate(cutoff.getDate() - days);
+
+      const { count, error } = await supabase
+        .from(table as any)
+        .delete({ count: "exact" })
+        .lt("created_at", cutoff.toISOString());
+
+      if (error) {
+        console.warn(`[Retention] Failed to purge ${table}: ${error.message}`);
+        purged[table] = 0;
+      } else {
+        purged[table] = count ?? 0;
+        if (count && count > 0) {
+          console.log(`[Retention] Purged ${count} old rows from ${table}`);
+        }
+      }
+    } catch (e: any) {
+      console.warn(`[Retention] Error purging ${table}: ${e?.message}`);
+      purged[table] = 0;
+    }
+  }
+
+  return { purged };
+}
+
+// ---------- Storage Stats ----------
+
+export interface SupabaseStorageStats {
+  tables: { table: string; totalSize: string; rowCount: number }[];
+  totalDiskMB: number;
+  limitMB: number;
+  usagePercent: number;
+}
+
+/**
+ * Queries Supabase for per-table storage usage via pg_total_relation_size.
+ * Uses a Supabase RPC call. If the RPC function doesn't exist, falls back
+ * to a row-count-based estimate.
+ */
+export async function getSupabaseStorageStats(): Promise<SupabaseStorageStats> {
+  const supabase = createClient();
+  const FREE_TIER_LIMIT_MB = 500;
+
+  // Try the RPC approach first (requires the function to be created in Supabase)
+  const { data: rpcData, error: rpcError } = await supabase.rpc("get_table_sizes");
+
+  if (!rpcError && rpcData && Array.isArray(rpcData)) {
+    const tables = rpcData.map((row: any) => ({
+      table: row.table_name,
+      totalSize: row.total_size,
+      rowCount: Number(row.row_count) || 0,
+    }));
+    const totalDiskMB = rpcData.reduce(
+      (sum: number, row: any) => sum + (Number(row.total_bytes) || 0),
+      0
+    ) / (1024 * 1024);
+
+    return {
+      tables,
+      totalDiskMB: Math.round(totalDiskMB * 100) / 100,
+      limitMB: FREE_TIER_LIMIT_MB,
+      usagePercent: Math.round((totalDiskMB / FREE_TIER_LIMIT_MB) * 10000) / 100,
+    };
+  }
+
+  // Fallback: estimate from row counts
+  const allTables: string[] = Object.values(SYNC_MODEL_CONFIG).map((c) => c.table);
+  allTables.push("audit_logs"); // audit_logs is always synced
+
+  const ROW_SIZE_ESTIMATES: Record<string, number> = {
+    audit_logs: 400, financial_events: 400, ledger_entries: 300,
+    outgoing_sales: 500, incoming_boulder: 450, party_ledger: 250,
+    inventory_transactions: 200, expenses: 350, party_credit: 200,
+    party_collections: 250, party_payments: 250, day_book_entries: 250,
+    day_book_expense_entries: 200, employee_ledgers: 200, fuel_purchases: 300,
+    cash_transfers: 200, day_books: 300, weighbridge_tickets: 350,
+  };
+  const DEFAULT_ROW_SIZE = 250;
+
+  const tableStats: { table: string; totalSize: string; rowCount: number }[] = [];
+  let totalBytes = 0;
+
+  for (const table of allTables) {
+    try {
+      const { count, error } = await supabase
+        .from(table as any)
+        .select("*", { count: "exact", head: true });
+
+      const rowCount = error ? 0 : (count ?? 0);
+      const rowSize = ROW_SIZE_ESTIMATES[table] ?? DEFAULT_ROW_SIZE;
+      const estimatedBytes = rowCount * rowSize;
+      totalBytes += estimatedBytes;
+
+      tableStats.push({
+        table,
+        totalSize: estimatedBytes > 1024 * 1024
+          ? `${(estimatedBytes / (1024 * 1024)).toFixed(1)} MB`
+          : `${(estimatedBytes / 1024).toFixed(1)} KB`,
+        rowCount,
+      });
+    } catch {
+      tableStats.push({ table, totalSize: "?", rowCount: 0 });
+    }
+  }
+
+  // Sort by estimated size descending
+  tableStats.sort((a, b) => b.rowCount - a.rowCount);
+
+  const totalDiskMB = totalBytes / (1024 * 1024);
+  return {
+    tables: tableStats,
+    totalDiskMB: Math.round(totalDiskMB * 100) / 100,
+    limitMB: FREE_TIER_LIMIT_MB,
+    usagePercent: Math.round((totalDiskMB / FREE_TIER_LIMIT_MB) * 10000) / 100,
   };
 }

@@ -561,7 +561,7 @@ model WeighbridgeTicket {
   partyId         String?  @map("party_id")
   materialId      String?  @map("material_id")
   
-  ticketType      String   @default("OUTGOING") // OUTGOING (Sale) or INCOMING (Purchase)
+  ticketType      String   @default("OUTGOING") @map("ticket_type") // OUTGOING (Sale) or INCOMING (Purchase)
   status          String   @default("FIRST_WEIGHT") // FIRST_WEIGHT, SECOND_WEIGHT, COMPLETED, VOID
   
   grossWeight     Float?   @map("gross_weight")

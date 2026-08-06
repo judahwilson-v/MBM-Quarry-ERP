@@ -1,14 +1,14 @@
-# AI Continuation Checkpoint — Phase 14 Sync fixes
+# AI Continuation Checkpoint — v1.13.0 Supabase Retention & Storage Indicator
 
 ---
 
 ## CURRENT STATE
 
 ```
-Current Task:    Phase 14 Sync Realtime Push & Duplicate Check
+Current Task:    v1.13.0 Release
 Status:          100%
-Next File:       docs/CHANGELOG.md
-Next Command:    None
+Next File:       None
+Next Command:    npm run release:minor
 Blockers:        None
 ```
 
@@ -18,9 +18,9 @@ Blockers:        None
 
 ```
 Project:         MBM Quarry V2
-Version:         v1.12.6
+Version:         v1.13.0
 Phase:           Phase 14 Field Deployment & Sync Reliability
-Current Goal:    Comprehensive sync conflict resolution across all models
+Current Goal:    Supabase Free Tier storage retention and indicator widget
 Branch:          main
 State:           Uncommitted
 ```
@@ -29,19 +29,14 @@ State:           Uncommitted
 
 ## 2. Completed Work
 
-- [x] Set up Supabase Realtime listener in `app-shell.tsx` (`ShellSync` component) to instantly detect `audit_logs` and `outgoing_sales` changes from the cloud.
-- [x] Trigger `handleSync()` on Realtime events to pull remote data automatically.
-- [x] Trigger Next.js App Router layout revalidation so that the UI refreshes instantly across PCs when sync pulls new data.
-- [x] Created `checkDuplicateSaleBookNumber` in `sales.ts` (checks both `outgoing_sales` and `incoming_boulder` for Book/Page Number collisions).
-- [x] Added `window.confirm` UI blocker inside `submit()` in `sales-entry-form.tsx` to warn about duplicate Book/Page.
-- [x] Added `window.confirm` UI blocker inside `submit()` in `boulder-purchases-page.tsx`.
-- [x] Fixed `sync-service.ts` pull logic to resolve duplicate book numbers by picking the latest timestamp.
-- [x] TypeScript compiled successfully.
+- [x] Implemented `purgeOldSupabaseData()` in `sync-service.ts` for 3-day (user logs) and 30-day retention policies on Supabase.
+- [x] Built `<StorageIndicator />` dashboard widget to monitor 500MB Free Tier limits.
+- [x] Added server actions `getSupabaseStorageUsage()` and `triggerSupabaseDataPurge()` in `admin.ts`.
+- [x] Updated `docs/CHANGELOG.md` with v1.13.0 details.
 
 ---
 
 ## 3. Remaining Work
 
-- [x] Complete app testing.
-- [x] Final package deployment (installer).
-- [x] Comprehensive sync unique constraint audit and handling (v1.12.6).
+- [x] Send new app update (`npm run release:minor`).
+

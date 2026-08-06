@@ -1,13 +1,18 @@
 # MBM Quarry ERP — Project State
 
-**Status**: Phase 13 Remediation Complete
-**Version**: `v1.12.0`
-**Phase**: Remediation & Code Health (Complete)
+**Status**: Milestone 2 Architectural Resilience & Error Boundaries Complete
+**Version**: `v1.14.0`
+**Phase**: Sync Engine Hardening & Error Isolation (Complete)
 **Last Updated**: 2026-08-06
 
 ## Status
 | Area | Status |
 |------|--------|
+| Sync Engine Error Boundaries | ✅ Service, Table, & Row Level Isolation (`sync-service.ts`) |
+| Structured Summary Contract | ✅ Non-throwing `SyncResult` summary objects returned |
+| Row Quarantine & Cursor | ✅ Failures logged & skipped; cursors advance progressively |
+| Adaptive UI Polling | ✅ Polling exponential backoff on error (`app-shell.tsx`) |
+| Multi-PC Sync & Realtime | ✅ Supabase Realtime Auto-Refresh & Duplicate Prevention Added |
 | Sales Engine Audit | ✅ Audit Completed & Hotfixed |
 | Boulder Purchases Audit | ✅ Audit Completed & Hotfixed (runTx fixed) |
 | Vehicles & Bootstrap Audit | ✅ Audit Completed & Hotfixed (engine_hours added) |

@@ -4,6 +4,7 @@ import { ArrowRight, Banknote, Factory, IndianRupee, PieChart, Receipt, Trending
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { formatCurrency, cn } from "@/lib/utils";
 import Link from "next/link";
+import { StorageIndicator } from "@/components/storage-indicator";
 import { type getDashboardMetrics } from "@/lib/domain/dashboard/service";
 import {
   BarChart,
@@ -121,6 +122,8 @@ export function Dashboard({ metrics }: { metrics: Metrics }) {
           </div>
         </div>
       </div>
+
+      <StorageIndicator />
 
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
         <QuickLink href="/sales" icon={Factory} label="Go to Sales" />

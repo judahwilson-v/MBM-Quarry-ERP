@@ -35,7 +35,11 @@ DECLARE
     'fuel_purchases',
     'global_settings',
     'inventory_stock',
-    'inventory_transactions'
+    'inventory_transactions',
+    'weighbridge_tickets',
+    'maintenance_records',
+    'maintenance_schedules',
+    'vehicle_stats'
   ];
 BEGIN
   FOREACH t IN ARRAY sync_tables LOOP
@@ -63,9 +67,16 @@ $$;
 GRANT USAGE ON SCHEMA public TO anon;
 GRANT USAGE ON SCHEMA public TO authenticated;
 
--- 5. Add missing columns to global_settings if not already present
+-- 5. Add missing columns to global_settings, vehicles, and parties if not already present
 ALTER TABLE "global_settings"
   ADD COLUMN IF NOT EXISTS "admin_pin"  TEXT NOT NULL DEFAULT '8888',
   ADD COLUMN IF NOT EXISTS "delete_pin" TEXT NOT NULL DEFAULT '7711';
+
+ALTER TABLE "vehicles"
+  ADD COLUMN IF NOT EXISTS "vehicle_type" TEXT,
+  ADD COLUMN IF NOT EXISTS "engine_hours" DOUBLE PRECISION;
+
+ALTER TABLE "parties"
+  ADD COLUMN IF NOT EXISTS "party_group" TEXT;
 
 -- Done. Verify with: SELECT tablename, rowsecurity FROM pg_tables WHERE schemaname='public';

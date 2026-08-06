@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef, useCallback } from "react";
 import { triggerSync, fetchSyncStatus, fetchOnlineStatus } from "@/app/actions/sync";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
@@ -197,46 +197,68 @@ function ShellSync() {
   const [syncStatus, setSyncStatus] = useState<any>(null);
   const [isSyncing, setIsSyncing] = useState(false);
   const [isOnline, setIsOnline] = useState<boolean | null>(null);
+  const [, setConsecutiveErrors] = useState(0);
+  const timerRef = useRef<NodeJS.Timeout | null>(null);
+
+  const runPoll = useCallback(async () => {
+    let hasError = false;
+    try {
+      const [status, online] = await Promise.all([
+        fetchSyncStatus(),
+        fetchOnlineStatus(),
+      ]);
+      setSyncStatus(status);
+      setIsOnline(online);
+      if (status?.status === "ERROR" || !online) {
+        hasError = true;
+      }
+    } catch (e) {
+      console.error("[Sync Poll] Exception during status check:", e);
+      hasError = true;
+    }
+
+    setConsecutiveErrors((prev) => {
+      const nextErrors = hasError ? prev + 1 : 0;
+      // Exponential backoff: 10s base, 20s, 40s, 80s, 160s, up to 300s (5m) max
+      const nextDelay = hasError
+        ? Math.min(10000 * Math.pow(2, prev), 300000)
+        : 10000;
+      if (timerRef.current) clearTimeout(timerRef.current);
+      timerRef.current = setTimeout(runPoll, nextDelay);
+      return nextErrors;
+    });
+  }, []);
 
   useEffect(() => {
-    // Use server-side ping instead of navigator.onLine (broken in Electron)
-    const checkAll = async () => {
-      try {
-        const [status, online] = await Promise.all([
-          fetchSyncStatus(),
-          fetchOnlineStatus(),
-        ]);
-        setSyncStatus(status);
-        setIsOnline(online);
-      } catch (e) {
-        console.error(e);
-      }
+    runPoll();
+
+    return () => {
+      if (timerRef.current) clearTimeout(timerRef.current);
     };
-
-    checkAll();
-    const interval = setInterval(checkAll, 10000); // Poll every 10s
-
-    return () => clearInterval(interval);
-  }, []);
+  }, [runPoll]);
 
   const handleSync = async () => {
     if (isSyncing) return;
     setIsSyncing(true);
     try {
-      await triggerSync();
+      const syncRes = await triggerSync();
       const [newStatus, online] = await Promise.all([
         fetchSyncStatus(),
         fetchOnlineStatus(),
       ]);
       setSyncStatus(newStatus);
       setIsOnline(online);
-      
-      // Force a re-fetch of server components (e.g., table lists) to instantly show pulled data
-      const { useRouter } = require("next/navigation");
-      // App router refresh is handled globally, but revalidatePath in triggerSync should handle it.
-      // We don't have useRouter in this hook scope, so we rely on triggerSync's revalidatePath
+
+      if (syncRes?.status === "ERROR" || newStatus?.status === "ERROR" || !online) {
+        setConsecutiveErrors((prev) => prev + 1);
+      } else {
+        setConsecutiveErrors(0);
+        if (timerRef.current) clearTimeout(timerRef.current);
+        timerRef.current = setTimeout(runPoll, 10000);
+      }
     } catch (e) {
-      console.error(e);
+      console.error("[Sync UI] Sync failed:", e);
+      setConsecutiveErrors((prev) => prev + 1);
     } finally {
       setIsSyncing(false);
     }
@@ -279,6 +301,7 @@ function ShellSync() {
         });
       }
     };
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   const getRelativeTime = (dateString?: string) => {

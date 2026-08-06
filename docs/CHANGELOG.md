@@ -1,5 +1,16 @@
 # MBM Quarry ERP — Changelog
 
+## v1.14.0 — Multi-Tier Error Boundaries & Architectural Resilience (2026-08-06)
+- **Multi-Tier Error Boundaries**: Refactored `pushSync()` and `pullSync()` in `src/lib/sync/sync-service.ts` to implement 3 tiers of error isolation (Service level, Table level in `pullSync()`, and Row level in `pushSync()`/`pullSync()`).
+- **Structured Summary Result (`SyncResult`)**: Both `pushSync()` and `pullSync()` now return `{ pushed, pulled, skipped, errors, status }` without throwing uncaught fatal exceptions to callers.
+- **Row Quarantine & Progressive Cursor Advancement**: Bad rows or corrupt payloads log errors to the summary list and update database status, skipping the single item while safely advancing `lastSyncedAt` for all successfully processed records.
+- **Adaptive Exponential Backoff Polling**: Updated background sync polling in `src/components/app-shell.tsx` to handle sync errors with exponential backoff (10s base doubling up to 5 minutes max) rather than spinning in tight 10-second retry loops.
+
+## v1.13.0 — Supabase Free Tier Retention & Storage Indicator (2026-08-06 05:45 PM)
+- **Automatic 3-Day / 30-Day Data Retention**: Implemented `purgeOldSupabaseData()` in `sync-service.ts` to automatically delete old ephemeral logs from Supabase after every successful sync push. `audit_logs` are purged after 3 days (user logs requirement), while `financial_events`, `ledger_entries`, and `inventory_transactions` are purged after 30 days. Local SQLite database retains 100% of historical records.
+- **Supabase Storage Indicator Widget**: Built `<StorageIndicator />` component on the main dashboard showing live Supabase disk usage (MB used vs 500MB free tier limit), visual health gauge (Healthy/Warning/Critical), per-table breakdown, and manual purge trigger.
+- **Server Actions for Storage**: Added `getSupabaseStorageUsage()` and `triggerSupabaseDataPurge()` in `src/app/actions/admin.ts`.
+
 ## v1.12.6 — Comprehensive Sync Conflict Resolution (2026-08-06 05:40 PM)
 - **Global Sync Resilience**: Conducted a comprehensive audit of all 17 synced models with unique constraints. Added proper push and pull conflict handling for all 11 previously unhandled models to eliminate cascading sync errors.
 - **Push Crash Prevention**: Fixed a critical bug where direct-pushed models (`FinancialEvent`, `DayBook`, `Expense`, etc.) would crash the entire sync queue if a unique constraint was violated. Upserts now safely update existing records.

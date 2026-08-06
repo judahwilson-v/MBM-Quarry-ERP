@@ -229,7 +229,7 @@ export function UpdaterOverlay() {
             <div className="space-y-6">
               <div className="bg-[var(--bg-muted)] rounded-lg p-4 max-h-[160px] overflow-y-auto custom-scrollbar border border-[var(--border-light)] text-sm text-[var(--text-secondary)] whitespace-pre-wrap">
                 <p className="font-semibold text-[var(--text-primary)] mb-2 text-xs uppercase tracking-wider">Release Notes</p>
-                {releaseNotes}
+                <div dangerouslySetInnerHTML={{ __html: releaseNotes }} />
               </div>
               
               <button 

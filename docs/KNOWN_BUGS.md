@@ -93,6 +93,11 @@
 **Description**: `listPartiesWithBalances` in `credits.ts` executes an individual `db.partyLedger.findFirst(...)` query in a JS loop per party (201 queries for 200 parties).  
 **Resolution**: Fetch latest ledger balances for all parties in a single batch query using SQLite `ROW_NUMBER()`.
 
+#### KB-028: Eternal Sync Loop & Uncaught Fatal Exceptions in Sync Engine
+**Severity**: Critical (Resolved)  
+**Description**: Single table fetch error (e.g. `[Sync Pull] Fetch failed for weighbridge_tickets`) or corrupt row payload caused uncaught top-level exceptions in `pushSync()` and `pullSync()`, exiting before database sync cursors (`lastSyncedAt`) could be saved. The UI polling loop (10s) continuously re-executed the identical failing operation indefinitely.  
+**Resolution**: Implemented Multi-Tier Error Boundaries (Service level, Table level in `pullSync`, and Row level in `pushSync`/`pullSync`) returning structured `SyncResult` summary objects `{ pushed, pulled, skipped, errors, status }`. Failing tables and bad rows are logged and skipped so the cursor advances safely for all healthy records. Updated UI polling in `app-shell.tsx` to use adaptive exponential backoff (10s to 5 mins max) on sync errors.
+
 ---
 
 ### Category 3: React, UI & Hydration Bugs

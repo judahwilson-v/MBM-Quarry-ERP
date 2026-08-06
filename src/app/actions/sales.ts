@@ -121,6 +121,30 @@ export async function getLastBookPage(): Promise<{ bookNumber: number; pageNumbe
   return { bookNumber: latest.bookNumber, pageNumber: latest.pageNumber };
 }
 
+export async function checkDuplicateSaleBookNumber(bookNo: number, pageNo: number, excludeId?: string): Promise<boolean> {
+  const db = await getDb();
+  const existingSale = await db.outgoingSale.findFirst({
+    where: {
+      bookNumber: bookNo,
+      pageNumber: pageNo,
+      ...(excludeId ? { id: { not: excludeId } } : {})
+    },
+    select: { id: true }
+  });
+  
+  const existingBoulder = await db.incomingBoulder.findFirst({
+    where: {
+      bookNumber: bookNo,
+      pageNumber: pageNo,
+      ...(excludeId ? { id: { not: excludeId } } : {})
+    },
+    select: { id: true }
+  });
+  
+  return !!existingSale || !!existingBoulder;
+}
+
+
 
 export async function saveSale(input: SaleInput, pin?: string) {
   try {

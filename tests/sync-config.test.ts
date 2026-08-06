@@ -38,15 +38,8 @@ function run() {
   assert.throws(() => getRowTimestamp({ createdAt: "not-a-date" }, "createdAt"), /invalid createdAt timestamp/);
 
   assert.deepEqual(DIRECT_PUSH_MODELS, [
-    "GlobalSettings",
     "FinancialEvent",
     "LedgerEntry",
-    "PartyLedger",
-    "DayBook",
-    "DayBookExpenseEntry",
-    "Employee",
-    "EmployeeLedger",
-    "CashTransfer",
     "InventoryStock",
     "InventoryTransaction",
   ]);

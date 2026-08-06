@@ -393,7 +393,7 @@
     "vehicleId": "vehicle_id",
     "partyId": "party_id",
     "materialId": "material_id",
-    "ticketType": "ticketType",
+    "ticketType": "ticket_type",
     "status": "status",
     "grossWeight": "gross_weight",
     "grossTime": "gross_time",
