@@ -1,5 +1,14 @@
 # MBM Quarry ERP — Changelog
 
+## v1.12.6 — Comprehensive Sync Conflict Resolution (2026-08-06 05:40 PM)
+- **Global Sync Resilience**: Conducted a comprehensive audit of all 17 synced models with unique constraints. Added proper push and pull conflict handling for all 11 previously unhandled models to eliminate cascading sync errors.
+- **Push Crash Prevention**: Fixed a critical bug where direct-pushed models (`FinancialEvent`, `DayBook`, `Expense`, etc.) would crash the entire sync queue if a unique constraint was violated. Upserts now safely update existing records.
+- **Merge Suffix Expansion**: Expanded the automatic duplicate resolution fallback (which appends `(Merge 1234)` to duplicate names) from just Parties and Vehicles to now include **Suppliers**, **Employees**, **Materials**, and **Weighbridge Tickets**. This guarantees the local SQLite database will never panic on naming collisions from the cloud.
+
+## v1.12.5 — Invisible Delta Updates (2026-08-06 05:20 PM)
+- **Silent Background Updates**: Reconfigured the updater pipeline to use `autoUpdater.quitAndInstall(true, true)` for completely invisible, zero-click updates similar to modern professional apps.
+- **GitHub Release Sync**: Pre-created GitHub releases in the CI pipeline before building to fix 404 race conditions and missing `latest.yml` errors.
+
 ## v1.12.1 — Updater UI & Delta Patch Fixes (2026-08-06 01:14 PM)
 - **Updater UI Minimize**: Added a "Minimize" button to the full-screen auto-updater overlay. Users can now minimize the 150MB download progress to a small floating widget in the top right, allowing them to continue using the ERP while the update downloads in the background.
 - **Delta Patches (Blockmap) Fix**: Removed the conflicting `portable` Windows target from `package.json`, ensuring `electron-builder` correctly generates and uploads `.blockmap` files to GitHub. This enables the app to download tiny 2-5MB delta patches for future updates instead of redownloading the entire 150MB file.

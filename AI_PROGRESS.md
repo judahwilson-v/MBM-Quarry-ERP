@@ -1,13 +1,13 @@
-# AI Continuation Checkpoint — Phase 13 Remediation
+# AI Continuation Checkpoint — Phase 14 Sync fixes
 
 ---
 
 ## CURRENT STATE
 
 ```
-Current Task:    Phase 13 Remaining Bug Remediation
+Current Task:    Phase 14 Sync Realtime Push & Duplicate Check
 Status:          100%
-Next File:       docs/KNOWN_BUGS.md
+Next File:       docs/CHANGELOG.md
 Next Command:    None
 Blockers:        None
 ```
@@ -18,115 +18,30 @@ Blockers:        None
 
 ```
 Project:         MBM Quarry V2
-Version:         v1.12.0
-Phase:           Phase 13 Remediation
-Current Goal:    Resolve remaining 7 bugs from KNOWN_BUGS.md
+Version:         v1.12.6
+Phase:           Phase 14 Field Deployment & Sync Reliability
+Current Goal:    Comprehensive sync conflict resolution across all models
 Branch:          main
 State:           Uncommitted
 ```
 
 ---
 
-## 2. Resume Instructions
+## 2. Completed Work
 
-```
-1. Read this file first.
-2. Run: git status --short
-3. Preserve all existing changes.
-4. Continue from the first unchecked □ task in "Remaining Work".
-5. Update this file after every completed milestone.
-6. Never redo completed work (✅ items).
-7. Run verification checks before stopping.
-```
-
----
-
-## 3. Completed Work
-
-- [x] Agent 1 Scope: Purged 267+ unused import and variable declarations across 11 Server Action files via `eslint --fix` (KB-014).
-- [x] Agent 1 Scope: Created `src/types/global.d.ts` for `window.electron`, removing `any` casts (KB-015).
-- [x] Agent 2 Scope: Implemented Zod validation schemas (`SaleInputSchema`, `ExpenseInputSchema`, etc.) in `src/lib/validators/schemas.ts` and deployed them across all 5 primary Server Actions (`sales.ts`, `purchases.ts`, `expenses.ts`, `credits.ts`, `weighbridge.ts`) (KB-021).
-- [x] Agent 3 Scope: Added missing `aria-label`, `htmlFor`, and `id` bindings to 55+ form input, textarea, and checkbox controls across transaction and settings forms (KB-009).
-- [x] Agent 3 Scope: Fixed element squishing on viewports <375px by enforcing mobile-first breakpoints (`grid-cols-1 sm:grid-cols-2`) and horizontal scroll flex wrappers in the bottom navigation (KB-010).
-- [x] Agent 3 Scope: Added nullish coalescing `data?.transfers ?? []` in `day-book-page.tsx` (KB-016).
-- [x] Verification: Validated the build with a clean `tsc --noEmit` pass and `eslint` check.
+- [x] Set up Supabase Realtime listener in `app-shell.tsx` (`ShellSync` component) to instantly detect `audit_logs` and `outgoing_sales` changes from the cloud.
+- [x] Trigger `handleSync()` on Realtime events to pull remote data automatically.
+- [x] Trigger Next.js App Router layout revalidation so that the UI refreshes instantly across PCs when sync pulls new data.
+- [x] Created `checkDuplicateSaleBookNumber` in `sales.ts` (checks both `outgoing_sales` and `incoming_boulder` for Book/Page Number collisions).
+- [x] Added `window.confirm` UI blocker inside `submit()` in `sales-entry-form.tsx` to warn about duplicate Book/Page.
+- [x] Added `window.confirm` UI blocker inside `submit()` in `boulder-purchases-page.tsx`.
+- [x] Fixed `sync-service.ts` pull logic to resolve duplicate book numbers by picking the latest timestamp.
+- [x] TypeScript compiled successfully.
 
 ---
 
-## 4. Remaining Work
+## 3. Remaining Work
 
-### [x] Teamwork Remediation — Phase 13
-
-- [x] Execute `teamwork_preview` subagent to resolve remaining 7 bugs.
-- [x] Agent 1: TypeScript & Lint Cleanup (KB-012, KB-013, KB-014, KB-015)
-- [x] Agent 2: Zod Validation (KB-021)
-- [x] Agent 3: UI & Accessibility (KB-009, KB-010, KB-016)
-
----
-
-## 5. Important Constraints
-
-### Do NOT
-
-- Do not modify Prisma schema unless fixing a specific bug.
-- Do not change electron build settings.
-
-### Must Preserve
-
-- SQLite compatibility.
-- Supabase sync mechanisms.
-
----
-
-## 6. Files Modified (Current Task Scope)
-
-```
-docs/KNOWN_BUGS.md
-docs/PROJECT_STATE.md
-src/app/actions/*.ts
-```
-
----
-
-## 7. Files To Never Touch
-
-```
-prisma/schema.prisma        ← Unless required for a documented bug
-package.json                ← Dependencies are stable
-```
-
----
-
-## 8. Verification Status
-
-```
-Verified
-[x] npx tsc --noEmit
-[x] npm run lint
-[x] Supabase sync functionality
-```
-
----
-
-## 9. Known Risks
-
-```
-1. API Rate Limits
-   → Subagents may crash if the Gemini API quotas are exhausted.
-```
-
----
-
-## 10. Next Immediate Action
-
-```
-NEXT ACTION
-
-Phase 13 Remediation is complete. All 7 bugs are resolved.
-The AI_PROGRESS.md file can now be archived or reset for Phase 14.
-```
-
----
-
-*Last updated: 2026-08-06T08:24:00+05:30*
-*Updated by: Gemini 3.1 Pro (High)*
+- [x] Complete app testing.
+- [x] Final package deployment (installer).
+- [x] Comprehensive sync unique constraint audit and handling (v1.12.6).
