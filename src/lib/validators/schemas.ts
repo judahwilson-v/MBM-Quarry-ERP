@@ -15,14 +15,14 @@ export function validateWithSchema<T>(schema: z.ZodSchema<T>, data: unknown): T 
 }
 
 /**
- * Coerces string/number/null/undefined inputs to number or null cleanly.
+ * Coerces string/number/null/undefined inputs to number or null cleanly, enforcing positive values.
  */
 export const optionalNumber = z
   .union([z.number(), z.string(), z.null(), z.undefined()])
   .transform((val) => {
     if (val === null || val === undefined || val === "") return null;
     const num = Number(val);
-    return Number.isFinite(num) ? num : null;
+    return Number.isFinite(num) && num >= 0 ? num : null;
   });
 
 /**

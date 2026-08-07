@@ -288,6 +288,7 @@ model PartyLedger {
   @@index([partyId])
   @@index([partyName])
   @@index([date])
+  @@index([refId])
   @@map("party_ledger")
 }
 
@@ -337,6 +338,9 @@ model EmployeeCredit {
   createdAt       DateTime  @default(now()) @map("created_at")
   updatedAt       DateTime  @updatedAt @map("updated_at")
 
+  @@index([employeeName])
+  @@index([status])
+  @@index([createdAt])
   @@map("employee_credit")
 }
 
@@ -375,6 +379,8 @@ model AuditLog {
   createdAt  DateTime @default(now()) @map("created_at")
 
   @@index([entityName, entityId])
+  @@index([createdAt])
+  @@index([action])
   @@map("audit_logs")
 }
 
@@ -397,6 +403,9 @@ model OtherCredit {
   createdAt       DateTime  @default(now()) @map("created_at")
   updatedAt       DateTime  @updatedAt @map("updated_at")
 
+  @@index([name])
+  @@index([status])
+  @@index([createdAt])
   @@map("other_credits")
 }
 

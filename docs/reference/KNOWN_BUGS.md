@@ -102,6 +102,16 @@
 - **Milestone 3 (Constraint Audit & Topological Order)**: Re-sequenced all 29 models into a parent-first topological dependency order (`PUSH_PRIORITY` and `PULL_ORDER`). Expanded unique conflict keys across 16 unique models. Implemented FK holding queue with `earliestSkippedTime` bounded cursor safety window so skipped child records are re-evaluated without prematurely advancing cursors. Updated ISO date regex in `toCamelCase()` to support timezone offsets (e.g. `+05:30`) and introduced a 10-second safety window (`SAFETY_WINDOW_MS = 10000`) subtracted from cursors to protect against device clock skew.
 - **Milestone 4 (Verification & Documentation Updates)**: Full codebase verification completed with `npx tsc --noEmit` passing with 0 errors, `npx eslint src/ --quiet` passing with 0 errors, `npx prisma validate` confirming schema validity, and documentation files updated across `KNOWN_BUGS.md`, `PROJECT_STATE.md`, and `CHANGELOG.md`.
 
+#### KB-029: Missing database indexes on Supabase PostgreSQL
+**Severity**: High (Resolved)
+**Description**: Nine index annotations were missing in the cloud PostgreSQL schema compared to SQLite, resulting in query latency during synchronization lookup tasks.
+**Resolution**: Appended matching `@@index` annotations to `prisma/schema_pg.prisma` and generated the index deployment SQL DDL script.
+
+#### KB-030: Inconsistent sequence ceilings and engine hour validation checks
+**Severity**: Medium (Resolved)
+**Description**: Forms used differing sequence limits (50 vs 100 pages), and Zod validator parameters allowed negative values for engine hours.
+**Resolution**: Aligned `sales-entry-form.tsx` sequence thresholds to 100 pages, and adjusted `schemas.ts` `optionalNumber` transformer to strictly enforce positive non-negative values.
+
 ---
 
 ### Category 3: React, UI & Hydration Bugs

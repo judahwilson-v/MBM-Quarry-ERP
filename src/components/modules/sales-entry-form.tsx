@@ -174,7 +174,7 @@ export function SalesEntryForm({
     getLastBookPage().then(({ bookNumber, pageNumber }) => {
       let nextBook = bookNumber;
       let nextPage = pageNumber + 1;
-      if (nextPage > 50) {
+      if (nextPage > 100) {
         nextBook = bookNumber + 1;
         nextPage = 1;
       }
@@ -336,13 +336,13 @@ export function SalesEntryForm({
               placeholder="1"
             />
           </Field>
-          <Field label="Page # (1–50)" htmlFor="pageNumber">
+          <Field label="Page # (1–100)" htmlFor="pageNumber">
             <Input
               id="pageNumber"
               className="text-right tabular-nums"
               type="number"
               min="1"
-              max="50"
+              max="100"
               step="1"
               value={form.pageNumber}
               onChange={(e) => updateForm("pageNumber", e.target.value)}
