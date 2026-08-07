@@ -5,12 +5,35 @@ This directory contains documentation files that have been superseded, archived,
 Do not use these files as authoritative references. The current documentation lives in `docs/`.
 
 ## Contents
-- `CURRENT_ARCHITECTURE.md` — Superseded by `docs/ARCHITECTURE.md`
-- `MBM_BUSINESS_SPEC.md` — Superseded by `docs/BUSINESS_RULES.md`
-- `MBM_DATABASE_SPEC.md` — Early DB design doc (keep for reference)
-- `MBM_DECISIONS.md` — Superseded by `docs/DECISIONS.md`
-- `MBM_PHASES.md` — Superseded by `docs/ROADMAP.md`
-- `MBM_UI_SPEC.md` — Early UI spec (keep for reference)
-- `PHASE_1_1A_EXECUTION_PLAN.md` — Completed implementation plan (Phase 1.1A)
-- `PHASE_1_1_SALES_DESIGN.md` — Completed sales design doc
-- `DATABASE.md` — Early database notes, superseded by schema.prisma and ARCHITECTURE.md
+- `02_BUSINESS_LOGIC.md`
+- `03_SUPABASE_SCHEMA.md`
+- `04_API_FLOW.md`
+- `05_APP_ARCHITECTURE.md`
+- `06_FEATURES.md`
+- `07_OWNER_DASHBOARD_GUIDE.md`
+- `08_ANDROID_HANDOFF.md`
+- `AI_HANDOFF.md`
+- `AI_PROGRESS_PhaseA_2026_07_04.md`
+- `ARCHITECTURE.md`
+- `BUSINESS_RULES.md`
+- `CHANGELOG.md`
+- `CURRENT_ARCHITECTURE.md`
+- `DATABASE.md`
+- `DECISIONS.md`
+- `DEPLOYMENT_ARCHITECTURE.md`
+- `KNOWN_BUGS.md`
+- `MBM_BUSINESS_SPEC.md`
+- `MBM_DATABASE_SPEC.md`
+- `MBM_DECISIONS.md`
+- `MBM_PHASES.md`
+- `MBM_UI_SPEC.md`
+- `ORIGINAL_REQUEST.md`
+- `PHASE_1_1A_EXECUTION_PLAN.md`
+- `PHASE_1_1_SALES_DESIGN.md`
+- `phase_a_audit_remediation_2026-08-04.md`
+- `PROJECT.md`
+- `PROJECT_STATE.md`
+- `RELEASE_NOTES_v1.0.md`
+- `ROADMAP.md`
+- `ROADMAP_archived_2026-08-07.md`
+- `startup_crash_report.md`

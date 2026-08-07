@@ -1,6 +1,3 @@
-# v1.15.0 (Current Update)
-- Fixed masking of Server Component rendering errors on forms by converting server actions to return robust ActionResponse wrappers.
-- Stabilized the sync engine permanently by introducing topological table processing orders, fixing the weighbridge schema cache issue, and adding cursor management.
 
 # MBM Quarry ERP — Changelog
 

@@ -1,3 +1,5 @@
+This is a historical audit report from 2026-08-05. The recommended actions (8 deletes, 7 merges) have already been executed. Do not treat this as current guidance.
+
 # Master Source of Truth Report: MBM Quarry ERP Documentation Audit
 
 **Milestones:** Milestone 2 & Milestone 3 Master Synthesis  
@@ -28,12 +30,12 @@ Every single one of the 126 Markdown files in the repository has been evaluated 
 
 ```
        MASTER DOCUMENTATION CATEGORIZATION (126 FILES)
-       ┌─────────────────────────────────────────────┐
-       │ Keep: 88 files (69.84%)                    │
-       │ Historical: 23 files (18.25%)               │
-       │ Delete: 8 files (6.35%)                     │
-       │ Merge: 7 files (5.56%)                      │
-       └─────────────────────────────────────────────┘
+       â”Œâ”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”
+       â”‚ Keep: 88 files (69.84%)                    â”‚
+       â”‚ Historical: 23 files (18.25%)               â”‚
+       â”‚ Delete: 8 files (6.35%)                     â”‚
+       â”‚ Merge: 7 files (5.56%)                      â”‚
+       â””â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”˜
 ```
 
 ---
@@ -55,7 +57,7 @@ The table below explicitly cataloges and categorizes **EVERY SINGLE ONE of the 1
 | 3 | `project/MBM1/docs/ARCHITECTURE.md` | Domain 1 | **Keep** | **Authoritative SoT for System Architecture**: runtime stack, data flow, invariants, DB change protocol. |
 | 4 | `project/MBM1/docs/archive/ARCHITECTURE.md` | Domain 1 | **Historical** | Early 19-line high-level architecture outline preserved in `docs/archive/`. |
 | 5 | `project/MBM1/docs/archive/CURRENT_ARCHITECTURE.md` | Domain 1 | **Historical** | Archived 41-line architecture document superseded on 2026-06-27. |
-| 6 | `project/MBM1/docs/archive/DECISIONS.md` | Domain 1 | **Historical** | Early 26-line decision draft recording Decisions 001–006. |
+| 6 | `project/MBM1/docs/archive/DECISIONS.md` | Domain 1 | **Historical** | Early 26-line decision draft recording Decisions 001â€“006. |
 | 7 | `project/MBM1/docs/archive/DEPLOYMENT_ARCHITECTURE.md` | Domain 1 | **Historical** | Archived 60-line deployment architecture document. |
 | 8 | `project/MBM1/docs/archive/MBM_DECISIONS.md` | Domain 1 | **Historical** | Early 84-line decision log tracking Phase 1.1B authorization & audit scope. |
 | 9 | `project/MBM1/docs/AUTO_UPDATE.md` | Domain 1 | **Keep** | **Authoritative SoT for Auto-Updater Procedures**: publishing workflow & release packaging. |
@@ -63,7 +65,7 @@ The table below explicitly cataloges and categorizes **EVERY SINGLE ONE of the 1
 | 11 | `project/MBM1/docs/DECISIONS.md` | Domain 1 | **Keep** | **Authoritative SoT for Architecture Decision Records (ADRs D-001..D-013)**. |
 | 12 | `project/MBM1/docs/DEPLOYMENT.md` | Domain 1 | **Keep** | **Authoritative SoT for Deployment & Packaging**: dev setup, data persistence, backup & recovery. |
 | 13 | `project/MBM1/docs/FINANCIAL_EVENT_ARCHITECTURE.md` | Domain 1 | **Keep** | **Authoritative SoT for Financial Event Sourcing**: event engine, projections, immutability, recovery. |
-| 14 | `project/MBM1/docs/PROJECT_STRUCTURE.md` | Domain 1 | **Merge** | 17-line directory breakdown; to be merged into `docs/ARCHITECTURE.md` § "Source Layout". |
+| 14 | `project/MBM1/docs/PROJECT_STRUCTURE.md` | Domain 1 | **Merge** | 17-line directory breakdown; to be merged into `docs/ARCHITECTURE.md` Â§ "Source Layout". |
 | 15 | `project/MBM1/.agents/skills/supabase-postgres-best-practices/references/_contributing.md` | Domain 2 | **Keep** | Contributing guidelines for Postgres skill reference documents. |
 | 16 | `project/MBM1/.agents/skills/supabase-postgres-best-practices/references/_sections.md` | Domain 2 | **Keep** | Taxonomy and section definitions for Postgres best practice rules. |
 | 17 | `project/MBM1/.agents/skills/supabase-postgres-best-practices/references/_template.md` | Domain 2 | **Keep** | Markdown template for adding new Postgres reference rules. |
@@ -185,19 +187,19 @@ This section provides granular, mandatory evidence for every file recommended fo
 
 | # | File Path | Category | Why | Overlapping File | Overlapping Sections | Confidence |
 | :-: | :--- | :-: | :--- | :--- | :--- | :-: |
-| 1 | `project/MBM1/docs/ARCHITECTURE_ROOT.md` | `Delete` | Obsolete 20-line draft fragment created at root of `docs/`. Its contents (Tech stack & 6 architecture rules) are fully superseded by `docs/ARCHITECTURE.md`. Retaining it causes confusion regarding which file is the true architecture root. | `project/MBM1/docs/ARCHITECTURE.md` | Entire file (§ "Overview", § "Tech Stack", § "Critical Architecture Rules"). | **High** |
-| 2 | `project/MBM1/docs/DECISIONS_ROOT.md` | `Delete` | Obsolete 17-line fragment at root of `docs/` recording early draft ADRs 1-3. ADRs 1 & 2 are captured as D-001 and D-005 in `docs/DECISIONS.md`, while ADR 3 is implemented directly in code. Retaining this draft fragment litters `docs/`. | `project/MBM1/docs/DECISIONS.md` | Entire file (§ "ADR 1", § "ADR 2", § "ADR 3"). | **High** |
-| 3 | `project/MBM1/docs/PROJECT_STRUCTURE.md` | `Merge` | 17-line directory outline listing top-level project folders (`desktop/`, `prisma/`, `scripts/`, `src/`). Overlaps with `docs/ARCHITECTURE.md` § "Source Layout". Merging its unique bullet descriptions (e.g. `scripts/` utility scripts description) into `docs/ARCHITECTURE.md` establishes a single layout reference. | `project/MBM1/docs/ARCHITECTURE.md` | Entire file (§ "Folder Layout"). | **High** |
+| 1 | `project/MBM1/docs/ARCHITECTURE_ROOT.md` | `Delete` | Obsolete 20-line draft fragment created at root of `docs/`. Its contents (Tech stack & 6 architecture rules) are fully superseded by `docs/ARCHITECTURE.md`. Retaining it causes confusion regarding which file is the true architecture root. | `project/MBM1/docs/ARCHITECTURE.md` | Entire file (Â§ "Overview", Â§ "Tech Stack", Â§ "Critical Architecture Rules"). | **High** |
+| 2 | `project/MBM1/docs/DECISIONS_ROOT.md` | `Delete` | Obsolete 17-line fragment at root of `docs/` recording early draft ADRs 1-3. ADRs 1 & 2 are captured as D-001 and D-005 in `docs/DECISIONS.md`, while ADR 3 is implemented directly in code. Retaining this draft fragment litters `docs/`. | `project/MBM1/docs/DECISIONS.md` | Entire file (Â§ "ADR 1", Â§ "ADR 2", Â§ "ADR 3"). | **High** |
+| 3 | `project/MBM1/docs/PROJECT_STRUCTURE.md` | `Merge` | 17-line directory outline listing top-level project folders (`desktop/`, `prisma/`, `scripts/`, `src/`). Overlaps with `docs/ARCHITECTURE.md` Â§ "Source Layout". Merging its unique bullet descriptions (e.g. `scripts/` utility scripts description) into `docs/ARCHITECTURE.md` establishes a single layout reference. | `project/MBM1/docs/ARCHITECTURE.md` | Entire file (Â§ "Folder Layout"). | **High** |
 | 4 | `project/MBM1/docs/ai-handoff/01_DATABASE_SCHEMA.md` | `Merge` | AI handoff data dictionary listing 19 Prisma models. `docs/DATABASE_SCHEMA.md` is the canonical schema SoT covering all 27 tables with line-by-line field mappings, defaults, and `@map` table names. Sample JSON record payloads from `01_DATABASE_SCHEMA.md` should be merged into `docs/DATABASE_SCHEMA.md` before deprecation. | `project/MBM1/docs/DATABASE_SCHEMA.md` | Sections 1-19 (All 19 model field tables). | **High** |
-| 5 | `project/MBM1/docs/archive/SUPABASE_SCHEMA_CHECK.md` | `Delete` | 25-line developer scratchpad containing a standard Postgres SQL column inspection query (`SELECT table_name, column_name...`). Contains zero project-specific architecture, rules, or schema details. Supabase sync spec is fully documented in `docs/ai-handoff/03_SUPABASE_SCHEMA.md`. | `project/MBM1/docs/ai-handoff/03_SUPABASE_SCHEMA.md` | Entire file (Lines 1–25). | **High** |
-| 6 | `project/MBM1/docs/archive/OWNER_DASHBOARD_PRD.md` | `Delete` | Incomplete 39-line draft PRD written during early planning. `project/MBM1/docs/OWNER_DASHBOARD_PRD.md` is the canonical 79-line specification containing every section of the draft with enhanced detail, Next.js 14 architecture, Recharts integration, and Mermaid flow diagrams. | `project/MBM1/docs/OWNER_DASHBOARD_PRD.md` | Entire file (§ "Overview", § "Core Architecture", § "Authentication", § "Feature Requirements", § "Deployment"). | **High** |
+| 5 | `project/MBM1/docs/archive/SUPABASE_SCHEMA_CHECK.md` | `Delete` | 25-line developer scratchpad containing a standard Postgres SQL column inspection query (`SELECT table_name, column_name...`). Contains zero project-specific architecture, rules, or schema details. Supabase sync spec is fully documented in `docs/ai-handoff/03_SUPABASE_SCHEMA.md`. | `project/MBM1/docs/ai-handoff/03_SUPABASE_SCHEMA.md` | Entire file (Lines 1â€“25). | **High** |
+| 6 | `project/MBM1/docs/archive/OWNER_DASHBOARD_PRD.md` | `Delete` | Incomplete 39-line draft PRD written during early planning. `project/MBM1/docs/OWNER_DASHBOARD_PRD.md` is the canonical 79-line specification containing every section of the draft with enhanced detail, Next.js 14 architecture, Recharts integration, and Mermaid flow diagrams. | `project/MBM1/docs/OWNER_DASHBOARD_PRD.md` | Entire file (Â§ "Overview", Â§ "Core Architecture", Â§ "Authentication", Â§ "Feature Requirements", Â§ "Deployment"). | **High** |
 | 7 | `project/MBM1/_archive/backup-phase-1.1a/docs/PHASE_1_1A_EXECUTION_PLAN.md` | `Delete` | Un-cleaned backup copy residing in an ad-hoc backup folder (`_archive/backup-phase-1.1a/`). Contains non-portable absolute local file paths (`/Users/judahvijaiwilson/...`). 100% duplicated by the clean relative-link copy `project/MBM1/docs/archive/PHASE_1_1A_EXECUTION_PLAN.md`. | `project/MBM1/docs/archive/PHASE_1_1A_EXECUTION_PLAN.md` | Entire file (All 10 plan sections). | **High** |
 | 8 | `project/MBM1/docs/archive/IDEAS.md` | `Merge` | Early draft of ideas inbox from 2026-06-27. Contains two foundational meta-idea governance rules ("Prompt-based idea capture" and "Future phase planning notes") missing from active `docs/IDEAS.md`. Merging these rules into `docs/IDEAS.md` consolidates all idea guidelines in active SoT. | `project/MBM1/docs/IDEAS.md` | Header (`# Ideas`), Format specification (`## Format`), and Current Ideas list. | **High** |
 | 9 | `.agents/ORIGINAL_REQUEST.md` | `Delete` | 100% exact verbatim duplicate of root user prompt `ORIGINAL_REQUEST.md`. Storing a duplicate copy inside `.agents/` creates unnecessary file clutter without providing additional information. | `ORIGINAL_REQUEST.md` | Entire file (All sections). | **High** |
 | 10 | `project/mbm-dashboard/CLAUDE.md` | `Merge` | Contains a single text line `@AGENTS.md` pointing to `project/mbm-dashboard/AGENTS.md` in the same folder. Removing this redundant alias redirection simplifies project structure. | `project/mbm-dashboard/AGENTS.md` | Entire file (`@AGENTS.md` alias). | **High** |
 | 11 | `project/MBM1/.agents/AGENTS.md` | `Merge` | Substantially duplicates generic AI guidelines (`AI Operating Rules`, `Output Style`) from root `.agents/AGENTS.md`. Its unique subproject content (`MBM Quarry Safe Development Protocol` and 8-phase database rules) should be consolidated into root `.agents/AGENTS.md`. | `.agents/AGENTS.md` | `## AI Operating Rules`, `## Output Style & Communication`. | **High** |
 | 12 | `project/MBM1/docs/AI_HANDOFF.md` | `Merge` | Contains an outdated `## Current Operating Notes (2026-06-27)` section claiming the app is on early sync validation, directly contradicting live status in `project/MBM1/AI_PROGRESS.md` (`v1.11.3`). Static onboarding content should be kept while replacing stale notes with dynamic pointers to `AI_PROGRESS.md`. | `project/MBM1/AI_PROGRESS.md` | Section `## Current Operating Notes (2026-06-27)`. | **High** |
-| 13 | `project/MBM1/_archive/backup-phase-1.1a/CHANGELOG.md` | `Delete` | Orphaned, partial changelog slice stored inside an early code backup folder (`_archive/backup-phase-1.1a/`). All 30 lines (Phase 0 and Phase 1.1A details) are 100% duplicated in active master changelog `docs/CHANGELOG.md` (lines 114–124). | `project/MBM1/docs/CHANGELOG.md` | Entire file (`## Phase 0`, `## Phase 1.1A`, `## Future Phases`). | **High** |
+| 13 | `project/MBM1/_archive/backup-phase-1.1a/CHANGELOG.md` | `Delete` | Orphaned, partial changelog slice stored inside an early code backup folder (`_archive/backup-phase-1.1a/`). All 30 lines (Phase 0 and Phase 1.1A details) are 100% duplicated in active master changelog `docs/CHANGELOG.md` (lines 114â€“124). | `project/MBM1/docs/CHANGELOG.md` | Entire file (`## Phase 0`, `## Phase 1.1A`, `## Future Phases`). | **High** |
 | 14 | `project/MBM1/docs/KNOWN_ISSUES.md` | `Merge` | Narrative post-mortem notes covering Electron Startup Timeout (Prisma desync) and ZIP Extraction. Creates a split source of truth alongside `docs/KNOWN_BUGS.md`. Merging its operational lessons into `docs/KNOWN_BUGS.md` establishes a single bug tracking file. | `project/MBM1/docs/KNOWN_BUGS.md` | Entire file (Issues #1 and #2). | **High** |
 | 15 | `project/mbm-dashboard/README.md` | `Delete` | Unedited starter README created automatically by `create-next-app`. Recommends standard web Next.js commands (`npm run dev`) and Vercel deployment, directly contradicting the MBM Quarry ERP offline desktop app architecture (`npm run electron:dev`). | `project/MBM1/README.md` | Section `Getting Started`. | **High** |
 
@@ -208,11 +210,11 @@ This section provides granular, mandatory evidence for every file recommended fo
 During the cross-examination of authoritative specifications across all 7 domains, several critical cross-domain contradictions, file redundancies, and freshness lags were detected. This section details each conflict and explicitly declares the **Definitive Source of Truth (SoT)** and resolution strategy for each topic.
 
 ### 4.1 Architecture & Infrastructure Specification Alignment
-- **Conflict**: Root directory draft fragments `docs/ARCHITECTURE_ROOT.md` and `docs/DECISIONS_ROOT.md` contain abbreviated 6-rule tech stack descriptions and early draft ADRs (ADR 1–3) that conflict with the detailed active architecture documents in `docs/`.
+- **Conflict**: Root directory draft fragments `docs/ARCHITECTURE_ROOT.md` and `docs/DECISIONS_ROOT.md` contain abbreviated 6-rule tech stack descriptions and early draft ADRs (ADR 1â€“3) that conflict with the detailed active architecture documents in `docs/`.
 - **Resolution & Definitive SoT**:
   - **System Architecture SoT**: `project/MBM1/docs/ARCHITECTURE.md` (Canonical specification for Next.js + Electron stack, event sourcing, data flow, invariants, and DB change protocol).
   - **ADRs SoT**: `project/MBM1/docs/DECISIONS.md` (Canonical master log for Architecture Decision Records D-001 through D-013).
-  - **Action**: Delete `docs/ARCHITECTURE_ROOT.md` and `docs/DECISIONS_ROOT.md`. Merge unique folder descriptions from `docs/PROJECT_STRUCTURE.md` into `docs/ARCHITECTURE.md` § "Source Layout".
+  - **Action**: Delete `docs/ARCHITECTURE_ROOT.md` and `docs/DECISIONS_ROOT.md`. Merge unique folder descriptions from `docs/PROJECT_STRUCTURE.md` into `docs/ARCHITECTURE.md` Â§ "Source Layout".
 
 ### 4.2 Local SQLite Database Schema vs. AI Handoff Data Dictionary
 - **Conflict**: `project/MBM1/docs/ai-handoff/01_DATABASE_SCHEMA.md` lists 19 Prisma models from an earlier Phase A snapshot, whereas `project/MBM1/docs/DATABASE_SCHEMA.md` lists all 27 entity tables with line-by-line field definitions, nullability, defaults, foreign key constraints, indexes, and explicit `@map` snake_case table mappings.
@@ -235,7 +237,7 @@ During the cross-examination of authoritative specifications across all 7 domain
   - **Action**: Copy derived field calculation formulas from `docs/archive/MBM_DATABASE_SPEC.md` into `docs/BUSINESS_RULES.md` and `docs/DATABASE_SCHEMA.md`.
 
 ### 4.5 Owner Dashboard Product Requirements & Local ERP Dashboard Metrics
-- **Conflict**: Archived draft `docs/archive/OWNER_DASHBOARD_PRD.md` (39 lines) conflicts with active PRD `docs/OWNER_DASHBOARD_PRD.md` (79 lines). Furthermore, `docs/ai-handoff/02_BUSINESS_LOGIC.md` § 8 provides a high-level summary of local dashboard KPIs, while `docs/ai-handoff/07_OWNER_DASHBOARD_GUIDE.md` details deep-dive SQL queries for the same 7 widgets.
+- **Conflict**: Archived draft `docs/archive/OWNER_DASHBOARD_PRD.md` (39 lines) conflicts with active PRD `docs/OWNER_DASHBOARD_PRD.md` (79 lines). Furthermore, `docs/ai-handoff/02_BUSINESS_LOGIC.md` Â§ 8 provides a high-level summary of local dashboard KPIs, while `docs/ai-handoff/07_OWNER_DASHBOARD_GUIDE.md` details deep-dive SQL queries for the same 7 widgets.
 - **Resolution & Definitive SoT**:
   - **Owner Dashboard Web App PRD SoT**: `project/MBM1/docs/OWNER_DASHBOARD_PRD.md` (Canonical specification for standalone Next.js 14 cloud web app hosted on Vercel reading from Supabase).
   - **Local ERP Desktop Dashboard Guide SoT**: `project/MBM1/docs/ai-handoff/07_OWNER_DASHBOARD_GUIDE.md` (Canonical reference for internal Electron app dashboard queries in `src/app/dashboard/page.tsx`).
@@ -244,7 +246,7 @@ During the cross-examination of authoritative specifications across all 7 domain
 ### 4.6 Master Project Roadmap, State Tracking & Feature Ideas
 - **Conflict**: Backup folder `_archive/backup-phase-1.1a/docs/PHASE_1_1A_EXECUTION_PLAN.md` contains broken workstation paths (`/Users/judahvijaiwilson/...`), duplicating clean archived plan `docs/archive/PHASE_1_1A_EXECUTION_PLAN.md`. Additionally, `docs/archive/IDEAS.md` contains 2 meta-idea rules missing from active `docs/IDEAS.md`.
 - **Resolution & Definitive SoT**:
-  - **Master Roadmap SoT**: `project/MBM1/docs/ROADMAP.md` (Canonical schedule for released versions `v1.9.0+` and future Phases 7–9).
+  - **Master Roadmap SoT**: `project/MBM1/docs/ROADMAP.md` (Canonical schedule for released versions `v1.9.0+` and future Phases 7â€“9).
   - **Project State SoT**: `project/MBM1/docs/PROJECT_STATE.md` (Canonical status matrix for 17 core modules, Cloud-Synced status, and current version `v1.10.1`).
   - **Ideas Inbox SoT**: `project/MBM1/docs/IDEAS.md` (Canonical inbox for unconfirmed feature suggestions).
   - **Action**: Delete backup copy `_archive/backup-phase-1.1a/docs/PHASE_1_1A_EXECUTION_PLAN.md`. Merge meta-idea governance rules into active `docs/IDEAS.md`.
@@ -302,16 +304,16 @@ Based on the rigorous evaluation of all 126 Markdown files across the repository
 
 ```
                 DOCUMENTATION HEALTH SCORE: 84 / 100
- ┌───────────────────────────┬──────────────┬──────────────┐
- │ Evaluation Category       │ Weight       │ Score        │
- ├───────────────────────────┼──────────────┼──────────────┤
- │ 1. Completeness           │ 25%          │ 23 / 25      │
- │ 2. Redundancy & Cleanliness│ 25%          │ 18 / 25      │
- │ 3. Freshness & Maintenance│ 25%          │ 21 / 25      │
- │ 4. Evidence Rigor & Trace │ 25%          │ 22 / 25      │
- ├───────────────────────────┼──────────────┼──────────────┤
- │ TOTAL SCORE               │ 100%         │ 84 / 100     │
- └───────────────────────────┴──────────────┴──────────────┘
+ â”Œâ”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”¬â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”¬â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”
+ â”‚ Evaluation Category       â”‚ Weight       â”‚ Score        â”‚
+ â”œâ”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”¼â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”¼â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”¤
+ â”‚ 1. Completeness           â”‚ 25%          â”‚ 23 / 25      â”‚
+ â”‚ 2. Redundancy & Cleanlinessâ”‚ 25%          â”‚ 18 / 25      â”‚
+ â”‚ 3. Freshness & Maintenanceâ”‚ 25%          â”‚ 21 / 25      â”‚
+ â”‚ 4. Evidence Rigor & Trace â”‚ 25%          â”‚ 22 / 25      â”‚
+ â”œâ”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”¼â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”¼â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”¤
+ â”‚ TOTAL SCORE               â”‚ 100%         â”‚ 84 / 100     â”‚
+ â””â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”´â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”´â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”˜
 ```
 
 ### 6.2 Rubric Metrics & Scoring Rationale

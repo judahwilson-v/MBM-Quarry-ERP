@@ -28,6 +28,7 @@ After completing any task:
 4. Never rewrite documents unnecessarily.
 5. Never duplicate information.
 6. Prefer references over repeated explanations.
+7. A fix verified in-session with actual command output (git diff + git status) is finalized and is not re-audited in a future session unless the file changes again.
 
 ## When NOT to Update Documentation
 
