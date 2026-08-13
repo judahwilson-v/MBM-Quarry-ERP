@@ -367,7 +367,7 @@ export async function pushSync(): Promise<SyncResult> {
       where: { id: "default" },
       data: {
         lastSyncedAt: finalPushCursor,
-        status: finalStatus === "ERROR" ? "ERROR" : "IDLE",
+        status: finalStatus === "IDLE" ? "IDLE" : finalStatus,
         lastError: lastErrorMessage,
       }
     });
@@ -641,7 +641,7 @@ export async function pullSync(): Promise<SyncResult> {
       where: { id: "pull_state" },
       data: {
         lastSyncedAt: finalPullCursor,
-        status: finalStatus === "ERROR" ? "ERROR" : "IDLE",
+        status: finalStatus === "IDLE" ? "IDLE" : finalStatus,
         lastError: lastErrorMessage,
       }
     });
@@ -697,7 +697,8 @@ export async function getSyncStatus() {
   return {
     lastSyncedAt: pushState?.lastSyncedAt || null,
     lastPulledAt: pullState?.lastSyncedAt || null,
-    status: pushState?.status === "ERROR" || pullState?.status === "ERROR" ? "ERROR" : 
+    status: pushState?.status === "ERROR" || pullState?.status === "ERROR" ? "ERROR" :
+            pushState?.status === "PARTIAL_SUCCESS" || pullState?.status === "PARTIAL_SUCCESS" ? "PARTIAL_SUCCESS" :
             pushState?.status === "SYNCING" || pullState?.status === "SYNCING" ? "SYNCING" : "IDLE",
     lastError: pushState?.lastError || pullState?.lastError || null,
     pendingCount

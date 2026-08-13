@@ -321,7 +321,7 @@ function ShellSync() {
   };
 
   const pending = syncStatus?.pendingCount || 0;
-  const isError = syncStatus?.status === "ERROR";
+  const isError = syncStatus?.status === "ERROR" || syncStatus?.status === "PARTIAL_SUCCESS";
 
   return (
     <div className="p-4 border-t flex-shrink-0 bg-card">

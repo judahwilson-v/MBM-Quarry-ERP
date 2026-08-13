@@ -157,7 +157,8 @@ export async function saveCashTransfer(data: { type: string; amount: number; tim
     after: transfer,
   });
 
-  triggerAutoSync().catch(console.error);
+  // Fire-and-forget: don't block the server action response with sync
+  setTimeout(() => triggerAutoSync().catch(console.error), 0);
 }
 
 export async function logDayBookAudit(data: { userName: string; date: string; time: string; oldValue: any; newValue: any; action: string; module: string }) {

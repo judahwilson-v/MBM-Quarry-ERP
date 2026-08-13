@@ -1,9 +1,9 @@
 # MBM Quarry ERP — Project State
 
-**Status**: Milestone 4 Final Verification & Documentation Complete (All Sync Engine Milestones M1-M4 Complete)
-**Version**: `v1.15.0`
-**Phase**: Sync Engine Hardening & Architectural Resilience (STABLE / FULLY OPERATIONAL)
-**Last Updated**: 2026-08-06
+**Status**: v1.16.1 Party Ledger Bulk Insert, Non-Blocking Sync & Partial Sync UX Released (STABLE / FULLY OPERATIONAL)
+**Version**: `v1.16.1`
+**Phase**: Performance Optimization & UI Responsiveness (STABLE / FULLY OPERATIONAL)
+**Last Updated**: 2026-08-13
 
 ## Status
 | Area | Status |

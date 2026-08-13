@@ -1,6 +1,23 @@
 
 # MBM Quarry ERP — Changelog
 
+## v1.16.1 — Party Ledger Optimization, Non-Blocking Sync & Partial Sync UX (2026-08-13)
+- **Party Ledger Bulk Creation**: Replaced sequential N+1 `create` queries in `recalculatePartyLedger` with bulk `createMany` operation to accelerate balance recalculations.
+- **Non-Blocking Background Auto-Sync**: Wrapped `triggerAutoSync()` in non-blocking `setTimeout(..., 0)` calls across server actions to prevent local UI response latency from blocking on background Supabase sync network calls.
+- **Partial Sync State Handling**: Added `PARTIAL_SUCCESS` status tracking to `pushSync()` and `pullSync()` in `sync-service.ts` and updated `app-shell.tsx` header indicator for improved UI feedback during row-level quarantine events.
+
+## v1.16.0 — Cross-Validation Audit & Defect Remediation (2026-08-07)
+- **Milestone 1: Supabase Index Matching**:
+  - Matched all `@@index` annotations in `schema_pg.prisma` with Supabase schema indices.
+- **Milestone 2: Form Validation Alignment**:
+  - Fixed sequence rollover logic in `sales-entry-form.tsx` to strictly use 100-page rollover.
+- **Milestone 3: Engine Hours Constraint**:
+  - Enforced `num >= 0` constraint in `schemas.ts` to prevent negative engine hours entries.
+- **Milestone 4: Defect Remediation**:
+  - Resolved and cataloged KB-029 and KB-030 in `KNOWN_BUGS.md`.
+- **Milestone 5 & 6: Verification & Desktop Package**:
+  - Successfully verified build and packaged Windows executable `MBM Quarry V2 Setup 1.16.0.exe`.
+
 ## v1.15.0 — Permanent Sync Engine Fixes & Topological Dependency Architecture (2026-08-06)
 - **Milestone 1: Cloud Schema & Root Cause Resolution**:
   - Added missing tables `weighbridge_tickets`, `maintenance_records`, `maintenance_schedules`, and `vehicle_stats` to cloud PostgreSQL schema (`prisma/schema_pg.prisma`) and SQL migration script (`docs/supabase_sync_fix_RUNME.sql`).

@@ -108,7 +108,8 @@ async function runTx<T>(txFn: (tx: Prisma.TransactionClient) => Promise<T>): Pro
   try {
     return await db.$transaction(txFn);
   } finally {
-    triggerAutoSync().catch(console.error);
+    // Fire-and-forget: don't block the server action response with sync
+    setTimeout(() => triggerAutoSync().catch(console.error), 0);
   }
 }
 

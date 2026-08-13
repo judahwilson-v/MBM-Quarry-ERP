@@ -100,28 +100,30 @@ export async function recalculatePartyLedger(tx: Prisma.TransactionClient, party
     return a.createdAt.getTime() - b.createdAt.getTime();
   });
 
-  // 5. Calculate running balance and insert
+  // 5. Calculate running balance and bulk insert
   let runningBalance = 0; // Positive = Customer owes us. Negative = We owe Supplier.
   
-  for (const entry of entries) {
+  const ledgerData = entries.map((entry) => {
     runningBalance += entry.debitAmount;
     runningBalance -= entry.creditAmount;
 
-    await tx.partyLedger.create({
-      data: {
-        partyId: party.id,
-        partyName: party.partyName,
-        date: entry.date,
-        time: entry.time || null,
-        type: entry.type,
-        refId: entry.refId,
-        description: entry.description,
-        paymentMethod: entry.paymentMethod || null,
-        debitAmount: entry.debitAmount,
-        creditAmount: entry.creditAmount,
-        balance: runningBalance,
-        createdAt: entry.createdAt,
-      },
-    });
+    return {
+      partyId: party.id,
+      partyName: party.partyName,
+      date: entry.date,
+      time: entry.time || null,
+      type: entry.type,
+      refId: entry.refId,
+      description: entry.description,
+      paymentMethod: entry.paymentMethod || null,
+      debitAmount: entry.debitAmount,
+      creditAmount: entry.creditAmount,
+      balance: runningBalance,
+      createdAt: entry.createdAt,
+    };
+  });
+
+  if (ledgerData.length > 0) {
+    await tx.partyLedger.createMany({ data: ledgerData });
   }
 }

@@ -78,7 +78,8 @@ export async function updateGlobalSettings(data: any) {
       before,
       after: settings,
     });
-    triggerAutoSync().catch(console.error);
+    // Fire-and-forget: don't block the server action response with sync
+    setTimeout(() => triggerAutoSync().catch(console.error), 0);
     revalidatePath("/settings");
     revalidatePath("/");
     return { success: true, settings };

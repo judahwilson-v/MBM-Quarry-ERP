@@ -33,14 +33,14 @@ export async function GET() {
       qty: 100,
       quantityReason: "Test",
       gstEnabled: false,
-      discountType: "fixed",
+      discountType: "fixed" as const,
       discountValue: 0,
       cashPaid: 0,
       bankPaid: 0,
       gPayPaid: 0,
       remarks: "E2E Sync Test Sale",
-      bookNumber: 9999,
-      pageNumber: 9999,
+      bookNumber: "9999",
+      pageNumber: "9999",
     };
     
     const saveResult = await saveSale(testSaleData);

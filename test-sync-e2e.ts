@@ -1,6 +1,6 @@
 import { PrismaClient } from "@prisma/client";
 import { createClient } from "@supabase/supabase-js";
-import { performSync } from "./src/lib/sync/sync-service"; // Adjust path if needed
+import { pushSync, pullSync } from "./src/lib/sync/sync-service"; // Adjust path if needed
 import { getDb } from "./src/lib/prisma";
 import { saveSale } from "./src/app/actions/sales";
 
@@ -17,7 +17,7 @@ async function runTest() {
   // 1. Enter sale & save
   console.log("1. Creating test sale locally...");
   const testSaleData = {
-    saleDate: new Date(),
+    saleDate: new Date().toISOString().split("T")[0],
     vehicleNumber: "TEST-SYNC-1234",
     partyName: "Sync Test Party",
     materialId: material.id,
@@ -25,14 +25,14 @@ async function runTest() {
     qty: 100,
     quantityReason: "Test",
     gstEnabled: false,
-    discountType: "fixed",
+    discountType: "fixed" as const,
     discountValue: 0,
     cashPaid: 0,
     bankPaid: 0,
     gPayPaid: 0,
     remarks: "E2E Sync Test Sale",
-    bookNumber: 9999,
-    pageNumber: 9999,
+    bookNumber: "9999",
+    pageNumber: "9999",
   };
   
   const saveResult = await saveSale(testSaleData);
@@ -45,7 +45,7 @@ async function runTest() {
 
   // 2. Click sync
   console.log("2. Running sync push to Supabase...");
-  await performSync();
+  await pushSync();
   console.log("Sync complete.");
 
   // 3. Check if it's there in Supabase
@@ -84,7 +84,7 @@ async function runTest() {
 
   // 5. Click sync to retrieve data from Supabase
   console.log("5. Running sync pull from Supabase...");
-  await performSync();
+  await pullSync();
   console.log("Sync pull complete.");
 
   // 6. See that data in sale section
