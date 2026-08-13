@@ -1,7 +1,7 @@
 # MBM Quarry ERP — Project State
 
-**Status**: v1.16.1 Party Ledger Bulk Insert, Non-Blocking Sync & Partial Sync UX Released (STABLE / FULLY OPERATIONAL)
-**Version**: `v1.16.1`
+**Status**: v1.16.2 Root Directory Cleanup & Artifact Removal (STABLE / FULLY OPERATIONAL)
+**Version**: `v1.16.2`
 **Phase**: Performance Optimization & UI Responsiveness (STABLE / FULLY OPERATIONAL)
 **Last Updated**: 2026-08-13
 

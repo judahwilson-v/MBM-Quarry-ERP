@@ -1,5 +1,8 @@
-
 # MBM Quarry ERP — Changelog
+
+## v1.16.2 — Root Directory Cleanup & Artifact Removal (2026-08-13)
+- **Root Directory Cleanup**: Moved 15 un-nested root scratch and test scripts (`check_*.js`, `add_*.js`, `test_*.js`, `fix_*.js`) into the designated `scratch/` directory.
+- **Artifact Removal**: Removed stale `latest.yml` root artifact and added it to `.gitignore` to prevent future build pollution.
 
 ## v1.16.1 — Party Ledger Optimization, Non-Blocking Sync & Partial Sync UX (2026-08-13)
 - **Party Ledger Bulk Creation**: Replaced sequential N+1 `create` queries in `recalculatePartyLedger` with bulk `createMany` operation to accelerate balance recalculations.
