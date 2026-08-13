@@ -1,6 +1,7 @@
 # MBM Quarry ERP — Release Notes
 
-## v1.16.2 — Root Directory Cleanup & Artifact Removal (2026-08-13)
+## v1.16.2 — Sync Deadlock Resolution & Artifact Removal (2026-08-13)
+- **Sync Deadlock Resolution**: Fixed critical deadlock in `sync-service.ts` where FK violations caused `recordSkippedTime()` to permanently pin the `lastSyncedAt` cursor in the past, causing an infinite loop. The sync engine now safely advances the cursor past failing records.
 - **Root Directory Cleanup**: Moved 15 un-nested root scratch and test scripts (`check_*.js`, `add_*.js`, `test_*.js`, `fix_*.js`) into the designated `scratch/` directory.
 - **Artifact Removal**: Removed stale `latest.yml` root artifact and added it to `.gitignore` to prevent future build pollution.
 
