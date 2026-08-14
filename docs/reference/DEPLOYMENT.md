@@ -33,11 +33,11 @@ App code (`C:\Program Files\MBM Quarry\`) is completely decoupled from app data 
 3. `electron-builder` outputs: installer `.exe`, blockmap `.yml`, portable executable.
 4. Upload artifacts to a **GitHub Release** tagged `v1.0.x`.
 
-## 5. Auto-Updater (Deferred — D-011)
-Infrastructure is prepared (`electron-updater`) but disabled. After RC1 is validated at the quarry:
-1. Enable `autoUpdater.checkForUpdatesAndNotify()` in `main.js`.
-2. Point it at the GitHub Releases feed.
-3. User data remains safe because it lives outside the installation directory.
+## 5. Auto-Updater (Active — D-011)
+Infrastructure is operational (`electron-updater`).
+1. `autoUpdater.checkForUpdatesAndNotify()` is enabled in `desktop/main.js`.
+2. Checks GitHub Releases feed for new `.exe` versions and downloads/applies updates.
+3. User data remains safe in `%APPDATA%/mbm-quarry-erp/quarry.db` because it lives outside the installation directory.
 
 ## 6. Backup Strategy
 - **Local backup**: Backup Manager (About page) copies `quarry.db` → `backups/quarry-backup-{timestamp}.bak`.

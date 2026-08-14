@@ -1,5 +1,9 @@
 # MBM Quarry ERP — Changelog
 
+## v1.16.4 — Infinite Sync Loop Fix (2026-08-14)
+- **Infinite Sync Loop Fix**: Disabled `SAFETY_WINDOW_MS` in `src/lib/sync/sync-service.ts` to prevent the perpetual "pending changes" issue caused by the cursor intentionally lagging behind and repeatedly reprocessing the same logs.
+
+
 ## v1.16.3 — Sync Engine Cookie Fix, Animated Splash Screen & Agent Rules (2026-08-14 08:37 AM)
 - **Sync Engine Cookie Fix**: Introduced `createSyncClient` in `src/lib/supabase/client-sync.ts` using standard `@supabase/supabase-js` without Next.js `cookies()`, fixing `cookies was called outside a request scope` crash during background sync loop operations.
 - **Valorant-Style Animated Splash Screen**: Created `desktop/splash.html` and updated `desktop/main.js` to display an animated dark/red theme loading splash screen showing live status transitions (e.g. database loading, Next.js engine booting) during desktop app startup.

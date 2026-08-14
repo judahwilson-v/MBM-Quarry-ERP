@@ -46,9 +46,9 @@ A phase is frozen (build passes, docs updated) before the next phase begins. Spe
 Sales edit and delete protection uses password `1177` until full authentication replaces it.
 **Reason**: Prevents accidental mutations at the quarry counter without a full auth system.
 
-## D-011: Auto-Updater Deferred
-`electron-updater` infrastructure is prepared but **disabled** until RC1 has been used successfully at the quarry.
-**Reason**: Stability and real-world validation must come before automated update risk.
+## D-011: Auto-Updater Active
+`electron-updater` infrastructure is fully configured and active via GitHub Releases to ensure quarry workstations automatically receive updates seamlessly.
+**Reason**: Streamlines deployment and ensures all client machines run the latest stable release without manual file copying.
 
 ## D-012: Owner Dashboard Separation
 The Owner Dashboard will be a **separate Next.js web application** connecting directly to Supabase. It must not be merged into the Electron ERP.

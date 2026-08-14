@@ -1,5 +1,6 @@
 "use client";
 import { usePrompt } from "@/components/ui/prompt-provider";
+import { handlePrint } from "@/lib/utils/print";
 
 import { useCallback, useEffect, useMemo, useState } from "react";
 import { Pencil, Plus, Save, Search, Trash2, X, Download, Printer } from "lucide-react";
@@ -199,7 +200,7 @@ export function PartyCreditPage() {
               <Download className="h-3.5 w-3.5" />
               Export
             </Button>
-            <Button variant="outline" size="sm" onClick={() => window.print()} className="text-xs gap-1.5">
+            <Button variant="outline" size="sm" onClick={() => handlePrint()} className="text-xs gap-1.5">
               <Printer className="h-3.5 w-3.5" />
               Print
             </Button>
@@ -390,7 +391,7 @@ export function EmployeeCreditPage() {
             <Download className="h-4 w-4" />
             Export
           </Button>
-          <Button variant="outline" onClick={() => window.print()} className="gap-1.5">
+          <Button variant="outline" onClick={() => handlePrint()} className="gap-1.5">
             <Printer className="h-4 w-4" />
             Print
           </Button>
@@ -813,7 +814,7 @@ export function OtherCreditPage() {
             <Download className="h-4 w-4" />
             Export
           </Button>
-          <Button variant="outline" onClick={() => window.print()} className="gap-1.5">
+          <Button variant="outline" onClick={() => handlePrint()} className="gap-1.5">
             <Printer className="h-4 w-4" />
             Print
           </Button>

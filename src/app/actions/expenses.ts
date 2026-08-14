@@ -180,13 +180,15 @@ export async function deleteExpense(id: string, pin?: string) {
       if (!row) throw new Error("Expense not found");
 
       const financialEvent = await tx.financialEvent.findFirst({ where: { entityId: id } });
+      const eventIdToDelete = financialEvent?.eventId;
       if (financialEvent) await tx.financialEvent.delete({ where: { id: financialEvent.id } });
 
       await tx.expense.delete({ where: { id } });
 
       // Clean up orphaned DayBookExpenseEntry records
+      const sourceIdsToDelete = [id, row.sourceEventId, eventIdToDelete].filter(Boolean) as string[];
       await tx.dayBookExpenseEntry.deleteMany({
-        where: { sourceEventId: id }
+        where: { sourceEventId: { in: sourceIdsToDelete } }
       });
 
       const dayBook = await getOrCreateDayBook(tx, row.expenseDate.toISOString());

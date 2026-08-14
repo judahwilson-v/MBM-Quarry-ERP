@@ -198,6 +198,13 @@ export async function deleteFuelPurchase(id: string) {
         await tx.dayBookExpenseEntry.deleteMany({ where: { sourceEventId: financialEvent.eventId } });
       }
       await tx.expense.delete({ where: { id: expense.id } });
+
+      const businessDateStr = expense.expenseDate.toISOString().split("T")[0];
+      const day = new Date(`${businessDateStr}T00:00:00`);
+      const dayBook = await tx.dayBook.findUnique({ where: { businessDate: day } });
+      if (dayBook) {
+        await recalculateDayBook(tx, dayBook);
+      }
     }
     
     await tx.fuelPurchase.delete({ where: { id } });

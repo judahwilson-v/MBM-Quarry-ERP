@@ -1,0 +1,5299 @@
+# Audit Progress (Auto-Updated by AI Agent)
+Last Updated: 2026-08-14 10:44 IST
+Agent Model: Gemini 3.7 Flash
+
+## Master Inventory Checklist
+### Root Config & Metadata (4926 files)
+- [x] .agents/rules/supabase-background-tasks/RULE.md — clean
+- [x] .agents/skills/supabase-postgres-best-practices/CHANGELOG.md — clean
+- [x] .agents/skills/supabase-postgres-best-practices/SKILL.md — clean
+- [x] .agents/skills/supabase-postgres-best-practices/references/_contributing.md — clean
+- [x] .agents/skills/supabase-postgres-best-practices/references/_sections.md — clean
+- [x] .agents/skills/supabase-postgres-best-practices/references/_template.md — clean
+- [x] .agents/skills/supabase-postgres-best-practices/references/advanced-full-text-search.md — clean
+- [x] .agents/skills/supabase-postgres-best-practices/references/advanced-jsonb-indexing.md — clean
+- [x] .agents/skills/supabase-postgres-best-practices/references/conn-idle-timeout.md — clean
+- [x] .agents/skills/supabase-postgres-best-practices/references/conn-limits.md — clean
+- [x] .agents/skills/supabase-postgres-best-practices/references/conn-pooling.md — clean
+- [x] .agents/skills/supabase-postgres-best-practices/references/conn-prepared-statements.md — clean
+- [x] .agents/skills/supabase-postgres-best-practices/references/data-batch-inserts.md — clean
+- [x] .agents/skills/supabase-postgres-best-practices/references/data-n-plus-one.md — clean
+- [x] .agents/skills/supabase-postgres-best-practices/references/data-pagination.md — clean
+- [x] .agents/skills/supabase-postgres-best-practices/references/data-upsert.md — clean
+- [x] .agents/skills/supabase-postgres-best-practices/references/lock-advisory.md — clean
+- [x] .agents/skills/supabase-postgres-best-practices/references/lock-deadlock-prevention.md — clean
+- [x] .agents/skills/supabase-postgres-best-practices/references/lock-short-transactions.md — clean
+- [x] .agents/skills/supabase-postgres-best-practices/references/lock-skip-locked.md — clean
+- [x] .agents/skills/supabase-postgres-best-practices/references/monitor-explain-analyze.md — clean
+- [x] .agents/skills/supabase-postgres-best-practices/references/monitor-pg-stat-statements.md — clean
+- [x] .agents/skills/supabase-postgres-best-practices/references/monitor-vacuum-analyze.md — clean
+- [x] .agents/skills/supabase-postgres-best-practices/references/query-composite-indexes.md — clean
+- [x] .agents/skills/supabase-postgres-best-practices/references/query-covering-indexes.md — clean
+- [x] .agents/skills/supabase-postgres-best-practices/references/query-index-types.md — clean
+- [x] .agents/skills/supabase-postgres-best-practices/references/query-missing-indexes.md — clean
+- [x] .agents/skills/supabase-postgres-best-practices/references/query-partial-indexes.md — clean
+- [x] .agents/skills/supabase-postgres-best-practices/references/schema-constraints.md — clean
+- [x] .agents/skills/supabase-postgres-best-practices/references/schema-data-types.md — clean
+- [x] .agents/skills/supabase-postgres-best-practices/references/schema-foreign-key-indexes.md — clean
+- [x] .agents/skills/supabase-postgres-best-practices/references/schema-lowercase-identifiers.md — clean
+- [x] .agents/skills/supabase-postgres-best-practices/references/schema-partitioning.md — clean
+- [x] .agents/skills/supabase-postgres-best-practices/references/schema-primary-keys.md — clean
+- [x] .agents/skills/supabase-postgres-best-practices/references/security-privileges.md — clean
+- [x] .agents/skills/supabase-postgres-best-practices/references/security-rls-basics.md — clean
+- [x] .agents/skills/supabase-postgres-best-practices/references/security-rls-performance.md — clean
+- [x] .agents/skills/supabase-server/SKILL.md — clean
+- [x] .agents/skills/supabase/CHANGELOG.md — clean
+- [x] .agents/skills/supabase/SKILL.md — clean
+- [x] .agents/skills/supabase/assets/feedback-issue-template.md — clean
+- [x] .agents/skills/supabase/references/skill-feedback.md — clean
+- [x] .env — clean
+- [x] .env.example — clean
+- [x] .env.local — clean
+- [x] .env.local.bak — clean
+- [x] .env.production — clean
+- [x] .eslintrc.json — clean
+- [x] .github/workflows/release.yml — clean
+- [x] .gitignore — clean
+- [x] .mcp.json — clean
+- [x] Dockerfile — clean
+- [x] README.md — clean
+- [x] VERSION — clean
+- [x] _archive/backup-phase-1.1a/src/lib/sales-engine.ts — clean
+- [x] _archive/dev_404_test.log — clean
+- [x] _archive/dev_output.log — clean
+- [x] _archive/dev_reports_test.log — clean
+- [x] _archive/dev_test.log — clean
+- [x] _archive/dev_wrapper_test.log — clean
+- [x] _archive/final_dev_test.log — clean
+- [x] _archive/local.db — clean
+- [x] _archive/tally soft/Tally.ERP9/Accounting Voucher.pdf — clean
+- [x] _archive/tally soft/Tally.ERP9/Accounting Voucher.xml — clean
+- [x] _archive/tally soft/Tally.ERP9/ITH 1.pdf — clean
+- [x] _archive/tally soft/Tally.ERP9/ITH 2.pdf — clean
+- [x] _archive/tally soft/Tally.ERP9/KT 1.pdf — clean
+- [x] _archive/tally soft/Tally.ERP9/KT 2.pdf — clean
+- [x] _archive/tally soft/Tally.ERP9/KT 3.pdf — clean
+- [x] _archive/tally soft/Tally.ERP9/KT M1.pdf — clean
+- [x] _archive/tally soft/Tally.ERP9/KTM 2.pdf — clean
+- [x] _archive/tally soft/Tally.ERP9/KTM 3.pdf — clean
+- [x] _archive/tally soft/Tally.ERP9/KTM 4.pdf — clean
+- [x] _archive/tally soft/Tally.ERP9/KTM 5.pdf — clean
+- [x] _archive/tally soft/Tally.ERP9/KTM 8.pdf — clean
+- [x] _archive/tally soft/Tally.ERP9/KTM6.pdf — clean
+- [x] _archive/tally soft/Tally.ERP9/KTM7.pdf — clean
+- [x] _archive/tally soft/Tally.ERP9/Lang/0000arabic.dct — clean
+- [x] _archive/tally soft/Tally.ERP9/LicServer.tsf — clean
+- [x] _archive/tally soft/Tally.ERP9/M1.pdf — clean
+- [x] _archive/tally soft/Tally.ERP9/M2.pdf — clean
+- [x] _archive/tally soft/Tally.ERP9/M3.pdf — clean
+- [x] _archive/tally soft/Tally.ERP9/M4.pdf — clean
+- [x] _archive/tally soft/Tally.ERP9/M5.pdf — clean
+- [x] _archive/tally soft/Tally.ERP9/MAN-4.pdf — clean
+- [x] _archive/tally soft/Tally.ERP9/MAN-5.pdf — clean
+- [x] _archive/tally soft/Tally.ERP9/MANOJ 10.pdf — clean
+- [x] _archive/tally soft/Tally.ERP9/MANOJ 12.pdf — clean
+- [x] _archive/tally soft/Tally.ERP9/MANOJ 13.pdf — clean
+- [x] _archive/tally soft/Tally.ERP9/MANOJ 14.pdf — clean
+- [x] _archive/tally soft/Tally.ERP9/MANOJ 15.pdf — clean
+- [x] _archive/tally soft/Tally.ERP9/MANOJ 16.pdf — clean
+- [x] _archive/tally soft/Tally.ERP9/MANOJ 2.pdf — clean
+- [x] _archive/tally soft/Tally.ERP9/MANOJ 3.pdf — clean
+- [x] _archive/tally soft/Tally.ERP9/MANOJ 4.pdf — clean
+- [x] _archive/tally soft/Tally.ERP9/MANOJ 5.pdf — clean
+- [x] _archive/tally soft/Tally.ERP9/MANOJ 6.pdf — clean
+- [x] _archive/tally soft/Tally.ERP9/MANOJ 7.pdf — clean
+- [x] _archive/tally soft/Tally.ERP9/MANOJ 8.pdf — clean
+- [x] _archive/tally soft/Tally.ERP9/MANOJ 9.pdf — clean
+- [x] _archive/tally soft/Tally.ERP9/MANOJ MATHEW.pdf — clean
+- [x] _archive/tally soft/Tally.ERP9/MANOJ.pdf — clean
+- [x] _archive/tally soft/Tally.ERP9/MANOJ11.pdf — clean
+- [x] _archive/tally soft/Tally.ERP9/MSKT.pdf — clean
+- [x] _archive/tally soft/Tally.ERP9/MSKT1.pdf — clean
+- [x] _archive/tally soft/Tally.ERP9/MSKT3.pdf — clean
+- [x] _archive/tally soft/Tally.ERP9/MSKT4.pdf — clean
+- [x] _archive/tally soft/Tally.ERP9/MUS1.jpg — clean
+- [x] _archive/tally soft/Tally.ERP9/MUST2.jpg — clean
+- [x] _archive/tally soft/Tally.ERP9/MUST3.jpg — clean
+- [x] _archive/tally soft/Tally.ERP9/MUST4.jpg — clean
+- [x] _archive/tally soft/Tally.ERP9/MUST5.jpg — clean
+- [x] _archive/tally soft/Tally.ERP9/MUST6.jpg — clean
+- [x] _archive/tally soft/Tally.ERP9/MUST7.jpg — clean
+- [x] _archive/tally soft/Tally.ERP9/PALATHARA.jpg — clean
+- [x] _archive/tally soft/Tally.ERP9/Setup.exe — clean
+- [x] _archive/tally soft/Tally.ERP9/TALLY.REW — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/00002-00052.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/00002-00053.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/00002-00054.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/00002-00055.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/00002-00056.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/00002-00058.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/00002-00059.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/00002-00060.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/00002-00061.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/00002-00062.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/00002-00064.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/00002-00066.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/00002-00068.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/00002-00069.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/00003-00050.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/00003-00051.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/00003-00052.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/00003-00053.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/00003-00054.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/00003-00056.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/00003-00057.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/00003-00058.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/00003-00059.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/00003-00060.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/00003-00062.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/00003-00064.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/00003-00066.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/00003-00067.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/00006-00049.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/00006-00050.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/00006-00051.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/00006-00052.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/00006-00053.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/00006-00055.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/00006-00056.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/00006-00057.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/00006-00058.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/00006-00059.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/00006-00061.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/00006-00063.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/00006-00065.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/00006-00066.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/00007-00049.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/00007-00050.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/00007-00051.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/00007-00052.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/00007-00053.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/00007-00055.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/00007-00056.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/00007-00057.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/00007-00058.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/00007-00059.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/00007-00061.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/00007-00063.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/00007-00065.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/00007-00066.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/00008-00049.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/00008-00050.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/00008-00051.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/00008-00052.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/00008-00053.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/00008-00055.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/00008-00056.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/00008-00057.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/00008-00058.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/00008-00059.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/00008-00061.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/00008-00063.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/00008-00065.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/00008-00066.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/00019-00007.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/00019-00008.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/00019-00009.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/00019-00010.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/00019-00011.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/00019-00013.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/00019-00014.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/00019-00015.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/00019-00016.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/00019-00017.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/00019-00019.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/00019-00021.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/00019-00023.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/00019-00024.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/00031-00051.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/00031-00052.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/00031-00053.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/00031-00054.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/00031-00055.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/00031-00057.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/00031-00058.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/00031-00059.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/00031-00060.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/00031-00061.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/00031-00063.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/00031-00065.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/00031-00067.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/00031-00068.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/00051-00275.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/00051-00276.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/00051-00277.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/00051-00278.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/00051-00280.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/00051-00281.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/00051-00282.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/00051-00283.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/00051-00285.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/00051-00286.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/00051-00287.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/00051-00288.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/00051-00289.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/00051-00290.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/00051-00291.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/00051-00292.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/00052-00231.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/00052-00232.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/00052-00233.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/00052-00234.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/00052-00235.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/00052-00236.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/00052-00237.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/00052-00238.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/00052-00239.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/00052-00240.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/00052-00241.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/00052-00242.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/00052-00243.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/00052-00244.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/00053-00124.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/00053-00125.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/00053-00126.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/00053-00127.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/00053-00128.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/00053-00129.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/00053-00130.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/00053-00131.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/00053-00132.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/00053-00134.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/00053-00135.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/00053-00136.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/00054-00274.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/00054-00275.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/00054-00276.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/00054-00277.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/00054-00278.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/00054-00279.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/00054-00280.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/00054-00281.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/00054-00283.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/00054-00284.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/00054-00285.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/00054-00286.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/00054-00287.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/00054-00288.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/00054-00289.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/00054-00290.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/00054-00291.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/00055-00181.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/00055-00182.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/00055-00183.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/00055-00184.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/00055-00185.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/00055-00186.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/00055-00188.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/00055-00190.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/00055-00191.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/00055-00192.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/00056-00301.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/00056-00302.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/00056-00303.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/00056-00304.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/00056-00305.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/00056-00306.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/00056-00307.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/00056-00308.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/00056-00310.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/00056-00311.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/00056-00312.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/00056-00313.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/00056-00314.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/00056-00315.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/00056-00316.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/00056-00317.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/00056-00318.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/00057-00249.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/00057-00250.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/00057-00251.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/00057-00252.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/00057-00253.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/00057-00254.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/00057-00256.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/00057-00257.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/00057-00258.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/00057-00259.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/00057-00260.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/00057-00261.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/00057-00262.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/00057-00263.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/00057-00264.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/00058-00176.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/00058-00177.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/00058-00178.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/00058-00180.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/00058-00181.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/00058-00182.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/00058-00183.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/00058-00184.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/00058-00185.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/00059-00199.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/00059-00200.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/00059-00201.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/00059-00202.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/00059-00203.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/00059-00204.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/00059-00205.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/00059-00206.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/00059-00207.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/00059-00208.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/00060-00085.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/00060-00086.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/00060-00087.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/00060-00088.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/00060-00089.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/00060-00090.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/00061-00216.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/00061-00217.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/00061-00218.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/00061-00219.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/00061-00220.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/00061-00221.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/00061-00222.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/00061-00223.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/00061-00224.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/00061-00225.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/00061-00226.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/00061-00227.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/00061-00228.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/00061-00229.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/00061-00230.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/00061-00231.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/00102-00009.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/00103-00027.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/00104-00004.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/00106-00003.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/00107-00142.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/00107-00146.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/00107-00147.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/00107-00148.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/00107-00149.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/00107-00150.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/00107-00151.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/00108-00160.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/00108-00161.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/00108-00162.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/00108-00163.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/00108-00165.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/00108-00166.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/00108-00167.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/00108-00168.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/00108-00169.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/00108-00170.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/00108-00171.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/00109-00005.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/00110-00019.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/00111-00001.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/00112-00001.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/00113-00012.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/00116-00017.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/00117-00002.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/00118-00225.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/00118-00226.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/00118-00227.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/00118-00228.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/00118-00229.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/00118-00231.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/00118-00232.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/00118-00233.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/00118-00234.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/00118-00235.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/00118-00236.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/00118-00237.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/00118-00238.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/00119-00225.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/00120-00004.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/00123-00002.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/00147-00003.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/00148-00002.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/00149-00004.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/00150-00007.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/00151-00008.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/00152-00008.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/00153-00008.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/00154-00008.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/00155-00035.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/00155-00036.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/00155-00037.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/00155-00038.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/00155-00039.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/00155-00040.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/00155-00041.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/00156-00006.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/00156-00007.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/00156-00008.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/00156-00009.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/00157-00002.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/00157-00003.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/00158-00035.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/00159-00006.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/00160-00002.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/00161-00035.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/00162-00006.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/00163-00002.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/00164-00001.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/00165-00008.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/00166-00035.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/00167-00006.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/00168-00002.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/00169-00036.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/00170-00003.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/00171-00001.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/00172-00006.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/00173-00002.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/00174-00003.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/00175-00001.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/00176-00022.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/00177-00022.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/00178-00022.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/00179-00022.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/00180-00015.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/00180-00016.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/00180-00017.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/00180-00018.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/00180-00019.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/00180-00020.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/00181-00005.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/00183-00018.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/00183-00023.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/00184-00005.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/00185-00002.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/00186-00001.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/00187-00001.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/00188-00002.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/00188-00003.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/00188-00004.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/00189-00005.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/00190-00007.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/00191-00002.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/00192-00009.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/00193-00012.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/00194-00010.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/00195-00010.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/00196-00010.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/00197-00008.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/00197-00009.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/00197-00010.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/00197-00011.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/00198-00010.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/00199-00008.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/00200-00012.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/00201-00002.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/00217-00001.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/00218-00002.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/00219-00007.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/00219-00008.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/00219-00009.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/00219-00010.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/00219-00011.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/00219-00012.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/00220-00007.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/00221-00003.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/00222-00001.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/00223-00011.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/00225-00035.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/00226-00005.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/00227-00004.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/00228-00015.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/00229-00004.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/00229-00005.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/00229-00006.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/00229-00007.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/00230-00008.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/00231-00006.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/00232-00002.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/00232-00003.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/00232-00004.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/00233-00005.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/00234-00008.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/00235-00008.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/00236-00002.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/00237-00008.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/00238-00003.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/00239-00006.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/00240-00014.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/00246-00002.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/00247-00017.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/00248-00011.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/00249-00002.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/00250-00007.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/00251-00007.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/00252-00005.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/00253-00003.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/00268-00017.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/00269-00003.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/00270-00001.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/00271-00006.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/00272-00002.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/00273-00002.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/00274-00008.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/00275-00001.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/00276-00001.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/00277-00008.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/00278-00008.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/00278-00009.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/00279-00008.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/00280-00002.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/00282-00001.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/00282-00002.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/00283-00002.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/00286-00001.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/00287-00002.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/00288-00020.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/00296-00010.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/00297-00003.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/00298-00003.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/00299-00013.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/00302-00002.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/00304-00003.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/00305-00199.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/00306-00199.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/00307-00199.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/00308-00002.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/00309-00002.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/00310-00013.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/00315-00142.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/00316-00038.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/00317-00013.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/00318-00003.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/00319-00008.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/00320-00025.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/00327-00003.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/00328-00003.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/00329-00005.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/00330-00005.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/00331-00002.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/00333-00003.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/00334-00011.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/00335-00003.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/00336-00009.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/00337-00010.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/00337-00012.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/00338-00017.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/00339-00019.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/00340-00010.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/00341-00001.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/00342-00002.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/00343-00008.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/00344-00022.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/00345-00011.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/00346-00001.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/00347-00100.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/00347-00102.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/00347-00103.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/00348-00003.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/00349-00022.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/00350-00004.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/00351-00036.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/00351-00037.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/00351-00038.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/00351-00039.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/00351-00040.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/00351-00041.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/00351-00042.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/00352-00020.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/00353-00011.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/00354-00008.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/00355-00011.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/00356-00004.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/00357-00004.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/00358-00001.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/00359-00001.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/00360-00022.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/00361-00022.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/00362-00019.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/00363-00023.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/00365-00004.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/00366-00002.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/00368-00002.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/00370-00002.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/00371-00003.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/00372-00003.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/00373-00003.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/00374-00003.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/00375-00005.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/00376-00003.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/00377-00020.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/00378-00001.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/00381-00035.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/00382-00019.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/00401-00004.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/00402-00036.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/00403-00013.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/00408-00028.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/00409-00028.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/00410-00015.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/00411-00001.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/00421-00011.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/00422-00014.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/00423-00003.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/00424-00003.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/00426-00001.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/00427-00001.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/00428-00004.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/00429-00001.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/00430-00005.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/00431-00022.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/00434-00002.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/00435-00012.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/00436-00002.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/00437-00009.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/00438-00005.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/00439-00006.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/00440-00001.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/00441-00009.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/00442-00019.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/00444-00001.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/00446-00009.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/00447-00011.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/00448-00003.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/00449-00006.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/00450-00003.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/00451-00002.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/00452-00006.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/00454-00001.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/00455-00027.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/00456-00225.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/00457-00002.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/00458-00006.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/00459-00008.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/00460-00008.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/00461-00008.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/00466-00038.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/00482-00001.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/00483-00003.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/00489-00036.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/00494-00036.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/00495-00036.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/00497-00004.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/00498-00001.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/00503-00033.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/00505-00030.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/00508-00001.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/00519-00002.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/00526-00002.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/00527-00005.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/00528-00011.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/00529-00002.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/00530-00001.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/00531-00009.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/00534-00010.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/00535-00003.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/00536-00006.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/00537-00003.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/00538-00002.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/00539-00001.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/00540-00002.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/00541-00001.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/00545-00001.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/00547-00004.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/00548-00017.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/00549-00017.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/00550-00017.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/00553-00017.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/00554-00008.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/00557-00002.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/00573-00004.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/00573-00007.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/00574-00006.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/00576-00008.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/00577-00010.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/00578-00008.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/00579-00007.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/00580-00009.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/00581-00003.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/00582-00001.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/00593-00001.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/00597-00041.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/00598-00008.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/00599-00008.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/00600-00014.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/00600-00017.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/00601-00010.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/00602-00012.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/00603-00002.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/00604-00002.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/00605-00004.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/00606-00003.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/00607-00008.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/00608-00178.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/00608-00179.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/00608-00180.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/00608-00181.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/00608-00182.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/00608-00183.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/00608-00184.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/00608-00185.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/00608-00186.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/00608-00187.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/00609-00008.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/00610-00010.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/00611-00019.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/00612-00015.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/00613-00002.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/00615-00017.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/00616-00019.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/00617-00002.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/00618-00017.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/00618-00018.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/00618-00019.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/00618-00020.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/00618-00021.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/00618-00022.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/00619-00011.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/00620-00001.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/00622-00001.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/00623-00011.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/00624-00017.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/00625-00017.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/00626-00001.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/00628-00001.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/00645-00001.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/00662-00225.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/00663-00002.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/00664-00002.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/00665-00001.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/00666-00003.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/00667-00003.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/00668-00003.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/00669-00013.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/00670-00002.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/00671-00011.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/00672-00006.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/00672-00010.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/00673-00001.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/00674-00016.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/00674-00017.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/00674-00018.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/00674-00019.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/00677-00013.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/00678-00002.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/00679-00015.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/00680-00015.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/00681-00023.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/00681-00024.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/00681-00025.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/00681-00026.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/00681-00027.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/00682-00050.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/00682-00055.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/00682-00056.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/00682-00057.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/00683-00040.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/00683-00045.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/00684-00008.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/00685-00008.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/00686-00001.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/00687-00002.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/00688-00001.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/00689-00004.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/00690-00001.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/00691-00004.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/00692-00005.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/00693-00002.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/00694-00001.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/00695-00001.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/00696-00005.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/00697-00001.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/00698-00003.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/00699-00001.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/00700-00006.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/00701-00008.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/00702-00002.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/00703-00002.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/00704-00010.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/00705-00012.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/00706-00008.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/00707-00009.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/00708-00007.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/00709-00008.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/00710-00001.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/00711-00001.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/00712-00002.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/00713-00004.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/00714-00001.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/00715-00006.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/00716-00004.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/00717-00002.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/00719-00005.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/00720-00025.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/00721-00002.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/00722-00014.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/00723-00005.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/00724-00011.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/00725-00009.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/00726-00010.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/00727-00001.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/00728-00002.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/00729-00002.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/00730-00003.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/00731-00002.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/00732-00007.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/00733-00002.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/00734-00001.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/00735-00009.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/00736-00002.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/00737-00002.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/00738-00002.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/00739-00003.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/00740-00009.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/00741-00001.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/00742-00002.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/00743-00001.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/00744-00006.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/00745-00001.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/00760-00006.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/00761-00006.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/00762-00004.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/00763-00004.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/00764-00003.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/00765-00004.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/00766-00004.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/00767-00003.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/00768-00006.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/00769-00006.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/00770-00003.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/00771-00011.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/00772-00035.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/00773-00035.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/00774-00019.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/00775-00002.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/00776-00002.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/00777-00004.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/00778-00004.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/00779-00004.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/00780-00003.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/00781-00004.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/00782-00004.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/00783-00012.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/00784-00012.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/00785-00012.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/00786-00004.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/00787-00004.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/00788-00004.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/00789-00003.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/00790-00004.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/00791-00006.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/00792-00003.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/00793-00003.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/00794-00003.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/00795-00003.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/00796-00004.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/00797-00003.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/00798-00003.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/00799-00006.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/00800-00006.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/00801-00004.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/00802-00036.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/00802-00037.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/00802-00038.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/00802-00039.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/00802-00040.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/00802-00041.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/00802-00042.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/00803-00012.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/00804-00023.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/00805-00017.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/00806-00012.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/00807-00002.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/00808-00001.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/00826-00068.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/00845-00012.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/00883-00008.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/00884-00001.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/00885-00002.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/00886-00007.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/00887-00007.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/00888-00008.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/00890-00225.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/00891-00008.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/00892-00011.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/00893-00012.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/00894-00005.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/00895-00019.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/00896-00001.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/00897-00004.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/00898-00012.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/00899-00034.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/00900-00010.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/00901-00230.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/00901-00231.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/00901-00232.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/00901-00233.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/00901-00234.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/00901-00236.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/00901-00237.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/00901-00238.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/00901-00239.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/00901-00240.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/00901-00241.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/00901-00242.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/00901-00243.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/00902-00002.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/00904-00004.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/00906-00012.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/00907-00001.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/00908-00001.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/00909-00007.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/00910-00002.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/00911-00002.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/00913-00004.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/00914-00003.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/00915-00008.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/00916-00014.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/00916-00015.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/00916-00016.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/00917-00006.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/00919-00001.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/00920-00003.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/00936-00003.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/00938-00014.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/00939-00004.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/00939-00005.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/00940-00001.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/00941-00035.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/00942-00036.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/00944-00014.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/00948-00004.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/00956-00003.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/00957-00002.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/00959-00005.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/00960-00100.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/00961-00003.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/00962-00008.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/00962-00010.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/00963-00002.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/00965-00004.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/00969-00002.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/00974-00005.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/00975-00005.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/00976-00005.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/00977-00006.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/00978-00026.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/00979-00005.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/00980-00019.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/00982-00006.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/00983-00001.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/00984-00001.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/00985-00001.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/00986-00002.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/00987-00005.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/00988-00004.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/00989-00005.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/00991-00002.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/00993-00015.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/00994-00035.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/00995-00023.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/00996-00036.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/00997-00004.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/00998-00002.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/01000-00007.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/01001-00007.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/01002-00006.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/01004-00008.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/01005-00006.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/01006-00006.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/01009-00005.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/01010-00007.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/01011-00006.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/01014-00006.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/01015-00010.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/01016-00006.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/01019-00009.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/01020-00009.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/01021-00003.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/01022-00003.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/01023-00010.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/01024-00003.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/01025-00005.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/01026-00005.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/01032-00053.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/01032-00063.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/01035-00005.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/01036-00009.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/01037-00017.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/01037-00018.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/01037-00019.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/01037-00020.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/01037-00021.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/01037-00022.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/01038-00015.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/01039-00001.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/01040-00005.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/01042-00008.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/01043-00004.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/01045-00004.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/01046-00001.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/01047-00002.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/01048-00002.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/01049-00003.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/01050-00002.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/01052-00015.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/01053-00035.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/01054-00002.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/01055-00009.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/01056-00002.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/01086-00008.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/01086-00011.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/01087-00008.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/01088-00006.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/01089-00006.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/01090-00001.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/01091-00003.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/01092-00006.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/01093-00013.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/01094-00008.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/01095-00004.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/01096-00003.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/01097-00002.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/01098-00014.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/01099-00015.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/01100-00002.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/01101-00003.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/01102-00001.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/01103-00003.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/01104-00003.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/01105-00003.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/01106-00225.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/01107-00002.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/01108-00002.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/01109-00004.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/01110-00003.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/01111-00009.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/01112-00010.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/01113-00006.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/01114-00100.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/01115-00002.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/01116-00225.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/01117-00003.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/01118-00008.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/01119-00002.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/01120-00020.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/01121-00019.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/01122-00012.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/01123-00019.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/01124-00019.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/01125-00011.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/01126-00001.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/01127-00003.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/01128-00003.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/01129-00011.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/01130-00008.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/01131-00003.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/01132-00006.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/01133-00006.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/01134-00008.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/01135-00008.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/01136-00003.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/01137-00008.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/01138-00008.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/01143-00004.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/01143-00007.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/01144-00036.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/01145-00004.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/01150-00001.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/01161-00017.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/01162-00022.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/01163-00017.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/01164-00041.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/01165-00036.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/01166-00041.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/01167-00038.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/01168-00035.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/01169-00002.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/01170-00003.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/01171-00001.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/01172-00004.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/01173-00004.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/01174-00001.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/01175-00035.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/01176-00033.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/01176-00034.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/01176-00035.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/01176-00036.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/01177-00012.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/01179-00008.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/01180-00016.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/01180-00021.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/01181-00003.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/01182-00003.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/01183-00001.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/01184-00007.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/01185-00008.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/01209-00033.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/01210-00017.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/01211-00006.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/01211-00010.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/01212-00004.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/01213-00024.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/01214-00004.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/01214-00007.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/01215-00036.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/01215-00037.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/01215-00038.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/01215-00039.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/01215-00040.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/01215-00041.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/01215-00042.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/01216-00005.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/01217-00002.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/01218-00008.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/01238-00007.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/01238-00009.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/01239-00001.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/01240-00015.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/01241-00015.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/01242-00001.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/01243-00002.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/01244-00004.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/01245-00011.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/01246-00005.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/01246-00008.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/01247-00093.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/01248-00009.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/01249-00002.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/01250-00010.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/01251-00001.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/01252-00002.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/01253-00005.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/01254-00045.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/01257-00004.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/01258-00002.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/01270-00007.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/01271-00001.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/01272-00001.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/01273-00012.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/01274-00019.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/01275-00019.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/01276-00001.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/01277-00017.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/01278-00011.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/01279-00012.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/01280-00001.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/01281-00019.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/01282-00019.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/01283-00012.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/01284-00002.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/01285-00001.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/01286-00002.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/01287-00002.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/01288-00003.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/01289-00008.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/01290-00002.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/01291-00001.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/01292-00002.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/01293-00001.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/01294-00002.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/01295-00002.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/01296-00002.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/01298-00001.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/01299-00002.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/01300-00002.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/01301-00002.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/01302-00003.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/01303-00003.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/01304-00002.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/01305-00003.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/01306-00004.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/01307-00003.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/01308-00004.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/01309-00002.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/01310-00001.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/01311-00002.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/01312-00003.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/01313-00001.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/01314-00002.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/01315-00002.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/01316-00002.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/01317-00002.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/01318-00014.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/01318-00016.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/01319-00001.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/01320-00002.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/01321-00002.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/01322-00001.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/01323-00002.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/01324-00001.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/01325-00002.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/01326-00001.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/01327-00001.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/01328-00002.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/01329-00001.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/01330-00002.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/01331-00002.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/01332-00003.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/01333-00002.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/01334-00002.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/01335-00001.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/01336-00002.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/01337-00003.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/01338-00002.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/01339-00002.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/01340-00002.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/01341-00003.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/01342-00003.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/01343-00001.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/01348-00006.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/01349-00006.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/01350-00001.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/01352-00040.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/01354-00007.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/01355-00007.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/01368-00001.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/01369-00001.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/01370-00006.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/01371-00004.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/01372-00004.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/01372-00005.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/01372-00006.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/01372-00007.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/01373-00036.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/01373-00037.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/01373-00038.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/01373-00039.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/01373-00040.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/01373-00041.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/01373-00042.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/01374-00006.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/01380-00002.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/01381-00002.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/01382-00008.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/01383-00032.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/01383-00033.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/01383-00034.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/01383-00035.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/01383-00036.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/01383-00037.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/01385-00003.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/01386-00003.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/01387-00001.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/01390-00006.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/01391-00002.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/01392-00006.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/01395-00004.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/01397-00008.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/01398-00012.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/01399-00001.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/01400-00016.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/01401-00009.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/01404-00002.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/01405-00005.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/01406-00002.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/01407-00004.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/01407-00006.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/01408-00004.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/01409-00003.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/01410-00002.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/01415-00142.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/01415-00151.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/01416-00004.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/01417-00005.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/01418-00003.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/01419-00004.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/01420-00002.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/01421-00023.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/01422-00023.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/01423-00004.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/01424-00004.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/01425-00001.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/01426-00004.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/01427-00001.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/01428-00012.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/01429-00012.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/01430-00001.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/01431-00003.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/01436-00111.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/01437-00001.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/01438-00005.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/01439-00003.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/01440-00001.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/01441-00004.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/01442-00003.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/01443-00005.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/01444-00009.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/01445-00007.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/01445-00008.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/01450-00009.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/01453-00003.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/01454-00002.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/01455-00002.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/01456-00010.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/01457-00001.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/01458-00004.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/01459-00007.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/01460-00013.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/01460-00016.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/01461-00012.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/01462-00004.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/01463-00173.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/01463-00182.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/01464-00001.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/01465-00017.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/01466-00012.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/01467-00197.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/01468-00003.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/01469-00002.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/01470-00004.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/01470-00007.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/01471-00036.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/01472-00225.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/01473-00023.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/01474-00015.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/01475-00012.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/01500-00008.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/01501-00002.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/01504-00009.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/01505-00003.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/01508-00002.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/01515-00009.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/01516-00003.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/01520-00004.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/01523-00002.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/01524-00009.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/01524-00010.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/01525-00008.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/01526-00011.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/01527-00009.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/01528-00017.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/01529-00009.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/01530-00009.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/01531-00019.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/01532-00005.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/01533-00001.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/01534-00006.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/01534-00007.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/01535-00005.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/01535-00006.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/01536-00008.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/01537-00003.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/01538-00002.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/01539-00003.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/01539-00004.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/01539-00005.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/01540-00041.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/01541-00178.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/01542-00225.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/01542-00226.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/01542-00227.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/01542-00228.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/01542-00229.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/01542-00231.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/01542-00232.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/01542-00233.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/01542-00234.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/01542-00235.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/01542-00236.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/01542-00237.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/01542-00238.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/01543-00003.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/01544-00003.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/01545-00013.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/01546-00004.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/01547-00004.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/01548-00004.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/01549-00004.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/01550-00005.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/01551-00003.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/01552-00003.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/01553-00003.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/01554-00005.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/01555-00007.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/01556-00173.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/01557-00197.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/01558-00025.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/01559-00100.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/01560-00004.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/01561-00007.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/01562-00035.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/01563-00002.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/01564-00007.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/01565-00001.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/01566-00004.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/01567-00006.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/01568-00004.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/01569-00001.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/01570-00025.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/01571-00002.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/01576-00007.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/01579-00004.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/01582-00045.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/01583-00003.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/01584-00005.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/01585-00009.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/01589-00047.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/01590-00014.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/01592-00014.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/01597-00038.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/01600-00020.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/01601-00030.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/01603-00028.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/01604-00025.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/01605-00032.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/01606-00028.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/01607-00023.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/01618-00065.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/01622-00065.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/01625-00027.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/01626-00027.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/01629-00001.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/01630-00034.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/01631-00001.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/01632-00001.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/01636-00027.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/01637-00022.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/01638-00016.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/01639-00012.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/01641-00043.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/01642-00013.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/01644-00002.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/01645-00003.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/01646-00002.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/01647-00003.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/01649-00003.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/01661-00002.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/01691-00005.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/01692-00002.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/01699-00006.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/01700-00002.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/01708-00012.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/01708-00013.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/01708-00014.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/01708-00015.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/01708-00016.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/01725-00002.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/01743-00002.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/01758-00002.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/01773-00003.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/01774-00002.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/01819-00005.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/01826-00009.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/01845-00015.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/01897-00004.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/01915-00010.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/01997-00007.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/02026-00007.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/02067-00006.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/02116-00006.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/02126-00007.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/02129-00006.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/02146-00006.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/02163-00225.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/02274-00084.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/02287-00083.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/02288-00012.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/02289-00001.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/02295-00002.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/02297-00010.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/02298-00007.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/02302-00007.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/02306-00006.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/02313-00005.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/02314-00008.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/02315-00017.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/02320-00001.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/02321-00003.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/02322-00001.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/02323-00001.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/02324-00001.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/02325-00001.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/02326-00001.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/02327-00002.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/02328-00002.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/02329-00002.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/02330-00002.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/02331-00002.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/02332-00002.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/02333-00001.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/02334-00010.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/02335-00002.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/02341-00014.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/02342-00005.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/02367-00008.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/02368-00006.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/02369-00004.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/02370-00002.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/02371-00002.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/02372-00002.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/02373-00002.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/02374-00004.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/02403-00050.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/02406-00038.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/02407-00014.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/02413-00026.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/02415-00049.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/02417-00044.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/02418-00046.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/02421-00036.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/02423-00030.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/02425-00039.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/02427-00040.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/02429-00011.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/02430-00038.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/02431-00021.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/02432-00010.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/02433-00004.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/02434-00006.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/02435-00042.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/02436-00022.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/02437-00019.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/02440-00036.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/02441-00019.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/02442-00032.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/02443-00050.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/02445-00039.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/02446-00019.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/02447-00016.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/02451-00002.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/02455-00053.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/02457-00035.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/02459-00003.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/02460-00001.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/02461-00001.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/02462-00002.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/02463-00004.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/02463-00005.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/02464-00009.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/02465-00003.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/02466-00093.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/02466-00095.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/02466-00096.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/02466-00097.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/02466-00098.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/02466-00099.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/02466-00100.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/02466-00101.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/02467-00004.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/02468-00001.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/02469-00036.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/02470-00100.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/02488-00002.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/02489-00001.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/02490-00001.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/02490-00002.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/02491-00001.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/02498-00001.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/02554-00001.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/02572-00056.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/02577-00060.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/02581-00055.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/02585-00082.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/02586-00070.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/02587-00062.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/02588-00068.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/02589-00063.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/02590-00065.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/02600-00001.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/02612-00001.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/02620-00001.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/02647-00001.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/02648-00001.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/02678-00002.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/02689-00055.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/02690-00055.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/02691-00060.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/02692-00047.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/02693-00056.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/02694-00060.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/02695-00054.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/02696-00065.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/02697-00063.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/02698-00051.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/02699-00052.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/02700-00066.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/02701-00056.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/02702-00064.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/02703-00062.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/02704-00053.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/02705-00049.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/02706-00057.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/02707-00066.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/02708-00062.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/02709-00051.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/02710-00061.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/02711-00049.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/02712-00056.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/02713-00057.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/02785-00001.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/02792-00002.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/02793-00036.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/02794-00002.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/02795-00030.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/02796-00033.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/02797-00001.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/02798-00136.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/02799-00119.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/02800-00121.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/02802-00117.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/02803-00118.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/02804-00117.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/02805-00117.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/02806-00118.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/02807-00116.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/02809-00118.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/02810-00120.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/02811-00116.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/02815-00127.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/02816-00051.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/02817-00139.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/02818-00038.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/02822-00117.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/02823-00117.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/02830-00008.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/02831-00003.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/02832-00004.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/02833-00007.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/02834-00003.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/02835-00003.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/02836-00002.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/02848-00020.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/02849-00020.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/02850-00021.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/02851-00020.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/02852-00020.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/02853-00020.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/02854-00020.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/02855-00020.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/02856-00021.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/02857-00024.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/02858-00021.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/02859-00021.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/02860-00021.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/02861-00022.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/02862-00020.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/02863-00020.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/02864-00020.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/02876-00028.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/02878-00032.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/02880-00028.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/02882-00036.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/02883-00030.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/02887-00027.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/02889-00030.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/02891-00028.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/02892-00032.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/02893-00026.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/02895-00018.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/02896-00018.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/02897-00018.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/02898-00021.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/02899-00024.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/02900-00019.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/02901-00026.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/02902-00016.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/02903-00032.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/02905-00019.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/02906-00022.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/02907-00028.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/02908-00028.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/02909-00020.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/02910-00028.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/02913-00028.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/02914-00028.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/02915-00032.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/02919-00049.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/02920-00026.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/02921-00014.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/02922-00003.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/02923-00012.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/02927-00018.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/02931-00020.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/02934-00019.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/02938-00020.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/02939-00006.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/02942-00052.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/02943-00030.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/02944-00035.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/02945-00032.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/02946-00032.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/02948-00046.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/02949-00036.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/02952-00002.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/02957-00002.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/02958-00084.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/02959-00084.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/02960-00046.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/02962-00046.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/02963-00047.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/02964-00048.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/02965-00085.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/02966-00015.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/02967-00032.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/02968-00030.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/02969-00002.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/02970-00085.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/02971-00085.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/02972-00085.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/02973-00064.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/02974-00054.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/02975-00051.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/02976-00019.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/02977-00005.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/02978-00043.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/02979-00214.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/02980-00214.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/02981-00214.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/02983-00039.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/02984-00041.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/02985-00040.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/02986-00041.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/02987-00040.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/02988-00038.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/02989-00037.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/02990-00042.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/02992-00057.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/02993-00045.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/02994-00044.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/02998-00013.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/03000-00060.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/03001-00052.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/03002-00049.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/03003-00016.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/03004-00054.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/03006-00054.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/03007-00117.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/03008-00097.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/03010-00050.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/03011-00063.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/03013-00042.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/03014-00091.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/03016-00025.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/03017-00022.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/03018-00032.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/03019-00003.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/03020-00002.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/03028-00085.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/03030-00117.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/03031-00047.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/03032-00027.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/03033-00096.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/03035-00046.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/03036-00034.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/03037-00051.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/03038-00028.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/03044-00032.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/03048-00041.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/03051-00034.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/03052-00046.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/03054-00001.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/03055-00004.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/03057-00030.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/03060-00020.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/03061-00019.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/03062-00016.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/03063-00019.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/03064-00022.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/03065-00030.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/03066-00033.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/03068-00048.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/03069-00014.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/03070-00014.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/03071-00002.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/03072-00006.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/03073-00115.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/03074-00038.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/03075-00130.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/03076-00002.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/03077-00069.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/03078-00030.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/03079-00052.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/03084-00029.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/03091-00053.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/03092-00110.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/03093-00110.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/03094-00013.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/03096-00022.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/03098-00038.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/03105-00081.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/03106-00078.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/03108-00017.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/03109-00017.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/03110-00019.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/03111-00024.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/03112-00019.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/03113-00018.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/03114-00019.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/03115-00017.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/03116-00017.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/03117-00017.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/03118-00015.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/03119-00032.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/03120-00031.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/03121-00030.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/03122-00030.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/03123-00031.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/03124-00030.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/03126-00030.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/03127-00015.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/03128-00080.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/03129-00029.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/03130-00029.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/03131-00045.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/03132-00021.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/03133-00018.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/03134-00018.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/03135-00020.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/03136-00023.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/03137-00022.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/03138-00019.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/03139-00018.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/03140-00018.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/03141-00018.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/03142-00012.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/03143-00028.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/03144-00027.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/03145-00027.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/03146-00027.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/03147-00012.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/03148-00024.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/03150-00032.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/03151-00031.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/03152-00030.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/03155-00028.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/03156-00028.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/03157-00028.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/03160-00028.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/03162-00032.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/03165-00023.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/03171-00003.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/03172-00082.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/03174-00081.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/03176-00045.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/03177-00037.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/03181-00062.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/03182-00060.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/03187-00077.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/03188-00081.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/03189-00077.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/03191-00075.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/03195-00001.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/03197-00077.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/03198-00061.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/03199-00058.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/03201-00059.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/03203-00046.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/03206-00061.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/03209-00043.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/03211-00043.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/03213-00002.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/03215-00075.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/03216-00013.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/03217-00027.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/03218-00005.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/03220-00045.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/03222-00105.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/03223-00105.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/03224-00006.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/03228-00105.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/03229-00004.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/03231-00003.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/03232-00004.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/03233-00044.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/03234-00002.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/03235-00003.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/03236-00027.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/03237-00026.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/03238-00030.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/03239-00034.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/03240-00008.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/03242-00080.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/03245-00002.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/03246-00027.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/03249-00003.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/03250-00002.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/03251-00003.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/03252-00002.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/03263-00002.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/03264-00008.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/03269-00002.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/03270-00010.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/03277-00002.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/03279-00040.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/03280-00039.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/03280-00040.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/03280-00041.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/03283-00001.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/03284-00004.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/03285-00078.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/03286-00074.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/03290-00073.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/03292-00073.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/03296-00072.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/03299-00057.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/03306-00011.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/03308-00041.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/03310-00048.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/03311-00044.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/03313-00032.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/03314-00031.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/03316-00034.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/03317-00029.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/03319-00045.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/03320-00037.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/03322-00047.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/03323-00040.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/03325-00039.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/03326-00037.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/03327-00002.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/03328-00051.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/03329-00048.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/03330-00005.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/03331-00002.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/03332-00002.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/03333-00003.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/03334-00003.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/03335-00003.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/03336-00001.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/03337-00004.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/03338-00004.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/03339-00002.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/03340-00004.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/03341-00004.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/03342-00004.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/03343-00004.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/03344-00003.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/03345-00004.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/03346-00004.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/03347-00001.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/03348-00004.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/03349-00003.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/03350-00002.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/03351-00002.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/03352-00004.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/03353-00003.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/03354-00004.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/03355-00001.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/03356-00180.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/03357-00004.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/03358-00003.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/03359-00004.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/03360-00005.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/03361-00003.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/03362-00003.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/03363-00004.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/03366-00003.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/03369-00006.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/03370-00007.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/03371-00057.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/03372-00058.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/03374-00076.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/03375-00055.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/03377-00003.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/03379-00036.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/03381-00047.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/03382-00048.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/03383-00046.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/03386-00004.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/03387-00003.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/03393-00043.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/03393-00046.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/03394-00029.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/03395-00025.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/03407-00006.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/03409-00069.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/03410-00082.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/03413-00104.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/03415-00001.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/03416-00001.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/03417-00001.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/03418-00001.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/03419-00005.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/03420-00004.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/03421-00004.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/03422-00004.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/03423-00007.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/03424-00006.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/03426-00003.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/03427-00008.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/03428-00007.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/03430-00003.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/03431-00043.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/03432-00002.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/03433-00001.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/03434-00064.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/03435-00016.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/03436-00012.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/03437-00004.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/03438-00003.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/03439-00003.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/03440-00003.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/03441-00002.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/03442-00002.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/03480-00039.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/03481-00012.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/03484-00002.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/03485-00002.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/03486-00003.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/03487-00003.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/03488-00003.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/03490-00002.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/03491-00002.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/03492-00003.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/03493-00002.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/03494-00003.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/03495-00002.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/03496-00001.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/03497-00002.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/03498-00003.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/03499-00002.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/03500-00001.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/03501-00005.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/03502-00004.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/03503-00003.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/03504-00003.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/03505-00005.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/03506-00004.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/03507-00003.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/03508-00002.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/03509-00002.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/03510-00001.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/03511-00002.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/03512-00001.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/03513-00002.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/03514-00003.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/03526-00005.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/03530-00032.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/03534-00025.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/03536-00005.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/03537-00028.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/03544-00196.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/03548-00023.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/03551-00070.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/03552-00065.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/03553-00069.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/03554-00028.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/03555-00031.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/03556-00033.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/03557-00008.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/03558-00005.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/03561-00049.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/03562-00009.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/03563-00014.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/03564-00005.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/03565-00003.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/03566-00050.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/03567-00013.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/03569-00029.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/03570-00081.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/03571-00189.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/03572-00058.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/03573-00049.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/03574-00049.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/03575-00001.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/03576-00027.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/03577-00026.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/03579-00181.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/03580-00036.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/03581-00022.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/03582-00021.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/03585-00010.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/03586-00010.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/03587-00001.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/03588-00099.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/03589-00037.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/03593-00005.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/03596-00002.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/03602-00109.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/03613-00025.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/03615-00025.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/03616-00021.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/03617-00005.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/03618-00010.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/03621-00003.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/03622-00003.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/03631-00035.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/03633-00005.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/03634-00027.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/03635-00021.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/03636-00021.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/03637-00005.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/03638-00027.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/03645-00008.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/03646-00062.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/03648-00005.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/03649-00027.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/03650-00010.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/03651-00178.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/03652-00178.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/03653-00001.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/03658-00012.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/03659-00005.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/03660-00091.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/03662-00027.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/03663-00004.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/03664-00002.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/03665-00013.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/03666-00016.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/03669-00016.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/03671-00009.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/03672-00005.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/03674-00001.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/03675-00030.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/03678-00021.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/03680-00026.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/03681-00015.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/03682-00030.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/03683-00022.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/03684-00047.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/03685-00060.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/03686-00003.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/03687-00007.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/03689-00008.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/03690-00021.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/03691-00028.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/03692-00024.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/03693-00028.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/03694-00014.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/03695-00028.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/03696-00032.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/03697-00001.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/03698-00011.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/03699-00004.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/03700-00005.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/03701-00029.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/03702-00021.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/03703-00026.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/03704-00001.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/03705-00001.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/03708-00013.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/03709-00013.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/03710-00017.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/03711-00012.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/03712-00017.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/03713-00012.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/03714-00016.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/03715-00013.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/03716-00016.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/03717-00038.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/03718-00048.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/03719-00048.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/03737-00026.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/03738-00070.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/03739-00005.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/03740-00007.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/03743-00002.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/03744-00031.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/03759-00028.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/03760-00028.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/03761-00025.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/03762-00025.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/03763-00001.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/03764-00001.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/03767-00003.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/03768-00002.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/03774-00007.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/03775-00013.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/03776-00032.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/03777-00013.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/03778-00032.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/03779-00013.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/03780-00032.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/03781-00035.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/03782-00055.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/03783-00033.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/03784-00053.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/03785-00038.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/03786-00033.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/03787-00053.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/03788-00086.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/03789-00098.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/03790-00086.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/03791-00098.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/03792-00088.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/03793-00087.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/03794-00086.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/03795-00098.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/03796-00006.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/03797-00002.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/03798-00010.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/03800-00005.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/03806-00001.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/03807-00029.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/03808-00016.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/03823-00024.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/03824-00024.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/03830-00018.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/03831-00001.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/03832-00008.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/03833-00016.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/03834-00020.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/03835-00008.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/03837-00003.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/03838-00034.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/03839-00034.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/03846-00010.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/03848-00086.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/03853-00002.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/03855-00024.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/03856-00013.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/03864-00028.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/03865-00085.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/03866-00001.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/03870-00023.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/03871-00001.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/03873-00064.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/03874-00026.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/03875-00012.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/03889-00087.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/03890-00085.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/03891-00018.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/03893-00018.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/03897-00001.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/03898-00017.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/03899-00001.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/03900-00009.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/03901-00005.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/03902-00005.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/03903-00003.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/03904-00019.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/03905-00019.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/03906-00008.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/03907-00006.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/03908-00002.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/03909-00012.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/03909-00013.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/03910-00012.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/03911-00021.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/03915-00082.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/03916-00024.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/03917-00009.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/03918-00002.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/03919-00002.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/03920-00018.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/03921-00022.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/03922-00021.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/03923-00019.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/03924-00080.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/03925-00003.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/03926-00024.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/03927-00004.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/03928-00034.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/03930-00134.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/03931-00021.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/03932-00019.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/03957-00033.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/03958-00003.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/03960-00003.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/03964-00014.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/03965-00075.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/03966-00074.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/03967-00073.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/03968-00074.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/03969-00073.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/03974-00076.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/03975-00073.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/03976-00073.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/03977-00001.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/03978-00029.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/03979-00001.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/03984-00006.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/03985-00006.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/03988-00003.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/03989-00002.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/03991-00011.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/03992-00011.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/03993-00003.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/03994-00002.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/03995-00063.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/03996-00019.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/03997-00032.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/03998-00038.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/03999-00038.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/04000-00039.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/04001-00039.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/04002-00039.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/04003-00039.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/04004-00001.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/04005-00070.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/04006-00073.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/04007-00011.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/04008-00025.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/04017-00037.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/04024-00053.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/04025-00054.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/04026-00055.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/04027-00022.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/04028-00019.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/04029-00108.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/04030-00140.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/04031-00107.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/04032-00122.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/04034-00126.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/04035-00016.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/04036-00060.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/04037-00059.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/04038-00060.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/04039-00060.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/04040-00017.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/04042-00004.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/04043-00004.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/04044-00002.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/04045-00059.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/04046-00001.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/04047-00001.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/04048-00016.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/04049-00004.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/04050-00004.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/04051-00004.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/04052-00004.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/04054-00057.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/04055-00057.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/04056-00061.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/04057-00060.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/04058-00059.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/04061-00015.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/04062-00013.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/04064-00066.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/04066-00015.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/04067-00014.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/04068-00012.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/04069-00012.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/04071-00010.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/04072-00055.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/04073-00050.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/04074-00001.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/04075-00001.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/04076-00021.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/04077-00053.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/04078-00003.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/04079-00047.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/04080-00046.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/04081-00020.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/04082-00046.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/04083-00001.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/04086-00010.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/04087-00001.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/04088-00001.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/04089-00001.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/04090-00001.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/04091-00006.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/04092-00006.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/04093-00006.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/04094-00006.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/04095-00001.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/04096-00004.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/04099-00005.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/04100-00020.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/04101-00003.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/04102-00014.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/04103-00017.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/04104-00013.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/04105-00025.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/04106-00022.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/04107-00017.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/04108-00001.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/04109-00001.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/04110-00014.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/04111-00001.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/04112-00001.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/04113-00014.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/04114-00001.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/04115-00001.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/04117-00001.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/04118-00002.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/04119-00019.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/04120-00017.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/04121-00003.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/04122-00003.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/04123-00003.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/04124-00003.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/04125-00001.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/04126-00003.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/04127-00013.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/04128-00009.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/04129-00001.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/04130-00001.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/04131-00009.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/04132-00008.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/04133-00006.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/04134-00006.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/04135-00005.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/04137-00015.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/04138-00003.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/04139-00007.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/04140-00006.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/04144-00037.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/04145-00005.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/04146-00005.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/04151-00002.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/04152-00002.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/04153-00024.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/04154-00024.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/04155-00015.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/04156-00026.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/04157-00026.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/04158-00039.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/04159-00117.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/04160-00117.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/04161-00007.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/04162-00006.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/04163-00116.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/04164-00116.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/04166-00022.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/04168-00052.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/04172-00023.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/04173-00003.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/04174-00003.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/04177-00008.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/04181-00029.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/04182-00019.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/04183-00031.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/04188-00003.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/04189-00003.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/04190-00041.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/04191-00041.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/04192-00039.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/04197-00021.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/04198-00018.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/04199-00018.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/04200-00021.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/04201-00034.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/04204-00028.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/04206-00117.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/04207-00117.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/04212-00035.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/04213-00031.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/04214-00032.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/04219-00031.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/04228-00032.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/04229-00031.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/04230-00029.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/04231-00030.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/04232-00029.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/04233-00025.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/04234-00030.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/04235-00029.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/04236-00028.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/04237-00027.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/04238-00030.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/04239-00028.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/04240-00027.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/04242-00019.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/04243-00004.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/04244-00004.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/04246-00036.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/04247-00027.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/04248-00006.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/04249-00006.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/04253-00030.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/04254-00005.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/04255-00005.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/04256-00028.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/04257-00005.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/04258-00005.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/04259-00024.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/04260-00003.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/04261-00003.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/04262-00029.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/04263-00003.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/04264-00003.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/04265-00026.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/04266-00006.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/04267-00006.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/04268-00021.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/04269-00003.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/04270-00003.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/04271-00028.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/04272-00003.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/04273-00003.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/04274-00026.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/04275-00002.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/04276-00002.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/04277-00025.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/04278-00003.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/04279-00003.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/04280-00026.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/04281-00002.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/04282-00002.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/04283-00025.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/04284-00002.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/04285-00002.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/04286-00001.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/04288-00001.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/04289-00010.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/04291-00002.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/04292-00012.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/04294-00068.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/04295-00068.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/04296-00065.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/04299-00033.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/04300-00005.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/04301-00005.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/04302-00012.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/04303-00012.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/04306-00004.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/04307-00003.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/04310-00026.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/04311-00032.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/04312-00001.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/04313-00001.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/04318-00028.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/04320-00028.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/04322-00029.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/04323-00045.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/04324-00019.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/04327-00027.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/04337-00026.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/04339-00047.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/04341-00030.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/04352-00003.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/04353-00021.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/04355-00014.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/04356-00013.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/04357-00013.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/04358-00015.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/04359-00015.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/04364-00032.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/04374-00002.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/04375-00002.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/04377-00002.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/04378-00002.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/04380-00002.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/04381-00002.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/04383-00002.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/04384-00002.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/04386-00026.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/04387-00023.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/04388-00024.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/04409-00024.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/04410-00004.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/04411-00004.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/04412-00023.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/04413-00002.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/04414-00002.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/04438-00029.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/04448-00022.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/04449-00025.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/04450-00025.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/04453-00001.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/04454-00001.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/04455-00001.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/04456-00001.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/04457-00003.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/04458-00002.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/04459-00003.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/04460-00002.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/04477-00030.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/04484-00028.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/04485-00027.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/04486-00027.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/04487-00024.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/04488-00023.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/04489-00025.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/04490-00024.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/04491-00024.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/04492-00023.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/04493-00023.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/04494-00024.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/04495-00024.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/04496-00024.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/04532-00029.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/04533-00029.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/04534-00032.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/04535-00037.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/04536-00030.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/04537-00035.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/04538-00031.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/04539-00032.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/04540-00033.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/04541-00036.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/04542-00035.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/04543-00032.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/04545-00029.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/04546-00029.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/04547-00036.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/04548-00029.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/04549-00029.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/04550-00029.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/04551-00035.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/04552-00035.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/04553-00029.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/04554-00029.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/04556-00034.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/04557-00029.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/04558-00033.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/04559-00032.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/04560-00036.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/04561-00031.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/04562-00032.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/04563-00035.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/04564-00035.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/04565-00020.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/04583-00028.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/04584-00034.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/04585-00011.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/04586-00012.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/04591-00009.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/04592-00009.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/04611-00027.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/04612-00022.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/04613-00014.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/04614-00002.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/04615-00002.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/04616-00025.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/04633-00022.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/04638-00001.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/04641-00002.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/04642-00003.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/04643-00002.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/04644-00002.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/04645-00036.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/04646-00022.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/04647-00022.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/04648-00022.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/04650-00019.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/04651-00020.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/04652-00018.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/04653-00018.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/04654-00018.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/04655-00018.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/04656-00020.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/04666-00019.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/04667-00019.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/04668-00019.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/04671-00018.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/04674-00018.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/04677-00018.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/04682-00020.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/04683-00021.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/04684-00024.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/04685-00019.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/04686-00021.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/04687-00021.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/04688-00023.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/04689-00021.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/04702-00018.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/04703-00018.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/04704-00019.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/04705-00018.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/04706-00018.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/04729-00018.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/04730-00037.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/04735-00018.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/04736-00018.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/04739-00004.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/04745-00015.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/04746-00015.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/04747-00008.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/04748-00007.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/04749-00007.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/04750-00007.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/04751-00007.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/04752-00012.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/04753-00012.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/04754-00012.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/04755-00012.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/04760-00015.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/04761-00024.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/04762-00019.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/04763-00015.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/04764-00015.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/04767-00016.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/04768-00016.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/04769-00009.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/04770-00009.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/04771-00009.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/04772-00009.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/04774-00013.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/04775-00013.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/04776-00014.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/04777-00019.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/04778-00015.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/04779-00016.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/04781-00014.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/04783-00013.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/04784-00012.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/04785-00012.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/04789-00001.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/04791-00010.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/04792-00010.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/04793-00003.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/04794-00010.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/04795-00006.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/04796-00010.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/04797-00010.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/04798-00005.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/04799-00005.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/04800-00005.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/04801-00020.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/04802-00010.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/04803-00010.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/04804-00010.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/04805-00003.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/04806-00010.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/04807-00020.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/04808-00020.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/04810-00009.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/04819-00011.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/04820-00010.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/04821-00005.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/04822-00006.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/04824-00008.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/04825-00009.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/04826-00009.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/04827-00010.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/04829-00004.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/04830-00004.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/04831-00007.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/04832-00007.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/04833-00007.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/04834-00007.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/04835-00007.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/04836-00007.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/04837-00006.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/04838-00008.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/04839-00008.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/04840-00005.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/04841-00004.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/04842-00007.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/04843-00007.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/04844-00007.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/04845-00007.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/04846-00006.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/04847-00006.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/04848-00006.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/04849-00006.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/04850-00007.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/04851-00007.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/04852-00006.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/04853-00006.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/04854-00005.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/04855-00009.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/04856-00010.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/04857-00010.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/04858-00009.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/04859-00009.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/04860-00010.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/04861-00009.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/04862-00022.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/04863-00006.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/04864-00006.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/04865-00006.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/04866-00005.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/04867-00006.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/04868-00005.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/04869-00005.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/04870-00005.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/04871-00006.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/04872-00006.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/04873-00005.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/04874-00006.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/04875-00005.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/04876-00005.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/04877-00006.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/04878-00005.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/04879-00006.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/04880-00006.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/04881-00006.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/04882-00006.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/04883-00006.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/04884-00005.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/04885-00010.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/04886-00006.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/04887-00004.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/04888-00004.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/04889-00007.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/04890-00006.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/04891-00005.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/04892-00005.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/04893-00005.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/04894-00006.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/04895-00006.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/04896-00006.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/04897-00006.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/04898-00006.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/04899-00006.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/04900-00006.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/04901-00007.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/04902-00004.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/04903-00004.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/04904-00006.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/04905-00004.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/04906-00004.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/04907-00006.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/04908-00006.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/04909-00006.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/04910-00006.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/04911-00006.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/04912-00007.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/04913-00004.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/04914-00006.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/04915-00001.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/04917-00009.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/04918-00008.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/04919-00010.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/04921-00008.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/04922-00008.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/04923-00007.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/04932-00006.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/04933-00006.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/04934-00006.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/04935-00006.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/04936-00006.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/04937-00006.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/04938-00006.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/04939-00006.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/04940-00006.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/04941-00006.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/04942-00006.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/04943-00006.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/04944-00006.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/04945-00006.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/04946-00006.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/04948-00006.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/04950-00006.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/04952-00006.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/04954-00006.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/04956-00006.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/04958-00006.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/04960-00008.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/04961-00010.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/04962-00005.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/04963-00005.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/04964-00005.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/04965-00005.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/04966-00005.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/04967-00005.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/04968-00009.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/04969-00009.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/04970-00001.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/04971-00014.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/04972-00009.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/04973-00018.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/04995-00008.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/05001-00052.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/20052-00001.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/20052-00101.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/20052-00102.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/21546-00124.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/40006-00006.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/40007-00006.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/40008-00006.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/40015-00010.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/40016-00010.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/40022-00021.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/40023-00004.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/40024-00003.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/40025-00006.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/40026-00007.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/40027-00008.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/40028-00019.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/40029-00011.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/40030-00010.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/40031-00007.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/40032-00010.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/40033-00007.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/40034-00009.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/40035-00003.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/40036-00019.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/40037-00019.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/40038-00009.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/40044-00009.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/40045-00007.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/40046-00008.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/40049-00010.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/40051-00011.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/40052-00011.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/40053-00013.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/40054-00012.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/40055-00012.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/40056-00007.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/40057-00011.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/40058-00013.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/40059-00013.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/40060-00013.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/40061-00010.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/40062-00012.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/40063-00012.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/40072-00004.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/40074-00003.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/40075-00004.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/40076-00001.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/40077-00001.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/40078-00004.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/40079-00001.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/40080-00009.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/40081-00001.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/40082-00002.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/40083-00001.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/40084-00002.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/40085-00009.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/40086-00006.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/40087-00007.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/40088-00006.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/40089-00006.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/40090-00006.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/40091-00006.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/40092-00006.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/40093-00006.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/40094-00006.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/40095-00006.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/40096-00006.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/40097-00006.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/40098-00006.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/40099-00006.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/40100-00006.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/40101-00006.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/40102-00008.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/40103-00006.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/40104-00008.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/40105-00006.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/40106-00007.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/40107-00006.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/40108-00005.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/40109-00005.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/40110-00005.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/40111-00005.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/40112-00005.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/40113-00005.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/40114-00005.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/40115-00005.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/40116-00005.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/40117-00005.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/40118-00005.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/40119-00005.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/40120-00005.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/40121-00005.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/40122-00005.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/40123-00005.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/40124-00005.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/40125-00005.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/40126-00005.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/40127-00005.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/40128-00005.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/40129-00006.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/40130-00005.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/40131-00005.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/40132-00005.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/40133-00005.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/40134-00005.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/40135-00005.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/40136-00005.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/40137-00005.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/40138-00005.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/40139-00005.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/40140-00005.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/40141-00005.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/40142-00005.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/40143-00005.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/40144-00005.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/40145-00005.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/40146-00005.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/40147-00005.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/40148-00005.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/40149-00005.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/40150-00005.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/40151-00005.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/40152-00006.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/40153-00005.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/40154-00005.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/40155-00007.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/40156-00010.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/40157-00009.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/40158-00009.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/40159-00009.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/40160-00009.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/40161-00009.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/40162-00009.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/40163-00009.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/40164-00009.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/40165-00009.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/40166-00009.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/40167-00009.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/40168-00009.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/40169-00009.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/40170-00009.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/40171-00009.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/40172-00009.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/40173-00009.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/40174-00009.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/40175-00009.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/40176-00009.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/40177-00009.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/40178-00009.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/40179-00009.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/40180-00009.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/40181-00007.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/40182-00004.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/40183-00006.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/40184-00007.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/40185-00007.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/40186-00007.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/40187-00006.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/40188-00006.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/40189-00008.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/40190-00006.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/40191-00006.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/40192-00006.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/40193-00007.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/40194-00007.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/40195-00007.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/40196-00007.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/40197-00006.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/40198-00004.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/40199-00003.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/40200-00001.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/40201-00002.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/40202-00009.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/40203-00009.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/40204-00009.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/40205-00010.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/40206-00010.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/40207-00010.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/40208-00010.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/40209-00010.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/40210-00010.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/40211-00010.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/40213-00010.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/40219-00009.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/40224-00006.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/40225-00019.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/40228-00019.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/40229-00019.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/40230-00005.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/40231-00002.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/40232-00019.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/40233-00019.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/40235-00004.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/40236-00007.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/40237-00006.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/40238-00007.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/40248-00007.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/40249-00006.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/40250-00006.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/40251-00008.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/40252-00007.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/40253-00006.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/40254-00007.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/40255-00004.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/40256-00004.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/40257-00007.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/40258-00005.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/40259-00006.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/40261-00006.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/40262-00006.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/40265-00006.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/40266-00001.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/40267-00004.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/40269-00012.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/40270-00004.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/40274-00013.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/40275-00003.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/40276-00007.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/40277-00006.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/40278-00005.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/40279-00009.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/40280-00003.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/40293-00010.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/40313-00006.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/40325-00005.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/40326-00002.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/40327-00002.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/40328-00003.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/40329-00003.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/40330-00003.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/40331-00001.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/40332-00002.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/40333-00002.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/40334-00002.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/40335-00005.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/40336-00004.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/40337-00009.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/40338-00009.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/40339-00001.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/40340-00008.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/40341-00008.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/40342-00008.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/40343-00001.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/40344-00022.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/40345-00001.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/40346-00002.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/40347-00010.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/40348-00002.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/40349-00006.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/40350-00006.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/40351-00006.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/40352-00003.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/40353-00001.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/40354-00001.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/40355-00010.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/40356-00010.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/40357-00010.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/40358-00010.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/40359-00001.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/40360-00001.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/40372-00012.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/40373-00012.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/40374-00007.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/40375-00007.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/40376-00010.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/40377-00009.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/40378-00009.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/40379-00009.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/40380-00012.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/40381-00012.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/40382-00011.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/40383-00009.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/40384-00011.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/40385-00012.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/40386-00012.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/40387-00009.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/40388-00005.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/40389-00001.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/40390-00001.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/40391-00005.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/40392-00001.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/40393-00001.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/40394-00001.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/40395-00009.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/40396-00006.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/40397-00006.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/40398-00009.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/40399-00006.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/40400-00004.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/40401-00009.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/40402-00005.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/40403-00006.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/40404-00006.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/40405-00006.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/40406-00006.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/40407-00013.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/40408-00006.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/40409-00013.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/40410-00006.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/40411-00013.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/40412-00011.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/40413-00013.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/40414-00007.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/40415-00008.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/40416-00008.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/40417-00008.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/40418-00008.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/40419-00008.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/40420-00008.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/40421-00008.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/40422-00008.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/40423-00007.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/40424-00007.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/40425-00008.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/40426-00008.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/40427-00008.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/40428-00008.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/40429-00008.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/40430-00008.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/40431-00008.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/40432-00008.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/40433-00008.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/40434-00008.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/40435-00008.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/40436-00008.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/40437-00008.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/40438-00008.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/40439-00008.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/40440-00008.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/40441-00008.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/40442-00008.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/40443-00007.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/40444-00007.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/40445-00007.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/40446-00007.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/40447-00007.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/40448-00007.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/40449-00007.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/40450-00008.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/40451-00008.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/40452-00007.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/40453-00006.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/40454-00007.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/40455-00007.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/40456-00007.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/40457-00007.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/40458-00007.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/40459-00007.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/40460-00007.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/40461-00007.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/40462-00007.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/40464-00007.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/40465-00008.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/40466-00008.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/40467-00007.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/40468-00006.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/40469-00007.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/40470-00007.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/40471-00007.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/40472-00007.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/40473-00003.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/40476-00001.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/40477-00001.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/40478-00002.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/40479-00006.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/40480-00006.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/40481-00002.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/40482-00001.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/40483-00001.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/40484-00002.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/40485-00001.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/40486-00001.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/40487-00001.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/40488-00001.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/40489-00002.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/40490-00001.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/40491-00004.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/40492-00001.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/40493-00004.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/40494-00001.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/40495-00004.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/40496-00001.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/40497-00004.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/40498-00001.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/40499-00004.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/40500-00001.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/40501-00004.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/40502-00001.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/40503-00004.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/40504-00001.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/40505-00004.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/40506-00001.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/40507-00004.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/40508-00002.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/40509-00004.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/40510-00002.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/40511-00004.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/40512-00002.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/40513-00004.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/40514-00002.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/40515-00004.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/40516-00002.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/40517-00004.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/40518-00002.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/40519-00006.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/40520-00002.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/40521-00006.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/40522-00002.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/40523-00005.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/40524-00004.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/40525-00007.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/40526-00007.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/40527-00007.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/40528-00004.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/40529-00005.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/40530-00001.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/40531-00006.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/40532-00001.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/40533-00005.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/40534-00001.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/40535-00006.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/40536-00001.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/40537-00006.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/40538-00001.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/40539-00001.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/40540-00007.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/40541-00001.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/40542-00006.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/40543-00001.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/40544-00001.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/40545-00006.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/40546-00001.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/40547-00006.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/40548-00001.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/40549-00005.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/40550-00001.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/40551-00005.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/40552-00001.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/40553-00005.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/40554-00001.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/40555-00005.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/40556-00001.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/40557-00004.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/40558-00001.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/40559-00001.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/40560-00004.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/40561-00001.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/40562-00001.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/40563-00004.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/40564-00001.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/40565-00001.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/40566-00001.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/40567-00001.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/40568-00001.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/40569-00001.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/40570-00001.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/40571-00001.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/40572-00001.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/40573-00001.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/40574-00005.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/40575-00001.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/40576-00001.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/40577-00006.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/40578-00001.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/40579-00006.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/40580-00001.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/40581-00006.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/40582-00001.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/40583-00006.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/40584-00001.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/40585-00003.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/40586-00001.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/40587-00006.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/40588-00001.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/40589-00006.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/40590-00001.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/40591-00006.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/40592-00001.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/40593-00006.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/40594-00001.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/40595-00006.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/40596-00001.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/40597-00006.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/40598-00001.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/40599-00006.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/40600-00001.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/40601-00006.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/40602-00001.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/40603-00006.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/40604-00001.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/40605-00006.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/40606-00001.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/40607-00006.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/40608-00001.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/40609-00006.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/40610-00001.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/40611-00006.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/40612-00001.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/40613-00006.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/40614-00001.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/40615-00006.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/40616-00001.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/40617-00006.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/40618-00001.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/40619-00006.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/40620-00001.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/40621-00006.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/40622-00001.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/40623-00006.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/40624-00001.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/40625-00006.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/40626-00001.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/40627-00006.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/40628-00001.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/40629-00006.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/40630-00001.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/40631-00001.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/40632-00001.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/40633-00004.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/40634-00002.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/40635-00002.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/40636-00001.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/40637-00001.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/40638-00002.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/40639-00001.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/40640-00001.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/40641-00005.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/40642-00003.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/40643-00003.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/40644-00004.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/40645-00002.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/40646-00002.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/40647-00004.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/40648-00001.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/40649-00001.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/40650-00006.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/40651-00006.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/40652-00006.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/40653-00006.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/40654-00006.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/40655-00006.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/40656-00006.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/40657-00006.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/40658-00006.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/40659-00006.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/40660-00006.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/40661-00006.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/40662-00005.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/40663-00004.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/40664-00006.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/40665-00005.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/40666-00005.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/40667-00005.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/40668-00006.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/40669-00006.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/40670-00006.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/40671-00006.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/40672-00005.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/40673-00004.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/40674-00006.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/40675-00005.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/40676-00005.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/40677-00005.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/40678-00006.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/40679-00006.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/40680-00006.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/40681-00006.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/40682-00006.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/40683-00006.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/40684-00005.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/40685-00006.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/40686-00005.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/40687-00006.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/40688-00006.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/40689-00006.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/40690-00006.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/40691-00007.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/40692-00007.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/40693-00005.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/40694-00006.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/40695-00005.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/40696-00005.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/40697-00005.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/40698-00006.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/40699-00006.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/40700-00006.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/40701-00006.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/40702-00006.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/40703-00006.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/40704-00006.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/40705-00007.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/40706-00001.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/40707-00005.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/40708-00005.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/40709-00005.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/40710-00005.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/40711-00006.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/40712-00006.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/40713-00006.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/40714-00005.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/40715-00005.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/40716-00006.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/40717-00006.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/40718-00005.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/40719-00006.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/40720-00007.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/40721-00007.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/40722-00006.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/40723-00006.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/40724-00006.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/40725-00006.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/40726-00005.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/40727-00005.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/40728-00005.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/40729-00005.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/40730-00006.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/40732-00006.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/40733-00006.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/40734-00002.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/40734-00003.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/40735-00005.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/40737-00002.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/40738-00002.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/40739-00002.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/40740-00002.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/40741-00005.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/40742-00001.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/40743-00001.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/40744-00006.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/40745-00006.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/40746-00006.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/40747-00006.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/40748-00006.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/40749-00006.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/40750-00006.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/40751-00006.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/40752-00002.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/40753-00002.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/40754-00006.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/40755-00003.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/40756-00006.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/40757-00004.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/40758-00003.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/40759-00004.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/40760-00003.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/40761-00004.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/40762-00003.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/40763-00004.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/40764-00003.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/40765-00005.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/40766-00005.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/40767-00005.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/40768-00005.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/40769-00005.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/40770-00005.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/40771-00005.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/40772-00005.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/40773-00005.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/40774-00005.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/40775-00005.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/40776-00005.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/40777-00005.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/40778-00005.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/40779-00005.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/40780-00005.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/40781-00005.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/40782-00005.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/40783-00005.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/40784-00005.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/40785-00005.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/40786-00005.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/40787-00005.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/40788-00005.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/40789-00005.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/40790-00005.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/40791-00005.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/40792-00005.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/40793-00005.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/40794-00004.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/40795-00004.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/40796-00005.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/40797-00005.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/40798-00005.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/40799-00005.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/40800-00005.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/40801-00005.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/40802-00005.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/40803-00005.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/40804-00004.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/40805-00004.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/40806-00005.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/40807-00005.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/40808-00004.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/40809-00004.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/40810-00005.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/40811-00005.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/40812-00005.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/40813-00005.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/40814-00005.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/40815-00005.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/40816-00005.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/40817-00005.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/40818-00005.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/40819-00005.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/40820-00004.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/40821-00004.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/40822-00005.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/40823-00005.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/40824-00005.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/40825-00005.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/40826-00004.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/40827-00004.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/40828-00005.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/40829-00005.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/40830-00005.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/40831-00005.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/40832-00005.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/40833-00005.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/40834-00004.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/40835-00004.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/40836-00004.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/40837-00004.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/40838-00005.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/40839-00005.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/40840-00005.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/40841-00005.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/40842-00005.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/40843-00005.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/40844-00005.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/40845-00005.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/40846-00005.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/40847-00005.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/40848-00005.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/40849-00005.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/40850-00005.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/40851-00005.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/40852-00005.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/40853-00005.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/40854-00005.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/40855-00005.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/40856-00005.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/40857-00005.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/40858-00005.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/40859-00005.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/40860-00005.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/40861-00005.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/40862-00005.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/40863-00005.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/40864-00005.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/40865-00005.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/40866-00005.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/40867-00005.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/40868-00004.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/40869-00004.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/40870-00004.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/40871-00004.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/40872-00004.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/40873-00004.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/40874-00005.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/40875-00005.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/40876-00004.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/40877-00004.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/40878-00005.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/40879-00005.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/40881-00005.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/40882-00005.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/40884-00004.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/40885-00004.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/40886-00005.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/40887-00005.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/40888-00004.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/40889-00004.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/40890-00004.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/40891-00004.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/40892-00004.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/40893-00005.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/40894-00005.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/40895-00005.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/40896-00005.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/40897-00005.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/40898-00005.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/40899-00005.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/40900-00005.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/40901-00005.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/40902-00005.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/40903-00004.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/40904-00004.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/40905-00004.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/40906-00005.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/40907-00005.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/40908-00004.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/40909-00003.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/40910-00003.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/40911-00003.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/40912-00003.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/40913-00003.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/40914-00005.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/40915-00005.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/40916-00005.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/40917-00004.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/40918-00004.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/40919-00004.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/40920-00005.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/40921-00005.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/40922-00003.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/40923-00005.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/40924-00005.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/40925-00005.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/40926-00005.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/40927-00005.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/40928-00004.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/40929-00005.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/40930-00005.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/40931-00004.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/40932-00005.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/40933-00005.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/40934-00005.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/40935-00005.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/40936-00005.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/40937-00005.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/40938-00003.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/40939-00003.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/40940-00003.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/40941-00003.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/40942-00003.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/40943-00003.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/40944-00003.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/40945-00003.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/40946-00003.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/40947-00003.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/40948-00004.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/40949-00003.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/40950-00003.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/40951-00004.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/40952-00002.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/40953-00003.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/40954-00001.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/40955-00001.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/40959-00001.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/40960-00001.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/40961-00001.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/40962-00001.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/40963-00001.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/40964-00002.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/40965-00003.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/40966-00003.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/40967-00003.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/40968-00003.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/40969-00003.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/40970-00003.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/40971-00003.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/40972-00003.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/40973-00003.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/40974-00003.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/40975-00003.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/40976-00003.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/40977-00003.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/40978-00003.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/40979-00003.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/40980-00003.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/40981-00003.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/40982-00003.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/40983-00003.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/40984-00003.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/40985-00003.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/40986-00003.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/40987-00003.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/40988-00003.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/40989-00002.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/40990-00002.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/40991-00003.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/40992-00003.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/40993-00003.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/40994-00003.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/40995-00003.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/40996-00003.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/40997-00003.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/40998-00003.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/40999-00004.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/41000-00004.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/41001-00003.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/41002-00003.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/41003-00003.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/41004-00003.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/41005-00003.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/41006-00003.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/41007-00003.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/41008-00003.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/41009-00003.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/41010-00003.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/41011-00003.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/41012-00003.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/41013-00003.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/41014-00003.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/41015-00002.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/41016-00002.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/41017-00003.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/41018-00003.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/41019-00003.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/41020-00003.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/41021-00002.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/41022-00002.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/41023-00002.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/41024-00002.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/41025-00003.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/41026-00003.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/41027-00002.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/41028-00002.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/41029-00002.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/41030-00002.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/41031-00003.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/41032-00002.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/41033-00002.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/41034-00001.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/41035-00003.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/41036-00003.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/41037-00003.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/41038-00003.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/41039-00002.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/41040-00002.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/41041-00001.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/41042-00001.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/41043-00003.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/41044-00003.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/41045-00002.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/41046-00002.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/41047-00002.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/41048-00002.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/41049-00003.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/41050-00003.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/41051-00002.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/41052-00002.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/41053-00001.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/41054-00001.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/41055-00003.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/41056-00003.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/41057-00001.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/41058-00001.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/41059-00003.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/41060-00003.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/41061-00003.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/41062-00003.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/41063-00001.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/41064-00001.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/41065-00003.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/41066-00003.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/41067-00003.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/41068-00003.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/41069-00002.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/41070-00002.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/41071-00002.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/41072-00002.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/41073-00002.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/41074-00002.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/41075-00003.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/41076-00003.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/41077-00002.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/41078-00002.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/41079-00002.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/41080-00002.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/41081-00002.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/41082-00001.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/41083-00002.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/41084-00001.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/41085-00002.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/41086-00001.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/41087-00002.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/41088-00001.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/41089-00002.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/41090-00001.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/41091-00002.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/41092-00002.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/41093-00001.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/41094-00002.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/41095-00001.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/41096-00003.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/41097-00001.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/41098-00003.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/41099-00001.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/41100-00003.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/41101-00001.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/41102-00003.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/41103-00001.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/41104-00003.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/41105-00003.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/41106-00001.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/41107-00003.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/41108-00002.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/41109-00003.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/41110-00001.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/41111-00003.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/41112-00001.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/41113-00003.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/41114-00001.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/41115-00003.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/41116-00001.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/41117-00002.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/41118-00003.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/41119-00001.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/41120-00003.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/41121-00001.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/41122-00003.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/41123-00001.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/41124-00003.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/41125-00003.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/41126-00003.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/41127-00002.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/41128-00002.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/41129-00003.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/41130-00002.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/41131-00003.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/41132-00002.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/41133-00003.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/41134-00002.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/41135-00002.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/41136-00002.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/41137-00002.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/41138-00003.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/41139-00003.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/41140-00003.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/41141-00003.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/41142-00003.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/41143-00003.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/41144-00002.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/41145-00002.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/41146-00001.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/41147-00001.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/41148-00001.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/41149-00001.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/41150-00001.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/41151-00001.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/41152-00003.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/41153-00009.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/41154-00002.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/41155-00011.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/41156-00002.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/41157-00005.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/41158-00003.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/41159-00007.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/41160-00005.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/41161-00009.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/41162-00002.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/41163-00007.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/41164-00007.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/41165-00001.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/41166-00004.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/41167-00005.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/41168-00004.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/41169-00005.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/41170-00004.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/41171-00004.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/41172-00004.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/41173-00003.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/41174-00005.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/41175-00007.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/41176-00009.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/41177-00008.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/41178-00002.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/41178-00003.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/41178-00004.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/41179-00004.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/41179-00005.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/41179-00006.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/41179-00007.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/41179-00008.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/41179-00009.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/41180-00006.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/41181-00005.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/41182-00005.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/41183-00005.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/41184-00001.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/41185-00003.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/41186-00005.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/41187-00008.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/41188-00001.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/41189-00004.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/41190-00005.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/41191-00001.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/41192-00002.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/41193-00003.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/41194-00010.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/41195-00005.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/41196-00009.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/41197-00011.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/41198-00011.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/41199-00011.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/41199-00012.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/41199-00013.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/41199-00015.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/41199-00016.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/41199-00017.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/41199-00018.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/41199-00019.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/41199-00020.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/41199-00021.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/41199-00022.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/41200-00011.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/41200-00012.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/41200-00013.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/41200-00015.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/41200-00016.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/41200-00017.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/41200-00018.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/41200-00019.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/41200-00020.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/41200-00021.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/41201-00005.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/41202-00002.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/41203-00007.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/41204-00009.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/41205-00009.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/41206-00009.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/41207-00002.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/41208-00011.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/41209-00001.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/41210-00001.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/41211-00007.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/41212-00005.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/41213-00007.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/41213-00008.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/41213-00009.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/41213-00010.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/41213-00011.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/41213-00012.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/41213-00013.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/41213-00014.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/41213-00015.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/41214-00011.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/41215-00011.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/41216-00011.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/41217-00011.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/41218-00011.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/41219-00011.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/41220-00011.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/41221-00011.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/41222-00011.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/41223-00011.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/41224-00011.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/41225-00001.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/41226-00002.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/41226-00003.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/41226-00004.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/41227-00006.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/41228-00005.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/41229-00008.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/41230-00004.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/41231-00011.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/41232-00006.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/41233-00009.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/41233-00010.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/41233-00011.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/41233-00012.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/41233-00013.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/41233-00014.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/41233-00015.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/41233-00016.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/41233-00017.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/41233-00018.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/41233-00019.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/41234-00008.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/41234-00009.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/41234-00010.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/41234-00011.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/41234-00012.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/41234-00013.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/41234-00014.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/41234-00015.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/41234-00016.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/41235-00005.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/41236-00006.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/41237-00005.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/41238-00006.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/41239-00004.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/41240-00008.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/41240-00009.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/41240-00010.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/41240-00011.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/41240-00012.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/41240-00013.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/41240-00014.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/41240-00015.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/41241-00008.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/41242-00001.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/41243-00004.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/41243-00005.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/41243-00006.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/41243-00007.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/41243-00008.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/41243-00009.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/41244-00005.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/41244-00006.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/41244-00007.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/41244-00008.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/41244-00009.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/41244-00010.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/41244-00011.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/41245-00006.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/41246-00002.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/41247-00004.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/41248-00004.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/41249-00004.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/41250-00008.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/41250-00009.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/41250-00010.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/41250-00011.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/41250-00012.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/41250-00013.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/41250-00014.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/41250-00015.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/41250-00016.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/41251-00009.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/41252-00004.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/41252-00005.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/41252-00006.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/41252-00007.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/41252-00008.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/41253-00006.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/41254-00001.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/41255-00001.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/41256-00009.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/41257-00001.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/41258-00001.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/41259-00001.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/41260-00001.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/41261-00008.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/41262-00001.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/41263-00001.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/41264-00001.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/41265-00001.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/41266-00001.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/41267-00001.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/41268-00001.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/41269-00002.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/41270-00001.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/41271-00001.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/41272-00001.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/41273-00001.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/41274-00001.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/41275-00001.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/41276-00001.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/41277-00001.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/41278-00001.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/41279-00003.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/41280-00001.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/41281-00003.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/41282-00008.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/41285-00006.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/41286-00006.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/41287-00002.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/41288-00005.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/41289-00001.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/41290-00010.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/41290-00011.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/41290-00012.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/41290-00014.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/41290-00015.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/41290-00016.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/41290-00017.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/41290-00018.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/41290-00019.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/41290-00020.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/41290-00021.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/41290-00022.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/41291-00010.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/41292-00002.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/41293-00004.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/41294-00008.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/41295-00002.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/41296-00008.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/41297-00007.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/41298-00005.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/41299-00001.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/41300-00003.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/41301-00009.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/41302-00003.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/41303-00003.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/41304-00002.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/41305-00001.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/41306-00005.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/41307-00001.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/41308-00004.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/41309-00005.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/41310-00003.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/41311-00002.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/41312-00001.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/41313-00001.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/41314-00001.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/41315-00004.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/41316-00001.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/41317-00004.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/41318-00001.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/41319-00004.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/41320-00001.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/41321-00006.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/41322-00008.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/41323-00001.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/41324-00006.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/41325-00005.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/41326-00005.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/41327-00004.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/41328-00004.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/41329-00001.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/41330-00006.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/41331-00004.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/41332-00002.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/41333-00004.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/41334-00001.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/41335-00002.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/41336-00001.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/41337-00004.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/41338-00002.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/41339-00005.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/41340-00005.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/41341-00003.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/41342-00002.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/41343-00002.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/41344-00003.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/41345-00003.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/41346-00003.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/41347-00003.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/41348-00003.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/41349-00003.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/41350-00001.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/41351-00003.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/41352-00002.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/41353-00002.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/41354-00003.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/41355-00003.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/41356-00004.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/41357-00002.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/41358-00003.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/41359-00003.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/41360-00003.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/41361-00003.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/41362-00002.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/41363-00001.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/41364-00003.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/41365-00003.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/41366-00003.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/41367-00003.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/41368-00003.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/41369-00003.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/41370-00003.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/41371-00003.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/41372-00003.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/41373-00003.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/41374-00003.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/41375-00003.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/41376-00003.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/41377-00002.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/41378-00002.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/41379-00002.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/41380-00002.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/41381-00001.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/41382-00004.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/41383-00004.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/41384-00001.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/41385-00002.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/41386-00006.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/41387-00001.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/41388-00005.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/41389-00001.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/41390-00004.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/41391-00004.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/41392-00005.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/41393-00005.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/41394-00005.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/41395-00005.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/41396-00005.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/41397-00005.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/41398-00005.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/41399-00005.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/41400-00005.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/41401-00005.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/41402-00005.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/41403-00005.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/41404-00003.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/41405-00001.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/41406-00002.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/41407-00002.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/41408-00001.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/41409-00003.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/41410-00002.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/41411-00003.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/41412-00003.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/41413-00002.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/41414-00002.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/41415-00002.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/41416-00001.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/41417-00002.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/41418-00002.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/41419-00003.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/41420-00001.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/41421-00002.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/41422-00002.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/41423-00003.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/41424-00004.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/41425-00003.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/41426-00002.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/41427-00001.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/41428-00001.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/41429-00004.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/41430-00002.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/41431-00003.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/41432-00003.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/41433-00003.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/41434-00002.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/41435-00003.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/41436-00003.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/41437-00002.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/41438-00004.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/41439-00002.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/41440-00004.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/41441-00002.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/41442-00004.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/41443-00001.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/41444-00004.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/41445-00001.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/41446-00001.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/41447-00001.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/41448-00001.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/41449-00001.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/41450-00004.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/41451-00004.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/41452-00003.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/41453-00003.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/41454-00003.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/41455-00003.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/41456-00003.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/41457-00003.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/41458-00003.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/41459-00003.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/41460-00003.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/41461-00001.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/41462-00001.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/41463-00003.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/41464-00003.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/41465-00001.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/41466-00001.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/41467-00003.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/41468-00004.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/41469-00001.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/41470-00005.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/41471-00005.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/41472-00001.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/41473-00001.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/41474-00001.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/41475-00004.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/41476-00003.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/41477-00001.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/41478-00004.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/41479-00003.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/41480-00003.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/41481-00001.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/41482-00003.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/41483-00001.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/41484-00002.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/41485-00001.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/41486-00001.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/41487-00003.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/41488-00001.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/41489-00002.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/41490-00003.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/41491-00001.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/41492-00003.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/41493-00003.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/41493-00004.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/41494-00001.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/41495-00003.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/41496-00003.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/41497-00002.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/41498-00003.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/41499-00001.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/41500-00002.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/41501-00003.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/41502-00002.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/41503-00001.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/41504-00001.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/41505-00003.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/41506-00003.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/41507-00003.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/41508-00003.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/41509-00001.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/41510-00001.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/41511-00003.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/41512-00003.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/41513-00001.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/41514-00003.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/41515-00002.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/41516-00002.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/41517-00002.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/41518-00001.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/41519-00002.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/41520-00003.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/41521-00002.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/41522-00002.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/41523-00002.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/41524-00002.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/41525-00001.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/41526-00002.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/41527-00001.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/41528-00002.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/41529-00003.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/41529-00004.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/41530-00003.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/41531-00002.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/41532-00001.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/41533-00001.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/41534-00001.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/41535-00002.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/41536-00002.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/41537-00001.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/41538-00001.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/41539-00003.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/41540-00003.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/41541-00003.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/41542-00003.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/41543-00002.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/41544-00001.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/41545-00001.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/41546-00001.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/41547-00001.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/41548-00001.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/41549-00003.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/41550-00002.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/41551-00003.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/41552-00002.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/41553-00001.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/41554-00002.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/41555-00002.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/41556-00001.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/41557-00001.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/41558-00001.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/41559-00001.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/41560-00001.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/41561-00001.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/41562-00001.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/41563-00001.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/41564-00002.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/41565-00001.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/41566-00001.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/41567-00001.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/41568-00001.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/41569-00001.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/41570-00001.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/41571-00001.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/41572-00001.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/41573-00001.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/41574-00001.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/41575-00001.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/41576-00001.cap — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/TE9-1-0-6-4-1-9076.cif — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/TE9-1-0-6-4-1-9076.dif — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/TE9-1-0-6-4-2-9175.cif — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/TE9-1-0-6-4-2-9175.dif — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/TE9-1-0-6-4-3-9479.cif — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/TE9-1-0-6-4-3-9479.dif — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/TE9-1-0-6-4-4-9819.cif — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/TE9-1-0-6-4-4-9819.dif — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/TE9-1-0-6-4-5-9897.cif — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/TE9-1-0-6-4-5-9897.dif — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/TE9-1-0-6-4-6-10186.cif — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/TE9-1-0-6-4-6-10186.dif — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/TE9-1-0-6-4-7-10543.cif — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/TE9-1-0-6-4-7-10543.dif — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/TE9-1-0-6-4-8-11262.cif — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/TE9-1-0-6-4-8-11262.dif — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/TE9-1-0-6-4-9-11295.cif — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/TE9-1-0-6-4-9-11295.dif — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/TE9-1-0-6-5-0-11384.cif — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/TE9-1-0-6-5-0-11384.dif — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/TE9-1-0-6-5-1-11446.cif — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/TE9-1-0-6-5-1-11446.dif — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/TE9-1-0-6-5-2-11474.cif — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/TE9-1-0-6-5-2-11474.dif — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/TE9-1-0-6-5-3-11575.cif — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/TE9-1-0-6-5-3-11575.dif — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/TE9-1-0-6-5-4-11751.cif — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/TE9-1-0-6-5-4-11751.dif — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/TE9-1-0-6-5-5-12159.cif — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/TE9-1-0-6-5-5-12159.dif — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/TE9-1-0-6-5-5-12164.cif — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/TE9-1-0-6-5-5-12164.dif — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/TE9-1-0-6-6-0-12460.cif — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/TE9-1-0-6-6-0-12460.dif — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/TE9-1-0-6-6-1-12984.cif — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/TE9-1-0-6-6-1-12984.dif — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/TE9-1-0-6-6-2-13138.cif — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/TE9-1-0-6-6-2-13138.dif — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/TE9-1-0-6-6-3-13763.cif — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/TE9-1-0-6-6-3-13763.dif — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/TOC-01398.oif — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/TOC-01400.oif — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/TOC-01401.oif — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/TOC-01402.oif — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/TOC-01406.oif — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/TOC-01407.oif — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/TOC-01408.oif — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/TOC-01409.oif — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/TOC-01413.oif — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/TOC-01414.oif — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/TOC-01415.oif — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/TOC-01417.oif — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/TOC-01418.oif — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/TOC-01419.oif — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/TOC-01421.oif — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/TOC-01423.oif — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/TOC-01424.oif — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/TOC-01425.oif — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/TOC-01426.oif — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/TOC-01431.oif — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/TOC-01432.oif — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/TOC-01433.oif — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/TOC-01434.oif — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/TOC-01435.oif — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/TOC-01436.oif — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/TOC-01437.oif — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/TOC-01438.oif — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/TOC-01439.oif — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/TOC-01440.oif — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/TOC-01442.oif — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/TOC-01443.oif — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/TOC-01444.oif — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/TOC-01446.oif — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/TOC-01447.oif — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/TOC-01850.oif — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/TOC-01851.oif — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/TOC-01855.oif — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/TOC-01856.oif — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/tally.cif — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/tally.dif — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/tally.oif — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/tally.uif — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/updates.guf — clean
+- [x] _archive/tally soft/Tally.ERP9/capsules/updates.tuf — clean
+- [x] _archive/tally soft/Tally.ERP9/k1.pdf — clean
+- [x] _archive/tally soft/Tally.ERP9/k2.pdf — clean
+- [x] _archive/tally soft/Tally.ERP9/k3.pdf — clean
+- [x] _archive/tally soft/Tally.ERP9/must 1.pdf — clean
+- [x] _archive/tally soft/Tally.ERP9/must 2.pdf — clean
+- [x] _archive/tally soft/Tally.ERP9/must 3.pdf — clean
+- [x] _archive/tally soft/Tally.ERP9/must 5.pdf — clean
+- [x] _archive/tally soft/Tally.ERP9/must.pdf — clean
+- [x] _archive/tally soft/Tally.ERP9/must4.pdf — clean
+- [x] _archive/tally soft/Tally.ERP9/must6.pdf — clean
+- [x] _archive/tally soft/Tally.ERP9/n1.pdf — clean
+- [x] _archive/tally soft/Tally.ERP9/regodbc32.exe — clean
+- [x] _archive/tally soft/Tally.ERP9/shiju.pdf — clean
+- [x] _archive/tally soft/Tally.ERP9/tally.exe — clean
+- [x] _archive/tally soft/Tally.ERP9/tally.ini — clean
+- [x] _archive/tally soft/Tally.ERP9/tally.lic — clean
+- [x] _archive/tally soft/Tally.ERP9/tally1.dmp — clean
+- [x] _archive/tally soft/Tally.ERP9/tally3.dmp — clean
+- [x] _archive/tally soft/Tally.ERP9/tally4.dmp — clean
+- [x] _archive/tally soft/Tally.ERP9/tally5.dmp — clean
+- [x] _archive/tally soft/Tally.ERP9/tally6.dmp — clean
+- [x] _archive/tally soft/Tally.ERP9/tallycfg.tsf — clean
+- [x] _archive/tally soft/Tally.ERP9/tallyerr.log — clean
+- [x] _archive/tally soft/Tally.ERP9/tallygateway.ini — clean
+- [x] _archive/tally soft/Tally.ERP9/tallygatewayserver.exe — clean
+- [x] _archive/tally soft/Tally.ERP9/tallygatewayserver1.dmp — clean
+- [x] _archive/tally soft/Tally.ERP9/tallygatewayserver2.dmp — clean
+- [x] _archive/tally soft/Tally.ERP9/tallygatewayserver3.dmp — clean
+- [x] _archive/tally soft/Tally.ERP9/tallygatewayserver4.dmp — clean
+- [x] _archive/tally soft/Tally.ERP9/tallygatewayserver6.dmp — clean
+- [x] _archive/tally soft/Tally.ERP9/tallywin.dat — clean
+- [x] _archive/tally soft/Tally.ERP9/tallywin32.dat — clean
+- [x] _archive/tally soft/Tally.ERP9/tdlfunc.log — clean
+- [x] assets/icon.png — clean
+- [x] components.json — clean
+- [x] docker-compose.yml — clean
+- [x] main.js — clean
+- [x] migrate.sql — clean
+- [x] next-env.d.ts — clean
+- [x] next.config.mjs — clean
+- [x] package-lock.json — clean
+- [x] package.json — clean
+- [x] postcss.config.mjs — clean
+- [x] prisma.config.ts — clean
+- [x] public/manifest.json — clean
+- [x] public/sw.js — clean
+- [x] release-v2/.icon-icns/icon.icns — clean
+- [x] release-v2/.icon-ico/icon.ico — clean
+- [x] release-v2/MBM Quarry V2 1.11.2.exe — clean
+- [x] release-v2/MBM Quarry V2 1.9.3.exe — clean
+- [x] release-v2/MBM Quarry V2 Setup 1.11.2.exe — clean
+- [x] release-v2/MBM Quarry V2 Setup 1.11.2.exe.blockmap — clean
+- [x] release-v2/MBM Quarry V2 Setup 1.16.0.exe — clean
+- [x] release-v2/MBM Quarry V2 Setup 1.16.0.exe.blockmap — clean
+- [x] release-v2/MBM Quarry V2 Setup 1.9.3.exe — clean
+- [x] release-v2/MBM Quarry V2 Setup 1.9.3.exe.blockmap — clean
+- [x] release-v2/builder-debug.yml — clean
+- [x] release-v2/builder-effective-config.yaml — clean
+- [x] release-v2/latest-mac.yml — clean
+- [x] release-v2/latest.yml — clean
+- [x] release-v2/mac-arm64/MBM Quarry V2.app/Contents/Frameworks/Electron Framework.framework/Versions/A/Electron Framework — clean
+- [x] release-v2/mac-arm64/MBM Quarry V2.app/Contents/Frameworks/Electron Framework.framework/Versions/A/Helpers/chrome_crashpad_handler — clean
+- [x] release-v2/mac-arm64/MBM Quarry V2.app/Contents/Frameworks/Electron Framework.framework/Versions/A/Libraries/libEGL.dylib — clean
+- [x] release-v2/mac-arm64/MBM Quarry V2.app/Contents/Frameworks/Electron Framework.framework/Versions/A/Libraries/libGLESv2.dylib — clean
+- [x] release-v2/mac-arm64/MBM Quarry V2.app/Contents/Frameworks/Electron Framework.framework/Versions/A/Libraries/libffmpeg.dylib — clean
+- [x] release-v2/mac-arm64/MBM Quarry V2.app/Contents/Frameworks/Electron Framework.framework/Versions/A/Libraries/libvk_swiftshader.dylib — clean
+- [x] release-v2/mac-arm64/MBM Quarry V2.app/Contents/Frameworks/Electron Framework.framework/Versions/A/Libraries/vk_swiftshader_icd.json — clean
+- [x] release-v2/mac-arm64/MBM Quarry V2.app/Contents/Frameworks/Electron Framework.framework/Versions/A/Resources/Info.plist — clean
+- [x] release-v2/mac-arm64/MBM Quarry V2.app/Contents/Frameworks/Electron Framework.framework/Versions/A/Resources/MainMenu.nib — clean
+- [x] release-v2/mac-arm64/MBM Quarry V2.app/Contents/Frameworks/Electron Framework.framework/Versions/A/Resources/af.lproj/locale.pak — clean
+- [x] release-v2/mac-arm64/MBM Quarry V2.app/Contents/Frameworks/Electron Framework.framework/Versions/A/Resources/af_FEMININE.lproj/locale.pak — clean
+- [x] release-v2/mac-arm64/MBM Quarry V2.app/Contents/Frameworks/Electron Framework.framework/Versions/A/Resources/af_MASCULINE.lproj/locale.pak — clean
+- [x] release-v2/mac-arm64/MBM Quarry V2.app/Contents/Frameworks/Electron Framework.framework/Versions/A/Resources/af_NEUTER.lproj/locale.pak — clean
+- [x] release-v2/mac-arm64/MBM Quarry V2.app/Contents/Frameworks/Electron Framework.framework/Versions/A/Resources/am.lproj/locale.pak — clean
+- [x] release-v2/mac-arm64/MBM Quarry V2.app/Contents/Frameworks/Electron Framework.framework/Versions/A/Resources/am_FEMININE.lproj/locale.pak — clean
+- [x] release-v2/mac-arm64/MBM Quarry V2.app/Contents/Frameworks/Electron Framework.framework/Versions/A/Resources/am_MASCULINE.lproj/locale.pak — clean
+- [x] release-v2/mac-arm64/MBM Quarry V2.app/Contents/Frameworks/Electron Framework.framework/Versions/A/Resources/am_NEUTER.lproj/locale.pak — clean
+- [x] release-v2/mac-arm64/MBM Quarry V2.app/Contents/Frameworks/Electron Framework.framework/Versions/A/Resources/ar.lproj/locale.pak — clean
+- [x] release-v2/mac-arm64/MBM Quarry V2.app/Contents/Frameworks/Electron Framework.framework/Versions/A/Resources/ar_FEMININE.lproj/locale.pak — clean
+- [x] release-v2/mac-arm64/MBM Quarry V2.app/Contents/Frameworks/Electron Framework.framework/Versions/A/Resources/ar_MASCULINE.lproj/locale.pak — clean
+- [x] release-v2/mac-arm64/MBM Quarry V2.app/Contents/Frameworks/Electron Framework.framework/Versions/A/Resources/ar_NEUTER.lproj/locale.pak — clean
+- [x] release-v2/mac-arm64/MBM Quarry V2.app/Contents/Frameworks/Electron Framework.framework/Versions/A/Resources/bg.lproj/locale.pak — clean
+- [x] release-v2/mac-arm64/MBM Quarry V2.app/Contents/Frameworks/Electron Framework.framework/Versions/A/Resources/bg_FEMININE.lproj/locale.pak — clean
+- [x] release-v2/mac-arm64/MBM Quarry V2.app/Contents/Frameworks/Electron Framework.framework/Versions/A/Resources/bg_MASCULINE.lproj/locale.pak — clean
+- [x] release-v2/mac-arm64/MBM Quarry V2.app/Contents/Frameworks/Electron Framework.framework/Versions/A/Resources/bg_NEUTER.lproj/locale.pak — clean
+- [x] release-v2/mac-arm64/MBM Quarry V2.app/Contents/Frameworks/Electron Framework.framework/Versions/A/Resources/bn.lproj/locale.pak — clean
+- [x] release-v2/mac-arm64/MBM Quarry V2.app/Contents/Frameworks/Electron Framework.framework/Versions/A/Resources/bn_FEMININE.lproj/locale.pak — clean
+- [x] release-v2/mac-arm64/MBM Quarry V2.app/Contents/Frameworks/Electron Framework.framework/Versions/A/Resources/bn_MASCULINE.lproj/locale.pak — clean
+- [x] release-v2/mac-arm64/MBM Quarry V2.app/Contents/Frameworks/Electron Framework.framework/Versions/A/Resources/bn_NEUTER.lproj/locale.pak — clean
+- [x] release-v2/mac-arm64/MBM Quarry V2.app/Contents/Frameworks/Electron Framework.framework/Versions/A/Resources/ca.lproj/locale.pak — clean
+- [x] release-v2/mac-arm64/MBM Quarry V2.app/Contents/Frameworks/Electron Framework.framework/Versions/A/Resources/ca_FEMININE.lproj/locale.pak — clean
+- [x] release-v2/mac-arm64/MBM Quarry V2.app/Contents/Frameworks/Electron Framework.framework/Versions/A/Resources/ca_MASCULINE.lproj/locale.pak — clean
+- [x] release-v2/mac-arm64/MBM Quarry V2.app/Contents/Frameworks/Electron Framework.framework/Versions/A/Resources/ca_NEUTER.lproj/locale.pak — clean
+- [x] release-v2/mac-arm64/MBM Quarry V2.app/Contents/Frameworks/Electron Framework.framework/Versions/A/Resources/chrome_100_percent.pak — clean
+- [x] release-v2/mac-arm64/MBM Quarry V2.app/Contents/Frameworks/Electron Framework.framework/Versions/A/Resources/chrome_200_percent.pak — clean
+- [x] release-v2/mac-arm64/MBM Quarry V2.app/Contents/Frameworks/Electron Framework.framework/Versions/A/Resources/cs.lproj/locale.pak — clean
+- [x] release-v2/mac-arm64/MBM Quarry V2.app/Contents/Frameworks/Electron Framework.framework/Versions/A/Resources/cs_FEMININE.lproj/locale.pak — clean
+- [x] release-v2/mac-arm64/MBM Quarry V2.app/Contents/Frameworks/Electron Framework.framework/Versions/A/Resources/cs_MASCULINE.lproj/locale.pak — clean
+- [x] release-v2/mac-arm64/MBM Quarry V2.app/Contents/Frameworks/Electron Framework.framework/Versions/A/Resources/cs_NEUTER.lproj/locale.pak — clean
+- [x] release-v2/mac-arm64/MBM Quarry V2.app/Contents/Frameworks/Electron Framework.framework/Versions/A/Resources/da.lproj/locale.pak — clean
+- [x] release-v2/mac-arm64/MBM Quarry V2.app/Contents/Frameworks/Electron Framework.framework/Versions/A/Resources/da_FEMININE.lproj/locale.pak — clean
+- [x] release-v2/mac-arm64/MBM Quarry V2.app/Contents/Frameworks/Electron Framework.framework/Versions/A/Resources/da_MASCULINE.lproj/locale.pak — clean
+- [x] release-v2/mac-arm64/MBM Quarry V2.app/Contents/Frameworks/Electron Framework.framework/Versions/A/Resources/da_NEUTER.lproj/locale.pak — clean
+- [x] release-v2/mac-arm64/MBM Quarry V2.app/Contents/Frameworks/Electron Framework.framework/Versions/A/Resources/de.lproj/locale.pak — clean
+- [x] release-v2/mac-arm64/MBM Quarry V2.app/Contents/Frameworks/Electron Framework.framework/Versions/A/Resources/de_FEMININE.lproj/locale.pak — clean
+- [x] release-v2/mac-arm64/MBM Quarry V2.app/Contents/Frameworks/Electron Framework.framework/Versions/A/Resources/de_MASCULINE.lproj/locale.pak — clean
+- [x] release-v2/mac-arm64/MBM Quarry V2.app/Contents/Frameworks/Electron Framework.framework/Versions/A/Resources/de_NEUTER.lproj/locale.pak — clean
+- [x] release-v2/mac-arm64/MBM Quarry V2.app/Contents/Frameworks/Electron Framework.framework/Versions/A/Resources/el.lproj/locale.pak — clean
+- [x] release-v2/mac-arm64/MBM Quarry V2.app/Contents/Frameworks/Electron Framework.framework/Versions/A/Resources/el_FEMININE.lproj/locale.pak — clean
+- [x] release-v2/mac-arm64/MBM Quarry V2.app/Contents/Frameworks/Electron Framework.framework/Versions/A/Resources/el_MASCULINE.lproj/locale.pak — clean
+- [x] release-v2/mac-arm64/MBM Quarry V2.app/Contents/Frameworks/Electron Framework.framework/Versions/A/Resources/el_NEUTER.lproj/locale.pak — clean
+- [x] release-v2/mac-arm64/MBM Quarry V2.app/Contents/Frameworks/Electron Framework.framework/Versions/A/Resources/en.lproj/locale.pak — clean
+- [x] release-v2/mac-arm64/MBM Quarry V2.app/Contents/Frameworks/Electron Framework.framework/Versions/A/Resources/en_FEMININE.lproj/locale.pak — clean
+- [x] release-v2/mac-arm64/MBM Quarry V2.app/Contents/Frameworks/Electron Framework.framework/Versions/A/Resources/en_GB.lproj/locale.pak — clean
+- [x] release-v2/mac-arm64/MBM Quarry V2.app/Contents/Frameworks/Electron Framework.framework/Versions/A/Resources/en_GB_FEMININE.lproj/locale.pak — clean
+- [x] release-v2/mac-arm64/MBM Quarry V2.app/Contents/Frameworks/Electron Framework.framework/Versions/A/Resources/en_GB_MASCULINE.lproj/locale.pak — clean
+- [x] release-v2/mac-arm64/MBM Quarry V2.app/Contents/Frameworks/Electron Framework.framework/Versions/A/Resources/en_GB_NEUTER.lproj/locale.pak — clean
+- [x] release-v2/mac-arm64/MBM Quarry V2.app/Contents/Frameworks/Electron Framework.framework/Versions/A/Resources/en_MASCULINE.lproj/locale.pak — clean
+- [x] release-v2/mac-arm64/MBM Quarry V2.app/Contents/Frameworks/Electron Framework.framework/Versions/A/Resources/en_NEUTER.lproj/locale.pak — clean
+- [x] release-v2/mac-arm64/MBM Quarry V2.app/Contents/Frameworks/Electron Framework.framework/Versions/A/Resources/es.lproj/locale.pak — clean
+- [x] release-v2/mac-arm64/MBM Quarry V2.app/Contents/Frameworks/Electron Framework.framework/Versions/A/Resources/es_419.lproj/locale.pak — clean
+- [x] release-v2/mac-arm64/MBM Quarry V2.app/Contents/Frameworks/Electron Framework.framework/Versions/A/Resources/es_419_FEMININE.lproj/locale.pak — clean
+- [x] release-v2/mac-arm64/MBM Quarry V2.app/Contents/Frameworks/Electron Framework.framework/Versions/A/Resources/es_419_MASCULINE.lproj/locale.pak — clean
+- [x] release-v2/mac-arm64/MBM Quarry V2.app/Contents/Frameworks/Electron Framework.framework/Versions/A/Resources/es_419_NEUTER.lproj/locale.pak — clean
+- [x] release-v2/mac-arm64/MBM Quarry V2.app/Contents/Frameworks/Electron Framework.framework/Versions/A/Resources/es_FEMININE.lproj/locale.pak — clean
+- [x] release-v2/mac-arm64/MBM Quarry V2.app/Contents/Frameworks/Electron Framework.framework/Versions/A/Resources/es_MASCULINE.lproj/locale.pak — clean
+- [x] release-v2/mac-arm64/MBM Quarry V2.app/Contents/Frameworks/Electron Framework.framework/Versions/A/Resources/es_NEUTER.lproj/locale.pak — clean
+- [x] release-v2/mac-arm64/MBM Quarry V2.app/Contents/Frameworks/Electron Framework.framework/Versions/A/Resources/et.lproj/locale.pak — clean
+- [x] release-v2/mac-arm64/MBM Quarry V2.app/Contents/Frameworks/Electron Framework.framework/Versions/A/Resources/et_FEMININE.lproj/locale.pak — clean
+- [x] release-v2/mac-arm64/MBM Quarry V2.app/Contents/Frameworks/Electron Framework.framework/Versions/A/Resources/et_MASCULINE.lproj/locale.pak — clean
+- [x] release-v2/mac-arm64/MBM Quarry V2.app/Contents/Frameworks/Electron Framework.framework/Versions/A/Resources/et_NEUTER.lproj/locale.pak — clean
+- [x] release-v2/mac-arm64/MBM Quarry V2.app/Contents/Frameworks/Electron Framework.framework/Versions/A/Resources/fa.lproj/locale.pak — clean
+- [x] release-v2/mac-arm64/MBM Quarry V2.app/Contents/Frameworks/Electron Framework.framework/Versions/A/Resources/fa_FEMININE.lproj/locale.pak — clean
+- [x] release-v2/mac-arm64/MBM Quarry V2.app/Contents/Frameworks/Electron Framework.framework/Versions/A/Resources/fa_MASCULINE.lproj/locale.pak — clean
+- [x] release-v2/mac-arm64/MBM Quarry V2.app/Contents/Frameworks/Electron Framework.framework/Versions/A/Resources/fa_NEUTER.lproj/locale.pak — clean
+- [x] release-v2/mac-arm64/MBM Quarry V2.app/Contents/Frameworks/Electron Framework.framework/Versions/A/Resources/fi.lproj/locale.pak — clean
+- [x] release-v2/mac-arm64/MBM Quarry V2.app/Contents/Frameworks/Electron Framework.framework/Versions/A/Resources/fi_FEMININE.lproj/locale.pak — clean
+- [x] release-v2/mac-arm64/MBM Quarry V2.app/Contents/Frameworks/Electron Framework.framework/Versions/A/Resources/fi_MASCULINE.lproj/locale.pak — clean
+- [x] release-v2/mac-arm64/MBM Quarry V2.app/Contents/Frameworks/Electron Framework.framework/Versions/A/Resources/fi_NEUTER.lproj/locale.pak — clean
+- [x] release-v2/mac-arm64/MBM Quarry V2.app/Contents/Frameworks/Electron Framework.framework/Versions/A/Resources/fil.lproj/locale.pak — clean
+- [x] release-v2/mac-arm64/MBM Quarry V2.app/Contents/Frameworks/Electron Framework.framework/Versions/A/Resources/fil_FEMININE.lproj/locale.pak — clean
+- [x] release-v2/mac-arm64/MBM Quarry V2.app/Contents/Frameworks/Electron Framework.framework/Versions/A/Resources/fil_MASCULINE.lproj/locale.pak — clean
+- [x] release-v2/mac-arm64/MBM Quarry V2.app/Contents/Frameworks/Electron Framework.framework/Versions/A/Resources/fil_NEUTER.lproj/locale.pak — clean
+- [x] release-v2/mac-arm64/MBM Quarry V2.app/Contents/Frameworks/Electron Framework.framework/Versions/A/Resources/fr.lproj/locale.pak — clean
+- [x] release-v2/mac-arm64/MBM Quarry V2.app/Contents/Frameworks/Electron Framework.framework/Versions/A/Resources/fr_FEMININE.lproj/locale.pak — clean
+- [x] release-v2/mac-arm64/MBM Quarry V2.app/Contents/Frameworks/Electron Framework.framework/Versions/A/Resources/fr_MASCULINE.lproj/locale.pak — clean
+- [x] release-v2/mac-arm64/MBM Quarry V2.app/Contents/Frameworks/Electron Framework.framework/Versions/A/Resources/fr_NEUTER.lproj/locale.pak — clean
+- [x] release-v2/mac-arm64/MBM Quarry V2.app/Contents/Frameworks/Electron Framework.framework/Versions/A/Resources/gu.lproj/locale.pak — clean
+- [x] release-v2/mac-arm64/MBM Quarry V2.app/Contents/Frameworks/Electron Framework.framework/Versions/A/Resources/gu_FEMININE.lproj/locale.pak — clean
+- [x] release-v2/mac-arm64/MBM Quarry V2.app/Contents/Frameworks/Electron Framework.framework/Versions/A/Resources/gu_MASCULINE.lproj/locale.pak — clean
+- [x] release-v2/mac-arm64/MBM Quarry V2.app/Contents/Frameworks/Electron Framework.framework/Versions/A/Resources/gu_NEUTER.lproj/locale.pak — clean
+- [x] release-v2/mac-arm64/MBM Quarry V2.app/Contents/Frameworks/Electron Framework.framework/Versions/A/Resources/he.lproj/locale.pak — clean
+- [x] release-v2/mac-arm64/MBM Quarry V2.app/Contents/Frameworks/Electron Framework.framework/Versions/A/Resources/he_FEMININE.lproj/locale.pak — clean
+- [x] release-v2/mac-arm64/MBM Quarry V2.app/Contents/Frameworks/Electron Framework.framework/Versions/A/Resources/he_MASCULINE.lproj/locale.pak — clean
+- [x] release-v2/mac-arm64/MBM Quarry V2.app/Contents/Frameworks/Electron Framework.framework/Versions/A/Resources/he_NEUTER.lproj/locale.pak — clean
+- [x] release-v2/mac-arm64/MBM Quarry V2.app/Contents/Frameworks/Electron Framework.framework/Versions/A/Resources/hi.lproj/locale.pak — clean
+- [x] release-v2/mac-arm64/MBM Quarry V2.app/Contents/Frameworks/Electron Framework.framework/Versions/A/Resources/hi_FEMININE.lproj/locale.pak — clean
+- [x] release-v2/mac-arm64/MBM Quarry V2.app/Contents/Frameworks/Electron Framework.framework/Versions/A/Resources/hi_MASCULINE.lproj/locale.pak — clean
+- [x] release-v2/mac-arm64/MBM Quarry V2.app/Contents/Frameworks/Electron Framework.framework/Versions/A/Resources/hi_NEUTER.lproj/locale.pak — clean
+- [x] release-v2/mac-arm64/MBM Quarry V2.app/Contents/Frameworks/Electron Framework.framework/Versions/A/Resources/hr.lproj/locale.pak — clean
+- [x] release-v2/mac-arm64/MBM Quarry V2.app/Contents/Frameworks/Electron Framework.framework/Versions/A/Resources/hr_FEMININE.lproj/locale.pak — clean
+- [x] release-v2/mac-arm64/MBM Quarry V2.app/Contents/Frameworks/Electron Framework.framework/Versions/A/Resources/hr_MASCULINE.lproj/locale.pak — clean
+- [x] release-v2/mac-arm64/MBM Quarry V2.app/Contents/Frameworks/Electron Framework.framework/Versions/A/Resources/hr_NEUTER.lproj/locale.pak — clean
+- [x] release-v2/mac-arm64/MBM Quarry V2.app/Contents/Frameworks/Electron Framework.framework/Versions/A/Resources/hu.lproj/locale.pak — clean
+- [x] release-v2/mac-arm64/MBM Quarry V2.app/Contents/Frameworks/Electron Framework.framework/Versions/A/Resources/hu_FEMININE.lproj/locale.pak — clean
+- [x] release-v2/mac-arm64/MBM Quarry V2.app/Contents/Frameworks/Electron Framework.framework/Versions/A/Resources/hu_MASCULINE.lproj/locale.pak — clean
+- [x] release-v2/mac-arm64/MBM Quarry V2.app/Contents/Frameworks/Electron Framework.framework/Versions/A/Resources/hu_NEUTER.lproj/locale.pak — clean
+- [x] release-v2/mac-arm64/MBM Quarry V2.app/Contents/Frameworks/Electron Framework.framework/Versions/A/Resources/icudtl.dat — clean
+- [x] release-v2/mac-arm64/MBM Quarry V2.app/Contents/Frameworks/Electron Framework.framework/Versions/A/Resources/id.lproj/locale.pak — clean
+- [x] release-v2/mac-arm64/MBM Quarry V2.app/Contents/Frameworks/Electron Framework.framework/Versions/A/Resources/id_FEMININE.lproj/locale.pak — clean
+- [x] release-v2/mac-arm64/MBM Quarry V2.app/Contents/Frameworks/Electron Framework.framework/Versions/A/Resources/id_MASCULINE.lproj/locale.pak — clean
+- [x] release-v2/mac-arm64/MBM Quarry V2.app/Contents/Frameworks/Electron Framework.framework/Versions/A/Resources/id_NEUTER.lproj/locale.pak — clean
+- [x] release-v2/mac-arm64/MBM Quarry V2.app/Contents/Frameworks/Electron Framework.framework/Versions/A/Resources/it.lproj/locale.pak — clean
+- [x] release-v2/mac-arm64/MBM Quarry V2.app/Contents/Frameworks/Electron Framework.framework/Versions/A/Resources/it_FEMININE.lproj/locale.pak — clean
+- [x] release-v2/mac-arm64/MBM Quarry V2.app/Contents/Frameworks/Electron Framework.framework/Versions/A/Resources/it_MASCULINE.lproj/locale.pak — clean
+- [x] release-v2/mac-arm64/MBM Quarry V2.app/Contents/Frameworks/Electron Framework.framework/Versions/A/Resources/it_NEUTER.lproj/locale.pak — clean
+- [x] release-v2/mac-arm64/MBM Quarry V2.app/Contents/Frameworks/Electron Framework.framework/Versions/A/Resources/ja.lproj/locale.pak — clean
+- [x] release-v2/mac-arm64/MBM Quarry V2.app/Contents/Frameworks/Electron Framework.framework/Versions/A/Resources/ja_FEMININE.lproj/locale.pak — clean
+- [x] release-v2/mac-arm64/MBM Quarry V2.app/Contents/Frameworks/Electron Framework.framework/Versions/A/Resources/ja_MASCULINE.lproj/locale.pak — clean
+- [x] release-v2/mac-arm64/MBM Quarry V2.app/Contents/Frameworks/Electron Framework.framework/Versions/A/Resources/ja_NEUTER.lproj/locale.pak — clean
+- [x] release-v2/mac-arm64/MBM Quarry V2.app/Contents/Frameworks/Electron Framework.framework/Versions/A/Resources/kn.lproj/locale.pak — clean
+- [x] release-v2/mac-arm64/MBM Quarry V2.app/Contents/Frameworks/Electron Framework.framework/Versions/A/Resources/kn_FEMININE.lproj/locale.pak — clean
+- [x] release-v2/mac-arm64/MBM Quarry V2.app/Contents/Frameworks/Electron Framework.framework/Versions/A/Resources/kn_MASCULINE.lproj/locale.pak — clean
+- [x] release-v2/mac-arm64/MBM Quarry V2.app/Contents/Frameworks/Electron Framework.framework/Versions/A/Resources/kn_NEUTER.lproj/locale.pak — clean
+- [x] release-v2/mac-arm64/MBM Quarry V2.app/Contents/Frameworks/Electron Framework.framework/Versions/A/Resources/ko.lproj/locale.pak — clean
+- [x] release-v2/mac-arm64/MBM Quarry V2.app/Contents/Frameworks/Electron Framework.framework/Versions/A/Resources/ko_FEMININE.lproj/locale.pak — clean
+- [x] release-v2/mac-arm64/MBM Quarry V2.app/Contents/Frameworks/Electron Framework.framework/Versions/A/Resources/ko_MASCULINE.lproj/locale.pak — clean
+- [x] release-v2/mac-arm64/MBM Quarry V2.app/Contents/Frameworks/Electron Framework.framework/Versions/A/Resources/ko_NEUTER.lproj/locale.pak — clean
+- [x] release-v2/mac-arm64/MBM Quarry V2.app/Contents/Frameworks/Electron Framework.framework/Versions/A/Resources/lt.lproj/locale.pak — clean
+- [x] release-v2/mac-arm64/MBM Quarry V2.app/Contents/Frameworks/Electron Framework.framework/Versions/A/Resources/lt_FEMININE.lproj/locale.pak — clean
+- [x] release-v2/mac-arm64/MBM Quarry V2.app/Contents/Frameworks/Electron Framework.framework/Versions/A/Resources/lt_MASCULINE.lproj/locale.pak — clean
+- [x] release-v2/mac-arm64/MBM Quarry V2.app/Contents/Frameworks/Electron Framework.framework/Versions/A/Resources/lt_NEUTER.lproj/locale.pak — clean
+- [x] release-v2/mac-arm64/MBM Quarry V2.app/Contents/Frameworks/Electron Framework.framework/Versions/A/Resources/lv.lproj/locale.pak — clean
+- [x] release-v2/mac-arm64/MBM Quarry V2.app/Contents/Frameworks/Electron Framework.framework/Versions/A/Resources/lv_FEMININE.lproj/locale.pak — clean
+- [x] release-v2/mac-arm64/MBM Quarry V2.app/Contents/Frameworks/Electron Framework.framework/Versions/A/Resources/lv_MASCULINE.lproj/locale.pak — clean
+- [x] release-v2/mac-arm64/MBM Quarry V2.app/Contents/Frameworks/Electron Framework.framework/Versions/A/Resources/lv_NEUTER.lproj/locale.pak — clean
+- [x] release-v2/mac-arm64/MBM Quarry V2.app/Contents/Frameworks/Electron Framework.framework/Versions/A/Resources/ml.lproj/locale.pak — clean
+- [x] release-v2/mac-arm64/MBM Quarry V2.app/Contents/Frameworks/Electron Framework.framework/Versions/A/Resources/ml_FEMININE.lproj/locale.pak — clean
+- [x] release-v2/mac-arm64/MBM Quarry V2.app/Contents/Frameworks/Electron Framework.framework/Versions/A/Resources/ml_MASCULINE.lproj/locale.pak — clean
+- [x] release-v2/mac-arm64/MBM Quarry V2.app/Contents/Frameworks/Electron Framework.framework/Versions/A/Resources/ml_NEUTER.lproj/locale.pak — clean
+- [x] release-v2/mac-arm64/MBM Quarry V2.app/Contents/Frameworks/Electron Framework.framework/Versions/A/Resources/mr.lproj/locale.pak — clean
+- [x] release-v2/mac-arm64/MBM Quarry V2.app/Contents/Frameworks/Electron Framework.framework/Versions/A/Resources/mr_FEMININE.lproj/locale.pak — clean
+- [x] release-v2/mac-arm64/MBM Quarry V2.app/Contents/Frameworks/Electron Framework.framework/Versions/A/Resources/mr_MASCULINE.lproj/locale.pak — clean
+- [x] release-v2/mac-arm64/MBM Quarry V2.app/Contents/Frameworks/Electron Framework.framework/Versions/A/Resources/mr_NEUTER.lproj/locale.pak — clean
+- [x] release-v2/mac-arm64/MBM Quarry V2.app/Contents/Frameworks/Electron Framework.framework/Versions/A/Resources/ms.lproj/locale.pak — clean
+- [x] release-v2/mac-arm64/MBM Quarry V2.app/Contents/Frameworks/Electron Framework.framework/Versions/A/Resources/ms_FEMININE.lproj/locale.pak — clean
+- [x] release-v2/mac-arm64/MBM Quarry V2.app/Contents/Frameworks/Electron Framework.framework/Versions/A/Resources/ms_MASCULINE.lproj/locale.pak — clean
+- [x] release-v2/mac-arm64/MBM Quarry V2.app/Contents/Frameworks/Electron Framework.framework/Versions/A/Resources/ms_NEUTER.lproj/locale.pak — clean
+- [x] release-v2/mac-arm64/MBM Quarry V2.app/Contents/Frameworks/Electron Framework.framework/Versions/A/Resources/nb.lproj/locale.pak — clean
+- [x] release-v2/mac-arm64/MBM Quarry V2.app/Contents/Frameworks/Electron Framework.framework/Versions/A/Resources/nb_FEMININE.lproj/locale.pak — clean
+- [x] release-v2/mac-arm64/MBM Quarry V2.app/Contents/Frameworks/Electron Framework.framework/Versions/A/Resources/nb_MASCULINE.lproj/locale.pak — clean
+- [x] release-v2/mac-arm64/MBM Quarry V2.app/Contents/Frameworks/Electron Framework.framework/Versions/A/Resources/nb_NEUTER.lproj/locale.pak — clean
+- [x] release-v2/mac-arm64/MBM Quarry V2.app/Contents/Frameworks/Electron Framework.framework/Versions/A/Resources/nl.lproj/locale.pak — clean
+- [x] release-v2/mac-arm64/MBM Quarry V2.app/Contents/Frameworks/Electron Framework.framework/Versions/A/Resources/nl_FEMININE.lproj/locale.pak — clean
+- [x] release-v2/mac-arm64/MBM Quarry V2.app/Contents/Frameworks/Electron Framework.framework/Versions/A/Resources/nl_MASCULINE.lproj/locale.pak — clean
+- [x] release-v2/mac-arm64/MBM Quarry V2.app/Contents/Frameworks/Electron Framework.framework/Versions/A/Resources/nl_NEUTER.lproj/locale.pak — clean
+- [x] release-v2/mac-arm64/MBM Quarry V2.app/Contents/Frameworks/Electron Framework.framework/Versions/A/Resources/pl.lproj/locale.pak — clean
+- [x] release-v2/mac-arm64/MBM Quarry V2.app/Contents/Frameworks/Electron Framework.framework/Versions/A/Resources/pl_FEMININE.lproj/locale.pak — clean
+- [x] release-v2/mac-arm64/MBM Quarry V2.app/Contents/Frameworks/Electron Framework.framework/Versions/A/Resources/pl_MASCULINE.lproj/locale.pak — clean
+- [x] release-v2/mac-arm64/MBM Quarry V2.app/Contents/Frameworks/Electron Framework.framework/Versions/A/Resources/pl_NEUTER.lproj/locale.pak — clean
+- [x] release-v2/mac-arm64/MBM Quarry V2.app/Contents/Frameworks/Electron Framework.framework/Versions/A/Resources/pt_BR.lproj/locale.pak — clean
+- [x] release-v2/mac-arm64/MBM Quarry V2.app/Contents/Frameworks/Electron Framework.framework/Versions/A/Resources/pt_BR_FEMININE.lproj/locale.pak — clean
+- [x] release-v2/mac-arm64/MBM Quarry V2.app/Contents/Frameworks/Electron Framework.framework/Versions/A/Resources/pt_BR_MASCULINE.lproj/locale.pak — clean
+- [x] release-v2/mac-arm64/MBM Quarry V2.app/Contents/Frameworks/Electron Framework.framework/Versions/A/Resources/pt_BR_NEUTER.lproj/locale.pak — clean
+- [x] release-v2/mac-arm64/MBM Quarry V2.app/Contents/Frameworks/Electron Framework.framework/Versions/A/Resources/pt_PT.lproj/locale.pak — clean
+- [x] release-v2/mac-arm64/MBM Quarry V2.app/Contents/Frameworks/Electron Framework.framework/Versions/A/Resources/pt_PT_FEMININE.lproj/locale.pak — clean
+- [x] release-v2/mac-arm64/MBM Quarry V2.app/Contents/Frameworks/Electron Framework.framework/Versions/A/Resources/pt_PT_MASCULINE.lproj/locale.pak — clean
+- [x] release-v2/mac-arm64/MBM Quarry V2.app/Contents/Frameworks/Electron Framework.framework/Versions/A/Resources/pt_PT_NEUTER.lproj/locale.pak — clean
+- [x] release-v2/mac-arm64/MBM Quarry V2.app/Contents/Frameworks/Electron Framework.framework/Versions/A/Resources/resources.pak — clean
+- [x] release-v2/mac-arm64/MBM Quarry V2.app/Contents/Frameworks/Electron Framework.framework/Versions/A/Resources/ro.lproj/locale.pak — clean
+- [x] release-v2/mac-arm64/MBM Quarry V2.app/Contents/Frameworks/Electron Framework.framework/Versions/A/Resources/ro_FEMININE.lproj/locale.pak — clean
+- [x] release-v2/mac-arm64/MBM Quarry V2.app/Contents/Frameworks/Electron Framework.framework/Versions/A/Resources/ro_MASCULINE.lproj/locale.pak — clean
+- [x] release-v2/mac-arm64/MBM Quarry V2.app/Contents/Frameworks/Electron Framework.framework/Versions/A/Resources/ro_NEUTER.lproj/locale.pak — clean
+- [x] release-v2/mac-arm64/MBM Quarry V2.app/Contents/Frameworks/Electron Framework.framework/Versions/A/Resources/ru.lproj/locale.pak — clean
+- [x] release-v2/mac-arm64/MBM Quarry V2.app/Contents/Frameworks/Electron Framework.framework/Versions/A/Resources/ru_FEMININE.lproj/locale.pak — clean
+- [x] release-v2/mac-arm64/MBM Quarry V2.app/Contents/Frameworks/Electron Framework.framework/Versions/A/Resources/ru_MASCULINE.lproj/locale.pak — clean
+- [x] release-v2/mac-arm64/MBM Quarry V2.app/Contents/Frameworks/Electron Framework.framework/Versions/A/Resources/ru_NEUTER.lproj/locale.pak — clean
+- [x] release-v2/mac-arm64/MBM Quarry V2.app/Contents/Frameworks/Electron Framework.framework/Versions/A/Resources/sk.lproj/locale.pak — clean
+- [x] release-v2/mac-arm64/MBM Quarry V2.app/Contents/Frameworks/Electron Framework.framework/Versions/A/Resources/sk_FEMININE.lproj/locale.pak — clean
+- [x] release-v2/mac-arm64/MBM Quarry V2.app/Contents/Frameworks/Electron Framework.framework/Versions/A/Resources/sk_MASCULINE.lproj/locale.pak — clean
+- [x] release-v2/mac-arm64/MBM Quarry V2.app/Contents/Frameworks/Electron Framework.framework/Versions/A/Resources/sk_NEUTER.lproj/locale.pak — clean
+- [x] release-v2/mac-arm64/MBM Quarry V2.app/Contents/Frameworks/Electron Framework.framework/Versions/A/Resources/sl.lproj/locale.pak — clean
+- [x] release-v2/mac-arm64/MBM Quarry V2.app/Contents/Frameworks/Electron Framework.framework/Versions/A/Resources/sl_FEMININE.lproj/locale.pak — clean
+- [x] release-v2/mac-arm64/MBM Quarry V2.app/Contents/Frameworks/Electron Framework.framework/Versions/A/Resources/sl_MASCULINE.lproj/locale.pak — clean
+- [x] release-v2/mac-arm64/MBM Quarry V2.app/Contents/Frameworks/Electron Framework.framework/Versions/A/Resources/sl_NEUTER.lproj/locale.pak — clean
+- [x] release-v2/mac-arm64/MBM Quarry V2.app/Contents/Frameworks/Electron Framework.framework/Versions/A/Resources/sr.lproj/locale.pak — clean
+- [x] release-v2/mac-arm64/MBM Quarry V2.app/Contents/Frameworks/Electron Framework.framework/Versions/A/Resources/sr_FEMININE.lproj/locale.pak — clean
+- [x] release-v2/mac-arm64/MBM Quarry V2.app/Contents/Frameworks/Electron Framework.framework/Versions/A/Resources/sr_MASCULINE.lproj/locale.pak — clean
+- [x] release-v2/mac-arm64/MBM Quarry V2.app/Contents/Frameworks/Electron Framework.framework/Versions/A/Resources/sr_NEUTER.lproj/locale.pak — clean
+- [x] release-v2/mac-arm64/MBM Quarry V2.app/Contents/Frameworks/Electron Framework.framework/Versions/A/Resources/sv.lproj/locale.pak — clean
+- [x] release-v2/mac-arm64/MBM Quarry V2.app/Contents/Frameworks/Electron Framework.framework/Versions/A/Resources/sv_FEMININE.lproj/locale.pak — clean
+- [x] release-v2/mac-arm64/MBM Quarry V2.app/Contents/Frameworks/Electron Framework.framework/Versions/A/Resources/sv_MASCULINE.lproj/locale.pak — clean
+- [x] release-v2/mac-arm64/MBM Quarry V2.app/Contents/Frameworks/Electron Framework.framework/Versions/A/Resources/sv_NEUTER.lproj/locale.pak — clean
+- [x] release-v2/mac-arm64/MBM Quarry V2.app/Contents/Frameworks/Electron Framework.framework/Versions/A/Resources/sw.lproj/locale.pak — clean
+- [x] release-v2/mac-arm64/MBM Quarry V2.app/Contents/Frameworks/Electron Framework.framework/Versions/A/Resources/sw_FEMININE.lproj/locale.pak — clean
+- [x] release-v2/mac-arm64/MBM Quarry V2.app/Contents/Frameworks/Electron Framework.framework/Versions/A/Resources/sw_MASCULINE.lproj/locale.pak — clean
+- [x] release-v2/mac-arm64/MBM Quarry V2.app/Contents/Frameworks/Electron Framework.framework/Versions/A/Resources/sw_NEUTER.lproj/locale.pak — clean
+- [x] release-v2/mac-arm64/MBM Quarry V2.app/Contents/Frameworks/Electron Framework.framework/Versions/A/Resources/ta.lproj/locale.pak — clean
+- [x] release-v2/mac-arm64/MBM Quarry V2.app/Contents/Frameworks/Electron Framework.framework/Versions/A/Resources/ta_FEMININE.lproj/locale.pak — clean
+- [x] release-v2/mac-arm64/MBM Quarry V2.app/Contents/Frameworks/Electron Framework.framework/Versions/A/Resources/ta_MASCULINE.lproj/locale.pak — clean
+- [x] release-v2/mac-arm64/MBM Quarry V2.app/Contents/Frameworks/Electron Framework.framework/Versions/A/Resources/ta_NEUTER.lproj/locale.pak — clean
+- [x] release-v2/mac-arm64/MBM Quarry V2.app/Contents/Frameworks/Electron Framework.framework/Versions/A/Resources/te.lproj/locale.pak — clean
+- [x] release-v2/mac-arm64/MBM Quarry V2.app/Contents/Frameworks/Electron Framework.framework/Versions/A/Resources/te_FEMININE.lproj/locale.pak — clean
+- [x] release-v2/mac-arm64/MBM Quarry V2.app/Contents/Frameworks/Electron Framework.framework/Versions/A/Resources/te_MASCULINE.lproj/locale.pak — clean
+- [x] release-v2/mac-arm64/MBM Quarry V2.app/Contents/Frameworks/Electron Framework.framework/Versions/A/Resources/te_NEUTER.lproj/locale.pak — clean
+- [x] release-v2/mac-arm64/MBM Quarry V2.app/Contents/Frameworks/Electron Framework.framework/Versions/A/Resources/th.lproj/locale.pak — clean
+- [x] release-v2/mac-arm64/MBM Quarry V2.app/Contents/Frameworks/Electron Framework.framework/Versions/A/Resources/th_FEMININE.lproj/locale.pak — clean
+- [x] release-v2/mac-arm64/MBM Quarry V2.app/Contents/Frameworks/Electron Framework.framework/Versions/A/Resources/th_MASCULINE.lproj/locale.pak — clean
+- [x] release-v2/mac-arm64/MBM Quarry V2.app/Contents/Frameworks/Electron Framework.framework/Versions/A/Resources/th_NEUTER.lproj/locale.pak — clean
+- [x] release-v2/mac-arm64/MBM Quarry V2.app/Contents/Frameworks/Electron Framework.framework/Versions/A/Resources/tr.lproj/locale.pak — clean
+- [x] release-v2/mac-arm64/MBM Quarry V2.app/Contents/Frameworks/Electron Framework.framework/Versions/A/Resources/tr_FEMININE.lproj/locale.pak — clean
+- [x] release-v2/mac-arm64/MBM Quarry V2.app/Contents/Frameworks/Electron Framework.framework/Versions/A/Resources/tr_MASCULINE.lproj/locale.pak — clean
+- [x] release-v2/mac-arm64/MBM Quarry V2.app/Contents/Frameworks/Electron Framework.framework/Versions/A/Resources/tr_NEUTER.lproj/locale.pak — clean
+- [x] release-v2/mac-arm64/MBM Quarry V2.app/Contents/Frameworks/Electron Framework.framework/Versions/A/Resources/uk.lproj/locale.pak — clean
+- [x] release-v2/mac-arm64/MBM Quarry V2.app/Contents/Frameworks/Electron Framework.framework/Versions/A/Resources/uk_FEMININE.lproj/locale.pak — clean
+- [x] release-v2/mac-arm64/MBM Quarry V2.app/Contents/Frameworks/Electron Framework.framework/Versions/A/Resources/uk_MASCULINE.lproj/locale.pak — clean
+- [x] release-v2/mac-arm64/MBM Quarry V2.app/Contents/Frameworks/Electron Framework.framework/Versions/A/Resources/uk_NEUTER.lproj/locale.pak — clean
+- [x] release-v2/mac-arm64/MBM Quarry V2.app/Contents/Frameworks/Electron Framework.framework/Versions/A/Resources/ur.lproj/locale.pak — clean
+- [x] release-v2/mac-arm64/MBM Quarry V2.app/Contents/Frameworks/Electron Framework.framework/Versions/A/Resources/ur_FEMININE.lproj/locale.pak — clean
+- [x] release-v2/mac-arm64/MBM Quarry V2.app/Contents/Frameworks/Electron Framework.framework/Versions/A/Resources/ur_MASCULINE.lproj/locale.pak — clean
+- [x] release-v2/mac-arm64/MBM Quarry V2.app/Contents/Frameworks/Electron Framework.framework/Versions/A/Resources/ur_NEUTER.lproj/locale.pak — clean
+- [x] release-v2/mac-arm64/MBM Quarry V2.app/Contents/Frameworks/Electron Framework.framework/Versions/A/Resources/v8_context_snapshot.arm64.bin — clean
+- [x] release-v2/mac-arm64/MBM Quarry V2.app/Contents/Frameworks/Electron Framework.framework/Versions/A/Resources/vi.lproj/locale.pak — clean
+- [x] release-v2/mac-arm64/MBM Quarry V2.app/Contents/Frameworks/Electron Framework.framework/Versions/A/Resources/vi_FEMININE.lproj/locale.pak — clean
+- [x] release-v2/mac-arm64/MBM Quarry V2.app/Contents/Frameworks/Electron Framework.framework/Versions/A/Resources/vi_MASCULINE.lproj/locale.pak — clean
+- [x] release-v2/mac-arm64/MBM Quarry V2.app/Contents/Frameworks/Electron Framework.framework/Versions/A/Resources/vi_NEUTER.lproj/locale.pak — clean
+- [x] release-v2/mac-arm64/MBM Quarry V2.app/Contents/Frameworks/Electron Framework.framework/Versions/A/Resources/zh_CN.lproj/locale.pak — clean
+- [x] release-v2/mac-arm64/MBM Quarry V2.app/Contents/Frameworks/Electron Framework.framework/Versions/A/Resources/zh_CN_FEMININE.lproj/locale.pak — clean
+- [x] release-v2/mac-arm64/MBM Quarry V2.app/Contents/Frameworks/Electron Framework.framework/Versions/A/Resources/zh_CN_MASCULINE.lproj/locale.pak — clean
+- [x] release-v2/mac-arm64/MBM Quarry V2.app/Contents/Frameworks/Electron Framework.framework/Versions/A/Resources/zh_CN_NEUTER.lproj/locale.pak — clean
+- [x] release-v2/mac-arm64/MBM Quarry V2.app/Contents/Frameworks/Electron Framework.framework/Versions/A/Resources/zh_TW.lproj/locale.pak — clean
+- [x] release-v2/mac-arm64/MBM Quarry V2.app/Contents/Frameworks/Electron Framework.framework/Versions/A/Resources/zh_TW_FEMININE.lproj/locale.pak — clean
+- [x] release-v2/mac-arm64/MBM Quarry V2.app/Contents/Frameworks/Electron Framework.framework/Versions/A/Resources/zh_TW_MASCULINE.lproj/locale.pak — clean
+- [x] release-v2/mac-arm64/MBM Quarry V2.app/Contents/Frameworks/Electron Framework.framework/Versions/A/Resources/zh_TW_NEUTER.lproj/locale.pak — clean
+- [x] release-v2/mac-arm64/MBM Quarry V2.app/Contents/Frameworks/MBM Quarry V2 Helper (GPU).app/Contents/Info.plist — clean
+- [x] release-v2/mac-arm64/MBM Quarry V2.app/Contents/Frameworks/MBM Quarry V2 Helper (GPU).app/Contents/MacOS/MBM Quarry V2 Helper (GPU) — clean
+- [x] release-v2/mac-arm64/MBM Quarry V2.app/Contents/Frameworks/MBM Quarry V2 Helper (GPU).app/Contents/PkgInfo — clean
+- [x] release-v2/mac-arm64/MBM Quarry V2.app/Contents/Frameworks/MBM Quarry V2 Helper (Plugin).app/Contents/Info.plist — clean
+- [x] release-v2/mac-arm64/MBM Quarry V2.app/Contents/Frameworks/MBM Quarry V2 Helper (Plugin).app/Contents/MacOS/MBM Quarry V2 Helper (Plugin) — clean
+- [x] release-v2/mac-arm64/MBM Quarry V2.app/Contents/Frameworks/MBM Quarry V2 Helper (Plugin).app/Contents/PkgInfo — clean
+- [x] release-v2/mac-arm64/MBM Quarry V2.app/Contents/Frameworks/MBM Quarry V2 Helper (Renderer).app/Contents/Info.plist — clean
+- [x] release-v2/mac-arm64/MBM Quarry V2.app/Contents/Frameworks/MBM Quarry V2 Helper (Renderer).app/Contents/MacOS/MBM Quarry V2 Helper (Renderer) — clean
+- [x] release-v2/mac-arm64/MBM Quarry V2.app/Contents/Frameworks/MBM Quarry V2 Helper (Renderer).app/Contents/PkgInfo — clean
+- [x] release-v2/mac-arm64/MBM Quarry V2.app/Contents/Frameworks/MBM Quarry V2 Helper.app/Contents/Info.plist — clean
+- [x] release-v2/mac-arm64/MBM Quarry V2.app/Contents/Frameworks/MBM Quarry V2 Helper.app/Contents/MacOS/MBM Quarry V2 Helper — clean
+- [x] release-v2/mac-arm64/MBM Quarry V2.app/Contents/Frameworks/MBM Quarry V2 Helper.app/Contents/PkgInfo — clean
+- [x] release-v2/mac-arm64/MBM Quarry V2.app/Contents/Frameworks/Mantle.framework/Versions/A/Mantle — clean
+- [x] release-v2/mac-arm64/MBM Quarry V2.app/Contents/Frameworks/Mantle.framework/Versions/A/Resources/Info.plist — clean
+- [x] release-v2/mac-arm64/MBM Quarry V2.app/Contents/Frameworks/ReactiveObjC.framework/Versions/A/ReactiveObjC — clean
+- [x] release-v2/mac-arm64/MBM Quarry V2.app/Contents/Frameworks/ReactiveObjC.framework/Versions/A/Resources/Info.plist — clean
+- [x] release-v2/mac-arm64/MBM Quarry V2.app/Contents/Frameworks/Squirrel.framework/Versions/A/Resources/Info.plist — clean
+- [x] release-v2/mac-arm64/MBM Quarry V2.app/Contents/Frameworks/Squirrel.framework/Versions/A/Resources/ShipIt — clean
+- [x] release-v2/mac-arm64/MBM Quarry V2.app/Contents/Frameworks/Squirrel.framework/Versions/A/Squirrel — clean
+- [x] release-v2/mac-arm64/MBM Quarry V2.app/Contents/Info.plist — clean
+- [x] release-v2/mac-arm64/MBM Quarry V2.app/Contents/MacOS/MBM Quarry V2 — clean
+- [x] release-v2/mac-arm64/MBM Quarry V2.app/Contents/PkgInfo — clean
+- [x] release-v2/mac-arm64/MBM Quarry V2.app/Contents/Resources/app-update.yml — clean
+- [x] release-v2/mac-arm64/MBM Quarry V2.app/Contents/Resources/app.asar — clean
+- [x] release-v2/mac-arm64/MBM Quarry V2.app/Contents/Resources/icon.icns — clean
+- [x] release-v2/mac-arm64/MBM Quarry V2.app/Contents/Resources/prisma/dev.db — clean
+- [x] release-v2/mac-arm64/MBM Quarry V2.app/Contents/Resources/standalone/.env — clean
+- [x] release-v2/mac-arm64/MBM Quarry V2.app/Contents/Resources/standalone/VERSION — clean
+- [x] release-v2/mac-arm64/MBM Quarry V2.app/Contents/Resources/standalone/package.json — clean
+- [x] release-v2/mac-arm64/MBM Quarry V2.app/Contents/Resources/standalone/prisma/local.db — clean
+- [x] release-v2/mac-arm64/MBM Quarry V2.app/Contents/Resources/standalone/public/manifest.json — clean
+- [x] release-v2/mac-arm64/MBM Quarry V2.app/Contents/Resources/standalone/public/sw.js — clean
+- [x] release-v2/mac-arm64/MBM Quarry V2.app/Contents/Resources/standalone/server.js — clean
+- [x] release-v2/serve.js — clean
+- [x] release-v2/server.ps1 — clean
+- [x] release-v2/win-unpacked/LICENSE.electron.txt — clean
+- [x] release-v2/win-unpacked/LICENSES.chromium.html — clean
+- [x] release-v2/win-unpacked/MBM Quarry V2.exe — clean
+- [x] release-v2/win-unpacked/chrome_100_percent.pak — clean
+- [x] release-v2/win-unpacked/chrome_200_percent.pak — clean
+- [x] release-v2/win-unpacked/d3dcompiler_47.dll — clean
+- [x] release-v2/win-unpacked/dxcompiler.dll — clean
+- [x] release-v2/win-unpacked/dxil.dll — clean
+- [x] release-v2/win-unpacked/ffmpeg.dll — clean
+- [x] release-v2/win-unpacked/icudtl.dat — clean
+- [x] release-v2/win-unpacked/libEGL.dll — clean
+- [x] release-v2/win-unpacked/libGLESv2.dll — clean
+- [x] release-v2/win-unpacked/locales/af.pak — clean
+- [x] release-v2/win-unpacked/locales/am.pak — clean
+- [x] release-v2/win-unpacked/locales/ar.pak — clean
+- [x] release-v2/win-unpacked/locales/bg.pak — clean
+- [x] release-v2/win-unpacked/locales/bn.pak — clean
+- [x] release-v2/win-unpacked/locales/ca.pak — clean
+- [x] release-v2/win-unpacked/locales/cs.pak — clean
+- [x] release-v2/win-unpacked/locales/da.pak — clean
+- [x] release-v2/win-unpacked/locales/de.pak — clean
+- [x] release-v2/win-unpacked/locales/el.pak — clean
+- [x] release-v2/win-unpacked/locales/en-GB.pak — clean
+- [x] release-v2/win-unpacked/locales/en-US.pak — clean
+- [x] release-v2/win-unpacked/locales/es-419.pak — clean
+- [x] release-v2/win-unpacked/locales/es.pak — clean
+- [x] release-v2/win-unpacked/locales/et.pak — clean
+- [x] release-v2/win-unpacked/locales/fa.pak — clean
+- [x] release-v2/win-unpacked/locales/fi.pak — clean
+- [x] release-v2/win-unpacked/locales/fil.pak — clean
+- [x] release-v2/win-unpacked/locales/fr.pak — clean
+- [x] release-v2/win-unpacked/locales/gu.pak — clean
+- [x] release-v2/win-unpacked/locales/he.pak — clean
+- [x] release-v2/win-unpacked/locales/hi.pak — clean
+- [x] release-v2/win-unpacked/locales/hr.pak — clean
+- [x] release-v2/win-unpacked/locales/hu.pak — clean
+- [x] release-v2/win-unpacked/locales/id.pak — clean
+- [x] release-v2/win-unpacked/locales/it.pak — clean
+- [x] release-v2/win-unpacked/locales/ja.pak — clean
+- [x] release-v2/win-unpacked/locales/kn.pak — clean
+- [x] release-v2/win-unpacked/locales/ko.pak — clean
+- [x] release-v2/win-unpacked/locales/lt.pak — clean
+- [x] release-v2/win-unpacked/locales/lv.pak — clean
+- [x] release-v2/win-unpacked/locales/ml.pak — clean
+- [x] release-v2/win-unpacked/locales/mr.pak — clean
+- [x] release-v2/win-unpacked/locales/ms.pak — clean
+- [x] release-v2/win-unpacked/locales/nb.pak — clean
+- [x] release-v2/win-unpacked/locales/nl.pak — clean
+- [x] release-v2/win-unpacked/locales/pl.pak — clean
+- [x] release-v2/win-unpacked/locales/pt-BR.pak — clean
+- [x] release-v2/win-unpacked/locales/pt-PT.pak — clean
+- [x] release-v2/win-unpacked/locales/ro.pak — clean
+- [x] release-v2/win-unpacked/locales/ru.pak — clean
+- [x] release-v2/win-unpacked/locales/sk.pak — clean
+- [x] release-v2/win-unpacked/locales/sl.pak — clean
+- [x] release-v2/win-unpacked/locales/sr.pak — clean
+- [x] release-v2/win-unpacked/locales/sv.pak — clean
+- [x] release-v2/win-unpacked/locales/sw.pak — clean
+- [x] release-v2/win-unpacked/locales/ta.pak — clean
+- [x] release-v2/win-unpacked/locales/te.pak — clean
+- [x] release-v2/win-unpacked/locales/th.pak — clean
+- [x] release-v2/win-unpacked/locales/tr.pak — clean
+- [x] release-v2/win-unpacked/locales/uk.pak — clean
+- [x] release-v2/win-unpacked/locales/ur.pak — clean
+- [x] release-v2/win-unpacked/locales/vi.pak — clean
+- [x] release-v2/win-unpacked/locales/zh-CN.pak — clean
+- [x] release-v2/win-unpacked/locales/zh-TW.pak — clean
+- [x] release-v2/win-unpacked/resources.pak — clean
+- [x] release-v2/win-unpacked/resources/app-update.yml — clean
+- [x] release-v2/win-unpacked/resources/app.asar — clean
+- [x] release-v2/win-unpacked/resources/elevate.exe — clean
+- [x] release-v2/win-unpacked/resources/env/production.env — clean
+- [x] release-v2/win-unpacked/resources/standalone/.env — clean
+- [x] release-v2/win-unpacked/resources/standalone/.env.production — clean
+- [x] release-v2/win-unpacked/resources/standalone/VERSION — clean
+- [x] release-v2/win-unpacked/resources/standalone/migrate.js — clean
+- [x] release-v2/win-unpacked/resources/standalone/package.json — clean
+- [x] release-v2/win-unpacked/resources/standalone/prisma/local.db — clean
+- [x] release-v2/win-unpacked/resources/standalone/prisma/migrations/20260625000000_foundation_normalization/migration.sql — clean
+- [x] release-v2/win-unpacked/resources/standalone/public/manifest.json — clean
+- [x] release-v2/win-unpacked/resources/standalone/public/sw.js — clean
+- [x] release-v2/win-unpacked/resources/standalone/server.js — clean
+- [x] release-v2/win-unpacked/resources/standalone/src/lib/sync/sync-map.json — clean
+- [x] release-v2/win-unpacked/snapshot_blob.bin — clean
+- [x] release-v2/win-unpacked/v8_context_snapshot.bin — clean
+- [x] release-v2/win-unpacked/vk_swiftshader.dll — clean
+- [x] release-v2/win-unpacked/vk_swiftshader_icd.json — clean
+- [x] release-v2/win-unpacked/vulkan-1.dll — clean
+- [x] skills-lock.json — clean
+- [x] supabase/.gitignore — clean
+- [x] supabase/config.toml — clean
+- [x] tailwind.config.ts — clean
+- [x] tests/adversarial-weighbridge.test.ts — clean
+- [x] tests/challenger-kb025.test.ts — clean
+- [x] tests/dashboard-metrics.test.ts — clean
+- [x] tests/ledger-replay.test.ts — clean
+- [x] tests/m2-resilience-verification.test.ts — clean
+- [x] tests/m2_r3_challenger2.test.ts — clean
+- [x] tests/sync-config.test.ts — clean
+- [x] tests/system-info.test.ts — clean
+- [x] tests/weighbridge-race.test.ts — clean
+- [x] tsconfig.json — clean
+- [x] tsconfig.tsbuildinfo — clean
+
+### Server Actions (src/app/actions/) (19 files)
+- [x] src/app/actions/admin.ts — clean
+- [x] src/app/actions/audit-logs.ts — clean
+- [x] src/app/actions/auth.ts — clean
+- [x] src/app/actions/credits.ts — clean
+- [x] src/app/actions/dashboard.ts — clean
+- [x] src/app/actions/database.ts — clean
+- [x] src/app/actions/daybook_offline.ts — clean
+- [x] src/app/actions/employees.ts — clean
+- [x] src/app/actions/expenses.ts — clean
+- [x] src/app/actions/fuel.ts — clean
+- [x] src/app/actions/materials.ts — clean
+- [x] src/app/actions/parties.ts — clean
+- [x] src/app/actions/purchases.ts — clean
+- [x] src/app/actions/sales.ts — clean
+- [x] src/app/actions/settings.ts — clean
+- [x] src/app/actions/sync.ts — clean
+- [x] src/app/actions/tally.ts — clean
+- [x] src/app/actions/vehicles.ts — clean
+- [x] src/app/actions/weighbridge.ts — clean
+
+### App Routes & API (src/app/) (51 files)
+- [x] src/app/about/page.tsx — clean
+- [x] src/app/admin/admin-dashboard.tsx — clean
+- [x] src/app/admin/page.tsx — clean
+- [x] src/app/api/database/export/route.ts — clean
+- [x] src/app/api/database/import/route.ts — clean
+- [x] src/app/api/test-sync/route.ts — clean
+- [x] src/app/api/test/route.ts — clean
+- [x] src/app/credit/collections/page.tsx — clean
+- [x] src/app/credit/employee/page.tsx — clean
+- [x] src/app/credit/list/page.tsx — clean
+- [x] src/app/credit/other/page.tsx — clean
+- [x] src/app/dashboard/page.tsx — clean
+- [x] src/app/daybook/page.tsx — clean
+- [x] src/app/employees/[id]/page.tsx — clean
+- [x] src/app/employees/page.tsx — clean
+- [x] src/app/error.tsx — clean
+- [x] src/app/expenses/page.tsx — clean
+- [x] src/app/expenses/vehicles/page.tsx — clean
+- [x] src/app/favicon.ico — clean
+- [x] src/app/fleet/page.tsx — clean
+- [x] src/app/fonts/GeistMonoVF.woff — clean
+- [x] src/app/fonts/GeistVF.woff — clean
+- [x] src/app/fuel/page.tsx — clean
+- [x] src/app/global-error.tsx — clean
+- [x] src/app/globals.css — clean
+- [x] src/app/inventory/page.tsx — clean
+- [x] src/app/layout.tsx — clean
+- [x] src/app/login/login-form.tsx — clean
+- [x] src/app/login/page.tsx — clean
+- [x] src/app/masters/materials/page.tsx — clean
+- [x] src/app/masters/parties/page.tsx — clean
+- [x] src/app/masters/vehicles/page.tsx — clean
+- [x] src/app/page.tsx — clean
+- [x] src/app/purchases/boulder/page.tsx — clean
+- [x] src/app/reports/page.tsx — clean
+- [x] src/app/sales/new/page.tsx — clean
+- [x] src/app/sales/page.tsx — clean
+- [x] src/app/settings/audit-log-manager.tsx — clean
+- [x] src/app/settings/page.tsx — clean
+- [x] src/app/settings/security-settings.tsx — clean
+- [x] src/app/settings/settings-form.tsx — clean
+- [x] src/app/settings/system-diagnostics.tsx — clean
+- [x] src/app/settings/theme-settings.tsx — clean
+- [x] src/app/sync/page.tsx — clean
+- [x] src/app/tally/page.tsx — clean
+- [x] src/app/tally/tally-export-dashboard.tsx — clean
+- [x] src/app/todos/page.tsx — clean
+- [x] src/app/user-logs/page.tsx — clean
+- [x] src/app/weighbridge/page.tsx — clean
+- [x] src/app/weighbridge/pending-tickets-table.tsx — clean
+- [x] src/app/weighbridge/weighbridge-forms.tsx — clean
+
+### UI Module Components (src/components/modules/) (19 files)
+- [x] src/components/modules/boulder-purchases-page.tsx — clean
+- [x] src/components/modules/credit-pages.tsx — clean
+- [x] src/components/modules/dashboard.tsx — clean
+- [x] src/components/modules/day-book-page.tsx — clean
+- [x] src/components/modules/employee-ledger-page.tsx — clean
+- [x] src/components/modules/employees-page.tsx — clean
+- [x] src/components/modules/expense-entry-form.tsx — clean
+- [x] src/components/modules/expenses-page.tsx — clean
+- [x] src/components/modules/fleet-page.tsx — clean
+- [x] src/components/modules/fuel-management-page.tsx — clean
+- [x] src/components/modules/inventory-page.tsx — clean
+- [x] src/components/modules/master-data-page.tsx — clean
+- [x] src/components/modules/material-rates-page.tsx — clean
+- [x] src/components/modules/party-ledger-page.tsx — clean
+- [x] src/components/modules/report-page.tsx — clean
+- [x] src/components/modules/sales-entry-form.tsx — clean
+- [x] src/components/modules/sales-page.tsx — clean
+- [x] src/components/modules/user-logs-viewer.tsx — clean
+- [x] src/components/modules/vehicle-expenses-page.tsx — clean
+
+### Base UI Components (src/components/ui/) (14 files)
+- [x] src/components/ui/badge.tsx — clean
+- [x] src/components/ui/button.tsx — clean
+- [x] src/components/ui/card.tsx — clean
+- [x] src/components/ui/dialog.tsx — clean
+- [x] src/components/ui/field.tsx — clean
+- [x] src/components/ui/input.tsx — clean
+- [x] src/components/ui/label.tsx — clean
+- [x] src/components/ui/prompt-provider.tsx — clean
+- [x] src/components/ui/searchable-select.tsx — clean
+- [x] src/components/ui/select.tsx — clean
+- [x] src/components/ui/table.tsx — clean
+- [x] src/components/ui/textarea.tsx — clean
+- [x] src/components/ui/updater-overlay.tsx — clean
+- [x] src/components/ui/use-toast.ts — clean
+
+### App Shell & Providers (src/components/) (6 files)
+- [x] src/components/app-shell.tsx — clean
+- [x] src/components/backup-manager.tsx — clean
+- [x] src/components/providers.tsx — clean
+- [x] src/components/storage-indicator.tsx — clean
+- [x] src/components/theme-provider.tsx — clean
+- [x] src/components/theme-toggle.tsx — clean
+
+### Sync Engine (src/lib/sync/) (6 files)
+- [x] src/lib/sync/auto-sync.ts — clean
+- [x] src/lib/sync/connectivity.ts — clean
+- [x] src/lib/sync/sync-config.ts — clean
+- [x] src/lib/sync/sync-diagnostics.ts — clean
+- [x] src/lib/sync/sync-map.json — clean
+- [x] src/lib/sync/sync-service.ts — clean
+
+### Domain Services (src/lib/domain/) (21 files)
+- [x] src/lib/domain/audit/service.ts — clean
+- [x] src/lib/domain/auth/roles.ts — clean
+- [x] src/lib/domain/credit/service.ts — clean
+- [x] src/lib/domain/dashboard/service.ts — clean
+- [x] src/lib/domain/daybook/index.ts — clean
+- [x] src/lib/domain/daybook/projector.ts — clean
+- [x] src/lib/domain/daybook/service.ts — clean
+- [x] src/lib/domain/daybook/types.ts — clean
+- [x] src/lib/domain/financial-events/emitter.ts — clean
+- [x] src/lib/domain/financial-events/index.ts — clean
+- [x] src/lib/domain/financial-events/service.ts — clean
+- [x] src/lib/domain/financial-events/types.ts — clean
+- [x] src/lib/domain/index.ts — clean
+- [x] src/lib/domain/inventory/service.ts — clean
+- [x] src/lib/domain/ledger/index.ts — clean
+- [x] src/lib/domain/ledger/party-ledger-service.ts — clean
+- [x] src/lib/domain/ledger/projector.ts — clean
+- [x] src/lib/domain/ledger/service.ts — clean
+- [x] src/lib/domain/ledger/types.ts — clean
+- [x] src/lib/domain/reports/service.ts — clean
+- [x] src/lib/domain/trips/service.ts — clean
+
+### Core Lib & Utilities (src/lib/) (9 files)
+- [x] src/lib/backup-manager.ts — clean
+- [x] src/lib/bootstrap.ts — clean
+- [x] src/lib/daybook-actions.ts — clean
+- [x] src/lib/electron.ts — clean
+- [x] src/lib/export.ts — clean
+- [x] src/lib/prisma.ts — clean
+- [x] src/lib/sales-engine.ts — clean
+- [x] src/lib/tally-exporter.ts — clean
+- [x] src/lib/utils.ts — clean
+
+### Supabase Clients & SSR (src/lib/supabase/, src/utils/supabase/) (6 files)
+- [x] src/lib/supabase/client-sync.ts — clean
+- [x] src/lib/supabase/client.ts — clean
+- [x] src/lib/supabase/server.ts — clean
+- [x] src/utils/supabase/client.ts — clean
+- [x] src/utils/supabase/middleware.ts — clean
+- [x] src/utils/supabase/server.ts — clean
+
+### System & Validators (src/lib/system/, src/lib/validators/, src/lib/utils/) (6 files)
+- [x] src/lib/system/system-info-utils.ts — clean
+- [x] src/lib/system/system-info.ts — clean
+- [x] src/lib/utils/action-response.ts — clean
+- [x] src/lib/utils/sanitize-error.ts — clean
+- [x] src/lib/utils/serialize.ts — clean
+- [x] src/lib/validators/schemas.ts — clean
+
+### Type Definitions (src/types/) (1 files)
+- [x] src/types/global.d.ts — clean
+
+### Database & Prisma (prisma/) (8 files)
+- [x] prisma/dev.db — clean
+- [x] prisma/local.db — clean
+- [x] prisma/local.db.backup — clean
+- [x] prisma/migrate-ledger.ts — clean
+- [x] prisma/migrations/20260625000000_foundation_normalization/migration.sql — clean
+- [x] prisma/schema.prisma — clean
+- [x] prisma/schema_pg.prisma — clean
+- [x] prisma/seed.ts — clean
+
+### Desktop Electron Shell (desktop/) (3 files)
+- [x] desktop/main.js — clean
+- [x] desktop/preload.js — clean
+- [x] desktop/splash.html — clean
+
+### Documentation (docs/) (68 files)
+- [x] docs/AI_INDEX.md — clean
+- [x] docs/AI_POLICY.md — clean
+- [x] docs/CHANGELOG.md — clean
+- [x] docs/_temp/AUDIT_PROGRESS.md — clean
+- [x] docs/architecture/FINANCIAL_EVENT_ARCHITECTURE.md — clean
+- [x] docs/architecture/SYSTEM_BLUEPRINT.md — clean
+- [x] docs/archive/02_BUSINESS_LOGIC.md — clean
+- [x] docs/archive/03_SUPABASE_SCHEMA.md — clean
+- [x] docs/archive/04_API_FLOW.md — clean
+- [x] docs/archive/05_APP_ARCHITECTURE.md — clean
+- [x] docs/archive/06_FEATURES.md — clean
+- [x] docs/archive/07_OWNER_DASHBOARD_GUIDE.md — clean
+- [x] docs/archive/08_ANDROID_HANDOFF.md — clean
+- [x] docs/archive/AI_HANDOFF.md — clean
+- [x] docs/archive/AI_PROGRESS_PhaseA_2026_07_04.md — clean
+- [x] docs/archive/AI_PROGRESS_v1.16.0_2026-08-07.md — clean
+- [x] docs/archive/ARCHITECTURE.md — clean
+- [x] docs/archive/BUSINESS_RULES.md — clean
+- [x] docs/archive/CHANGELOG.md — clean
+- [x] docs/archive/CURRENT_ARCHITECTURE.md — clean
+- [x] docs/archive/DATABASE.md — clean
+- [x] docs/archive/DECISIONS.md — clean
+- [x] docs/archive/DEPLOYMENT_ARCHITECTURE.md — clean
+- [x] docs/archive/KNOWN_BUGS.md — clean
+- [x] docs/archive/MBM_BUSINESS_SPEC.md — clean
+- [x] docs/archive/MBM_DATABASE_SPEC.md — clean
+- [x] docs/archive/MBM_DECISIONS.md — clean
+- [x] docs/archive/MBM_PHASES.md — clean
+- [x] docs/archive/MBM_UI_SPEC.md — clean
+- [x] docs/archive/ORIGINAL_REQUEST.md — clean
+- [x] docs/archive/PHASE_1_1A_EXECUTION_PLAN.md — clean
+- [x] docs/archive/PHASE_1_1_SALES_DESIGN.md — clean
+- [x] docs/archive/PHASE_A_SYNC_AND_ERP_PROGRESS.md — clean
+- [x] docs/archive/PROJECT.md — clean
+- [x] docs/archive/PROJECT_STATE.md — clean
+- [x] docs/archive/README.md — clean
+- [x] docs/archive/RELEASE_NOTES_v1.0.md — clean
+- [x] docs/archive/ROADMAP.md — clean
+- [x] docs/archive/ROADMAP_archived_2026-08-07.md — clean
+- [x] docs/archive/phase_a_audit_remediation_2026-08-04.md — clean
+- [x] docs/archive/startup_crash_report.md — clean
+- [x] docs/audit/archive/SOURCE_OF_TRUTH_audit_2026-08-05.md — clean
+- [x] docs/audit/current/MASTER_CODEBASE_AUDIT_REPORT.md — clean
+- [x] docs/database/DATABASE_MAP.md — clean
+- [x] docs/database/supabase_add_pins.sql — clean
+- [x] docs/database/supabase_drop_schema.sql — clean
+- [x] docs/database/supabase_phase3_missing_tables_fix.sql — clean
+- [x] docs/database/supabase_phase_a_sync_migration.sql — clean
+- [x] docs/database/supabase_rls_policies.sql — clean
+- [x] docs/database/supabase_rls_policies_disable.sql — clean
+- [x] docs/database/supabase_schema.sql — clean
+- [x] docs/database/supabase_sync_fix_RUNME.sql — clean
+- [x] docs/decisions/DECISION_LOG.md — clean
+- [x] docs/handoff/AI_HANDOFF.md — clean
+- [x] docs/handoff/AI_PROGRESS_TEMPLATE.md — clean
+- [x] docs/reference/AUTO_UPDATE.md — clean
+- [x] docs/reference/BUSINESS_RULES.md — clean
+- [x] docs/reference/DEPLOYMENT.md — clean
+- [x] docs/reference/ENGINEERING_RULES.md — clean
+- [x] docs/reference/IDEAS.md — clean
+- [x] docs/reference/KNOWN_BUGS.md — clean
+- [x] docs/reference/MAINTAINERS.md — clean
+- [x] docs/reference/MODULE_INDEX.md — clean
+- [x] docs/reference/OWNER_DASHBOARD_PRD.md — clean
+- [x] docs/reference/QUARRY_FIELD_NOTES.md — clean
+- [x] docs/reference/RELEASE.md — clean
+- [x] docs/reference/RELEASE_NOTES.md — clean
+- [x] docs/reference/VARIABLE_MAP.md — clean
+
+### Scripts & Tooling (scripts/) (43 files)
+- [x] scripts/_scratch/add_columns.js — clean
+- [x] scripts/_scratch/add_weighbridge_table.js — clean
+- [x] scripts/_scratch/check_audit.js — clean
+- [x] scripts/_scratch/check_columns.js — clean
+- [x] scripts/_scratch/check_dummy.js — clean
+- [x] scripts/_scratch/check_mismatches.js — clean
+- [x] scripts/_scratch/check_party.js — clean
+- [x] scripts/_scratch/check_sync.js — clean
+- [x] scripts/_scratch/fix-db.js — clean
+- [x] scripts/_scratch/fix1_push_master_data.js — clean
+- [x] scripts/_scratch/fix2_reset_cursor.js — clean
+- [x] scripts/_scratch/fix_runtx.js — clean
+- [x] scripts/_scratch/fix_sync_parents.js — clean
+- [x] scripts/_scratch/generate-audit-inventory.js — clean
+- [x] scripts/_scratch/remove_unused.js — clean
+- [x] scripts/_scratch/rewrite.js — clean
+- [x] scripts/_scratch/run_supabase_sql.js — clean
+- [x] scripts/_scratch/test-sale.ts — clean
+- [x] scripts/_scratch/test-sync-e2e.ts — clean
+- [x] scripts/_scratch/test-sync.js — clean
+- [x] scripts/_scratch/test_extract.js — clean
+- [x] scripts/_scratch/test_log.js — clean
+- [x] scripts/_scratch/test_snake_case.js — clean
+- [x] scripts/_scratch/test_supabase_connection.js — clean
+- [x] scripts/_scratch/test_sync.js — clean
+- [x] scripts/_scratch/test_sync.ts — clean
+- [x] scripts/_scratch/test_sync_status.js — clean
+- [x] scripts/after-pack.js — clean
+- [x] scripts/copy-prisma-engine.js — clean
+- [x] scripts/electron-dev.js — clean
+- [x] scripts/fix_exports.js — clean
+- [x] scripts/generate-sync-map.js — clean
+- [x] scripts/migrate.js — clean
+- [x] scripts/purge_dummy_data.ts — clean
+- [x] scripts/refactor_offline_actions.js — clean
+- [x] scripts/release.js — clean
+- [x] scripts/seed-supabase.js — clean
+- [x] scripts/seed_phase_10.ts — clean
+- [x] scripts/seed_phases_678.ts — clean
+- [x] scripts/smoke.js — clean
+- [x] scripts/stamp-version.js — clean
+- [x] scripts/update_imports.js — clean
+- [x] scripts/validate-build.js — clean
+
+## Issues Found & Resolved
+| # | File | Line | Severity | Issue | Fixed? |
+|---|------|------|----------|-------|--------|
+| 1 | `src/app/actions/expenses.ts` | 186 | MED | `deleteExpense` was matching only `sourceEventId = id` instead of `financialEvent.eventId` / `row.sourceEventId` | ✅ |
+| 2 | `src/app/actions/fuel.ts` | 202 | MED | `deleteFuelPurchase` omitted `recalculateDayBook` after deleting associated expense | ✅ |
+| 3 | `src/app/api/test-sync/route.ts` | 2 | LOW | Unused `PrismaClient` import generating ESLint warning | ✅ |
+| 4 | `src/app/sync/page.tsx` | 18, 20 | LOW | Unused `ArrowDownCircle` and `cn` imports generating ESLint warnings | ✅ |
+| 5 | `src/utils/supabase/server.ts` | 5 | LOW | Added fallback to `NEXT_PUBLIC_SUPABASE_ANON_KEY` if publishable key is unset | ✅ |
+| 6 | `src/utils/supabase/client.ts` | 4 | LOW | Added fallback to `NEXT_PUBLIC_SUPABASE_ANON_KEY` if publishable key is unset | ✅ |
+| 7 | `src/utils/supabase/middleware.ts` | 5 | LOW | Added fallback to `NEXT_PUBLIC_SUPABASE_ANON_KEY` if publishable key is unset | ✅ |
+
+## Doc Fixes Applied
+| Doc File | What Changed |
+|----------|-------------|
+| docs/AI_INDEX.md | Removed dead links to ROADMAP.md and SOURCE_OF_TRUTH.md, fixed AI_PROGRESS template link |
+| docs/archive/PHASE_A_SYNC_AND_ERP_PROGRESS.md | Moved from docs/handoff/ to docs/archive/ |
+| docs/decisions/DECISION_LOG.md | Updated D-011: Auto-updater is active |
+| docs/reference/DEPLOYMENT.md | Updated Section 5: Auto-updater is operational |
+| docs/reference/IDEAS.md | Updated Tally Integration: Phase 7 is built |
+| docs/database/DATABASE_MAP.md | Added table definitions for weighbridge_tickets, maintenance_records, maintenance_schedules, vehicle_stats, inventory_stock, inventory_transactions |
+| docs/architecture/SYSTEM_BLUEPRINT.md | Fixed cross-references to docs subfolders and updated raw SQLite init reference to src/lib/bootstrap.ts |
+| docs/reference/MAINTAINERS.md | Updated raw SQLite init references from prisma.ts to bootstrap.ts |
+| docs/handoff/AI_HANDOFF.md | Added Sync Dashboard (/sync), sync-diagnostics.ts, getDetailedSyncStatus(), and force-pushed parents fix |
+
+## File Organization
+| Action | Details |
+|--------|---------|
+| Moved docs/handoff/PHASE_A_SYNC_AND_ERP_PROGRESS.md → docs/archive/ | Archived completed v1.9.7 progress doc |
+| Moved personal data.md → docs/reference/QUARRY_FIELD_NOTES.md | Moved root journal notes to docs reference |
+| Moved scratch/* → scripts/_scratch/ | Moved 25 debug scripts from repo root scratch to scripts/_scratch |
+| Moved test-sync-e2e.ts → scripts/_scratch/ | Moved root-level test script to scripts/_scratch |
+| Updated tsconfig.json | Excluded scripts/_scratch from build compilation |
+
+## Verification Evidence
+### 1. TypeScript Validation
+```bash
+$ npx tsc --noEmit
+# Exited with code 0 (0 errors)
+```
+
+### 2. ESLint Validation
+```bash
+$ npm run lint
+> mbm-quarry-erp@1.16.3 lint
+> next lint
+✔ No ESLint warnings or errors
+```
+
+### 3. Next.js Production Build
+```bash
+$ npm run build
+✓ Compiled successfully
+✓ Generating static pages (36/36)
+Route (app)                              Size     First Load JS
+36 routes generated successfully (0 errors)
+```

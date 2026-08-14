@@ -2,6 +2,7 @@
 
 import { useState, useEffect } from "react";
 import { createLocalBackup, listLocalBackups, restoreLocalBackup } from "@/app/actions/database";
+import { useRouter } from "next/navigation";
 import { Button } from "@/components/ui/button";
 import { Save, Upload, Download, RotateCcw, AlertTriangle } from "lucide-react";
 
@@ -9,6 +10,7 @@ export function BackupManager() {
   const [backups, setBackups] = useState<any[]>([]);
   const [isLoading, setIsLoading] = useState(false);
   const [message, setMessage] = useState<{ text: string, type: "success" | "error" } | null>(null);
+  const router = useRouter();
 
   useEffect(() => {
     loadBackups();
@@ -36,7 +38,7 @@ export function BackupManager() {
     setMessage({ text: result.message, type: result.success ? "success" : "error" });
     if (result.success) {
       alert("Database restored successfully. The application will now reload.");
-      window.location.reload();
+      router.refresh();
     }
     setIsLoading(false);
   }
@@ -60,7 +62,7 @@ export function BackupManager() {
       if (res.ok && data.success) {
         setMessage({ text: data.message, type: "success" });
         alert("Database imported successfully. The application will now reload.");
-        window.location.reload();
+        router.refresh();
       } else {
         setMessage({ text: data.message || "Import failed", type: "error" });
       }

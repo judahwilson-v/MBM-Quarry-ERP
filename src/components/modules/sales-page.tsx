@@ -12,6 +12,7 @@ import { deleteSale, listSales, purgeNonGstSales } from "@/app/actions/sales";
 import { verifyEditPassword } from "@/app/actions/auth";
 import { cn, formatCurrency, formatDate, formatQty } from "@/lib/utils";
 import { exportToExcel } from "@/lib/export";
+import { handlePrint } from "@/lib/utils/print";
 
 type SaleRow = EditableSale & {
   amount: number;
@@ -232,7 +233,7 @@ export function SalesPage() {
               <Download className="h-3.5 w-3.5" />
               Export
             </Button>
-            <Button variant="outline" size="sm" onClick={() => window.print()} className="text-xs gap-1.5">
+            <Button variant="outline" size="sm" onClick={() => handlePrint()} className="text-xs gap-1.5">
               <Printer className="h-3.5 w-3.5" />
               Print
             </Button>

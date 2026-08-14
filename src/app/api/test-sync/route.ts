@@ -1,5 +1,6 @@
+export const dynamic = "force-dynamic";
+
 import { NextResponse } from "next/server";
-import { PrismaClient } from "@prisma/client";
 import { createClient } from "@supabase/supabase-js";
 import { pushSync, pullSync } from "@/lib/sync/sync-service";
 import { getDb } from "@/lib/prisma";

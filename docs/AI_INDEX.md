@@ -18,9 +18,7 @@ These files represent the permanent architectural memory of the project.
 ### 1. Project State & Active Tasks
 Check these files to understand what is currently being worked on and the project's roadmap.
 * **[AI_HANDOFF.md](handoff/AI_HANDOFF.md)**: Current project state, active work, known issues, and next recommended tasks.
-* **[ROADMAP.md](handoff/ROADMAP.md)**: Upcoming milestones.
-* **[AI_PROGRESS.md](../AI_PROGRESS.md)**: The active long-running task continuation checkpoint (if it exists).
-* **[PHASE_A_SYNC_AND_ERP_PROGRESS.md](handoff/PHASE_A_SYNC_AND_ERP_PROGRESS.md)**: Sync progress for Phase A.
+* **[AI_PROGRESS_TEMPLATE.md](handoff/AI_PROGRESS_TEMPLATE.md)**: Template for active long-running task continuation checkpoints.
 
 ### 2. Architecture & Systems
 Read these to understand how the system is built.
@@ -34,7 +32,6 @@ Read these for anything touching Prisma, SQLite, or Supabase.
 
 ### 4. Reference & Rules
 Use these for lookups, variables, and canonical standards.
-* **[SOURCE_OF_TRUTH.md](reference/SOURCE_OF_TRUTH.md)**: Canonical locations, ownership rules, and duplicate prevention.
 * **[VARIABLE_MAP.md](reference/VARIABLE_MAP.md)**: Important application variables, cross-layer mappings, and canonical field names.
 * **[MODULE_INDEX.md](reference/MODULE_INDEX.md)**: Module ownership, entry points, and dependencies.
 * **[KNOWN_BUGS.md](reference/KNOWN_BUGS.md)**: Active bugs, workarounds, and resolved post-mortems.

@@ -3,6 +3,7 @@
 import { useCallback, useEffect, useMemo, useState } from "react";
 import { Plus, Search, Printer, Trash2, Download } from "lucide-react";
 import { usePrompt } from "@/components/ui/prompt-provider";
+import { handlePrint } from "@/lib/utils/print";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Field } from "@/components/ui/field";
@@ -343,7 +344,7 @@ export function PartyLedgerPage() {
                     <Download className="mr-2 h-4 w-4" />
                     Export Excel
                   </Button>
-                  <Button variant="outline" onClick={() => window.print()} className="print:hidden">
+                  <Button variant="outline" onClick={() => handlePrint()} className="print:hidden">
                     <Printer className="mr-2 h-4 w-4" />
                     Print Statement
                   </Button>

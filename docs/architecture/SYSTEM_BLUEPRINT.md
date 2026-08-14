@@ -16,7 +16,8 @@
     *   **src/components/**: Reusable React components (UI elements, domain module forms, layout shells).
     *   **src/lib/**: Core business logic, database access, utilities, and background cloud sync engine.
         *   **src/lib/domain/**: Domain-driven service modules (e.g., inventory, daybook, ledger) isolating business rules from UI components.
-        *   **src/lib/prisma.ts**: Prisma client instantiation and raw SQLite fallback initialization.
+        *   **src/lib/bootstrap.ts**: Raw SQLite schema initialization, table migrations, and fallback setups.
+        *   **src/lib/prisma.ts**: Prisma client instantiation and database connections.
         *   **src/lib/sales-engine.ts**: Business engine for pricing, GST, rate calculations, and invoice totals.
         *   **src/lib/offline-actions.ts**: Core server actions for local database operations.
 *   **main.js**: Electron main process entry point handling server spawning and IPC.
@@ -42,7 +43,7 @@ Supabase Sync (background, offline-safe)
 - Facts (Domain Events, Financial Events) are **immutable**.
 - Ledger, Day Book, Reports, and Dashboard are **rebuildable projections**.
 - Corrections never edit prior events — they create new `SALE_CORRECTED` / `SALE_VOIDED` events.
-- See `docs/FINANCIAL_EVENT_ARCHITECTURE.md` for the full reference.
+- See `docs/architecture/FINANCIAL_EVENT_ARCHITECTURE.md` for the full reference.
 
 ## Core Invariants
 1. Business logic belongs in domain services, never in UI components.
@@ -58,21 +59,21 @@ Supabase Sync (background, offline-safe)
 - This means app upgrades **never** overwrite business data.
 
 ## Related Docs
-- `docs/DEPLOYMENT.md` — packaging, release and update workflow
-- `docs/FINANCIAL_EVENT_ARCHITECTURE.md` — full event system reference
-- `docs/BUSINESS_RULES.md` — quarry-specific business rules
-- `docs/DECISIONS.md` — long-lived architecture decisions
+- `docs/reference/DEPLOYMENT.md` — packaging, release and update workflow
+- `docs/architecture/FINANCIAL_EVENT_ARCHITECTURE.md` — full event system reference
+- `docs/reference/BUSINESS_RULES.md` — quarry-specific business rules
+- `docs/decisions/DECISION_LOG.md` — long-lived architecture decisions
 
 ## 🚨 MANDATORY DATABASE CHANGE PROTOCOL
 
 This project uses **three sources of truth** for its database schema:
 1. `prisma/schema.prisma`
-2. `src/lib/prisma.ts` (raw SQLite initialization queries)
+2. `src/lib/bootstrap.ts` (raw SQLite initialization queries)
 3. Supabase SQL migration files (for cloud sync)
 
 **Every DB change MUST update ALL of the following:**
 1. `prisma/schema.prisma`
-2. `src/lib/prisma.ts` (raw SQLite `CREATE TABLE` and `$executeRawUnsafe` initialization)
+2. `src/lib/bootstrap.ts` (raw SQLite `CREATE TABLE` and `$executeRawUnsafe` initialization)
 3. Supabase migration SQL
 4. `prisma/seed.ts` (if required for base data)
 5. Sync engine (`src/lib/sync/`) if tables are being synced

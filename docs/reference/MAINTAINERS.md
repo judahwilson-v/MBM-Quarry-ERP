@@ -23,7 +23,7 @@ The application utilizes a **CQRS (Command Query Responsibility Segregation) / E
 Because this is an offline-first app that syncs to a cloud backend, **the database schema exists in three places that must ALWAYS be perfectly synchronized**.
 Whenever you add or modify a table/field, you must update:
 1. **Prisma Schema (`prisma/schema.prisma`)**: Used for TypeScript generation and local querying.
-2. **SQLite Raw Initialization (`src/lib/prisma.ts`)**: Used to create tables on the local user's machine on fresh install if Prisma's automated `db push` fails or is skipped.
+2. **SQLite Raw Initialization (`src/lib/bootstrap.ts`)**: Used to create tables on the local user's machine on fresh install if Prisma's automated `db push` fails or is skipped.
 3. **Supabase Schema**: The cloud PostgreSQL database must mirror the local schema exactly.
 
 ## 4. Subsystems
@@ -63,7 +63,7 @@ Whenever you add or modify a table/field, you must update:
 
 ### Required Steps Whenever Adding a New Database Field
 1. Update `prisma/schema.prisma`.
-2. Update the raw `CREATE TABLE` script inside `src/lib/prisma.ts` to ensure fresh installs receive the column.
+2. Update the raw `CREATE TABLE` script inside `src/lib/bootstrap.ts` to ensure fresh installs receive the column.
 3. Add the column to Supabase (via SQL script or Supabase dashboard).
 4. Update `src/lib/sync/sync-service.ts` if the column requires special sync handling.
 5. Update TypeScript types and UI forms.

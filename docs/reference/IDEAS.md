@@ -32,7 +32,7 @@ Format each entry as:
 ### 2026-06-27 — Tally Integration (Phase 7) 
 - Summary: Generate Tally-compatible XML/CSV exports from sales data for GST filing.
 - Why it matters: Quarry accountant uses Tally ERP 9 / Tally Prime.
-- Status: rejected — scheduled as Phase 7, after field testing.
+- Status: completed — Phase 7 is BUILT (`src/app/tally/`, `src/lib/domain/tally/`).
 
 ### 2026-08-05 — IoT Weighbridge Integration
 - Summary: Direct RS-232/Ethernet integration with physical weighbridge indicators.

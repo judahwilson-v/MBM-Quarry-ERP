@@ -1,5 +1,6 @@
 "use client";
 import { usePrompt } from "@/components/ui/prompt-provider";
+import { handlePrint } from "@/lib/utils/print";
 
 import { useCallback, useEffect, useState } from "react";
 import { Pencil, Save, Search, Trash2, X, Download, Printer } from "lucide-react";
@@ -414,7 +415,7 @@ export function BoulderPurchasesPage() {
               <Download className="h-3.5 w-3.5" />
               Export
             </Button>
-            <Button variant="outline" size="sm" onClick={() => window.print()} className="text-xs gap-1.5">
+            <Button variant="outline" size="sm" onClick={() => handlePrint()} className="text-xs gap-1.5">
               <Printer className="h-3.5 w-3.5" />
               Print
             </Button>

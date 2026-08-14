@@ -13,7 +13,7 @@ import {
   ReceiptText,
   Truck,
   UserCircle,
-  X, Cloud, CloudOff, LayoutDashboard, Info, Settings, BookOpen, Fuel, Wallet, FileJson, Package, FileText
+  X, Cloud, CloudOff, LayoutDashboard, Info, Settings, BookOpen, Fuel, Wallet, FileJson, Package, FileText, RefreshCw
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
@@ -37,6 +37,7 @@ const navItems = [
   { href: "/tally", label: "Tally Export", icon: FileJson },
   { href: "/user-logs", label: "User Logs", icon: FileText },
   { href: "/fleet", label: "Fleet Maintenance", icon: Truck },
+  { href: "/sync", label: "Sync Dashboard", icon: RefreshCw },
   { href: "/about", label: "About & Backup", icon: Info },
   { href: "/settings", label: "Settings", icon: Settings },
 ];

@@ -56,6 +56,7 @@
     "@eslint/config-array": "^0.23.5",
     "@eslint/object-schema": "^3.0.5",
     "@types/node": "^20",
+    "@types/pg": "^8.21.0",
     "@types/react": "^18",
     "@types/react-dom": "^18",
     "concurrently": "^10.0.3",
@@ -142,7 +143,7 @@
         "provider": "github",
         "owner": "judahwilson-v",
         "repo": "MBM-Quarry-ERP",
-        "releaseType": "release"
+        "releaseType": "draft"
       }
     ]
   }

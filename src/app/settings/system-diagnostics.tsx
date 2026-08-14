@@ -2,8 +2,9 @@
 
 import { useState, useEffect } from "react";
 import { Button } from "@/components/ui/button";
-import { RefreshCw, HardDrive, FileText, Loader2 } from "lucide-react";
+import { RefreshCw, HardDrive, FileText, Loader2, Database } from "lucide-react";
 import { useToast } from "@/components/ui/use-toast";
+import { initializeSupabaseSchema } from "@/app/actions/setup-supabase";
 
 export function SystemDiagnostics({ 
   appVersion, 
@@ -19,6 +20,7 @@ export function SystemDiagnostics({
   const [updateStatus, setUpdateStatus] = useState<string | null>(null);
   const [updateAvailable, setUpdateAvailable] = useState(false);
   const [updateDownloaded, setUpdateDownloaded] = useState(false);
+  const [isInitializing, setIsInitializing] = useState(false);
 
   useEffect(() => {
     if (typeof window !== "undefined" && window.electron) {
@@ -139,6 +141,32 @@ export function SystemDiagnostics({
     });
   };
 
+  const handleInitSchema = async () => {
+    setIsInitializing(true);
+    setUpdateStatus("Initializing cloud schema...");
+    try {
+      const result = await initializeSupabaseSchema();
+      if (result.success) {
+        toast({
+          title: "Success",
+          description: result.message,
+        });
+        setUpdateStatus("Schema initialized");
+      } else {
+        throw new Error(result.error);
+      }
+    } catch (err: any) {
+      toast({
+        title: "Initialization Error",
+        description: err.message,
+        variant: "destructive"
+      });
+      setUpdateStatus("Init failed");
+    } finally {
+      setIsInitializing(false);
+    }
+  };
+
   return (
     <div className="rounded-xl border bg-card text-card-foreground shadow">
       <div className="p-6 pb-4 border-b flex justify-between items-center">
@@ -185,6 +213,10 @@ export function SystemDiagnostics({
           <Button variant="outline" size="sm" onClick={handleExportLogs} className="flex-1">
             <FileText className="w-4 h-4 mr-2" />
             Export Logs
+          </Button>
+          <Button variant="outline" size="sm" onClick={handleInitSchema} className="flex-1" disabled={isInitializing}>
+            {isInitializing ? <Loader2 className="w-4 h-4 mr-2 animate-spin" /> : <Database className="w-4 h-4 mr-2" />}
+            Init Cloud DB
           </Button>
         </div>
       </div>

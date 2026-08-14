@@ -7,6 +7,7 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { cn, formatCurrency } from "@/lib/utils";
 import * as XLSX from "xlsx";
 import { format } from "date-fns";
+import { handlePrint } from "@/lib/utils/print";
 
 type ReportData = Awaited<ReturnType<typeof import("@/lib/domain/reports/service").getReportData>>;
 
@@ -72,7 +73,7 @@ export function ReportPage({ data }: { data: ReportData }) {
             <Download className="mr-2 h-4 w-4" />
             Export Excel
           </Button>
-          <Button onClick={() => window.print()}>
+          <Button onClick={() => handlePrint()}>
             <Printer className="mr-2 h-4 w-4" />
             Print/PDF
           </Button>

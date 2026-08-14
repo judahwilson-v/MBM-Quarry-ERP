@@ -5,6 +5,7 @@ import { format } from "date-fns";
 import { ArrowLeft, Check, Printer, Download } from "lucide-react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
+import { handlePrint } from "@/lib/utils/print";
 import { Button } from "@/components/ui/button";
 import { getEmployeeLedger, saveEmployeeLedgerEntry, listEmployees } from "@/app/actions/employees";
 import { formatCurrency } from "@/lib/utils";
@@ -187,7 +188,7 @@ export function EmployeeLedgerPage({ id }: { id: string }) {
                 <Download className="mr-2 h-4 w-4" />
                 Export Excel
               </Button>
-              <Button variant="outline" size="sm" onClick={() => window.print()} className="print:hidden">
+              <Button variant="outline" size="sm" onClick={() => handlePrint()} className="print:hidden">
                 <Printer className="mr-2 h-4 w-4" />
                 Print Statement
               </Button>

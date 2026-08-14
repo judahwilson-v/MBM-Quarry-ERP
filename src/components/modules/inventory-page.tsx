@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import { useRouter } from "next/navigation";
 
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -11,6 +12,7 @@ import { adjustInventoryStock, type getInventoryStock } from "@/lib/domain/inven
 type InventoryStock = Awaited<ReturnType<typeof getInventoryStock>>[0];
 
 export function InventoryPage({ initialStock }: { initialStock: InventoryStock[] }) {
+  const router = useRouter();
   const [stock, setStock] = useState(initialStock);
   const [isAdjusting, setIsAdjusting] = useState<string | null>(null);
   const [adjustAmount, setAdjustAmount] = useState("");
@@ -68,7 +70,7 @@ export function InventoryPage({ initialStock }: { initialStock: InventoryStock[]
               const unit = (document.getElementById('new-material-unit') as HTMLInputElement).value;
               if (name) {
                 adjustInventoryStock(name, Number(adjustAmount), 'MANUAL_ADJUST', 'Initial Stock', unit).then(() => {
-                  window.location.reload();
+                  router.refresh();
                 });
               }
             }}>Save</Button>

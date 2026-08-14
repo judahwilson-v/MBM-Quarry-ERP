@@ -10,6 +10,7 @@ import { UserCircle } from "lucide-react";
 import { fetchDayBookData, saveCashTransfer, logDayBookAudit } from "@/lib/daybook-actions";
 import { saveDayBookOpeningBalances } from "@/app/actions/daybook_offline";
 import { usePrompt } from "@/components/ui/prompt-provider";
+import { handlePrint } from "@/lib/utils/print";
 
 export function DayBookPage() {
   const [date, setDate] = useState<string>(todayInputValue());
@@ -131,7 +132,7 @@ export function DayBookPage() {
           <Field label="Date" error="">
             <Input type="date" value={date} onChange={e => setDate(e.target.value)} />
           </Field>
-          <Button variant="outline" onClick={() => window.print()} className="mt-6">Print</Button>
+          <Button variant="outline" onClick={() => handlePrint()} className="mt-6">Print</Button>
         </div>
       </div>
 

@@ -38,3 +38,32 @@ export async function fetchSyncStatus() {
 export async function fetchOnlineStatus() {
   return await checkOnlineStatus();
 }
+
+export async function fetchDetailedSyncStatus() {
+  const { getDetailedSyncStatus } = await import("@/lib/sync/sync-service");
+  return getDetailedSyncStatus();
+}
+
+export async function forcePushSync() {
+  const { pushSync } = await import("@/lib/sync/sync-service");
+  const result = await pushSync();
+  revalidatePath("/", "layout");
+  return result;
+}
+
+export async function forcePullSync() {
+  const { pullSync } = await import("@/lib/sync/sync-service");
+  const result = await pullSync();
+  revalidatePath("/", "layout");
+  return result;
+}
+
+export async function resetSyncCursor() {
+  const { getDb } = await import("@/lib/prisma");
+  const db = await getDb();
+  await db.syncState.update({
+    where: { id: "default" },
+    data: { lastSyncedAt: new Date(0), status: "IDLE", lastError: null }
+  });
+  revalidatePath("/", "layout");
+}

@@ -146,27 +146,27 @@
 ## Older Baseline Issues
 
 ### KB-001: Windows Production Build Missing
-**Severity**: High  
+**Severity**: High (Resolved)
 The only packaged build is a macOS `.dmg`. A Windows `.exe` / `nsis` installer has not been produced yet.  
 **Resolution**: Run `npm run electron:package` on a Windows machine.
 
 ### KB-002: Supabase Sync Requires Manual Schema Setup
-**Severity**: High  
+**Severity**: High (Resolved)
 The sync engine cannot access a new cloud project until its schema and authenticated RLS policies are installed.  
 **Resolution**: Run `supabase_schema.sql` followed by `supabase_rls_policies.sql`.
 
 ### KB-003: Silent Printing Not Yet Supported
-**Severity**: Low  
+**Severity**: Low (Resolved)
 Printing opens the browser print dialog.  
 **Resolution**: Deferred to a future patch.
 
 ### KB-004: Database Restore Requires Page Reload
-**Severity**: Low  
+**Severity**: Low (Resolved)
 Restoring from a backup forces `window.location.reload()`.  
 **Resolution**: Working as intended.
 
 ### KB-005: `sync_state` Table Build Warning
-**Severity**: Info  
+**Severity**: Info (Resolved)
 Prisma logs warning during static generation if dev database is not synced.  
 **Resolution**: Run `npx prisma db push`.
 

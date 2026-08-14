@@ -14,6 +14,9 @@ import {
 
 import SYNC_MAP from "./sync-map.json";
 
+// In-memory store for the last held logs from pushSync (used by getDetailedSyncStatus)
+let _lastHeldLogs: Array<{table: string; entityId: string; action: string; reason: string; createdAt: string}> = [];
+
 // Build global bidirectional maps from the generated schema metadata
 const CAMEL_TO_DB: Record<string, string> = {};
 const DB_TO_CAMEL: Record<string, string> = {};
@@ -169,10 +172,7 @@ export async function pushSync(): Promise<SyncResult> {
 
           const snakeData = toSnakeCase(entityData);
           console.log(`[Sync Push] Upserting ${config.table}:${String(snakeData.id ?? log.entityId)}`);
-          // Use the correct onConflict column if this model has a unique key beyond 'id'
-          const rawConflictCol = REMOTE_CONFLICT_COLUMNS[modelName!];
-          const conflictColumn = (rawConflictCol && rawConflictCol !== "id" && snakeData[rawConflictCol] != null) ? rawConflictCol : undefined;
-          const { error } = await supabase.from(config.table).upsert(snakeData, conflictColumn ? { onConflict: conflictColumn } : undefined);
+          const { error } = await supabase.from(config.table).upsert(snakeData, { onConflict: 'id' });
           if (error) {
             if (error.code === '23503' || error.message?.includes('foreign key')) {
               console.warn(`[Sync Push] Holding ${config.table}:${log.entityId} (FK dep missing, will retry)`);
@@ -197,7 +197,7 @@ export async function pushSync(): Promise<SyncResult> {
               } else if (config.table === 'outgoing_sales' && snakeData.serial_number) {
                 snakeData.serial_number = null; // Drop conflicting auto-number
               }
-              const { error: retryError } = await supabase.from(config.table).upsert(snakeData, conflictColumn ? { onConflict: conflictColumn } : undefined);
+              const { error: retryError } = await supabase.from(config.table).upsert(snakeData, { onConflict: 'id' });
               if (retryError) {
                 throw new Error(`[Sync Push] Upsert retry failed for ${config.table}:${log.entityId}: ${retryError.message}`);
               }
@@ -261,9 +261,7 @@ export async function pushSync(): Promise<SyncResult> {
           } else if ((log.action === "create" || log.action === "update") && log.payload) {
             const entityData = extractEntityData(JSON.parse(log.payload));
             const snakeData = toSnakeCase(entityData);
-            const rawConflictCol = REMOTE_CONFLICT_COLUMNS[modelName!];
-            const conflictColumn = (rawConflictCol && rawConflictCol !== "id" && snakeData[rawConflictCol] != null) ? rawConflictCol : undefined;
-            const { error } = await supabase.from(config.table).upsert(snakeData, conflictColumn ? { onConflict: conflictColumn } : undefined);
+            const { error } = await supabase.from(config.table).upsert(snakeData, { onConflict: 'id' });
             if (error) {
               if (error.code === '23503' || error.message?.includes('foreign key')) {
                 nextHeld.push(log);
@@ -300,6 +298,21 @@ export async function pushSync(): Promise<SyncResult> {
         }
       }
       console.warn(`[Sync Push] ${currentHeld.length} logs remain held due to missing parent foreign keys. Cursor will advance past them to prevent deadlock.`);
+
+      // Store held logs for diagnostics (accessible via getDetailedSyncStatus)
+      _lastHeldLogs = currentHeld.map((log: any) => {
+        const heldModelName = resolveSyncModel(log.entityName);
+        const heldConfig = heldModelName ? SYNC_MODEL_CONFIG[heldModelName] : null;
+        return {
+          table: heldConfig?.table || log.entityName,
+          entityId: log.entityId,
+          action: log.action,
+          reason: `Missing parent FK — parent record not found in Supabase`,
+          createdAt: log.createdAt?.toISOString?.() || String(log.createdAt),
+        };
+      });
+    } else {
+      _lastHeldLogs = [];
     }
 
     // Event, ledger, and inventory projections
@@ -317,11 +330,9 @@ export async function pushSync(): Promise<SyncResult> {
           try {
             const snakeData = toSnakeCase(row);
             console.log(`[Sync Push] Upserting projection ${config.table}:${String(snakeData.id)}`);
-            const rawConflictCol = REMOTE_CONFLICT_COLUMNS[modelName];
-            const conflictColumn = (rawConflictCol && rawConflictCol !== "id" && snakeData[rawConflictCol] != null) ? rawConflictCol : undefined;
             const { error } = await supabase
               .from(config.table)
-              .upsert(snakeData, conflictColumn ? { onConflict: conflictColumn } : undefined);
+              .upsert(snakeData, { onConflict: 'id' });
             if (error) {
               throw new Error(`[Sync Push] Projection upsert failed for ${config.table}:${String(snakeData.id)}: ${error.message}`);
             }
@@ -355,8 +366,11 @@ export async function pushSync(): Promise<SyncResult> {
       errorsList.length === 0 ? "IDLE" : (pushedCount > 0 ? "PARTIAL_SUCCESS" : "ERROR");
     const lastErrorMessage = errorsList.length > 0 ? errorsList.map(e => `${e.table}${e.rowId ? `:${e.rowId}` : ''}: ${e.error}`).join("; ") : null;
 
-    // Cursor Management with 10-second Safety Window & Skipped Log Protection
-    const SAFETY_WINDOW_MS = 10000;
+    // Cursor Management
+    // SAFETY_WINDOW_MS was disabled (0) because it caused infinite loops where the same
+    // records within the last 10 seconds were repeatedly fetched and pushed,
+    // spamming the Supabase API and causing 'changes pending' to never reach 0.
+    const SAFETY_WINDOW_MS = 0;
     let finalPushCursor = syncState.lastSyncedAt;
 
     if (lastProcessedTime > syncState.lastSyncedAt) {
@@ -505,13 +519,10 @@ export async function pullSync(): Promise<SyncResult> {
             try {
               const camelRow = toCamelCase(row);
               const delegate = (db as any)[config.delegate];
-              const rawConflictField = LOCAL_CONFLICT_FIELDS[modelName] ?? "id";
-              const conflictField = (camelRow[rawConflictField] != null) ? rawConflictField : "id";
-
               let upserted = false;
               try {
                 await delegate.upsert({
-                  where: { [conflictField]: camelRow[conflictField] },
+                  where: { id: camelRow.id },
                   update: camelRow,
                   create: camelRow
                 });
@@ -582,7 +593,7 @@ export async function pullSync(): Promise<SyncResult> {
 
                   try {
                     await delegate.upsert({
-                      where: { [conflictField]: camelRow[conflictField] },
+                      where: { id: camelRow.id },
                       update: camelRow,
                       create: camelRow
                     });
@@ -637,7 +648,7 @@ export async function pullSync(): Promise<SyncResult> {
       errorsList.length === 0 ? "IDLE" : (pulledCount > 0 ? "PARTIAL_SUCCESS" : "ERROR");
     const lastErrorMessage = errorsList.length > 0 ? errorsList.map(e => `${e.table}${e.rowId ? `:${e.rowId}` : ''}: ${e.error}`).join("; ") : null;
 
-    const SAFETY_WINDOW_MS = 10000;
+    const SAFETY_WINDOW_MS = 0;
     let finalPullCursor = pullState.lastSyncedAt;
 
     if (lastProcessedTime > pullState.lastSyncedAt) {
@@ -850,5 +861,119 @@ export async function getSupabaseStorageStats(): Promise<SupabaseStorageStats> {
     totalDiskMB: Math.round(totalDiskMB * 100) / 100,
     limitMB: FREE_TIER_LIMIT_MB,
     usagePercent: Math.round((totalDiskMB / FREE_TIER_LIMIT_MB) * 10000) / 100,
+  };
+}
+
+export async function getDetailedSyncStatus() {
+  const db = await getDb();
+  let syncState = await db.syncState.findUnique({ where: { id: "default" } });
+  if (!syncState) {
+    syncState = await db.syncState.create({
+      data: { id: "default", lastSyncedAt: new Date(0) }
+    });
+  }
+  const pullState = await db.syncState.findUnique({ where: { id: "pull_state" } });
+
+  const pushCursor = syncState.lastSyncedAt || new Date(0);
+
+  const models: Array<{
+    name: string;
+    table: string;
+    pendingCount: number;
+    lastError: string | null;
+    status: 'synced' | 'pending' | 'error';
+  }> = [];
+  let totalPending = 0;
+
+  const sortedModels = Object.entries(PUSH_PRIORITY)
+    .sort(([, a], [, b]) => a - b)
+    .map(([name]) => name) as Array<keyof typeof SYNC_MODEL_CONFIG>;
+
+  for (const modelName of sortedModels) {
+    const config = SYNC_MODEL_CONFIG[modelName];
+    if (!config) continue;
+
+    let pendingCount = await db.auditLog.count({
+      where: {
+        entityName: modelName,
+        createdAt: { gt: pushCursor }
+      }
+    });
+
+    if (DIRECT_PUSH_MODELS.includes(modelName as any)) {
+      try {
+        const delegate = (db as any)[config.delegate];
+        if (delegate) {
+          const projectionCount = await delegate.count({
+            where: { [config.timeField]: { gt: pushCursor } }
+          });
+          pendingCount += projectionCount;
+        }
+      } catch {
+        // projection table might not exist yet
+      }
+    }
+
+    models.push({
+      name: modelName,
+      table: config.table,
+      pendingCount,
+      lastError: null,
+      status: pendingCount > 0 ? 'pending' : 'synced'
+    });
+
+    totalPending += pendingCount;
+  }
+
+  const recentErrors: Array<{
+    timestamp: string;
+    table: string;
+    rowId: string | null;
+    error: string;
+    errorCode: string | null;
+  }> = [];
+
+  if (syncState.lastError) {
+    const errorStrings = syncState.lastError.split('; ');
+    for (const errStr of errorStrings) {
+      const trimmed = errStr.trim();
+      if (!trimmed) continue;
+      const colonMatch = trimmed.match(/^([^:]+):([^:]+): (.+)$/);
+      if (colonMatch) {
+        recentErrors.push({
+          timestamp: new Date().toISOString(),
+          table: colonMatch[1],
+          rowId: colonMatch[2],
+          error: colonMatch[3],
+          errorCode: null
+        });
+      } else {
+        recentErrors.push({
+          timestamp: new Date().toISOString(),
+          table: 'unknown',
+          rowId: null,
+          error: trimmed,
+          errorCode: null
+        });
+      }
+    }
+  }
+
+  const status = syncState.status === 'SYNCING' ? 'SYNCING' as const
+    : syncState.lastError ? 'ERROR' as const
+    : totalPending > 0 ? 'PARTIAL_SUCCESS' as const
+    : 'IDLE' as const;
+
+  return {
+    overall: {
+      status,
+      lastPushedAt: syncState.lastSyncedAt?.toISOString() || null,
+      lastPulledAt: pullState?.lastSyncedAt?.toISOString() || null,
+      totalPending,
+      lastError: syncState.lastError
+    },
+    models,
+    recentErrors,
+    heldLogs: _lastHeldLogs
   };
 }

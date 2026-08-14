@@ -270,4 +270,83 @@ Configures global variables for the instance.
 - `phone` (String, Default `""`)
 - `default_printer` (String, Default `""`)
 - `backup_folder` (String, Default `""`)
+- `admin_pin` (String, Default `"8888"`)
+- `delete_pin` (String, Default `"7711"`)
+- `enable_weighbridge` (Boolean, Default `false`)
+- `enable_fleet_maintenance` (Boolean, Default `false`)
+- `enable_customer_portal` (Boolean, Default `false`)
+- `enable_credit_locks` (Boolean, Default `false`)
+- `updated_at` (DateTime)
+
+### Table: `inventory_stock`
+Stores live inventory summary for materials/stock items.
+- `id` (String, PK) - `cuid()`
+- `material_name` (String, Unique)
+- `quantity` (Float, Default `0`)
+- `unit` (String, Default `"TONS"`)
+- `last_updated` (DateTime, Default `now()`)
+*Relationships*: Has many `inventory_transactions`.
+
+### Table: `inventory_transactions`
+Records granular material stock modifications and balance adjustments.
+- `id` (String, PK) - `cuid()`
+- `stock_id` (String, FK to `inventory_stock.id` ON DELETE CASCADE)
+- `date` (DateTime, Default `now()`)
+- `type` (String) - `'PRODUCTION_IN'`, `'SALE_OUT'`, `'MANUAL_ADJUST'`
+- `quantity_change` (Float) - Positive for IN, Negative for OUT
+- `reference_id` (String, Nullable) - Ref ID of OutgoingSale or IncomingBoulder
+- `description` (String, Nullable)
+- `created_at` (DateTime, Default `now()`)
+
+### Table: `weighbridge_tickets`
+Records weighbridge gross, tare, and net weights with ticket sequences.
+- `id` (String, PK) - `cuid()`
+- `ticket_number` (Int, Unique)
+- `vehicle_number` (String)
+- `vehicle_id` (String, Nullable FK)
+- `party_id` (String, Nullable FK)
+- `material_id` (String, Nullable FK)
+- `ticket_type` (String, Default `"OUTGOING"`) - `"OUTGOING"` (Sale) or `"INCOMING"` (Purchase)
+- `status` (String, Default `"FIRST_WEIGHT"`) - `"FIRST_WEIGHT"`, `"SECOND_WEIGHT"`, `"COMPLETED"`, `"VOID"`
+- `gross_weight` (Float, Nullable)
+- `gross_time` (DateTime, Nullable)
+- `tare_weight` (Float, Nullable)
+- `tare_time` (DateTime, Nullable)
+- `net_weight` (Float, Nullable)
+- `linked_sale_id` (String, Unique Nullable)
+- `linked_boulder_id` (String, Unique Nullable)
+- `remarks` (String, Nullable)
+- `created_at` (DateTime, Default `now()`)
+- `updated_at` (DateTime)
+
+### Table: `maintenance_records`
+Logs servicing and maintenance events executed for fleet vehicles.
+- `id` (String, PK) - `cuid()`
+- `vehicle_id` (String, FK to `vehicles.id` ON DELETE CASCADE)
+- `date` (DateTime)
+- `engine_hours` (Float)
+- `service_type` (String)
+- `description` (String, Nullable)
+- `cost` (Float, Default `0`)
+- `created_at` (DateTime, Default `now()`)
+- `updated_at` (DateTime)
+
+### Table: `maintenance_schedules`
+Defines recurring preventative maintenance intervals for vehicles.
+- `id` (String, PK) - `cuid()`
+- `vehicle_id` (String, FK to `vehicles.id` ON DELETE CASCADE)
+- `service_type` (String)
+- `interval_hours` (Float, Nullable)
+- `interval_days` (Int, Nullable)
+- `next_due_hours` (Float, Nullable)
+- `next_due_date` (DateTime, Nullable)
+- `created_at` (DateTime, Default `now()`)
+- `updated_at` (DateTime)
+
+### Table: `vehicle_stats`
+Stores aggregated live telematics and operational statistics for vehicles.
+- `id` (String, PK) - `cuid()`
+- `vehicle_id` (String, Unique FK to `vehicles.id` ON DELETE CASCADE)
+- `engine_hours` (Float, Default `0`)
+- `created_at` (DateTime, Default `now()`)
 - `updated_at` (DateTime)
