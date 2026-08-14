@@ -7,6 +7,8 @@ import { ThemeSettings } from "./theme-settings";
 import fs from "fs";
 import path from "path";
 
+export const dynamic = 'force-dynamic';
+
 export default async function SettingsPage() {
   const settings = await getGlobalSettings();
   
