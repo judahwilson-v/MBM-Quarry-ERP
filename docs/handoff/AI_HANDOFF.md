@@ -1,9 +1,9 @@
 # MBM Quarry ERP — Project State
 
-**Status**: v1.16.2 Sync Deadlock Resolution & Artifact Removal (STABLE / FULLY OPERATIONAL)
-**Version**: `v1.16.2`
+**Status**: v1.16.3 Sync Engine Cookie Fix, Animated Splash Screen & Agent Rules (STABLE / FULLY OPERATIONAL)
+**Version**: `v1.16.3`
 **Phase**: Performance Optimization & UI Responsiveness (STABLE / FULLY OPERATIONAL)
-**Last Updated**: 2026-08-13
+**Last Updated**: 2026-08-14
 
 ## Status
 | Area | Status |

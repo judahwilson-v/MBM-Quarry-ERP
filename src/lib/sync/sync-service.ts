@@ -1,5 +1,5 @@
 import { getDb } from "@/lib/prisma";
-import { createClient } from "@/lib/supabase/server";
+import { createSyncClient } from "@/lib/supabase/client-sync";
 import {
   DIRECT_PUSH_MODELS,
   extractEntityData,
@@ -88,7 +88,7 @@ export async function pushSync(): Promise<SyncResult> {
   const errorsList: SyncErrorItem[] = [];
 
   const db = await getDb();
-  const supabase = createClient();
+  const supabase = createSyncClient();
 
   try {
     // 1. Get sync state
@@ -289,10 +289,17 @@ export async function pushSync(): Promise<SyncResult> {
 
     if (currentHeld.length > 0) {
       skippedCount += currentHeld.length;
+      // IMPORTANT: Do NOT call recordSkippedTime for permanently held FK logs.
+      // Previously this blocked the cursor forever, creating a deadlock where
+      // no subsequent logs could ever sync. Instead, advance past them and
+      // let the next sync cycle retry. The parent data will eventually arrive
+      // via pullSync or a future pushSync.
       for (const heldLog of currentHeld) {
-        recordSkippedTime(heldLog.createdAt);
+        if (heldLog.createdAt > lastProcessedTime) {
+          lastProcessedTime = heldLog.createdAt;
+        }
       }
-      console.warn(`[Sync Push] ${currentHeld.length} logs remain held due to missing parent foreign keys.`);
+      console.warn(`[Sync Push] ${currentHeld.length} logs remain held due to missing parent foreign keys. Cursor will advance past them to prevent deadlock.`);
     }
 
     // Event, ledger, and inventory projections
@@ -414,7 +421,7 @@ export async function pullSync(): Promise<SyncResult> {
   const errorsList: SyncErrorItem[] = [];
 
   const db = await getDb();
-  const supabase = createClient();
+  const supabase = createSyncClient();
 
   try {
     // 1. Get pull state
@@ -722,7 +729,7 @@ const RETENTION_POLICY: { table: string; days: number }[] = [
  * Safe to run repeatedly; idempotent.
  */
 export async function purgeOldSupabaseData(): Promise<{ purged: Record<string, number> }> {
-  const supabase = createClient();
+  const supabase = createSyncClient();
 
   const purged: Record<string, number> = {};
 
@@ -769,7 +776,7 @@ export interface SupabaseStorageStats {
  * to a row-count-based estimate.
  */
 export async function getSupabaseStorageStats(): Promise<SupabaseStorageStats> {
-  const supabase = createClient();
+  const supabase = createSyncClient();
   const FREE_TIER_LIMIT_MB = 500;
 
   // Try the RPC approach first (requires the function to be created in Supabase)

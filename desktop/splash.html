@@ -1,0 +1,140 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="UTF-8">
+  <title>Loading...</title>
+  <style>
+    :root {
+      --val-red: #ff4655;
+      --val-dark: #111111;
+      --val-light: #ece8e1;
+    }
+    
+    body {
+      margin: 0;
+      padding: 0;
+      width: 100vw;
+      height: 100vh;
+      background-color: var(--val-dark);
+      color: var(--val-light);
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      align-items: center;
+      overflow: hidden;
+      border: 2px solid var(--val-red);
+      box-sizing: border-box;
+      -webkit-app-region: drag; /* Makes the window draggable */
+    }
+
+    /* Animated background elements */
+    .bg-accent {
+      position: absolute;
+      top: 0;
+      left: -100%;
+      width: 50%;
+      height: 100%;
+      background: linear-gradient(90deg, transparent, rgba(255, 70, 85, 0.1), transparent);
+      animation: sweep 3s infinite linear;
+      transform: skewX(-20deg);
+      pointer-events: none;
+    }
+
+    @keyframes sweep {
+      0% { left: -100%; }
+      100% { left: 200%; }
+    }
+
+    /* Logo/Title Area */
+    .logo-container {
+      position: relative;
+      margin-bottom: 40px;
+    }
+
+    .title {
+      font-size: 3rem;
+      font-weight: 900;
+      letter-spacing: 4px;
+      margin: 0;
+      text-transform: uppercase;
+      position: relative;
+      z-index: 10;
+    }
+
+    .title::after {
+      content: 'MBM QUARRY';
+      position: absolute;
+      left: 3px;
+      top: 3px;
+      color: var(--val-red);
+      z-index: -1;
+      opacity: 0.7;
+    }
+
+    /* Progress bar */
+    .progress-container {
+      width: 80%;
+      height: 6px;
+      background-color: rgba(255, 255, 255, 0.1);
+      position: relative;
+      overflow: hidden;
+      margin-bottom: 20px;
+    }
+
+    .progress-bar {
+      position: absolute;
+      top: 0;
+      left: 0;
+      height: 100%;
+      width: 30%;
+      background-color: var(--val-red);
+      animation: pulse-width 2s ease-in-out infinite alternate;
+    }
+
+    @keyframes pulse-width {
+      0% { width: 10%; }
+      100% { width: 90%; }
+    }
+
+    /* Status text */
+    #status {
+      font-size: 0.9rem;
+      font-weight: 600;
+      letter-spacing: 2px;
+      text-transform: uppercase;
+      color: var(--val-red);
+      animation: blink 1.5s infinite;
+    }
+
+    @keyframes blink {
+      0%, 100% { opacity: 1; }
+      50% { opacity: 0.5; }
+    }
+    
+    .version {
+      position: absolute;
+      bottom: 10px;
+      right: 15px;
+      font-size: 0.7rem;
+      opacity: 0.5;
+      letter-spacing: 1px;
+    }
+  </style>
+</head>
+<body>
+  <div class="bg-accent"></div>
+  
+  <div class="logo-container">
+    <h1 class="title">MBM Quarry</h1>
+  </div>
+
+  <div class="progress-container">
+    <div class="progress-bar"></div>
+  </div>
+
+  <div id="status">INITIALIZING SYSTEM...</div>
+
+  <div class="version">v2.0 // ERP SYSTEM</div>
+</body>
+</html>

@@ -35,6 +35,7 @@ function loadProductionEnv() {
 }
 
 let mainWindow;
+let splashWindow = null;
 let nextProcess = null;
 let serverPort = null;
 let isManualUpdateCheck = false;
@@ -148,7 +149,38 @@ function waitForServer(url, timeoutMs = 60000) {
   });
 }
 
+function createSplashWindow() {
+  splashWindow = new BrowserWindow({
+    width: 600,
+    height: 350,
+    transparent: true,
+    frame: false,
+    alwaysOnTop: true,
+    show: true,
+    webPreferences: {
+      nodeIntegration: true,
+      contextIsolation: false
+    }
+  });
+  splashWindow.loadFile(path.join(__dirname, 'splash.html'));
+  
+  splashWindow.on('closed', () => {
+    splashWindow = null;
+  });
+}
+
+function updateSplashStatus(msg) {
+  if (splashWindow) {
+    splashWindow.webContents.executeJavaScript(`
+      const el = document.getElementById('status');
+      if (el) el.innerText = '${msg}';
+    `).catch(() => {});
+  }
+}
+
 async function createWindow() {
+  createSplashWindow();
+  
   mainWindow = new BrowserWindow({
     width: 1200,
     height: 800,
@@ -195,6 +227,9 @@ async function createWindow() {
   });
 
   mainWindow.once('ready-to-show', () => {
+    if (splashWindow) {
+      splashWindow.close();
+    }
     mainWindow.show();
   });
 
@@ -209,6 +244,7 @@ async function createWindow() {
 
     // Copy initial DB if it doesn't exist
     if (!fs.existsSync(dbPath)) {
+      updateSplashStatus("INITIALIZING DATABASE...");
       console.log("Initializing database at", dbPath);
       try {
         fs.copyFileSync(packagedDbPath, dbPath);
@@ -263,6 +299,7 @@ async function createWindow() {
       // 2.5 Run Auto-Migrator
       const migratePath = path.join(process.resourcesPath, "standalone", "migrate.js");
       if (fs.existsSync(migratePath)) {
+        updateSplashStatus("MIGRATING DATABASE SCHEMA...");
         console.log("Running auto-migrator...");
         const migrateResult = require('child_process').spawnSync(process.execPath, [migratePath], { env });
         console.log("Migrator Output:", migrateResult.stdout?.toString());
@@ -296,8 +333,10 @@ async function createWindow() {
 
       // 3. Wait for the server to be ready before loading
       const url = `http://localhost:${serverPort}`;
+      updateSplashStatus("BOOTING NEXT.JS ENGINE...");
       console.log(`Waiting for Next.js to be reachable at ${url}...`);
       await waitForServer(url);
+      updateSplashStatus("SYSTEM READY. LOADING UI...");
       console.log(`Next.js is ready. Loading window.`);
       mainWindow.loadURL(url);
       
@@ -395,8 +434,10 @@ async function createWindow() {
       // In dev mode, we expect `npm run dev` to be running concurrently on port 3005
       const devPort = process.env.ELECTRON_DEV_PORT || "3005";
       const url = `http://localhost:${devPort}`;
+      updateSplashStatus("CONNECTING TO DEV SERVER...");
       console.log(`Waiting for Dev Server to be reachable at ${url}...`);
       await waitForServer(url);
+      updateSplashStatus("SYSTEM READY. LOADING UI...");
       console.log(`Dev Server is ready. Loading window.`);
       mainWindow.loadURL(url);
       mainWindow.webContents.openDevTools();

@@ -1,5 +1,10 @@
 # MBM Quarry ERP — Changelog
 
+## v1.16.3 — Sync Engine Cookie Fix, Animated Splash Screen & Agent Rules (2026-08-14 08:37 AM)
+- **Sync Engine Cookie Fix**: Introduced `createSyncClient` in `src/lib/supabase/client-sync.ts` using standard `@supabase/supabase-js` without Next.js `cookies()`, fixing `cookies was called outside a request scope` crash during background sync loop operations.
+- **Valorant-Style Animated Splash Screen**: Created `desktop/splash.html` and updated `desktop/main.js` to display an animated dark/red theme loading splash screen showing live status transitions (e.g. database loading, Next.js engine booting) during desktop app startup.
+- **Background Tasks Agent Rule**: Added rule file `.agents/rules/supabase-background-tasks/RULE.md` to prevent future AI agents from using cookie-based clients in non-request scoped background loops.
+
 ## v1.16.2 — Sync Deadlock Resolution & Artifact Removal (2026-08-13 07:56 PM)
 - **Sync Deadlock Resolution**: Fixed critical deadlock in `sync-service.ts` where FK violations caused `recordSkippedTime()` to permanently pin the `lastSyncedAt` cursor in the past, causing an infinite loop. The sync engine now safely advances the cursor past failing records.
 - **Root Directory Cleanup**: Moved 15 un-nested root scratch and test scripts (`check_*.js`, `add_*.js`, `test_*.js`, `fix_*.js`) into the designated `scratch/` directory.
