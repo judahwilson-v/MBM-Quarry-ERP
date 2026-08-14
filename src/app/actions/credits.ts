@@ -169,7 +169,7 @@ export async function savePartyCollection(input: any) {
       }),
     );
   } catch (error) {
-    throw new Error(sanitizeError(error));
+    return { success: false, error: sanitizeError(error) };
   }
 }
 
@@ -239,7 +239,7 @@ export async function savePartyPayment(input: any) {
       }),
     );
   } catch (error) {
-    throw new Error(sanitizeError(error));
+    return { success: false, error: sanitizeError(error) };
   }
 }
 
@@ -266,7 +266,7 @@ export async function deletePartyCollection(id: string, pin?: string) {
       if (collection.partyId) await recalculatePartyLedger(tx, collection.partyId);
     });
   } catch (error) {
-    throw new Error(sanitizeError(error));
+    return { success: false, error: sanitizeError(error) };
   }
 }
 
@@ -293,7 +293,7 @@ export async function deletePartyPayment(id: string, pin?: string) {
       if (payment.partyId) await recalculatePartyLedger(tx, payment.partyId);
     });
   } catch (error) {
-    throw new Error(sanitizeError(error));
+    return { success: false, error: sanitizeError(error) };
   }
 }
 
@@ -376,7 +376,7 @@ export async function saveOtherCredit(input: any) {
       return row;
     }));
   } catch (error) {
-    throw new Error(sanitizeError(error));
+    return { success: false, error: sanitizeError(error) };
   }
 }
 
@@ -390,7 +390,7 @@ export async function deleteOtherCredit(id: string) {
       if (before) await writeAuditEvent(tx, { entityName: "OtherCredit", entityId: id, action: "delete", role: "system", before });
     });
   } catch (error) {
-    throw new Error(sanitizeError(error));
+    return { success: false, error: sanitizeError(error) };
   }
 }
 

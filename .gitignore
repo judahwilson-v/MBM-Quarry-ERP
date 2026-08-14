@@ -34,8 +34,16 @@ yarn-debug.log*
 yarn-error.log*
 
 # local env files and credential backups
+.env
+.env.*
 .env*.local
 .env*.bak
+!.env.example
+
+# scratch and logs
+scratch/
+scripts/_scratch/
+*.log
 
 # vercel
 .vercel

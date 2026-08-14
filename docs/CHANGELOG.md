@@ -1,7 +1,17 @@
 # MBM Quarry ERP — Changelog
 
-## v1.16.4 — Infinite Sync Loop Fix (2026-08-14)
-- **Infinite Sync Loop Fix**: Disabled `SAFETY_WINDOW_MS` in `src/lib/sync/sync-service.ts` to prevent the perpetual "pending changes" issue caused by the cursor intentionally lagging behind and repeatedly reprocessing the same logs.
+## v1.16.5 — Single Source of Truth, Automated Test Suite & CI/CD Pipeline (2026-08-14)
+- **Single Source of Truth Architecture**:
+  - Consolidated schema management to `prisma/schema.prisma` as the primary source of truth.
+  - Added automated generator pipeline in `prebuild` (`generate-bootstrap-ddl.js`, `generate-pg-schema.js`, `generate-supabase-sql.js`, `generate-sync-map.js`).
+  - Refactored `src/lib/bootstrap.ts` from 794 lines to 290 lines, dynamically loading auto-generated DDL from `src/lib/generated/bootstrap-ddl.json`.
+- **Automated Drift Detection & Test Suite**:
+  - Integrated Vitest test runner with 17 tests across `tests/schema-consistency.test.ts` (drift detection across Prisma, SQLite bootstrap, sync-map, and Postgres) and `tests/sync-completeness.test.ts`.
+- **CI/CD Pipeline**:
+  - Added GitHub Actions workflow (`.github/workflows/ci.yml`) for automated testing, type checking, and build validation on every push.
+- **Security & Repository Sanitization**:
+  - Untracked `.env` and `.env.production` from Git tracking and updated `.gitignore` to strictly ignore all `.env*` credentials except `.env.example`.
+  - Resolved UI delete handler error handling across master data, credits, fuel, and employee pages.
 
 
 ## v1.16.3 — Sync Engine Cookie Fix, Animated Splash Screen & Agent Rules (2026-08-14 08:37 AM)

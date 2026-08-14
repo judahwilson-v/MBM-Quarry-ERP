@@ -123,6 +123,10 @@ export function FuelManagementPage() {
     if (!confirm("Are you sure you want to delete this fuel record? This action cannot be undone.")) return;
     try {
       await deleteFuelPurchase(id);
+      if (form.id === id) {
+        setForm(blankForm());
+        setIsEditing(false);
+      }
       await load();
     } catch (e: any) {
       setError(e.message);

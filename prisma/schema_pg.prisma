@@ -1,5 +1,7 @@
+// AUTO-GENERATED from schema.prisma — DO NOT EDIT MANUALLY
+
 generator client {
-  provider = "prisma-client-js"
+  provider      = "prisma-client-js"
 }
 
 datasource db {
@@ -8,7 +10,7 @@ datasource db {
 }
 
 model Vehicle {
-  id             String   @id @default(cuid())
+  id             String   @id @default(dbgenerated("gen_random_uuid()"))
   vehicleNumber   String   @unique @map("vehicle_number")
   partyId         String?  @map("party_id")
   partyName       String?  @map("party_name")
@@ -17,8 +19,8 @@ model Vehicle {
   vehicleType     String?  @map("vehicle_type")
   tripCount       Int      @default(0) @map("trip_count")
   engineHours     Float?   @map("engine_hours")
-  createdAt       DateTime @default(now()) @map("created_at")
-  updatedAt       DateTime @updatedAt @map("updated_at")
+  createdAt       DateTime @default(now()) @map("created_at") @db.Timestamptz
+  updatedAt       DateTime @updatedAt @map("updated_at") @db.Timestamptz
 
   party           Party?   @relation(fields: [partyId], references: [id], onDelete: SetNull)
   outgoingSales   OutgoingSale[]
@@ -34,13 +36,13 @@ model Vehicle {
 }
 
 model Party {
-  id            String         @id @default(cuid())
+  id            String         @id @default(dbgenerated("gen_random_uuid()"))
   partyName     String         @unique @map("party_name")
   phone         String?
   address       String?
   partyGroup    String?        @map("party_group")
-  createdAt     DateTime       @default(now()) @map("created_at")
-  updatedAt     DateTime       @updatedAt @map("updated_at")
+  createdAt     DateTime       @default(now()) @map("created_at") @db.Timestamptz
+  updatedAt     DateTime       @updatedAt @map("updated_at") @db.Timestamptz
 
   vehicles      Vehicle[]
   outgoingSales OutgoingSale[]
@@ -55,11 +57,11 @@ model Party {
 }
 
 model Material {
-  id              String         @id @default(cuid())
+  id              String         @id @default(dbgenerated("gen_random_uuid()"))
   materialName    String         @unique @map("material_name")
   ratePerCft      Float          @default(0) @map("rate_per_cft")
-  createdAt       DateTime       @default(now()) @map("created_at")
-  updatedAt       DateTime       @updatedAt @map("updated_at")
+  createdAt       DateTime       @default(now()) @map("created_at") @db.Timestamptz
+  updatedAt       DateTime       @updatedAt @map("updated_at") @db.Timestamptz
 
   outgoingSales   OutgoingSale[]
   incomingBoulder IncomingBoulder[]
@@ -68,8 +70,8 @@ model Material {
 }
 
 model OutgoingSale {
-  id            String   @id @default(cuid())
-  saleDate      DateTime @map("sale_date")
+  id            String   @id @default(dbgenerated("gen_random_uuid()"))
+  saleDate      DateTime @map("sale_date") @db.Timestamptz
   serialNumber  Int?     @unique @map("serial_number")
   bookNumber    Int?     @map("book_number")
   pageNumber    Int?     @map("page_number")
@@ -99,8 +101,8 @@ model OutgoingSale {
   paidTotal     Float    @default(0) @map("paid_total")
   remainingCredit Float  @default(0) @map("remaining_credit")
   remarks       String?
-  createdAt     DateTime @default(now()) @map("created_at")
-  updatedAt     DateTime @updatedAt @map("updated_at")
+  createdAt     DateTime @default(now()) @map("created_at") @db.Timestamptz
+  updatedAt     DateTime @updatedAt @map("updated_at") @db.Timestamptz
 
   vehicle       Vehicle? @relation(fields: [vehicleId], references: [id], onDelete: SetNull)
   party         Party?   @relation(fields: [partyId], references: [id], onDelete: SetNull)
@@ -115,15 +117,15 @@ model OutgoingSale {
 }
 
 model FinancialEvent {
-  id             String   @id @default(cuid())
-  eventId        String   @unique @default(uuid()) @map("event_id")
+  id             String   @id @default(dbgenerated("gen_random_uuid()"))
+  eventId        String   @unique @default(dbgenerated("gen_random_uuid()")) @map("event_id")
   correlationId  String   @map("correlation_id")
   eventType      String   @map("event_type")
   entityType     String   @map("entity_type")
   entityId       String   @map("entity_id")
   schemaVersion  Int      @default(1) @map("schema_version")
   payload        Json
-  createdAt      DateTime @default(now()) @map("created_at")
+  createdAt      DateTime @default(now()) @map("created_at") @db.Timestamptz
 
   @@index([correlationId])
   @@index([entityType, entityId])
@@ -132,19 +134,19 @@ model FinancialEvent {
 }
 
 model LedgerEntry {
-  id              String   @id @default(cuid())
+  id              String   @id @default(dbgenerated("gen_random_uuid()"))
   financialEventId String   @unique @map("financial_event_id")
   correlationId   String   @map("correlation_id")
   eventType       String   @map("event_type")
   entityType      String   @map("entity_type")
   entityId        String   @map("entity_id")
-  entryDate       DateTime @map("entry_date")
+  entryDate       DateTime @map("entry_date") @db.Timestamptz
   cashAmount      Float    @default(0) @map("cash_amount")
   bankAmount      Float    @default(0) @map("bank_amount")
   gPayAmount      Float    @default(0) @map("gpay_amount")
   creditAmount    Float    @default(0) @map("credit_amount")
   totalAmount     Float    @default(0) @map("total_amount")
-  createdAt       DateTime @default(now()) @map("created_at")
+  createdAt       DateTime @default(now()) @map("created_at") @db.Timestamptz
 
   @@index([correlationId])
   @@index([entityType, entityId])
@@ -153,8 +155,8 @@ model LedgerEntry {
 }
 
 model DayBook {
-  id                 String                @id @default(cuid())
-  businessDate       DateTime              @unique @map("business_date")
+  id                 String                @id @default(dbgenerated("gen_random_uuid()"))
+  businessDate       DateTime              @unique @map("business_date") @db.Timestamptz
   openingCashBalance Float                 @default(0) @map("opening_cash_balance")
   openingBankBalance Float                 @default(0) @map("opening_bank_balance")
   cashSalesTotal     Float                 @default(0) @map("cash_sales_total")
@@ -163,8 +165,8 @@ model DayBook {
   expenseTotal       Float                 @default(0) @map("expense_total")
   closingCashBalance Float                 @default(0) @map("closing_cash_balance")
   closingBankBalance Float                 @default(0) @map("closing_bank_balance")
-  createdAt          DateTime              @default(now()) @map("created_at")
-  updatedAt          DateTime              @updatedAt @map("updated_at")
+  createdAt          DateTime              @default(now()) @map("created_at") @db.Timestamptz
+  updatedAt          DateTime              @updatedAt @map("updated_at") @db.Timestamptz
 
   expenses           DayBookExpenseEntry[]
 
@@ -173,14 +175,14 @@ model DayBook {
 }
 
 model DayBookExpenseEntry {
-  id             String   @id @default(cuid())
+  id             String   @id @default(dbgenerated("gen_random_uuid()"))
   dayBookId      String   @map("day_book_id")
   sourceEventId  String   @unique @map("source_event_id")
   expenseType    String   @map("expense_type")
-  entryDate      DateTime @map("entry_date")
+  entryDate      DateTime @map("entry_date") @db.Timestamptz
   amount         Float
   description    String?
-  createdAt      DateTime @default(now()) @map("created_at")
+  createdAt      DateTime @default(now()) @map("created_at") @db.Timestamptz
 
   dayBook        DayBook  @relation(fields: [dayBookId], references: [id], onDelete: Cascade)
 
@@ -190,8 +192,8 @@ model DayBookExpenseEntry {
 }
 
 model IncomingBoulder {
-  id            String   @id @default(cuid())
-  date          DateTime @default(now())
+  id            String   @id @default(dbgenerated("gen_random_uuid()"))
+  date          DateTime @default(now()) @db.Timestamptz
   bookNumber    Int?     @map("book_number")
   pageNumber    Int?     @map("page_number")
   vehicleId     String?  @map("vehicle_id")
@@ -213,8 +215,8 @@ model IncomingBoulder {
   settled         Boolean  @default(false)
   vehicleRent     Float    @default(0) @map("vehicle_rent")
   combinedPayment Boolean  @default(false) @map("combined_payment")
-  createdAt       DateTime @default(now()) @map("created_at")
-  updatedAt       DateTime @updatedAt @map("updated_at")
+  createdAt       DateTime @default(now()) @map("created_at") @db.Timestamptz
+  updatedAt       DateTime @updatedAt @map("updated_at") @db.Timestamptz
 
   vehicle       Vehicle?  @relation(fields: [vehicleId], references: [id], onDelete: SetNull)
   party         Party?    @relation(fields: [partyId], references: [id], onDelete: SetNull)
@@ -228,14 +230,14 @@ model IncomingBoulder {
 }
 
 model PartyCredit {
-  id         String       @id @default(cuid())
+  id         String       @id @default(dbgenerated("gen_random_uuid()"))
   partyId    String?      @map("party_id")
   partyName  String       @map("party_name")
   saleId     String       @map("sale_id")
   amount     Float
   status     String       @default("pending")
-  createdAt  DateTime     @default(now()) @map("created_at")
-  updatedAt  DateTime     @updatedAt @map("updated_at")
+  createdAt  DateTime     @default(now()) @map("created_at") @db.Timestamptz
+  updatedAt  DateTime     @updatedAt @map("updated_at") @db.Timestamptz
 
   party      Party?       @relation(fields: [partyId], references: [id], onDelete: SetNull)
   sale       OutgoingSale @relation(fields: [saleId], references: [id], onDelete: Cascade)
@@ -247,18 +249,18 @@ model PartyCredit {
 }
 
 model PartyCollection {
-  id             String   @id @default(cuid())
+  id             String   @id @default(dbgenerated("gen_random_uuid()"))
   partyId        String?  @map("party_id")
   partyName      String   @map("party_name")
-  collectionDate DateTime @map("collection_date")
+  collectionDate DateTime @map("collection_date") @db.Timestamptz
   cashPaid       Float    @default(0) @map("cash_paid")
   bankPaid       Float    @default(0) @map("bank_paid")
   gPayPaid       Float    @default(0) @map("gpay_paid")
   totalAmount    Float    @map("total_amount")
   remarks        String?
   sourceEventId  String   @unique @map("source_event_id")
-  createdAt      DateTime @default(now()) @map("created_at")
-  updatedAt      DateTime @updatedAt @map("updated_at")
+  createdAt      DateTime @default(now()) @map("created_at") @db.Timestamptz
+  updatedAt      DateTime @updatedAt @map("updated_at") @db.Timestamptz
 
   party          Party?   @relation(fields: [partyId], references: [id], onDelete: SetNull)
 
@@ -269,10 +271,10 @@ model PartyCollection {
 }
 
 model PartyLedger {
-  id            String   @id @default(cuid())
+  id            String   @id @default(dbgenerated("gen_random_uuid()"))
   partyId       String?  @map("party_id")
   partyName     String   @map("party_name")
-  date          DateTime
+  date          DateTime @db.Timestamptz
   time          String?
   type          String   // 'SALE', 'PURCHASE', 'PAYMENT_RECEIVED', 'PAYMENT_GIVEN', 'MANUAL_DEBIT', 'MANUAL_CREDIT'
   refId         String   @map("ref_id")
@@ -281,7 +283,7 @@ model PartyLedger {
   debitAmount   Float    @default(0) @map("debit_amount")  // + Asset (Customer owes MBM) or MBM pays Supplier
   creditAmount  Float    @default(0) @map("credit_amount") // + Liability (MBM owes Supplier) or Customer pays MBM
   balance       Float    @default(0)                       // Running balance. Positive = MBM is Owed. Negative = MBM Owes.
-  createdAt     DateTime @default(now()) @map("created_at")
+  createdAt     DateTime @default(now()) @map("created_at") @db.Timestamptz
 
   party         Party?   @relation(fields: [partyId], references: [id], onDelete: SetNull)
 
@@ -293,32 +295,32 @@ model PartyLedger {
 }
 
 model CashTransfer {
-  id            String   @id @default(cuid())
-  date          DateTime
+  id            String   @id @default(dbgenerated("gen_random_uuid()"))
+  date          DateTime @db.Timestamptz
   time          String
   type          String   // 'CASH_TO_BANK', 'BANK_TO_CASH'
   amount        Float
   userName      String   @map("user_name")
   remarks       String?
-  createdAt     DateTime @default(now()) @map("created_at")
+  createdAt     DateTime @default(now()) @map("created_at") @db.Timestamptz
 
   @@index([date])
   @@map("cash_transfers")
 }
 
 model PartyPayment {
-  id             String   @id @default(cuid())
+  id             String   @id @default(dbgenerated("gen_random_uuid()"))
   partyId        String?  @map("party_id")
   partyName      String   @map("party_name")
-  paymentDate    DateTime @map("payment_date")
+  paymentDate    DateTime @map("payment_date") @db.Timestamptz
   cashPaid       Float    @default(0) @map("cash_paid")
   bankPaid       Float    @default(0) @map("bank_paid")
   gPayPaid       Float    @default(0) @map("gpay_paid")
   totalAmount    Float    @map("total_amount")
   remarks        String?
   sourceEventId  String   @unique @map("source_event_id")
-  createdAt      DateTime @default(now()) @map("created_at")
-  updatedAt      DateTime @updatedAt @map("updated_at")
+  createdAt      DateTime @default(now()) @map("created_at") @db.Timestamptz
+  updatedAt      DateTime @updatedAt @map("updated_at") @db.Timestamptz
 
   party          Party?   @relation(fields: [partyId], references: [id], onDelete: SetNull)
 
@@ -329,14 +331,14 @@ model PartyPayment {
 }
 
 model EmployeeCredit {
-  id              String    @id @default(cuid())
+  id              String    @id @default(dbgenerated("gen_random_uuid()"))
   employeeName    String    @map("employee_name")
   amount          Float
   reason          String?
-  expectedDueDate DateTime? @map("expected_due_date")
+  expectedDueDate DateTime? @map("expected_due_date") @db.Timestamptz
   status          String    @default("pending")
-  createdAt       DateTime  @default(now()) @map("created_at")
-  updatedAt       DateTime  @updatedAt @map("updated_at")
+  createdAt       DateTime  @default(now()) @map("created_at") @db.Timestamptz
+  updatedAt       DateTime  @updatedAt @map("updated_at") @db.Timestamptz
 
   @@index([employeeName])
   @@index([status])
@@ -345,38 +347,38 @@ model EmployeeCredit {
 }
 
 model Supplier {
-  id         String   @id @default(cuid())
+  id         String   @id @default(dbgenerated("gen_random_uuid()"))
   supplierName String @unique @map("supplier_name")
   phone      String?
   address    String?
-  createdAt  DateTime @default(now()) @map("created_at")
-  updatedAt  DateTime @updatedAt @map("updated_at")
+  createdAt  DateTime @default(now()) @map("created_at") @db.Timestamptz
+  updatedAt  DateTime @updatedAt @map("updated_at") @db.Timestamptz
 
   @@map("suppliers")
 }
 
 model DayBookEntry {
-  id         String   @id @default(cuid())
-  entryDate  DateTime @map("entry_date")
+  id         String   @id @default(dbgenerated("gen_random_uuid()"))
+  entryDate  DateTime @map("entry_date") @db.Timestamptz
   entryType  String   @map("entry_type")
   reference  String?
   description String?
   debit      Float    @default(0)
   credit     Float    @default(0)
-  createdAt  DateTime @default(now()) @map("created_at")
-  updatedAt  DateTime @updatedAt @map("updated_at")
+  createdAt  DateTime @default(now()) @map("created_at") @db.Timestamptz
+  updatedAt  DateTime @updatedAt @map("updated_at") @db.Timestamptz
 
   @@index([entryDate])
   @@map("day_book_entries")
 }
 
 model AuditLog {
-  id         String   @id @default(cuid())
+  id         String   @id @default(dbgenerated("gen_random_uuid()"))
   entityName String   @map("entity_name")
   entityId   String   @map("entity_id")
   action     String
   payload    String?
-  createdAt  DateTime @default(now()) @map("created_at")
+  createdAt  DateTime @default(now()) @map("created_at") @db.Timestamptz
 
   @@index([entityName, entityId])
   @@index([createdAt])
@@ -385,23 +387,23 @@ model AuditLog {
 }
 
 model Role {
-  id         String   @id @default(cuid())
+  id         String   @id @default(dbgenerated("gen_random_uuid()"))
   roleName   String   @unique @map("role_name")
-  createdAt  DateTime @default(now()) @map("created_at")
-  updatedAt  DateTime @updatedAt @map("updated_at")
+  createdAt  DateTime @default(now()) @map("created_at") @db.Timestamptz
+  updatedAt  DateTime @updatedAt @map("updated_at") @db.Timestamptz
 
   @@map("roles")
 }
 
 model OtherCredit {
-  id              String    @id @default(cuid())
+  id              String    @id @default(dbgenerated("gen_random_uuid()"))
   name            String    @map("name")
   amount          Float
   reason          String?
-  expectedDueDate DateTime? @map("expected_due_date")
+  expectedDueDate DateTime? @map("expected_due_date") @db.Timestamptz
   status          String    @default("pending")
-  createdAt       DateTime  @default(now()) @map("created_at")
-  updatedAt       DateTime  @updatedAt @map("updated_at")
+  createdAt       DateTime  @default(now()) @map("created_at") @db.Timestamptz
+  updatedAt       DateTime  @updatedAt @map("updated_at") @db.Timestamptz
 
   @@index([name])
   @@index([status])
@@ -411,8 +413,8 @@ model OtherCredit {
 
 
 model Expense {
-  id              String   @id @default(cuid())
-  expenseDate     DateTime @map("expense_date")
+  id              String   @id @default(dbgenerated("gen_random_uuid()"))
+  expenseDate     DateTime @map("expense_date") @db.Timestamptz
   expenseType     String   @map("expense_type")
   amount          Float
   paymentMode     String   @default("CASH") @map("payment_mode")
@@ -422,8 +424,8 @@ model Expense {
   vehicleNumber   String?  @map("vehicle_number")
   description     String?
   sourceEventId   String   @unique @map("source_event_id")
-  createdAt       DateTime @default(now()) @map("created_at")
-  updatedAt       DateTime @updatedAt @map("updated_at")
+  createdAt       DateTime @default(now()) @map("created_at") @db.Timestamptz
+  updatedAt       DateTime @updatedAt @map("updated_at") @db.Timestamptz
 
   party           Party?   @relation(fields: [partyId], references: [id], onDelete: SetNull)
   vehicle         Vehicle? @relation(fields: [vehicleId], references: [id], onDelete: SetNull)
@@ -435,14 +437,14 @@ model Expense {
 }
 
 model Employee {
-  id            String   @id @default(cuid())
+  id            String   @id @default(dbgenerated("gen_random_uuid()"))
   name          String   @unique
   phone         String?
   address       String?
   role          String   @default("STAFF")
   balance       Float    @default(0) // Positive means we owe them, Negative means they owe us
-  createdAt     DateTime @default(now()) @map("created_at")
-  updatedAt     DateTime @updatedAt @map("updated_at")
+  createdAt     DateTime @default(now()) @map("created_at") @db.Timestamptz
+  updatedAt     DateTime @updatedAt @map("updated_at") @db.Timestamptz
 
   ledgers       EmployeeLedger[]
 
@@ -450,14 +452,14 @@ model Employee {
 }
 
 model EmployeeLedger {
-  id            String   @id @default(cuid())
+  id            String   @id @default(dbgenerated("gen_random_uuid()"))
   employeeId    String   @map("employee_id")
-  date          DateTime
+  date          DateTime @db.Timestamptz
   type          String   // 'SALARY', 'ADVANCE', 'PAYMENT', 'DEDUCTION'
   amount        Float
   balance       Float    // Running balance
   description   String?
-  createdAt     DateTime @default(now()) @map("created_at")
+  createdAt     DateTime @default(now()) @map("created_at") @db.Timestamptz
 
   employee      Employee @relation(fields: [employeeId], references: [id], onDelete: Cascade)
 
@@ -467,8 +469,8 @@ model EmployeeLedger {
 }
 
 model FuelPurchase {
-  id            String   @id @default(cuid())
-  date          DateTime
+  id            String   @id @default(dbgenerated("gen_random_uuid()"))
+  date          DateTime @db.Timestamptz
   fuelType      String   @default("DIESEL") @map("fuel_type") // DIESEL, PETROL
   pricePerLitre Float?   @map("price_per_litre")
   qtyLitre      Float?   @map("qty_litre")
@@ -481,8 +483,8 @@ model FuelPurchase {
   vehicleNumber String?  @map("vehicle_number")
   
   sourceEventId String   @unique @map("source_event_id")
-  createdAt     DateTime @default(now()) @map("created_at")
-  updatedAt     DateTime @updatedAt @map("updated_at")
+  createdAt     DateTime @default(now()) @map("created_at") @db.Timestamptz
+  updatedAt     DateTime @updatedAt @map("updated_at") @db.Timestamptz
 
   vehicle       Vehicle? @relation(fields: [vehicleId], references: [id], onDelete: SetNull)
 
@@ -493,24 +495,24 @@ model FuelPurchase {
 
 model SyncState {
   id             String   @id @default("default")
-  lastSyncedAt   DateTime @default(dbgenerated("'1970-01-01 00:00:00'")) @map("last_synced_at")
+  lastSyncedAt   DateTime @default(dbgenerated("'1970-01-01 00:00:00'")) @map("last_synced_at") @db.Timestamptz
   status         String   @default("IDLE") // IDLE, SYNCING, ERROR
   lastError      String?  @map("last_error")
-  updatedAt      DateTime @updatedAt @map("updated_at")
+  updatedAt      DateTime @updatedAt @map("updated_at") @db.Timestamptz
 
   @@map("sync_state")
 }
 
 model GlobalSettings {
-  id             String   @id @default("default")
-  quarryName     String   @default("MBM Quarry") @map("quarry_name")
-  gstNumber      String   @default("") @map("gst_number")
-  address        String   @default("")
-  phone          String   @default("")
-  defaultPrinter String   @default("") @map("default_printer")
-  backupFolder   String   @default("") @map("backup_folder")
-  adminPin       String   @default("8888") @map("admin_pin")
-  deletePin      String   @default("7711") @map("delete_pin")
+  id                     String   @id @default("default")
+  quarryName             String   @default("MBM Quarry") @map("quarry_name")
+  gstNumber              String   @default("") @map("gst_number")
+  address                String   @default("")
+  phone                  String   @default("")
+  defaultPrinter         String   @default("") @map("default_printer")
+  backupFolder           String   @default("") @map("backup_folder")
+  adminPin               String   @default("8888") @map("admin_pin")
+  deletePin              String   @default("7711") @map("delete_pin")
   
   // Feature Flags
   enableWeighbridge      Boolean  @default(false) @map("enable_weighbridge")
@@ -518,17 +520,17 @@ model GlobalSettings {
   enableCustomerPortal   Boolean  @default(false) @map("enable_customer_portal")
   enableCreditLocks      Boolean  @default(false) @map("enable_credit_locks")
   
-  updatedAt      DateTime @updatedAt @map("updated_at")
+  updatedAt              DateTime @updatedAt @map("updated_at") @db.Timestamptz
 
   @@map("global_settings")
 }
 
 model InventoryStock {
-  id           String   @id @default(cuid())
+  id           String   @id @default(dbgenerated("gen_random_uuid()"))
   materialName String   @unique @map("material_name") // Could be "20mm", "Boulder", "Dust"
   quantity     Float    @default(0) // Balance in metric tons or cft
   unit         String   @default("TONS") // TONS, CFT
-  lastUpdated  DateTime @default(now()) @updatedAt @map("last_updated")
+  lastUpdated  DateTime @default(now()) @updatedAt @map("last_updated") @db.Timestamptz
 
   transactions InventoryTransaction[]
 
@@ -536,14 +538,14 @@ model InventoryStock {
 }
 
 model InventoryTransaction {
-  id             String   @id @default(cuid())
+  id             String   @id @default(dbgenerated("gen_random_uuid()"))
   stockId        String   @map("stock_id")
-  date           DateTime @default(now())
+  date           DateTime @default(now()) @db.Timestamptz
   type           String   // 'PRODUCTION_IN', 'SALE_OUT', 'MANUAL_ADJUST'
   quantityChange Float    @map("quantity_change") // Positive for IN, Negative for OUT
   referenceId    String?  @map("reference_id") // ID of OutgoingSale or IncomingBoulder
   description    String?
-  createdAt      DateTime @default(now()) @map("created_at")
+  createdAt      DateTime @default(now()) @map("created_at") @db.Timestamptz
 
   stock          InventoryStock @relation(fields: [stockId], references: [id], onDelete: Cascade)
 
@@ -553,7 +555,7 @@ model InventoryTransaction {
 }
 
 model WeighbridgeTicket {
-  id              String   @id @default(cuid())
+  id              String   @id @default(dbgenerated("gen_random_uuid()"))
   ticketNumber    Int      @unique @map("ticket_number")
   vehicleNumber   String   @map("vehicle_number")
   vehicleId       String?  @map("vehicle_id")
@@ -564,17 +566,17 @@ model WeighbridgeTicket {
   status          String   @default("FIRST_WEIGHT") // FIRST_WEIGHT, SECOND_WEIGHT, COMPLETED, VOID
   
   grossWeight     Float?   @map("gross_weight")
-  grossTime       DateTime? @map("gross_time")
+  grossTime       DateTime? @map("gross_time") @db.Timestamptz
   tareWeight      Float?   @map("tare_weight")
-  tareTime        DateTime? @map("tare_time")
+  tareTime        DateTime? @map("tare_time") @db.Timestamptz
   netWeight       Float?   @map("net_weight")
   
   linkedSaleId    String?  @unique @map("linked_sale_id")
   linkedBoulderId String?  @unique @map("linked_boulder_id")
   
   remarks         String?
-  createdAt       DateTime @default(now()) @map("created_at")
-  updatedAt       DateTime @updatedAt @map("updated_at")
+  createdAt       DateTime @default(now()) @map("created_at") @db.Timestamptz
+  updatedAt       DateTime @updatedAt @map("updated_at") @db.Timestamptz
 
   @@index([vehicleNumber])
   @@index([status])
@@ -585,15 +587,15 @@ model WeighbridgeTicket {
 }
 
 model MaintenanceRecord {
-  id             String   @id @default(cuid())
+  id             String   @id @default(dbgenerated("gen_random_uuid()"))
   vehicleId      String   @map("vehicle_id")
-  date           DateTime
+  date           DateTime @db.Timestamptz
   engineHours    Float    @map("engine_hours")
   serviceType    String   @map("service_type")
   description    String?
   cost           Float    @default(0)
-  createdAt      DateTime @default(now()) @map("created_at")
-  updatedAt      DateTime @updatedAt @map("updated_at")
+  createdAt      DateTime @default(now()) @map("created_at") @db.Timestamptz
+  updatedAt      DateTime @updatedAt @map("updated_at") @db.Timestamptz
 
   vehicle        Vehicle  @relation(fields: [vehicleId], references: [id], onDelete: Cascade)
 
@@ -603,15 +605,15 @@ model MaintenanceRecord {
 }
 
 model MaintenanceSchedule {
-  id             String   @id @default(cuid())
+  id             String   @id @default(dbgenerated("gen_random_uuid()"))
   vehicleId      String   @map("vehicle_id")
   serviceType    String   @map("service_type")
   intervalHours  Float?   @map("interval_hours")
   intervalDays   Int?     @map("interval_days")
   nextDueHours   Float?   @map("next_due_hours")
-  nextDueDate    DateTime? @map("next_due_date")
-  createdAt      DateTime @default(now()) @map("created_at")
-  updatedAt      DateTime @updatedAt @map("updated_at")
+  nextDueDate    DateTime? @map("next_due_date") @db.Timestamptz
+  createdAt      DateTime @default(now()) @map("created_at") @db.Timestamptz
+  updatedAt      DateTime @updatedAt @map("updated_at") @db.Timestamptz
 
   vehicle        Vehicle  @relation(fields: [vehicleId], references: [id], onDelete: Cascade)
 
@@ -620,11 +622,11 @@ model MaintenanceSchedule {
 }
 
 model VehicleStats {
-  id             String   @id @default(cuid())
+  id             String   @id @default(dbgenerated("gen_random_uuid()"))
   vehicleId      String   @unique @map("vehicle_id")
   engineHours    Float    @default(0) @map("engine_hours")
-  createdAt      DateTime @default(now()) @map("created_at")
-  updatedAt      DateTime @updatedAt @map("updated_at")
+  createdAt      DateTime @default(now()) @map("created_at") @db.Timestamptz
+  updatedAt      DateTime @updatedAt @map("updated_at") @db.Timestamptz
 
   vehicle        Vehicle  @relation(fields: [vehicleId], references: [id], onDelete: Cascade)
 

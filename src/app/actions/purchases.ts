@@ -230,7 +230,7 @@ export async function saveIncomingBoulder(input: IncomingBoulderInput, pin?: str
       return row;
     }));
   } catch (error) {
-    throw new Error(sanitizeError(error));
+    return { success: false, error: sanitizeError(error) };
   }
 }
 
@@ -270,7 +270,7 @@ export async function deleteIncomingBoulder(id: string, pin?: string) {
       }
     });
   } catch (error) {
-    throw new Error(sanitizeError(error));
+    return { success: false, error: sanitizeError(error) };
   }
 }
 

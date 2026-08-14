@@ -187,7 +187,8 @@ export function BoulderPurchasesPage() {
     if (!(await confirmAction("Delete this boulder entry?"))) return;
     setError("");
     try {
-      await deleteIncomingBoulder(id, password);
+      const __res = await deleteIncomingBoulder(id, password);
+      if (__res && !__res.success) throw new Error(__res.error || "Delete failed");
       if (form.id === id) setForm(blankForm());
       await load();
     } catch (err) {

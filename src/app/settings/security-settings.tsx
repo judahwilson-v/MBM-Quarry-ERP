@@ -38,7 +38,10 @@ export function SecuritySettings({ initialSettings }: { initialSettings: any }) 
     setIsLoading(false);
 
     if (error) {
-      const errMsg = error.message || "Invalid Supabase email or password.";
+      let errMsg = error.message || "Invalid Supabase email or password.";
+      if (errMsg.toLowerCase().includes("email not confirmed")) {
+        errMsg = "Email not confirmed. Please disable 'Confirm email' in your Supabase Auth dashboard, or confirm your email to log in.";
+      }
       setAuthError(errMsg);
       toast({
         title: "Authentication Failed",

@@ -132,11 +132,13 @@ export function PartyLedgerPage() {
     if (!(await confirmAction(`Delete this ${typeLabel} of ${formatCurrency(entry.creditAmount || entry.debitAmount)}?`))) return;
     
     try {
-      if (entry.type === "PAYMENT_RECEIVED") {
-        await deletePartyCollection(entry.refId, password);
-      } else {
-        await deletePartyPayment(entry.refId, password);
-      }
+        let __res;
+        if (entry.type === "PAYMENT_RECEIVED") {
+          __res = await deletePartyCollection(entry.refId, password);
+        } else {
+          __res = await deletePartyPayment(entry.refId, password);
+        }
+        if (__res && !__res.success) throw new Error(__res.error || "Delete failed");
       await loadSummary();
       await loadEntries(selectedParty);
     } catch (err) {
