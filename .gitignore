@@ -39,6 +39,7 @@ yarn-error.log*
 .env*.local
 .env*.bak
 !.env.example
+!.env.production
 
 # scratch and logs
 scratch/
