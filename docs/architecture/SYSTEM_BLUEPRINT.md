@@ -13,6 +13,7 @@
 *   **scripts/**: Utility and build-time tooling scripts (e.g., manual database migration script `migrate.js`, version stamping `stamp-version.js`).
 *   **src/**: The core Next.js application codebase.
     *   **src/app/**: Next.js 14 App Router definitions, routes, pages, RSCs, layouts, and server action endpoints (`src/app/actions/`).
+        *   **src/app/settings/**: Contains unified diagnostic, sync, backup, and log view tabs nested within `layout.tsx`.
     *   **src/components/**: Reusable React components (UI elements, domain module forms, layout shells).
     *   **src/lib/**: Core business logic, database access, utilities, and background cloud sync engine.
         *   **src/lib/domain/**: Domain-driven service modules (e.g., inventory, daybook, ledger) isolating business rules from UI components.

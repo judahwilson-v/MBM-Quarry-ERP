@@ -1,4 +1,7 @@
-# Master Codebase Audit Report — MBM Quarry V2
+# Master Codebase Audit Report (v1.11.5 baseline)
+
+> [!NOTE]
+> **Status**: All 27 defects documented in this audit report have been fully remediated and tested as of **v2.0.0** (August 2026). This document remains as historical reference for the Phase 11-13 remediation pipeline. — MBM Quarry V2
 
 **Target Project Directory**: `d:\mbm file\project\MBM1`  
 **Working Directory**: `d:\mbm file\.agents\orchestrator`  

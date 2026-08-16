@@ -1,4 +1,4 @@
-# MBM Quarry ERP — Release Notes
+# MBM Quarry ERP — Release Notes\n\n## v2.1.0 — Architecture Polish & Build Fixes (2026-08-16)\n- **Build Architecture**: Resolved broken imports in settings/general and sync route.\n- **Data Deprecation**: Removed deprecated 	ime field from data schemas to enforce unified datetime standards.\n\n## v2.0.0 — Master Quality, Resilience & UI Polish Overhaul (2026-08-16)
 
 ## v1.16.5 — Single Source of Truth, Automated Test Suite & CI/CD Pipeline (2026-08-14)
 - **Single Source of Truth Architecture**: Consolidated schema management to `prisma/schema.prisma` with automatic generator pipeline (`generate-bootstrap-ddl.js`, `generate-pg-schema.js`, `generate-supabase-sql.js`, `generate-sync-map.js`) and reduced `bootstrap.ts` from 794 lines to 290 lines.

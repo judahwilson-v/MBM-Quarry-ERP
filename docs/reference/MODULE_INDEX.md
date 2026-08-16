@@ -26,6 +26,12 @@ This document maps module ownership, primary entry points, and dependencies acro
 
 #### A. Routing & Server Actions (`src/app/`)
 * **Entry Point**: `src/app/layout.tsx`
+* **Settings & Diagnostics (`src/app/settings/`)**:
+  * `/settings/general`: System Diagnostics & Reliability
+  * `/settings/about`: About & Backup
+  * `/settings/sync`: Sync Dashboard
+  * `/settings/user-logs`: Operator Audit Logs
+  * `/settings/tally`: Tally ERP Export
 * **Server Actions (`src/app/actions/`)**:
   * `sales.ts`: Handles customer sales records and event creation.
   * `purchases.ts`: Handles supplier boulder purchase logs.

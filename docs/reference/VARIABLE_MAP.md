@@ -30,8 +30,11 @@
 | Entity | Prisma / TS ID | Prisma / TS Name | DB ID Column | DB Name Column | Prohibited Variations |
 | :--- | :--- | :--- | :--- | :--- | :--- |
 | Vehicle | `vehicleId` | `vehicleNumber` | `vehicle_id` | `vehicle_number` | `veh_id`, `reg_no`, `v_num` |
+| Vehicle (Base Qty) | `companyBodyQty` | N/A | `company_body_qty` | N/A | `standard_qty`, `default_qty` |
+| Vehicle (Extra Qty) | `extraBodyQty` | N/A | `extra_body_qty` | N/A | `large_qty`, `side_boards_qty` |
 | Party (Customer/Vendor)| `partyId` | `partyName` | `party_id` | `party_name` | `customer_id`, `client_name` |
 | Material | `materialId` | `materialName` | `material_id` | `material_name` | `item_id`, `product_name` |
+| Audit Identity | N/A | `userName` | N/A | `user_name` | `operator_id`, `created_by` |
 
 ---
 

@@ -1,6 +1,6 @@
-# MBM Quarry ERP — Changelog
+# MBM Quarry ERP — Changelog\n\n## v2.1.0 — Architecture Polish & Build Fixes (2026-08-16)\n- **Build Architecture**: Resolved broken imports in settings/general and sync route.\n- **Data Deprecation**: Removed deprecated 	ime field from data schemas to enforce unified datetime standards.\n\n## v2.0.0 — Master Quality, Resilience & UI Polish Overhaul (2026-08-16)
 
-## v1.16.8 — Master Quality, Resilience & UI Polish Overhaul (2026-08-16)
+
 - **Defensive Error Handling & Deletion Safeguards (Task 1 & 5)**:
   - Added robust defensive `try/catch` wrappers around all relational cleanup hooks in `sales.ts` (`deleteSale`), preventing cascade failures and allowing safe deletion of orphaned or test records.
   - Fixed `purgeNonGstSales` to restore inventory per item before deletion, generate individual audit log entries for Supabase sync, and return structured errors instead of throwing.

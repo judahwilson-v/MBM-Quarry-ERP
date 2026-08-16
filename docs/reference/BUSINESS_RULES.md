@@ -4,11 +4,13 @@ This is the authoritative source for how the quarry operates. It overrides assum
 
 ## Sales
 - Vehicle selection drives quantity defaults from vehicle capacity rules. The default is editable.
-- If the user changes the quantity from the vehicle default, a `quantityReason` is captured.
+- **Vehicle Capacities**: Vehicles can have multiple physical capacities (`companyBodyQty` vs `extraBodyQty`). Operators can toggle between these configurations via the UI without triggering "custom quantity" warnings.
+- If the user changes the quantity to a non-standard value, a `quantityReason` is captured.
 - Material selection drives rate defaults. Rate is editable.
-- Payment supports split collection: **Cash**, **Bank**, and **GPay** simultaneously.
+- Payment supports split collection: **Cash**, **Bank**, and **GPay** simultaneously. Quick-pay buttons allow instant 1-click settlement for the full amount to any specific payment mode.
 - Remaining unpaid amount becomes **party credit** automatically.
 - Vehicle trip count increments by 1 (or `tripDelta`) per confirmed sale.
+- **Physical Tracking**: Receipt `bookNumber` and `pageNumber` must be tracked. Duplicates across Sales and Incoming Boulder are soft-blocked but can be bypassed with a force-commit confirmation.
 - Sales edits and deletes require password **1177**.
 - All mutations are audit-logged.
 
@@ -52,9 +54,10 @@ This is the authoritative source for how the quarry operates. It overrides assum
 - Cloud sync (Supabase) must never alter business history.
 - Sync is an append-only push of events to the cloud.
 
-## Edit Password Policy
+## Edit & Deletion Policy
 - Password `1177` protects all edit and delete operations on Sales.
 - This remains in force until full authentication replaces it.
+- **RAID Mode (Bulk Purge)**: Authorized operators can bulk-purge all non-GST sales. This action must explicitly reverse inventory (per-item stock restoration), decrement vehicle trips, emit granular audit logs for the sync engine, and retain all internal daybook invariants.
 
 ## Derived Fields Policy
 - If a derived value is stored (e.g., `finalAmount`, `paidTotal`), its source fields and formula are documented.

@@ -55,5 +55,17 @@ The Owner Dashboard will be a **separate Next.js web application** connecting di
 **Reason**: Keeps each application simpler, avoids exposing the ERP directly to the internet, and allows independent deployment.
 
 ## D-013: Backup Strategy
-The Backup Manager (in the About page) creates `.bak` snapshots in the user data folder. Export creates a portable `.db` file. Import overwrites the active database after explicit user confirmation.
+The Backup Manager (in `/settings/about`) creates `.bak` snapshots in the user data folder. Export creates a portable `.db` file. Import overwrites the active database after explicit user confirmation.
 **Reason**: Protects against accidental data loss at the quarry. Simple enough for non-technical staff to understand.
+
+## D-014: Consolidated Settings Hierarchy
+Diagnostics, backup, sync tools, user logs, and export settings are structurally united under `/settings/*` using a tabbed navigation layout (`src/app/settings/layout.tsx`).
+**Reason**: Reduces sidebar clutter, establishes a unified administrative context, and improves operator navigation without breaking Next.js App Router boundaries.
+
+## D-015: RAID Mode Constraints
+RAID mode (bulk non-GST purge) is a privileged operation that must uphold business invariants: reversing stock, decrementing vehicle trips, and publishing sync audit events.
+**Reason**: Ensures that large-scale physical ledger manipulation by operators does not destroy system integrity or block the background sync loop.
+
+## D-016: Explicit Multi-Body Vehicle Capacity
+Vehicles optionally persist both `companyBodyQty` and `extraBodyQty`. Forms allow explicit selection of either.
+**Reason**: Accounts for realistic physical modifications (side boards) on trucks, eliminating invalid quantity deviation warnings when trucks carry known, standard larger loads.

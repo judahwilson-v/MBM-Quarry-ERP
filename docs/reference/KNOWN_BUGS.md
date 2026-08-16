@@ -183,3 +183,18 @@ Prisma logs warning during static generation if dev database is not synced.
 **Severity**: Medium (Resolved)  
 **Root Cause**: `Expand-Archive` on Windows stripped top-level directory.  
 **Resolution**: Used `tar -xf` to preserve directory hierarchy.
+
+### KB-PM-003: Defensive Record Deletion (Tasks 1 & 5)
+**Severity**: Critical (Resolved in v2.0.0)  
+**Root Cause**: Deleting `TEST-SYNC-9999` rows or triggering RAID purge caused unhandled server crashes due to cascading FK relations (vehicle trips, inventory, ledgers) and invalid API responses.
+**Resolution**: Added defensive `try/catch` wrappers around all relational cleanup hooks in `sales.ts`. Purge commands now safely reverse inventory per-item, emit granular audit logs, and return structured errors.
+
+### KB-PM-004: UI UX Disconnects (Tasks 2, 3, 4, 7, 10)
+**Severity**: Medium (Resolved in v2.0.0)  
+**Root Cause**: Operators struggled with horizontal scrolling on dense tables, lacked quick-pay buttons, experienced GST-row unreadability in dark mode, and lacked accurate vehicle Extra Body capacity selection.
+**Resolution**: Introduced sticky primary columns, single-click payment shortcut pills, explicit vehicle `extraBodyQty` vs `companyBodyQty` toggles, and patched dark mode `dark:bg-red-950/30` classes across the application.
+
+### KB-PM-005: Physical Book Discontinuity & Settings Fragmentation (Tasks 6, 8, 9, 11)
+**Severity**: Low (Resolved in v2.0.0)  
+**Root Cause**: Settings modules were loosely organized across root routes, book/page tracking allowed silent duplicates, and DayBook logs lacked operator attribution.
+**Resolution**: Consolidated routes under `/settings/*` with a unified layout. Added duplicate check warnings (with force-commit) to Book/Page fields. Injected `userName` into DayBook transaction logic for audit traceability.
