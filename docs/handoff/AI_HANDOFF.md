@@ -1,7 +1,7 @@
 # MBM Quarry ERP — Project State
 
-**Status**: v2.1.0 Master Quality, Resilience & UI Polish Overhaul (STABLE / FULLY OPERATIONAL)
-**Version**: `v2.0.0`
+**Status**: v2.2.0 ACID Atomicity Fixes, Next.js Boot Fix & Structural Refactoring (STABLE / FULLY OPERATIONAL)
+**Version**: `v2.2.0`
 **Phase**: Field-Test Remediation & Data Table Ergonomics (STABLE / FULLY OPERATIONAL)
 **Last Updated**: 2026-08-16
 

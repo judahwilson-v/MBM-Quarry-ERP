@@ -1,5 +1,17 @@
-# MBM Quarry ERP — Release Notes\n\n## v2.1.0 — Architecture Polish & Build Fixes (2026-08-16)\n- **Build Architecture**: Resolved broken imports in settings/general and sync route.\n- **Data Deprecation**: Removed deprecated 	ime field from data schemas to enforce unified datetime standards.\n\n## v2.0.0 — Master Quality, Resilience & UI Polish Overhaul (2026-08-16)
+# MBM Quarry ERP — Release Notes
 
+## v2.2.0 — ACID Atomicity Fixes, Next.js Boot Fix & Structural Refactoring (2026-08-16)
+- **ACID Transaction Atomicity Fixes**: Removed swallowed `try/catch` wrappers around relational cleanup hooks (e.g., `decrementVehicleTrips`, `recalculatePartyLedger`, `txAdjustInventoryStock`) across all domain actions. This allows Prisma to natively abort and rollback the `$transaction` on error, ensuring ledgers and inventory remain in perfect parity.
+- **Next.js Boot Sequence Fix**: Converted the dynamic `require("./generated/bootstrap-ddl.json")` in `bootstrap.ts` to a static ES6 import, permanently resolving the Next.js timeout crash during Electron boot in production.
+- **UI Consistency & Dialog Prompts**: Replaced legacy blocking native `confirm()` and `prompt()` browser dialogs on the Employees page with the internal React-driven `@/components/ui/prompt-provider`.
+- **Route Orchestration & Cleanups**: Cleaned dead imports, deleted the orphaned `src/app/settings/users/` directory, and properly co-located 5 out-of-tree settings components into `src/app/settings/general/`.
+- **Verification & Pipeline Checks**: All static analysis passing. Passed all tests, `tsc --noEmit` checks, and ESLint checks with zero warnings/errors.
+
+## v2.1.0 — Architecture Polish & Build Fixes (2026-08-16)
+- **Build Architecture**: Resolved broken imports in settings/general and sync route.
+- **Data Deprecation**: Removed deprecated time field from data schemas to enforce unified datetime standards.
+
+## v2.0.0 — Master Quality, Resilience & UI Polish Overhaul (2026-08-16)
 ## v1.16.5 — Single Source of Truth, Automated Test Suite & CI/CD Pipeline (2026-08-14)
 - **Single Source of Truth Architecture**: Consolidated schema management to `prisma/schema.prisma` with automatic generator pipeline (`generate-bootstrap-ddl.js`, `generate-pg-schema.js`, `generate-supabase-sql.js`, `generate-sync-map.js`) and reduced `bootstrap.ts` from 794 lines to 290 lines.
 - **Automated Drift Detection & Test Suite**: Added Vitest test runner with 17 tests detecting multi-source schema drift in real-time.

@@ -1,5 +1,17 @@
-# MBM Quarry ERP — Changelog\n\n## v2.1.0 — Architecture Polish & Build Fixes (2026-08-16)\n- **Build Architecture**: Resolved broken imports in settings/general and sync route.\n- **Data Deprecation**: Removed deprecated 	ime field from data schemas to enforce unified datetime standards.\n\n## v2.0.0 — Master Quality, Resilience & UI Polish Overhaul (2026-08-16)
+# MBM Quarry ERP — Changelog
 
+## v2.2.0 — ACID Atomicity Fixes, Next.js Boot Fix & Structural Refactoring (2026-08-16)
+- **ACID Transaction Atomicity Fixes**: Removed swallowed `try/catch` wrappers around relational cleanup hooks (e.g., `decrementVehicleTrips`, `recalculatePartyLedger`, `txAdjustInventoryStock`) across all domain actions. This allows Prisma to natively abort and rollback the `$transaction` on error, ensuring ledgers and inventory remain in perfect parity.
+- **Next.js Boot Sequence Fix**: Converted the dynamic `require("./generated/bootstrap-ddl.json")` in `bootstrap.ts` to a static ES6 import, permanently resolving the Next.js timeout crash during Electron boot in production.
+- **UI Consistency & Dialog Prompts**: Replaced legacy blocking native `confirm()` and `prompt()` browser dialogs on the Employees page with the internal React-driven `@/components/ui/prompt-provider`.
+- **Route Orchestration & Cleanups**: Cleaned dead imports, deleted the orphaned `src/app/settings/users/` directory, and properly co-located 5 out-of-tree settings components into `src/app/settings/general/`.
+- **Verification & Pipeline Checks**: All static analysis passing. Passed all tests, `tsc --noEmit` checks, and ESLint checks with zero warnings/errors.
+
+## v2.1.0 — Architecture Polish & Build Fixes (2026-08-16)
+- **Build Architecture**: Resolved broken imports in settings/general and sync route.
+- **Data Deprecation**: Removed deprecated time field from data schemas to enforce unified datetime standards.
+
+## v2.0.0 — Master Quality, Resilience & UI Polish Overhaul (2026-08-16)
 
 - **Defensive Error Handling & Deletion Safeguards (Task 1 & 5)**:
   - Added robust defensive `try/catch` wrappers around all relational cleanup hooks in `sales.ts` (`deleteSale`), preventing cascade failures and allowing safe deletion of orphaned or test records.
