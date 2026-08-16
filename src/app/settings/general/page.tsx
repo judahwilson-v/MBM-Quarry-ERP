@@ -1,9 +1,9 @@
 import { getGlobalSettings } from "@/app/actions/settings";
-import { SettingsForm } from "./settings-form";
-import { AuditLogManager } from "./audit-log-manager";
-import { SystemDiagnostics } from "./system-diagnostics";
-import { SecuritySettings } from "./security-settings";
-import { ThemeSettings } from "./theme-settings";
+import { SettingsForm } from "../settings-form";
+import { AuditLogManager } from "../audit-log-manager";
+import { SystemDiagnostics } from "../system-diagnostics";
+import { SecuritySettings } from "../security-settings";
+import { ThemeSettings } from "../theme-settings";
 import fs from "fs";
 import path from "path";
 

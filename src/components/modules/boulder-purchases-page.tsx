@@ -112,7 +112,6 @@ export function BoulderPurchasesPage() {
     setForm({
       id: row.id,
       date: dateInput(row.date),
-      time: row.time ?? "",
       bookNumber: row.bookNumber != null ? String(row.bookNumber) : "",
       pageNumber: row.pageNumber != null ? String(row.pageNumber) : "",
       vehicleId: "",
