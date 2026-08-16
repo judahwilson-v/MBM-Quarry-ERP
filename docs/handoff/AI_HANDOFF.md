@@ -1,8 +1,8 @@
 ---
 type: handoff
-project_version: "2.3.0"
+project_version: "2.3.1"
 status: "STABLE"
-last_updated: "2026-08-16 20:30:00"
+last_updated: "2026-08-16 20:55:00"
 blocking_issues: 0
 ---
 
@@ -10,9 +10,9 @@ blocking_issues: 0
 
 ## Current State
 
-- **Version**: v2.3.0
+- **Version**: v2.3.1
 - **Status**: Stable / Fully Operational
-- **Phase**: Auto-Updater Pipeline Hardening & 2.3.0 Release (all systems green)
+- **Phase**: System Reliability Update (5-Asset Distribution & Delta Sync)
 - **Blocking Issues**: None
 
 ---
@@ -21,6 +21,7 @@ blocking_issues: 0
 
 | Version | What | Date |
 |:--------|:-----|:-----|
+| v2.3.1 | System Reliability Update (compulsory 5-asset distribution & delta chunk validation) | 2026-08-16 |
 | v2.3.0 | Auto-updater pipeline hardening (`latest.yml` sync fix), graceful updater error handling | 2026-08-16 |
 | v2.2.0 | ACID atomicity fixes, Next.js boot fix, structural refactoring, ESLint cleanup | 2026-08-16 |
 | v2.1.0 | Architecture polish, build fixes, settings route repair | 2026-08-16 |

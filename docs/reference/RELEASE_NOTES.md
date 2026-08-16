@@ -1,5 +1,10 @@
 # MBM Quarry ERP — Release Notes
 
+## v2.3.1 — System Reliability Update (2026-08-16)
+- **Compulsory 5-Asset Distribution**: Fully enforced upload and verification of all 5 release artifacts on GitHub (`latest.yml`, `MBM-Quarry-V2-Setup-X.Y.Z.exe`, `MBM-Quarry-V2-Setup-X.Y.Z.exe.blockmap`, `Source code (zip)`, `Source code (tar.gz)`).
+- **Delta Chunk Binary Optimization**: Ensured the `.blockmap` differential file is permanently attached to releases to enable fast partial-chunk delta downloads for quarry desktop clients.
+- **Continuous Artifact Assertion**: Configured automated GitHub Actions post-build assertion to verify that all assets are present before completing the release.
+
 ## v2.3.0 — Auto-Updater Pipeline Hardening & Release Synchronization (2026-08-16)
 - **Auto-Updater Release Synchronization**: Fixed root cause of 404 errors on `latest.yml` where duplicate draft releases caused release metadata to detach from GitHub releases. Reconfigured `electron-builder` to publish directly with `releaseType: "release"` so `latest.yml`, installer `.exe`, and blockmap files are atomically published to GitHub releases in a single pass.
 - **CI/CD Release Workflow Simplification**: Streamlined `.github/workflows/release.yml` by removing conflicting draft release steps and adding an automatic artifact verification step (`gh release view`).

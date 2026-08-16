@@ -1,9 +1,9 @@
 ---
 schema_version: 2
 project: "MBM Quarry ERP"
-project_version: "2.3.0"
+project_version: "2.3.1"
 stack: "Next.js 14 + Prisma/SQLite + Electron + Supabase"
-last_updated: "2026-08-16 20:30:00"
+last_updated: "2026-08-16 20:55:00"
 total_docs: 20
 ---
 
@@ -17,7 +17,7 @@ total_docs: 20
 
 **MBM Quarry ERP** is an offline-first desktop ERP for quarry management.
 - **Stack**: Next.js 14 (App Router) + Prisma + SQLite + Electron + Supabase (cloud sync)
-- **Version**: v2.3.0 (Stable, field-tested)
+- **Version**: v2.3.1 (Stable, field-tested)
 - **State**: All systems operational. See `handoff/AI_HANDOFF.md` for current status.
 - **Database**: 3 sources of truth — `prisma/schema.prisma`, `src/lib/bootstrap.ts`, Supabase SQL.
 
