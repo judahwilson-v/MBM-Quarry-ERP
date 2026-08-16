@@ -132,7 +132,7 @@ export function BackupManager() {
                       size="sm" 
                       onClick={() => handleRestore(b.name)}
                       disabled={isLoading}
-                      className="text-red-600 hover:text-red-700 hover:bg-red-50 gap-1"
+                      className="text-red-600 hover:text-red-700 hover:bg-red-50 dark:hover:bg-red-950/30 gap-1"
                     >
                       <RotateCcw className="h-3 w-3" />
                       Restore

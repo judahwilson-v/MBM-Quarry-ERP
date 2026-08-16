@@ -2,13 +2,14 @@
 
 import { useEffect, useState, useMemo } from "react";
 import { format } from "date-fns";
-import { Truck, Search, Receipt, ArrowLeft } from "lucide-react";
+import { Truck, Search, Receipt, ArrowLeft, Download } from "lucide-react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { listVehicles } from "@/app/actions/vehicles";
 import { listExpenses } from "@/app/actions/expenses";
 import { formatCurrency } from "@/lib/utils";
+import { exportToExcel } from "@/lib/export";
 
 interface VehicleRow {
   id: string;
@@ -73,6 +74,32 @@ export function VehicleExpensesPage() {
     return expenses.filter(e => e.vehicleId === selectedVehicle.id).sort((a, b) => new Date(b.expenseDate).getTime() - new Date(a.expenseDate).getTime());
   }, [expenses, selectedVehicle]);
 
+  function handleExportExcel() {
+    if (!selectedVehicle || selectedExpenses.length === 0) return;
+    
+    let totalAmount = 0;
+    const excelData = selectedExpenses.map((row) => {
+      totalAmount += Number(row.amount);
+      return {
+        Date: format(new Date(row.expenseDate), "dd/MM/yyyy"),
+        Category: row.expenseType,
+        Description: row.description || "-",
+        "Payment Mode": row.paymentMode || "-",
+        Amount: Number(row.amount)
+      };
+    });
+    
+    excelData.push({
+      Date: "TOTAL",
+      Category: "",
+      Description: "",
+      "Payment Mode": "",
+      Amount: totalAmount
+    });
+
+    exportToExcel(excelData, `Vehicle_Expenses_${selectedVehicle.vehicleNumber}_${format(new Date(), "yyyy-MM-dd")}`);
+  }
+
   if (selectedVehicle) {
     return (
       <div className="space-y-6 p-4 lg:p-8 max-w-7xl mx-auto">
@@ -87,14 +114,18 @@ export function VehicleExpensesPage() {
         </div>
 
         <Card>
-          <CardHeader>
+          <CardHeader className="flex flex-row items-center justify-between pb-2">
             <CardTitle>Expense History</CardTitle>
+            <Button variant="outline" size="sm" onClick={handleExportExcel} className="gap-2">
+              <Download className="h-4 w-4" />
+              Export
+            </Button>
           </CardHeader>
           <CardContent>
             <div className="rounded-md border">
-              <div className="overflow-x-auto">
+              <div className="overflow-x-auto overflow-y-auto max-h-[calc(100vh-[350px])] sm:max-h-[60vh]">
                 <table className="w-full text-sm">
-                  <thead>
+                  <thead className="sticky top-0 z-10 shadow-sm print:relative print:shadow-none print:z-0">
                     <tr className="border-b bg-muted/50 text-left font-medium text-muted-foreground">
                       <th className="p-4">Date</th>
                       <th className="p-4">Category</th>

@@ -5,6 +5,8 @@ import { serialize } from "@/lib/utils/serialize";
 import { getDb } from "@/lib/prisma";
 import { triggerAutoSync } from "@/lib/sync/auto-sync";
 import { writeAuditEvent } from "@/lib/domain";
+import { verifyEditPassword } from "@/app/actions/auth";
+import { sanitizeError } from "@/lib/utils/sanitize-error";
 
 export type VehicleInput = {
   id?: string;
@@ -55,7 +57,15 @@ async function upsertPartyByName(partyName: string) {
     select: { id: true },
   });
   if (!existing) {
-    return await db.party.create({ data: { partyName: name } });
+    return await runTx(async (tx) => {
+      const row = await tx.party.create({ data: { partyName: name } });
+      try {
+        await writeAuditEvent(tx, { entityName: "Party", entityId: row.id, action: "create", role: "system", after: row });
+      } catch (e) {
+        console.warn("Failed to write audit event for party upsert:", e);
+      }
+      return row;
+    });
   }
   return existing;
 }
@@ -100,10 +110,33 @@ export async function saveVehicle(input: VehicleInput) {
   }));
 }
 
-export async function deleteVehicle(id: string) {
-  await runTx(async (tx) => {
-    const before = await tx.vehicle.findUnique({ where: { id } });
-    await tx.vehicle.delete({ where: { id } });
-    if (before) await writeAuditEvent(tx, { entityName: "Vehicle", entityId: id, action: "delete", role: "system", before });
-  });
+export async function deleteVehicle(id: string, pin?: string) {
+  try {
+    if (!pin || !(await verifyEditPassword(pin, "delete"))) {
+      throw new Error("Invalid delete PIN");
+    }
+    await runTx(async (tx) => {
+      const before = await tx.vehicle.findUnique({ where: { id } });
+      if (!before) return;
+      
+      // Check for FK references that would cause constraint violations
+      const saleCount = await tx.outgoingSale.count({ where: { vehicleId: id } });
+      const boulderCount = await tx.incomingBoulder.count({ where: { vehicleId: id } });
+      const fuelCount = await tx.fuelPurchase.count({ where: { vehicleId: id } });
+      const total = saleCount + boulderCount + fuelCount;
+      if (total > 0) {
+        throw new Error(`Cannot delete vehicle "${before.vehicleNumber}" — it has ${saleCount} sale(s), ${boulderCount} boulder purchase(s), and ${fuelCount} fuel record(s). Remove those records first.`);
+      }
+      
+      await tx.vehicle.delete({ where: { id } });
+      try {
+        await writeAuditEvent(tx, { entityName: "Vehicle", entityId: id, action: "delete", role: "system", before });
+      } catch (e) {
+        console.warn("Failed to write audit event for vehicle:", e);
+      }
+    });
+    return { success: true };
+  } catch (error) {
+    return { success: false, error: sanitizeError(error) };
+  }
 }

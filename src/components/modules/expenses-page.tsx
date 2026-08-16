@@ -2,7 +2,7 @@
 import { usePrompt } from "@/components/ui/prompt-provider";
 
 import { useCallback, useEffect, useMemo, useState } from "react";
-import { ArrowUpDown, Pencil, Search, Trash2 } from "lucide-react";
+import { ArrowUpDown, Pencil, Search, Trash2, Download } from "lucide-react";
 import { ExpenseEntryForm, type EditableExpense } from "@/components/modules/expense-entry-form";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
@@ -11,6 +11,7 @@ import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@
 import { deleteExpense, listExpenses } from "@/app/actions/expenses";
 import { verifyEditPassword } from "@/app/actions/auth";
 import { cn, formatCurrency, formatDate } from "@/lib/utils";
+import { exportToExcel } from "@/lib/export";
 
 type ExpenseRow = EditableExpense & {
   createdAt: string;
@@ -91,6 +92,36 @@ export function ExpensesPage() {
     }
   }
 
+  function handleExportExcel() {
+    if (visibleRows.length === 0) return;
+    
+    let totalAmount = 0;
+    const excelData: Record<string, any>[] = visibleRows.map((row) => {
+      totalAmount += row.amount;
+      return {
+        Date: formatDate(row.expenseDate),
+        Type: row.expenseType,
+        Amount: row.amount,
+        "Payment Mode": row.paymentMode,
+        Party: row.partyName || "-",
+        Vehicle: row.vehicleNumber || "-",
+        Description: row.description || "-"
+      };
+    });
+    
+    excelData.push({
+      Date: "TOTAL",
+      Type: "",
+      Amount: totalAmount,
+      "Payment Mode": "",
+      Party: "",
+      Vehicle: "",
+      Description: ""
+    });
+
+    exportToExcel(excelData, `Expenses_${new Date().toISOString().slice(0, 10)}`);
+  }
+
   return (
     <div className="space-y-5 p-4 lg:p-6">
       <div>
@@ -110,9 +141,15 @@ export function ExpensesPage() {
       <Card>
         <CardHeader className="flex-row flex-wrap items-center justify-between gap-3">
           <CardTitle>Expense Register</CardTitle>
-          <div className="relative w-full sm:w-80">
-            <Search className="pointer-events-none absolute left-3 top-3 h-4 w-4 text-muted-foreground" />
-            <Input className="pl-9" placeholder="Search expenses..." value={search} onChange={(e) => setSearch(e.target.value)} />
+          <div className="flex w-full sm:w-auto gap-2 items-center">
+            <div className="relative w-full sm:w-80">
+              <Search className="pointer-events-none absolute left-3 top-3 h-4 w-4 text-muted-foreground" />
+              <Input className="pl-9" placeholder="Search expenses..." value={search} onChange={(e) => setSearch(e.target.value)} />
+            </div>
+            <Button variant="outline" size="sm" onClick={handleExportExcel} className="text-xs gap-1.5 whitespace-nowrap">
+              <Download className="h-3.5 w-3.5" />
+              Export
+            </Button>
           </div>
         </CardHeader>
         <CardContent className="grid gap-4">

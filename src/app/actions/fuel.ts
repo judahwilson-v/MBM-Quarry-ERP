@@ -8,6 +8,8 @@ import { triggerAutoSync } from "@/lib/sync/auto-sync";
 import { writeAuditEvent } from "@/lib/domain";
 import { emitFinancialEvent } from "@/lib/domain/financial-events";
 import { projectDayBookExpense, recalculateDayBook } from "@/lib/domain/daybook";
+import { verifyEditPassword } from "@/app/actions/auth";
+import { sanitizeError } from "@/lib/utils/sanitize-error";
 
 const dateTimeKeys = new Set(["createdAt", "updatedAt", "saleDate", "date", "expectedDueDate"]);
 
@@ -185,32 +187,51 @@ export async function saveFuelPurchase(input: any) {
 }
 
 
-export async function deleteFuelPurchase(id: string) {
-  return serialize(await runTx(async (tx: Prisma.TransactionClient) => {
-    const row = await tx.fuelPurchase.findUnique({ where: { id } });
-    if (!row) throw new Error("Fuel purchase not found");
-    
-    const expense = await tx.expense.findUnique({ where: { sourceEventId: row.sourceEventId } });
-    if (expense) {
-      const financialEvent = await tx.financialEvent.findFirst({ where: { entityId: expense.id } });
-      if (financialEvent) {
-        await tx.financialEvent.delete({ where: { id: financialEvent.id } });
-        await tx.dayBookExpenseEntry.deleteMany({ where: { sourceEventId: financialEvent.eventId } });
-      }
-      await tx.expense.delete({ where: { id: expense.id } });
-
-      const businessDateStr = expense.expenseDate.toISOString().split("T")[0];
-      const day = new Date(`${businessDateStr}T00:00:00`);
-      const dayBook = await tx.dayBook.findUnique({ where: { businessDate: day } });
-      if (dayBook) {
-        await recalculateDayBook(tx, dayBook);
-      }
+export async function deleteFuelPurchase(id: string, pin?: string) {
+  try {
+    if (!pin || !(await verifyEditPassword(pin, "delete"))) {
+      throw new Error("Invalid delete PIN");
     }
-    
-    await tx.fuelPurchase.delete({ where: { id } });
-    await writeAuditEvent(tx, { entityName: "FuelPurchase", entityId: id, action: "delete", role: "system", before: row, after: null });
-    return row;
-  }));
+    return serialize(await runTx(async (tx: Prisma.TransactionClient) => {
+      const row = await tx.fuelPurchase.findUnique({ where: { id } });
+      if (!row) throw new Error("Fuel purchase not found");
+      
+      const expense = await tx.expense.findUnique({ where: { sourceEventId: row.sourceEventId } });
+      if (expense) {
+        const financialEvent = await tx.financialEvent.findFirst({ where: { entityId: expense.id } });
+        if (financialEvent) {
+          try {
+            await tx.financialEvent.delete({ where: { id: financialEvent.id } });
+            await tx.dayBookExpenseEntry.deleteMany({ where: { sourceEventId: financialEvent.eventId } });
+          } catch (e) {
+            console.warn("Failed to delete financial events for fuel purchase:", e);
+          }
+        }
+        await tx.expense.delete({ where: { id: expense.id } });
+
+        const businessDateStr = expense.expenseDate.toISOString().split("T")[0];
+        const day = new Date(`${businessDateStr}T00:00:00`);
+        const dayBook = await tx.dayBook.findUnique({ where: { businessDate: day } });
+        if (dayBook) {
+          try {
+            await recalculateDayBook(tx, dayBook);
+          } catch (e) {
+            console.warn("Failed to recalculate daybook for fuel purchase:", e);
+          }
+        }
+      }
+      
+      await tx.fuelPurchase.delete({ where: { id } });
+      try {
+        await writeAuditEvent(tx, { entityName: "FuelPurchase", entityId: id, action: "delete", role: "system", before: row, after: null });
+      } catch (e) {
+        console.warn("Failed to write audit event for fuel purchase:", e);
+      }
+      return row;
+    }));
+  } catch (error) {
+    return { success: false, error: sanitizeError(error) };
+  }
 }
 
 export type EmployeeInput = {

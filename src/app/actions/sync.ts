@@ -59,11 +59,17 @@ export async function forcePullSync() {
 }
 
 export async function resetSyncCursor() {
-  const { getDb } = await import("@/lib/prisma");
-  const db = await getDb();
-  await db.syncState.update({
-    where: { id: "default" },
-    data: { lastSyncedAt: new Date(0), status: "IDLE", lastError: null }
-  });
-  revalidatePath("/", "layout");
+  try {
+    const { getDb } = await import("@/lib/prisma");
+    const db = await getDb();
+    await db.syncState.update({
+      where: { id: "default" },
+      data: { lastSyncedAt: new Date(0), status: "IDLE", lastError: null }
+    });
+    revalidatePath("/", "layout");
+    return { success: true };
+  } catch (error) {
+    const { sanitizeError } = await import("@/lib/utils/sanitize-error");
+    return { success: false, error: sanitizeError(error) };
+  }
 }

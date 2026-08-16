@@ -270,12 +270,12 @@ export function EmployeeLedgerPage({ id }: { id: string }) {
           </CardHeader>
           <CardContent className="print:p-0">
             <div className="rounded-md border print:border-none">
-              <div className="overflow-x-auto">
+              <div className="overflow-x-auto overflow-y-auto max-h-[calc(100vh-[350px])] sm:max-h-[60vh]">
                 <table className="w-full text-sm">
-                  <thead>
+                  <thead className="sticky top-0 z-10 shadow-sm print:relative print:shadow-none print:z-0">
                     <tr className="border-b bg-muted/50 print:bg-transparent print:border-b-2 print:border-black text-left font-medium text-muted-foreground print:text-black">
-                      <th className="p-4">Date</th>
-                      <th className="p-4">Type</th>
+                      <th className="p-4 sm:sticky sm:left-0 z-20 bg-muted/50 w-[110px] min-w-[110px] max-w-[110px] print:static print:w-auto">Date</th>
+                      <th className="p-4 sm:sticky sm:left-[110px] z-20 bg-muted/50 w-[120px] min-w-[120px] max-w-[120px] print:static print:w-auto sm:border-r border-border">Type</th>
                       <th className="p-4">Details</th>
                       <th className="p-4 text-right">Credit (+)</th>
                       <th className="p-4 text-right">Debit (-)</th>
@@ -290,9 +290,9 @@ export function EmployeeLedgerPage({ id }: { id: string }) {
                       <tr><td colSpan={7} className="p-4 text-center text-muted-foreground">No records found.</td></tr>
                     ) : (
                       data.map((row) => (
-                        <tr key={row.id} className="border-b hover:bg-muted/50">
-                          <td className="p-4">{format(new Date(row.date), "dd/MM/yyyy")}</td>
-                          <td className="p-4">
+                        <tr key={row.id} className="border-b group bg-background hover:bg-muted/50">
+                          <td className="p-4 sm:sticky sm:left-0 z-10 bg-inherit w-[110px] min-w-[110px] max-w-[110px] print:static print:w-auto group-hover:bg-accent/50">{format(new Date(row.date), "dd/MM/yyyy")}</td>
+                          <td className="p-4 sm:sticky sm:left-[110px] z-10 bg-inherit w-[120px] min-w-[120px] max-w-[120px] print:static print:w-auto sm:border-r border-border group-hover:bg-accent/50">
                             <span className={`inline-flex items-center rounded-full px-2 py-0.5 text-xs font-semibold ${row.type === 'SALARY' ? 'bg-emerald-100 text-emerald-700' : 'bg-rose-100 text-rose-700'}`}>
                               {row.type}
                             </span>

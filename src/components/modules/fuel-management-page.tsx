@@ -2,13 +2,15 @@
 
 import { useEffect, useState } from "react";
 import { format } from "date-fns";
-import { Search, Check, Fuel } from "lucide-react";
+import { Search, Check, Fuel, Download } from "lucide-react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { listFuelPurchases, saveFuelPurchase, deleteFuelPurchase } from "@/app/actions/fuel";
 import { listVehicles } from "@/app/actions/vehicles";
+import { verifyEditPassword } from "@/app/actions/auth";
 import { formatCurrency } from "@/lib/utils";
+import { exportToExcel } from "@/lib/export";
 import { SearchableSelect } from "@/components/ui/searchable-select";
 
 interface FuelPurchaseRow {
@@ -121,8 +123,20 @@ export function FuelManagementPage() {
 
   async function remove(id: string) {
     if (!confirm("Are you sure you want to delete this fuel record? This action cannot be undone.")) return;
+    const password = prompt("Enter delete PIN:");
+    if (!password) return;
+    const isAuth = await verifyEditPassword(password, "delete");
+    if (!isAuth) {
+      setError("❌ Incorrect Delete PIN. Delete cancelled.");
+      return;
+    }
+    setError("");
     try {
-      await deleteFuelPurchase(id);
+      const res = await deleteFuelPurchase(id, password);
+      if (res && "error" in res) {
+        setError(res.error || "Delete failed.");
+        return;
+      }
       if (form.id === id) {
         setForm(blankForm());
         setIsEditing(false);
@@ -140,6 +154,43 @@ export function FuelManagementPage() {
     if (row.isCan && "can".includes(q)) return true;
     return false;
   });
+
+  function handleExportExcel() {
+    if (filtered.length === 0) return;
+    
+    let totalAmount = 0;
+    let totalPaid = 0;
+    let totalCredit = 0;
+
+    const excelData = filtered.map((row) => {
+      totalAmount += row.amount;
+      totalPaid += row.paidAmount;
+      totalCredit += (row.amount - row.paidAmount);
+      return {
+        Date: format(new Date(row.date), "dd/MM/yyyy"),
+        Type: row.fuelType,
+        Target: row.isCan ? "CAN" : row.vehicleNumber || "Unknown",
+        "Qty (L)": row.qtyLitre || "",
+        "Price/L": row.pricePerLitre || "",
+        Amount: row.amount,
+        Paid: row.paidAmount,
+        Credit: row.amount - row.paidAmount
+      };
+    });
+    
+    excelData.push({
+      Date: "TOTAL",
+      Type: "",
+      Target: "",
+      "Qty (L)": "",
+      "Price/L": "",
+      Amount: totalAmount,
+      Paid: totalPaid,
+      Credit: totalCredit
+    });
+
+    exportToExcel(excelData, `Fuel_Purchases_${format(new Date(), "yyyy-MM-dd")}`);
+  }
 
   return (
     <div className="space-y-6 p-4 lg:p-8 max-w-7xl mx-auto">
@@ -233,41 +284,48 @@ export function FuelManagementPage() {
         <Card className="md:col-span-2">
           <CardHeader className="flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between pb-2">
             <CardTitle>Recent Fuel Purchases</CardTitle>
-            <div className="relative w-full sm:w-64">
-              <Search className="absolute left-2.5 top-2.5 h-4 w-4 text-muted-foreground" />
-              <Input placeholder="Search vehicle or CAN..." className="pl-8" value={search} onChange={(e) => setSearch(e.target.value)} aria-label="Search fuel purchases" />
+            <div className="flex w-full sm:w-auto gap-2 items-center">
+              <div className="relative w-full sm:w-64">
+                <Search className="absolute left-2.5 top-2.5 h-4 w-4 text-muted-foreground" />
+                <Input placeholder="Search vehicle or CAN..." className="pl-8" value={search} onChange={(e) => setSearch(e.target.value)} aria-label="Search fuel purchases" />
+              </div>
+              <Button variant="outline" size="sm" onClick={handleExportExcel} className="gap-2 whitespace-nowrap">
+                <Download className="h-4 w-4" />
+                Export
+              </Button>
             </div>
           </CardHeader>
           <CardContent>
             <div className="rounded-md border">
-              <div className="overflow-x-auto">
+              <div className="overflow-x-auto overflow-y-auto max-h-[calc(100vh-[350px])] sm:max-h-[60vh]">
                 <table className="w-full text-sm">
-                  <thead>
+                  <thead className="sticky top-0 z-10 shadow-sm print:relative print:shadow-none print:z-0">
                     <tr className="border-b bg-muted/50 text-left font-medium text-muted-foreground">
-                      <th className="p-4">Date</th>
-                      <th className="p-4">Type</th>
-                      <th className="p-4">Target</th>
+                      <th className="p-4 sm:sticky sm:left-0 z-20 bg-muted/50 w-[110px] min-w-[110px] max-w-[110px] print:static print:w-auto">Date</th>
+                      <th className="p-4 sm:sticky sm:left-[110px] z-20 bg-muted/50 w-[100px] min-w-[100px] max-w-[100px] print:static print:w-auto">Type</th>
+                      <th className="p-4 sm:sticky sm:left-[210px] z-20 bg-muted/50 w-[140px] min-w-[140px] max-w-[140px] print:static print:w-auto sm:border-r border-border">Target</th>
                       <th className="p-4 text-right">Qty/Price</th>
                       <th className="p-4 text-right">Amount</th>
-                      <th className="p-4 text-right">Status</th>
+                      <th className="p-4 text-right">Paid</th>
+                      <th className="p-4 text-right">Credit</th>
                       <th className="p-4 text-right">Actions</th>
                     </tr>
                   </thead>
                   <tbody>
                     {loading ? (
-                      <tr><td colSpan={7} className="p-4 text-center">Loading...</td></tr>
+                      <tr><td colSpan={8} className="p-4 text-center">Loading...</td></tr>
                     ) : filtered.length === 0 ? (
-                      <tr><td colSpan={7} className="p-4 text-center text-muted-foreground">No records found.</td></tr>
+                      <tr><td colSpan={8} className="p-4 text-center text-muted-foreground">No records found.</td></tr>
                     ) : (
                       filtered.map((row) => (
-                        <tr key={row.id} className="border-b hover:bg-muted/50">
-                          <td className="p-4">{format(new Date(row.date), "dd/MM/yyyy")}</td>
-                          <td className="p-4">
+                        <tr key={row.id} className="border-b group bg-background hover:bg-muted/50">
+                          <td className="p-4 sm:sticky sm:left-0 z-10 bg-inherit w-[110px] min-w-[110px] max-w-[110px] print:static print:w-auto group-hover:bg-accent/50">{format(new Date(row.date), "dd/MM/yyyy")}</td>
+                          <td className="p-4 sm:sticky sm:left-[110px] z-10 bg-inherit w-[100px] min-w-[100px] max-w-[100px] print:static print:w-auto group-hover:bg-accent/50">
                             <span className={`inline-flex items-center rounded-full px-2 py-0.5 text-xs font-semibold ${row.fuelType === 'PETROL' ? 'bg-orange-100 text-orange-700' : 'bg-zinc-100 text-zinc-700'}`}>
                               {row.fuelType}
                             </span>
                           </td>
-                          <td className="p-4 font-medium">
+                          <td className="p-4 font-medium sm:sticky sm:left-[210px] z-10 bg-inherit w-[140px] min-w-[140px] max-w-[140px] print:static print:w-auto sm:border-r border-border group-hover:bg-accent/50">
                             {row.isCan ? (
                               <span className="flex items-center text-blue-600"><Fuel className="mr-1 h-3 w-3" /> CAN</span>
                             ) : (
@@ -280,14 +338,11 @@ export function FuelManagementPage() {
                           <td className="p-4 text-right tabular-nums font-medium text-rose-600">
                             {formatCurrency(row.amount)}
                           </td>
-                          <td className="p-4 text-right tabular-nums">
-                            {row.paidAmount >= row.amount ? (
-                              <span className="text-emerald-600 font-medium">Paid</span>
-                            ) : row.paidAmount > 0 ? (
-                              <span className="text-amber-600 font-medium">Partial</span>
-                            ) : (
-                              <span className="text-rose-600 font-medium">Credit</span>
-                            )}
+                          <td className="p-4 text-right tabular-nums font-medium text-emerald-600">
+                            {formatCurrency(row.paidAmount)}
+                          </td>
+                          <td className={`p-4 text-right tabular-nums font-medium ${(row.amount - row.paidAmount) > 0 ? "text-rose-600" : "text-muted-foreground"}`}>
+                            {formatCurrency(row.amount - row.paidAmount)}
                           </td>
                           <td className="p-4 text-right">
                             <Button variant="ghost" size="sm" onClick={() => edit(row)}>Edit</Button>

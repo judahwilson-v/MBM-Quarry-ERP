@@ -31,7 +31,7 @@ export async function getReportData() {
           tripDelta: true,
         },
       }),
-      db.incomingBoulder.findMany({ orderBy: [{ date: "desc" }, { createdAt: "desc" }], select: { date: true, qty: true, createdAt: true } }),
+      db.incomingBoulder.findMany({ orderBy: [{ date: "desc" }, { createdAt: "desc" }], select: { date: true, qty: true, amount: true, cashPaid: true, bankPaid: true, gPayPaid: true, createdAt: true } }),
       db.dayBook.findMany({
         orderBy: { businessDate: "desc" },
         select: {
@@ -46,11 +46,11 @@ export async function getReportData() {
           closingBankBalance: true,
         },
       }),
-      db.partyCollection.findMany({ orderBy: [{ collectionDate: "desc" }, { createdAt: "desc" }], select: { partyName: true, totalAmount: true, collectionDate: true, createdAt: true } }),
+      db.partyCollection.findMany({ orderBy: [{ collectionDate: "desc" }, { createdAt: "desc" }], select: { partyName: true, totalAmount: true, cashPaid: true, bankPaid: true, gPayPaid: true, collectionDate: true, createdAt: true } }),
       db.partyCredit.findMany({ orderBy: { createdAt: "desc" }, select: { partyName: true, amount: true, createdAt: true } }),
       db.vehicle.findMany({ orderBy: { vehicleNumber: "asc" }, select: { id: true, vehicleNumber: true, tripCount: true } }),
       db.party.findMany({ orderBy: { partyName: "asc" }, select: { id: true, partyName: true } }),
-      db.dayBookExpenseEntry.findMany({ orderBy: [{ entryDate: "desc" }, { createdAt: "desc" }], select: { expenseType: true, amount: true, entryDate: true, createdAt: true } }),
+      db.expense.findMany({ orderBy: [{ expenseDate: "desc" }, { createdAt: "desc" }], select: { expenseType: true, amount: true, paymentMode: true, expenseDate: true, createdAt: true } }),
     ]);
 
   const salesByMaterial = new Map<string, { materialName: string; qty: number; amount: number; finalAmount: number }>();
@@ -64,8 +64,8 @@ export async function getReportData() {
   const monthlyCollections = new Map<string, { partyName: string; collected: number }>();
   const monthlyVehicleUtilization = new Map<string, { vehicleNumber: string; trips: number }>();
   const monthlyPurchaseSummary = new Map<string, { day: string; qty: number }>();
-  const monthlyExpenseSummary = new Map<string, { expenseType: string; amount: number }>();
-  const dailyExpenses = new Map<string, { expenseType: string; amount: number }>();
+  const monthlyExpenseSummary = new Map<string, { expenseType: string; amount: number; cashPaid: number; bankPaid: number; gPayPaid: number }>();
+  const dailyExpenses = new Map<string, { expenseType: string; amount: number; cashPaid: number; bankPaid: number; gPayPaid: number }>();
   const dailyPurchases = new Map<string, { qty: number }>();
 
   for (const sale of sales) {
@@ -152,11 +152,18 @@ export async function getReportData() {
   }
 
   for (const expense of dayBookExpenses) {
-    const current = dailyExpenses.get(expense.expenseType) ?? { expenseType: expense.expenseType, amount: 0 };
+    const current = dailyExpenses.get(expense.expenseType) ?? { expenseType: expense.expenseType, amount: 0, cashPaid: 0, bankPaid: 0, gPayPaid: 0 };
     current.amount += Number(expense.amount ?? 0);
+    if (expense.paymentMode === "CASH") current.cashPaid += Number(expense.amount ?? 0);
+    else if (expense.paymentMode === "BANK") current.bankPaid += Number(expense.amount ?? 0);
+    else if (expense.paymentMode === "GPAY") current.gPayPaid += Number(expense.amount ?? 0);
     dailyExpenses.set(expense.expenseType, current);
-    const monthCurrent = monthlyExpenseSummary.get(expense.expenseType) ?? { expenseType: expense.expenseType, amount: 0 };
+    
+    const monthCurrent = monthlyExpenseSummary.get(expense.expenseType) ?? { expenseType: expense.expenseType, amount: 0, cashPaid: 0, bankPaid: 0, gPayPaid: 0 };
     monthCurrent.amount += Number(expense.amount ?? 0);
+    if (expense.paymentMode === "CASH") monthCurrent.cashPaid += Number(expense.amount ?? 0);
+    else if (expense.paymentMode === "BANK") monthCurrent.bankPaid += Number(expense.amount ?? 0);
+    else if (expense.paymentMode === "GPAY") monthCurrent.gPayPaid += Number(expense.amount ?? 0);
     monthlyExpenseSummary.set(expense.expenseType, monthCurrent);
   }
 

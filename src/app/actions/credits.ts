@@ -261,10 +261,28 @@ export async function deletePartyCollection(id: string, pin?: string) {
       await tx.partyCollection.delete({ where: { id } });
       
       // Cascade delete events
-      await tx.financialEvent.deleteMany({ where: { entityId: id } });
+      try {
+        await tx.financialEvent.deleteMany({ where: { entityId: id } });
+      } catch (e) {
+        console.warn("Failed to delete financial events for collection:", e);
+      }
       
-      if (collection.partyId) await recalculatePartyLedger(tx, collection.partyId);
+      if (collection.partyId) {
+        try {
+          const p = await tx.party.findUnique({ where: { id: collection.partyId } });
+          if (p) await recalculatePartyLedger(tx, collection.partyId);
+        } catch (e) {
+          console.warn("Failed to recalculate party ledger for collection:", e);
+        }
+      }
+
+      try {
+        await writeAuditEvent(tx, { entityName: "PartyCollection", entityId: id, action: "delete", role: "system", before: collection });
+      } catch (e) {
+        console.warn("Failed to write audit event for collection:", e);
+      }
     });
+    return { success: true };
   } catch (error) {
     return { success: false, error: sanitizeError(error) };
   }
@@ -288,10 +306,28 @@ export async function deletePartyPayment(id: string, pin?: string) {
       await tx.partyPayment.delete({ where: { id } });
       
       // Cascade delete events
-      await tx.financialEvent.deleteMany({ where: { entityId: id } });
+      try {
+        await tx.financialEvent.deleteMany({ where: { entityId: id } });
+      } catch (e) {
+        console.warn("Failed to delete financial events for payment:", e);
+      }
       
-      if (payment.partyId) await recalculatePartyLedger(tx, payment.partyId);
+      if (payment.partyId) {
+        try {
+          const p = await tx.party.findUnique({ where: { id: payment.partyId } });
+          if (p) await recalculatePartyLedger(tx, payment.partyId);
+        } catch (e) {
+          console.warn("Failed to recalculate party ledger for payment:", e);
+        }
+      }
+
+      try {
+        await writeAuditEvent(tx, { entityName: "PartyPayment", entityId: id, action: "delete", role: "system", before: payment });
+      } catch (e) {
+        console.warn("Failed to write audit event for payment:", e);
+      }
     });
+    return { success: true };
   } catch (error) {
     return { success: false, error: sanitizeError(error) };
   }
@@ -340,7 +376,52 @@ export async function listPartyLedgerEntries(partyId: string) {
     where: { partyId },
     orderBy: [{ date: "desc" }, { createdAt: "desc" }],
   });
-  return serialize(rows);
+
+  const collectionIds = rows.filter((r: any) => r.type === "PAYMENT_RECEIVED").map((r: any) => r.refId);
+  const paymentIds = rows.filter((r: any) => r.type === "PAYMENT_GIVEN").map((r: any) => r.refId);
+  const saleIds = rows.filter((r: any) => r.type === "SALE").map((r: any) => r.refId);
+  const purchaseIds = rows.filter((r: any) => r.type === "PURCHASE").map((r: any) => r.refId);
+
+  const [collections, payments, sales, purchases] = await Promise.all([
+    collectionIds.length > 0 ? db.partyCollection.findMany({ where: { id: { in: collectionIds } } }) : Promise.resolve([]),
+    paymentIds.length > 0 ? db.partyPayment.findMany({ where: { id: { in: paymentIds } } }) : Promise.resolve([]),
+    saleIds.length > 0 ? db.outgoingSale.findMany({ where: { id: { in: saleIds } } }) : Promise.resolve([]),
+    purchaseIds.length > 0 ? db.incomingBoulder.findMany({ where: { id: { in: purchaseIds } } }) : Promise.resolve([]),
+  ]);
+
+  const collectionMap = new Map(collections.map((r: any) => [r.id, r]));
+  const paymentMap = new Map(payments.map((r: any) => [r.id, r]));
+  const saleMap = new Map(sales.map((r: any) => [r.id, r]));
+  const purchaseMap = new Map(purchases.map((r: any) => [r.id, r]));
+
+  const enrichedRows = rows.map((row: any) => {
+    let cashPaid = 0;
+    let bankPaid = 0;
+    let gPayPaid = 0;
+
+    if (row.type === "PAYMENT_RECEIVED") {
+      const ref = collectionMap.get(row.refId);
+      if (ref) { cashPaid = ref.cashPaid; bankPaid = ref.bankPaid; gPayPaid = ref.gPayPaid; }
+    } else if (row.type === "PAYMENT_GIVEN") {
+      const ref = paymentMap.get(row.refId);
+      if (ref) { cashPaid = ref.cashPaid; bankPaid = ref.bankPaid; gPayPaid = ref.gPayPaid; }
+    } else if (row.type === "SALE") {
+      const ref = saleMap.get(row.refId);
+      if (ref) { cashPaid = ref.cashPaid; bankPaid = ref.bankPaid; gPayPaid = ref.gPayPaid; }
+    } else if (row.type === "PURCHASE") {
+      const ref = purchaseMap.get(row.refId);
+      if (ref) { cashPaid = ref.cashPaid; bankPaid = ref.bankPaid; gPayPaid = ref.gPayPaid; }
+    }
+
+    return {
+      ...row,
+      cashPaid,
+      bankPaid,
+      gPayPaid
+    };
+  });
+
+  return serialize(enrichedRows);
 }
 
 
@@ -381,14 +462,23 @@ export async function saveOtherCredit(input: any) {
 }
 
 
-export async function deleteOtherCredit(id: string) {
+export async function deleteOtherCredit(id: string, pin?: string) {
   try {
     validateWithSchema(DeleteOtherCreditSchema, { id });
+    if (!pin || !(await verifyEditPassword(pin, "delete"))) {
+      throw new Error("Invalid delete PIN");
+    }
     await runTx(async (tx: Prisma.TransactionClient) => {
       const before = await tx.otherCredit.findUnique({ where: { id } });
+      if (!before) return;
       await tx.otherCredit.delete({ where: { id } });
-      if (before) await writeAuditEvent(tx, { entityName: "OtherCredit", entityId: id, action: "delete", role: "system", before });
+      try {
+        await writeAuditEvent(tx, { entityName: "OtherCredit", entityId: id, action: "delete", role: "system", before });
+      } catch (e) {
+        console.warn("Failed to write audit event for other credit:", e);
+      }
     });
+    return { success: true };
   } catch (error) {
     return { success: false, error: sanitizeError(error) };
   }

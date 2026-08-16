@@ -19,6 +19,7 @@ type SaleRow = EditableSale & {
   finalAmount: number;
   gstEnabled?: boolean;
   gstAmount?: number;
+  paidTotal?: number;
   remainingCredit?: number;
   createdAt: string;
 };
@@ -136,11 +137,15 @@ export function SalesPage() {
     }
     setError("");
     try {
-      const count = await purgeNonGstSales(password);
+      const res = await purgeNonGstSales(password);
+      if (!res.success) {
+        setError(res.error || "Purge failed.");
+        return;
+      }
       setEditingSale(null);
       await loadSales();
       setError("");
-      alert(`Purge complete. ${count} non-GST sale(s) deleted. Only GST sales remain.`);
+      alert(`Purge complete. ${res.count} non-GST sale(s) deleted. Only GST sales remain.`);
     } catch (err) {
       setError(err instanceof Error ? err.message : "Purge failed.");
     }
@@ -160,6 +165,10 @@ export function SalesPage() {
       Amount: row.amount,
       Discount: row.discountType === "percentage" ? `${row.discountValue}%` : row.discountValue,
       "Final Amount": row.finalAmount,
+      "Cash Paid": row.cashPaid ?? 0,
+      "Bank/GPay": (row.bankPaid ?? 0) + (row.gPayPaid ?? 0),
+      "Paid Total": row.paidTotal ?? 0,
+      "Credit": row.remainingCredit ?? 0,
       Remarks: row.remarks || "-",
       "Book/Page": row.bookNumber && row.pageNumber ? `${row.bookNumber}/${row.pageNumber}` : row.bookNumber || row.pageNumber || "-"
     }));
@@ -175,6 +184,10 @@ export function SalesPage() {
       Amount: "",
       Discount: "",
       "Final Amount": summary.totalRevenue,
+      "Cash Paid": "",
+      "Bank/GPay": "",
+      "Paid Total": "",
+      "Credit": "",
       Remarks: "",
       "Book/Page": ""
     });
@@ -256,21 +269,25 @@ export function SalesPage() {
         </CardHeader>
         <CardContent className="grid gap-4 print:p-0">
           {error ? <p className="text-sm text-destructive print:hidden">{error}</p> : null}
-          <div className="overflow-x-auto rounded-md border print:border-none">
+          <div className="overflow-x-auto overflow-y-auto max-h-[calc(100vh-[350px])] sm:max-h-[60vh] rounded-md border print:border-none print:overflow-visible print:max-h-none">
             <Table>
-              <TableHeader className="bg-muted/50 print:bg-transparent print:border-b-2 print:border-black">
+              <TableHeader className="bg-muted/50 sticky top-0 z-10 shadow-sm print:bg-transparent print:border-b-2 print:border-black print:relative print:shadow-none">
               <TableRow>
-                <TableHead>GST</TableHead>
-                <SortableHead label="Date" active={sortKey === "saleDate"} onClick={() => sortBy("saleDate")} />
+                <TableHead className="sm:sticky sm:left-0 z-20 bg-muted/50 w-[70px] min-w-[70px] max-w-[70px] print:static print:w-auto">GST</TableHead>
+                <SortableHead className="sm:sticky sm:left-[70px] z-20 bg-muted/50 w-[110px] min-w-[110px] max-w-[110px] print:static print:w-auto" label="Date" active={sortKey === "saleDate"} onClick={() => sortBy("saleDate")} />
                 <TableHead>Time</TableHead>
-                <SortableHead label="Vehicle" active={sortKey === "vehicleNumber"} onClick={() => sortBy("vehicleNumber")} />
-                <SortableHead label="Party" active={sortKey === "partyName"} onClick={() => sortBy("partyName")} />
+                <SortableHead className="sm:sticky sm:left-[180px] z-20 bg-muted/50 w-[130px] min-w-[130px] max-w-[130px] print:static print:w-auto" label="Vehicle" active={sortKey === "vehicleNumber"} onClick={() => sortBy("vehicleNumber")} />
+                <SortableHead className="sm:sticky sm:left-[310px] z-20 bg-muted/50 w-[150px] min-w-[150px] max-w-[150px] print:static print:w-auto sm:border-r border-border" label="Party" active={sortKey === "partyName"} onClick={() => sortBy("partyName")} />
                 <SortableHead label="Material" active={sortKey === "materialName"} onClick={() => sortBy("materialName")} />
                 <SortableHead label="Qty" active={sortKey === "qty"} alignRight onClick={() => sortBy("qty")} />
                 <TableHead className="text-right">Rate</TableHead>
                 <TableHead className="text-right">Amount</TableHead>
                 <TableHead className="text-right print:hidden">Discount</TableHead>
                 <SortableHead label="Final" active={sortKey === "finalAmount"} alignRight onClick={() => sortBy("finalAmount")} />
+                <TableHead className="text-right">Cash</TableHead>
+                <TableHead className="text-right">Bank/GPay</TableHead>
+                <TableHead className="text-right">Paid</TableHead>
+                <TableHead className="text-right">Credit</TableHead>
                 <TableHead className="print:hidden">Remarks</TableHead>
                 <TableHead className="print:hidden">Book/Page</TableHead>
                 <TableHead className="w-24 text-right print:hidden">Actions</TableHead>
@@ -278,8 +295,12 @@ export function SalesPage() {
             </TableHeader>
             <TableBody>
               {visibleRows.map((row) => (
-                <TableRow key={row.id} className={cn(editingSale?.id === row.id && "bg-accent/70", row.gstEnabled && "bg-red-50 hover:bg-red-100", "print:border-b print:border-gray-200")}>
-                  <TableCell className="print:hidden">
+                <TableRow key={row.id} className={cn(
+                  editingSale?.id === row.id && "bg-accent/70",
+                  row.gstEnabled ? "bg-red-50 hover:bg-red-100 dark:bg-red-950/30 dark:hover:bg-red-900/40" : "bg-background hover:bg-muted/50",
+                  "print:border-b print:border-gray-200 group"
+                )}>
+                  <TableCell className="print:hidden sm:sticky sm:left-0 z-10 bg-inherit w-[70px] min-w-[70px] max-w-[70px] group-hover:bg-accent/50">
                     {row.gstEnabled ? (
                       <span className="inline-flex items-center gap-1 rounded-md bg-red-600 px-2.5 py-1 text-xs font-bold text-white shadow-sm ring-2 ring-red-400/50 animate-pulse">
                         GST
@@ -289,10 +310,10 @@ export function SalesPage() {
                       <span className="text-muted-foreground text-xs">—</span>
                     )}
                   </TableCell>
-                  <TableCell>{formatDate(row.saleDate)}</TableCell>
+                  <TableCell className="sm:sticky sm:left-[70px] z-10 bg-inherit w-[110px] min-w-[110px] max-w-[110px] print:static print:w-auto group-hover:bg-accent/50">{formatDate(row.saleDate)}</TableCell>
                   <TableCell>{new Date(row.createdAt).toLocaleTimeString("en-IN", { hour: "2-digit", minute: "2-digit" })}</TableCell>
-                  <TableCell>{row.vehicleNumber}</TableCell>
-                  <TableCell>{row.partyName}</TableCell>
+                  <TableCell className="sm:sticky sm:left-[180px] z-10 bg-inherit w-[130px] min-w-[130px] max-w-[130px] print:static print:w-auto group-hover:bg-accent/50">{row.vehicleNumber}</TableCell>
+                  <TableCell className="sm:sticky sm:left-[310px] z-10 bg-inherit w-[150px] min-w-[150px] max-w-[150px] print:static print:w-auto sm:border-r border-border group-hover:bg-accent/50 truncate" title={row.partyName}>{row.partyName}</TableCell>
                   <TableCell>{row.materialName}</TableCell>
                   <TableCell className="number-cell">{formatQty(row.qty, "")}</TableCell>
                   <TableCell className="number-cell">{formatCurrency(row.ratePerCft)}</TableCell>
@@ -301,6 +322,10 @@ export function SalesPage() {
                     {row.discountType === "percentage" ? `${row.discountValue}%` : formatCurrency(row.discountValue)}
                   </TableCell>
                   <TableCell className="number-cell font-medium">{formatCurrency(row.finalAmount)}</TableCell>
+                  <TableCell className="number-cell">{(row.cashPaid ?? 0) > 0 ? formatCurrency(row.cashPaid ?? 0) : <span className="text-muted-foreground">—</span>}</TableCell>
+                  <TableCell className="number-cell">{((row.bankPaid ?? 0) + (row.gPayPaid ?? 0)) > 0 ? formatCurrency((row.bankPaid ?? 0) + (row.gPayPaid ?? 0)) : <span className="text-muted-foreground">—</span>}</TableCell>
+                  <TableCell className="number-cell font-medium">{(row.paidTotal ?? 0) > 0 ? formatCurrency(row.paidTotal ?? 0) : <span className="text-muted-foreground">—</span>}</TableCell>
+                  <TableCell className={cn("number-cell", (row.remainingCredit ?? 0) > 0 && "text-red-600 font-semibold dark:text-red-400")}>{(row.remainingCredit ?? 0) > 0 ? formatCurrency(row.remainingCredit ?? 0) : <span className="text-muted-foreground">—</span>}</TableCell>
                   <TableCell className="max-w-44 truncate print:hidden">{row.remarks}</TableCell>
                   <TableCell className="tabular-nums text-muted-foreground print:hidden">
                     {row.bookNumber && row.pageNumber ? `${row.bookNumber}/${row.pageNumber}` : row.bookNumber || row.pageNumber || "-"}
@@ -331,7 +356,7 @@ export function SalesPage() {
               ))}
               {!visibleRows.length ? (
                 <TableRow>
-                  <TableCell colSpan={14} className="h-24 text-center text-muted-foreground">
+                  <TableCell colSpan={18} className="h-24 text-center text-muted-foreground">
                     No sales found.
                   </TableCell>
                 </TableRow>
@@ -358,14 +383,16 @@ function SortableHead({
   active,
   alignRight,
   onClick,
+  className,
 }: {
   label: string;
   active: boolean;
   alignRight?: boolean;
   onClick: () => void;
+  className?: string;
 }) {
   return (
-    <TableHead className={alignRight ? "text-right" : undefined}>
+    <TableHead className={cn(alignRight ? "text-right" : "", className)}>
       <button
         type="button"
         className={cn("inline-flex items-center gap-1", alignRight && "justify-end")}

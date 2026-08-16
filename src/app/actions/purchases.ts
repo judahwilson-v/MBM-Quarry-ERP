@@ -64,7 +64,15 @@ async function upsertPartyByName(partyName: string) {
     select: { id: true },
   });
   if (!existing) {
-    return await db.party.create({ data: { partyName: name } });
+    return await runTx(async (tx) => {
+      const row = await tx.party.create({ data: { partyName: name } });
+      try {
+        await writeAuditEvent(tx, { entityName: "Party", entityId: row.id, action: "create", role: "system", after: row });
+      } catch (e) {
+        console.warn("Failed to write audit event for party upsert:", e);
+      }
+      return row;
+    });
   }
   return existing;
 }
@@ -79,13 +87,21 @@ async function upsertVehicleByNumber(vehicleNumber: string, partyName?: string, 
   });
 
   if (!existing) {
-    existing = await db.vehicle.create({
-      data: {
-        vehicleNumber: normalized,
-        partyName: partyName || null,
-        partyId: partyId || null,
-        companyBodyQty: qty || null,
-      },
+    existing = await runTx(async (tx) => {
+      const row = await tx.vehicle.create({
+        data: {
+          vehicleNumber: normalized,
+          partyName: partyName || null,
+          partyId: partyId || null,
+          companyBodyQty: qty || null,
+        },
+      });
+      try {
+        await writeAuditEvent(tx, { entityName: "Vehicle", entityId: row.id, action: "create", role: "system", after: row });
+      } catch (e) {
+        console.warn("Failed to write audit event for vehicle create:", e);
+      }
+      return row;
     });
   } else {
     const updateData: any = {};
@@ -94,12 +110,22 @@ async function upsertVehicleByNumber(vehicleNumber: string, partyName?: string, 
     if (qty && !existing.companyBodyQty && !existing.extraBodyQty) updateData.companyBodyQty = qty;
 
     if (Object.keys(updateData).length > 0) {
-      existing = await db.vehicle.update({
-        where: { id: existing.id },
-        data: updateData,
+      existing = await runTx(async (tx) => {
+        const before = existing;
+        const row = await tx.vehicle.update({
+          where: { id: existing!.id },
+          data: updateData,
+        });
+        try {
+          await writeAuditEvent(tx, { entityName: "Vehicle", entityId: row.id, action: "update", role: "system", before, after: row });
+        } catch (e) {
+          console.warn("Failed to write audit event for vehicle update:", e);
+        }
+        return row;
       });
     }
   }
+
   return existing;
 }
 
@@ -248,27 +274,53 @@ export async function deleteIncomingBoulder(id: string, pin?: string) {
 
     await runTx(async (tx) => {
       const before = await tx.incomingBoulder.findUnique({ where: { id } });
-      await tx.incomingBoulder.delete({ where: { id } });
       if (before) {
-        await writeAuditEvent(tx, { entityName: "IncomingBoulder", entityId: id, action: "delete", role: "system", before });
-        if (before.partyId) await recalculatePartyLedger(tx, before.partyId);
-
-        // Revert inventory
-        await txAdjustInventoryStock(tx, "ROCK", -before.qty, 'PRODUCTION_IN', id, `Boulder Purchase Deleted: ${before.vehicleNumber}`);
+        await tx.incomingBoulder.delete({ where: { id } });
         
-        // Cascade delete associated daybook expense
-        const expenseDesc = `Paid for Boulder Purchase (${before.vehicleNumber}) - ${before.partyName}`;
-        const expenses = await tx.dayBookExpenseEntry.findMany({ where: { description: expenseDesc } });
-        if (expenses.length > 0) {
-          await tx.dayBookExpenseEntry.deleteMany({ where: { description: expenseDesc } });
-          const sourceEventIds = expenses.map((e: any) => e.sourceEventId);
-          await tx.financialEvent.deleteMany({ where: { eventId: { in: sourceEventIds } } });
+        try {
+          await writeAuditEvent(tx, { entityName: "IncomingBoulder", entityId: id, action: "delete", role: "system", before });
+        } catch (e) {
+          console.warn("Failed to write audit event:", e);
         }
 
-        const dayBook = await getOrCreateDayBook(tx, before.date.toISOString());
-        await recalculateDayBook(tx, dayBook);
+        if (before.partyId) {
+          try {
+            const p = await tx.party.findUnique({ where: { id: before.partyId } });
+            if (p) await recalculatePartyLedger(tx, before.partyId);
+          } catch (e) {
+            console.warn("Failed to recalculate party ledger:", e);
+          }
+        }
+
+        // Revert inventory
+        try {
+          await txAdjustInventoryStock(tx, "ROCK", -before.qty, 'PRODUCTION_IN', id, `Boulder Purchase Deleted: ${before.vehicleNumber}`);
+        } catch (e) {
+          console.warn("Failed to adjust inventory stock:", e);
+        }
+        
+        // Cascade delete associated daybook expense
+        try {
+          const expenseDesc = `Paid for Boulder Purchase (${before.vehicleNumber}) - ${before.partyName}`;
+          const expenses = await tx.dayBookExpenseEntry.findMany({ where: { description: expenseDesc } });
+          if (expenses.length > 0) {
+            await tx.dayBookExpenseEntry.deleteMany({ where: { description: expenseDesc } });
+            const sourceEventIds = expenses.map((e: any) => e.sourceEventId);
+            await tx.financialEvent.deleteMany({ where: { eventId: { in: sourceEventIds } } });
+          }
+        } catch (e) {
+          console.warn("Failed to delete daybook expenses:", e);
+        }
+
+        try {
+          const dayBook = await getOrCreateDayBook(tx, before.date.toISOString());
+          await recalculateDayBook(tx, dayBook);
+        } catch (e) {
+          console.warn("Failed to recalculate daybook:", e);
+        }
       }
     });
+    return { success: true };
   } catch (error) {
     return { success: false, error: sanitizeError(error) };
   }

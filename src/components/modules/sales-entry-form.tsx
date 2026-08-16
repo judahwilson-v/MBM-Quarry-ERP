@@ -118,7 +118,7 @@ export function SalesEntryForm({
   const [message, setMessage] = useState("");
   const [error, setError] = useState("");
   const [isSubmitting, setIsSubmitting] = useState(false);
-  const { promptPassword } = usePrompt();
+  const { promptPassword, confirmAction } = usePrompt();
 
   const loadMasters = useCallback(async () => {
     try {
@@ -219,7 +219,12 @@ export function SalesEntryForm({
 
   function selectVehicle(vehicleId: string) {
     const vehicle = vehicles.find((row) => row.id === vehicleId);
-    const defaultQty = vehicle?.companyBodyQty ?? vehicle?.extraBodyQty ?? null;
+    let defaultQty = null;
+    if (vehicle?.companyBodyQty && vehicle.companyBodyQty > 0) {
+      defaultQty = vehicle.companyBodyQty;
+    } else if (vehicle?.extraBodyQty && vehicle.extraBodyQty > 0) {
+      defaultQty = vehicle.extraBodyQty;
+    }
     setForm((current) => ({
       ...current,
       vehicleId,
@@ -259,7 +264,7 @@ export function SalesEntryForm({
         );
         
         if (isDuplicate) {
-          const proceed = window.confirm(
+          const proceed = await confirmAction(
             `Warning: Book Number ${form.bookNumber} / Page ${form.pageNumber} already exists in the database!\n\nAre you sure you want to proceed and save a duplicate or overwrite?`
           );
           if (!proceed) {
@@ -405,22 +410,68 @@ export function SalesEntryForm({
               placeholder="0"
             />
           </Field>
-          <Field label="Qty (CFT)" htmlFor="qty">
-            <Input
-              id="qty"
-              className="text-right tabular-nums"
-              type="number"
-              step="0.001"
-              value={form.qty}
-              onChange={(e) => updateForm("qty", e.target.value)}
-            />
-          </Field>
+          <div className="space-y-2">
+            <Field label="Qty (CFT)" htmlFor="qty">
+              <Input
+                id="qty"
+                className="text-right tabular-nums"
+                type="number"
+                step="0.001"
+                value={form.qty}
+                onChange={(e) => updateForm("qty", e.target.value)}
+              />
+            </Field>
+            {(() => {
+              const vehicle = vehicles.find(v => v.id === form.vehicleId);
+              if (!vehicle || (!vehicle.companyBodyQty && !vehicle.extraBodyQty)) return null;
+              
+              return (
+                <div className="flex flex-wrap gap-2 mt-2">
+                  {vehicle.companyBodyQty ? (
+                    <button 
+                      type="button" 
+                      onClick={() => {
+                        updateForm("qty", String(vehicle.companyBodyQty));
+                        updateForm("quantityReason", "");
+                      }}
+                      className={`px-3 py-1.5 text-xs font-medium rounded-md border transition-colors ${Number(form.qty) === vehicle.companyBodyQty ? 'bg-primary text-primary-foreground border-primary shadow-sm' : 'bg-background text-muted-foreground border-input hover:bg-accent hover:text-accent-foreground'}`}
+                    >
+                      🚛 Company: {vehicle.companyBodyQty} CFT
+                    </button>
+                  ) : null}
+                  {vehicle.extraBodyQty ? (
+                    <button 
+                      type="button" 
+                      onClick={() => {
+                        updateForm("qty", String(vehicle.extraBodyQty));
+                        updateForm("quantityReason", "");
+                      }}
+                      className={`px-3 py-1.5 text-xs font-medium rounded-md border transition-colors ${Number(form.qty) === vehicle.extraBodyQty ? 'bg-primary text-primary-foreground border-primary shadow-sm' : 'bg-background text-muted-foreground border-input hover:bg-accent hover:text-accent-foreground'}`}
+                    >
+                      📦 Extra: {vehicle.extraBodyQty} CFT
+                    </button>
+                  ) : null}
+                </div>
+              );
+            })()}
+          </div>
 
           {/* Quantity Reason if changed */}
           {(() => {
             const vehicle = vehicles.find(v => v.id === form.vehicleId);
-            const defaultQty = vehicle?.companyBodyQty ?? vehicle?.extraBodyQty ?? null;
-            const isChanged = defaultQty !== null && defaultQty > 0 && Number(form.qty) !== defaultQty;
+            if (!vehicle) return null;
+            const companyQty = vehicle.companyBodyQty ?? null;
+            const extraQty = vehicle.extraBodyQty ?? null;
+            
+            const hasCompany = companyQty !== null && companyQty > 0;
+            const hasExtra = extraQty !== null && extraQty > 0;
+            const hasDefault = hasCompany || hasExtra;
+            
+            const currentQty = Number(form.qty);
+            const isCompany = hasCompany && currentQty === companyQty;
+            const isExtra = hasExtra && currentQty === extraQty;
+            
+            const isChanged = hasDefault && currentQty > 0 && !isCompany && !isExtra;
             if (!isChanged) return null;
             return (
               <Field label="Quantity Reason (Required)" className="xl:col-span-4" htmlFor="quantityReason">
@@ -471,7 +522,7 @@ export function SalesEntryForm({
                 <span className="ms-3 text-sm font-medium">{form.gstEnabled ? "GST Enabled" : "No GST"}</span>
               </label>
               {form.gstEnabled && totals.gstAmount > 0 && (
-                <div className="flex items-center gap-2 rounded-md border border-red-200 bg-red-50 px-3 py-1 text-xs text-red-700 font-medium">
+                <div className="flex items-center gap-2 rounded-md border border-red-200 bg-red-50 px-3 py-1 text-xs text-red-700 font-medium dark:bg-red-950/30 dark:text-red-200 dark:border-red-900/50">
                   <span>SGST: {formatCurrency(totals.sgst)}</span>
                   <span>•</span>
                   <span>CGST: {formatCurrency(totals.cgst)}</span>
@@ -524,14 +575,22 @@ export function SalesEntryForm({
           </Field>
 
           {/* Row 5: Summary & Remarks */}
-          <Field label="Final Amount (₹)" className="xl:col-span-2" htmlFor="finalAmount">
-            <Input
-              id="finalAmount"
-              className="text-right tabular-nums font-bold text-xl text-emerald-500 bg-emerald-500/5 border-emerald-500/20 h-10"
-              readOnly
-              value={formatCurrency(totals.finalAmount)}
-            />
-          </Field>
+          <div className="xl:col-span-2 flex flex-col gap-2">
+            <Field label="Final Amount (₹)" htmlFor="finalAmount">
+              <Input
+                id="finalAmount"
+                className="text-right tabular-nums font-bold text-xl text-emerald-500 bg-emerald-500/5 border-emerald-500/20 h-10"
+                readOnly
+                value={formatCurrency(totals.finalAmount)}
+              />
+            </Field>
+            <div className="flex flex-wrap gap-1">
+              <Button type="button" variant="outline" size="sm" className="h-7 text-xs px-2 bg-green-50/50 hover:bg-green-100/50 text-green-700 border-green-200" onClick={() => setForm(f => ({ ...f, cashPaid: String(totals.finalAmount), bankPaid: "0", gPayPaid: "0" }))}>💵 Full Cash</Button>
+              <Button type="button" variant="outline" size="sm" className="h-7 text-xs px-2 bg-blue-50/50 hover:bg-blue-100/50 text-blue-700 border-blue-200" onClick={() => setForm(f => ({ ...f, cashPaid: "0", bankPaid: "0", gPayPaid: String(totals.finalAmount) }))}>📱 Full GPay</Button>
+              <Button type="button" variant="outline" size="sm" className="h-7 text-xs px-2 bg-purple-50/50 hover:bg-purple-100/50 text-purple-700 border-purple-200" onClick={() => setForm(f => ({ ...f, cashPaid: "0", bankPaid: String(totals.finalAmount), gPayPaid: "0" }))}>🏦 Full Bank</Button>
+              <Button type="button" variant="outline" size="sm" className="h-7 text-xs px-2 bg-amber-50/50 hover:bg-amber-100/50 text-amber-700 border-amber-200" onClick={() => setForm(f => ({ ...f, cashPaid: "0", bankPaid: "0", gPayPaid: "0" }))}>📝 Full Credit</Button>
+            </div>
+          </div>
           <Field label="Remarks" className="xl:col-span-2" htmlFor="remarks">
             <Input
               id="remarks"

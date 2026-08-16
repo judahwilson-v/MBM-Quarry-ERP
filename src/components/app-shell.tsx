@@ -34,12 +34,8 @@ const navItems = [
   { href: "/credit/list", label: "Party Ledger", icon: Banknote },
   { href: "/employees", label: "Employees", icon: UserCircle },
   { href: "/credit/other", label: "Other Credit", icon: CircleDollarSign },
-  { href: "/tally", label: "Tally Export", icon: FileJson },
-  { href: "/user-logs", label: "User Logs", icon: FileText },
   { href: "/fleet", label: "Fleet Maintenance", icon: Truck },
-  { href: "/sync", label: "Sync Dashboard", icon: RefreshCw },
-  { href: "/about", label: "About & Backup", icon: Info },
-  { href: "/settings", label: "Settings", icon: Settings },
+  { href: "/settings/general", label: "Settings", icon: Settings },
 ];
 
 const mobileItems = navItems.slice(0, 5);

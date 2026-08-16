@@ -8,6 +8,8 @@ import { triggerAutoSync } from "@/lib/sync/auto-sync";
 import { writeAuditEvent } from "@/lib/domain";
 import { emitFinancialEvent } from "@/lib/domain/financial-events";
 import { projectDayBookExpense, recalculateDayBook } from "@/lib/domain/daybook";
+import { verifyEditPassword } from "@/app/actions/auth";
+import { sanitizeError } from "@/lib/utils/sanitize-error";
 
 export type EmployeeCreditInput = {
   id?: string;
@@ -111,12 +113,25 @@ export async function saveEmployeeCredit(input: EmployeeCreditInput) {
 }
 
 
-export async function deleteEmployeeCredit(id: string) {
-  await runTx(async (tx) => {
-    const before = await tx.employeeCredit.findUnique({ where: { id } });
-    await tx.employeeCredit.delete({ where: { id } });
-    if (before) await writeAuditEvent(tx, { entityName: "EmployeeCredit", entityId: id, action: "delete", role: "system", before });
-  });
+export async function deleteEmployeeCredit(id: string, pin?: string) {
+  try {
+    if (!pin || !(await verifyEditPassword(pin, "delete"))) {
+      throw new Error("Invalid delete PIN");
+    }
+    await runTx(async (tx) => {
+      const before = await tx.employeeCredit.findUnique({ where: { id } });
+      if (!before) return;
+      await tx.employeeCredit.delete({ where: { id } });
+      try {
+        await writeAuditEvent(tx, { entityName: "EmployeeCredit", entityId: id, action: "delete", role: "system", before });
+      } catch (e) {
+        console.warn("Failed to write audit event for employee credit:", e);
+      }
+    });
+    return { success: true };
+  } catch (error) {
+    return { success: false, error: sanitizeError(error) };
+  }
 }
 
 
@@ -130,7 +145,6 @@ export async function listEmployees() {
 
 
 export async function saveEmployee(input: any) {
-  const db = await getDb();
   const data = {
     name: input.name,
     phone: input.phone || null,
@@ -139,19 +153,49 @@ export async function saveEmployee(input: any) {
   };
   
   if (input.id) {
-    const row = await db.employee.update({ where: { id: input.id }, data });
-    return serialize(row);
+    return serialize(await runTx(async (tx) => {
+      const before = await tx.employee.findUnique({ where: { id: input.id } });
+      const row = await tx.employee.update({ where: { id: input.id }, data });
+      try {
+        await writeAuditEvent(tx, { entityName: "Employee", entityId: row.id, action: "update", role: "system", before, after: row });
+      } catch (e) {
+        console.warn("Failed to write audit event for employee update:", e);
+      }
+      return row;
+    }));
   } else {
-    const row = await db.employee.create({ data });
-    return serialize(row);
+    return serialize(await runTx(async (tx) => {
+      const row = await tx.employee.create({ data });
+      try {
+        await writeAuditEvent(tx, { entityName: "Employee", entityId: row.id, action: "create", role: "system", after: row });
+      } catch (e) {
+        console.warn("Failed to write audit event for employee create:", e);
+      }
+      return row;
+    }));
   }
 }
 
 
-export async function deleteEmployee(id: string) {
-  const db = await getDb();
-  await db.employee.delete({ where: { id } });
-  return true;
+export async function deleteEmployee(id: string, pin?: string) {
+  try {
+    if (!pin || !(await verifyEditPassword(pin, "delete"))) {
+      throw new Error("Invalid delete PIN");
+    }
+    await runTx(async (tx) => {
+      const before = await tx.employee.findUnique({ where: { id } });
+      if (!before) return;
+      await tx.employee.delete({ where: { id } });
+      try {
+        await writeAuditEvent(tx, { entityName: "Employee", entityId: id, action: "delete", role: "system", before });
+      } catch (e) {
+        console.warn("Failed to write audit event for employee:", e);
+      }
+    });
+    return { success: true };
+  } catch (error) {
+    return { success: false, error: sanitizeError(error) };
+  }
 }
 
 export type EmployeeLedgerInput = {

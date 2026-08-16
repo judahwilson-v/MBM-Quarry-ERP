@@ -134,9 +134,9 @@ export function UserLogsViewer() {
           ) : logs.length === 0 ? (
             <p className="text-sm text-muted-foreground py-8 text-center">No audit logs found for the selected filters.</p>
           ) : (
-            <div className="overflow-x-auto">
+            <div className="overflow-x-auto overflow-y-auto max-h-[calc(100vh-[350px])] sm:max-h-[60vh]">
               <table className="w-full text-sm">
-                <thead>
+                <thead className="sticky top-0 z-10 bg-background shadow-sm print:relative print:shadow-none print:z-0">
                   <tr className="border-b text-left">
                     <th className="pb-2 pr-4 font-medium text-muted-foreground">Time</th>
                     <th className="pb-2 pr-4 font-medium text-muted-foreground">Action</th>
@@ -154,7 +154,7 @@ export function UserLogsViewer() {
                         })}
                       </td>
                       <td className="py-2.5 pr-4">
-                        <span className={`inline-block px-2 py-0.5 rounded text-xs font-medium capitalize ${ACTION_STYLES[log.action] || "bg-gray-100 text-gray-700"}`}>
+                        <span className={`inline-block px-2 py-0.5 rounded text-xs font-medium capitalize ${ACTION_STYLES[log.action] || "bg-gray-100 text-gray-700 dark:bg-gray-800 dark:text-gray-300"}`}>
                           {log.action}
                         </span>
                       </td>

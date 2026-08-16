@@ -33,7 +33,7 @@ export function LoginForm() {
   return (
     <form className="mt-8 space-y-6" onSubmit={handleLogin}>
       {error && (
-        <div className="rounded-md bg-red-50 p-4 text-sm text-red-700">
+        <div className="rounded-md bg-red-50 p-4 text-sm text-red-700 dark:bg-red-950/30 dark:text-red-200">
           {error}
         </div>
       )}
@@ -46,7 +46,7 @@ export function LoginForm() {
             type="email"
             autoComplete="email"
             required
-            className="relative block w-full rounded-t-md border-0 py-1.5 text-gray-900 ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:z-10 focus:ring-2 focus:ring-inset focus:ring-primary sm:text-sm sm:leading-6"
+            className="relative block w-full rounded-t-md border-0 py-1.5 text-gray-900 ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:z-10 focus:ring-2 focus:ring-inset focus:ring-primary sm:text-sm sm:leading-6 dark:bg-background dark:text-gray-100 dark:ring-gray-700 dark:placeholder:text-gray-500"
             placeholder="Email address"
             value={email}
             onChange={(e) => setEmail(e.target.value)}
@@ -60,7 +60,7 @@ export function LoginForm() {
             type="password"
             autoComplete="current-password"
             required
-            className="relative block w-full rounded-b-md border-0 py-1.5 text-gray-900 ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:z-10 focus:ring-2 focus:ring-inset focus:ring-primary sm:text-sm sm:leading-6"
+            className="relative block w-full rounded-b-md border-0 py-1.5 text-gray-900 ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:z-10 focus:ring-2 focus:ring-inset focus:ring-primary sm:text-sm sm:leading-6 dark:bg-background dark:text-gray-100 dark:ring-gray-700 dark:placeholder:text-gray-500"
             placeholder="Password"
             value={password}
             onChange={(e) => setPassword(e.target.value)}

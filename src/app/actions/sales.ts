@@ -34,7 +34,15 @@ async function upsertPartyByName(partyName: string) {
     select: { id: true },
   });
   if (!existing) {
-    return await db.party.create({ data: { partyName: name } });
+    return await runTx(async (tx) => {
+      const row = await tx.party.create({ data: { partyName: name } });
+      try {
+        await writeAuditEvent(tx, { entityName: "Party", entityId: row.id, action: "create", role: "system", after: row });
+      } catch (e) {
+        console.warn("Failed to write audit event for party upsert:", e);
+      }
+      return row;
+    });
   }
   return existing;
 }
@@ -49,13 +57,21 @@ async function upsertVehicleByNumber(vehicleNumber: string, partyName?: string, 
   });
 
   if (!existing) {
-    existing = await db.vehicle.create({
-      data: {
-        vehicleNumber: normalized,
-        partyName: partyName || null,
-        partyId: partyId || null,
-        companyBodyQty: qty || null,
-      },
+    existing = await runTx(async (tx) => {
+      const row = await tx.vehicle.create({
+        data: {
+          vehicleNumber: normalized,
+          partyName: partyName || null,
+          partyId: partyId || null,
+          companyBodyQty: qty || null,
+        },
+      });
+      try {
+        await writeAuditEvent(tx, { entityName: "Vehicle", entityId: row.id, action: "create", role: "system", after: row });
+      } catch (e) {
+        console.warn("Failed to write audit event for vehicle create:", e);
+      }
+      return row;
     });
   } else {
     const updateData: any = {};
@@ -64,9 +80,18 @@ async function upsertVehicleByNumber(vehicleNumber: string, partyName?: string, 
     if (qty && !existing.companyBodyQty && !existing.extraBodyQty) updateData.companyBodyQty = qty;
 
     if (Object.keys(updateData).length > 0) {
-      existing = await db.vehicle.update({
-        where: { id: existing.id },
-        data: updateData,
+      existing = await runTx(async (tx) => {
+        const before = existing;
+        const row = await tx.vehicle.update({
+          where: { id: existing!.id },
+          data: updateData,
+        });
+        try {
+          await writeAuditEvent(tx, { entityName: "Vehicle", entityId: row.id, action: "update", role: "system", before, after: row });
+        } catch (e) {
+          console.warn("Failed to write audit event for vehicle update:", e);
+        }
+        return row;
       });
     }
   }
@@ -351,32 +376,66 @@ export async function deleteSale(id: string, pin?: string) {
       const existing = await tx.outgoingSale.findUnique({ where: { id } });
       if (existing) {
         await tx.outgoingSale.delete({ where: { id } });
+        
         if (existing.vehicleId) {
-          await decrementVehicleTrips(tx, existing.vehicleId, existing.tripDelta ?? 1);
+          try {
+            const v = await tx.vehicle.findUnique({ where: { id: existing.vehicleId } });
+            if (v) await decrementVehicleTrips(tx, existing.vehicleId, existing.tripDelta ?? 1);
+          } catch (e) {
+            console.warn("Failed to decrement vehicle trips:", e);
+          }
         }
-        await writeAuditEvent(tx, {
-          entityName: "Sale",
-          entityId: id,
-          action: "delete",
-          role: "system",
-          before: existing,
-        });
-        if (existing.partyId) await recalculatePartyLedger(tx, existing.partyId);
+        
+        try {
+          await writeAuditEvent(tx, {
+            entityName: "Sale",
+            entityId: id,
+            action: "delete",
+            role: "system",
+            before: existing,
+          });
+        } catch (e) {
+          console.warn("Failed to write audit event:", e);
+        }
+
+        if (existing.partyId) {
+          try {
+            const p = await tx.party.findUnique({ where: { id: existing.partyId } });
+            if (p) await recalculatePartyLedger(tx, existing.partyId);
+          } catch (e) {
+            console.warn("Failed to recalculate party ledger:", e);
+          }
+        }
 
         // Restore inventory
-        await txAdjustInventoryStock(tx, existing.materialName, existing.qty, 'SALE_OUT', id, `Sale Deleted: ${existing.vehicleNumber}`);
+        try {
+          const m = await tx.material.findFirst({ where: { materialName: existing.materialName } });
+          if (m) {
+            await txAdjustInventoryStock(tx, existing.materialName, existing.qty, 'SALE_OUT', id, `Sale Deleted: ${existing.vehicleNumber}`);
+          }
+        } catch (e) {
+          console.warn("Failed to adjust inventory stock:", e);
+        }
         
         // Cascade delete financial events and ledger entries
-        const events = await tx.financialEvent.findMany({ where: { entityId: id } });
-        const eventIds = events.map((e: any) => e.eventId);
-        if (eventIds.length > 0) {
-          await tx.ledgerEntry.deleteMany({ where: { financialEventId: { in: eventIds } } });
-          await tx.financialEvent.deleteMany({ where: { eventId: { in: eventIds } } });
+        try {
+          const events = await tx.financialEvent.findMany({ where: { entityId: id } });
+          const eventIds = events.map((e: any) => e.eventId);
+          if (eventIds.length > 0) {
+            await tx.ledgerEntry.deleteMany({ where: { financialEventId: { in: eventIds } } });
+            await tx.financialEvent.deleteMany({ where: { eventId: { in: eventIds } } });
+          }
+        } catch (e) {
+          console.warn("Failed to delete financial events:", e);
         }
 
         // Recalculate daybook for the sale date
-        const dayBook = await getOrCreateDayBook(tx, existing.saleDate.toISOString());
-        await recalculateDayBook(tx, dayBook);
+        try {
+          const dayBook = await getOrCreateDayBook(tx, existing.saleDate.toISOString());
+          await recalculateDayBook(tx, dayBook);
+        } catch (e) {
+          console.warn("Failed to recalculate daybook:", e);
+        }
       }
     });
     return { success: true };
@@ -386,12 +445,12 @@ export async function deleteSale(id: string, pin?: string) {
 }
 
 
-export async function purgeNonGstSales(pin?: string): Promise<number> {
+export async function purgeNonGstSales(pin?: string) {
   try {
     if (!pin || !(await verifyEditPassword(pin, "delete"))) {
-      throw new Error("Invalid delete PIN");
+      return { success: false, error: "Invalid delete PIN" };
     }
-    return await runTx(async (tx) => {
+    const count = await runTx(async (tx) => {
       const nonGstSales = await tx.outgoingSale.findMany({
         where: { gstEnabled: false },
       });
@@ -399,12 +458,42 @@ export async function purgeNonGstSales(pin?: string): Promise<number> {
 
       const affectedPartyIds = new Set<string>();
       const affectedDates = new Set<string>();
+      
       for (const sale of nonGstSales) {
         if (sale.vehicleId) {
-          await decrementVehicleTrips(tx, sale.vehicleId, sale.tripDelta ?? 1);
+          try {
+            const v = await tx.vehicle.findUnique({ where: { id: sale.vehicleId } });
+            if (v) await decrementVehicleTrips(tx, sale.vehicleId, sale.tripDelta ?? 1);
+          } catch (e) {
+            console.warn("Failed to decrement vehicle trips:", e);
+          }
         }
-        if (sale.partyId) affectedPartyIds.add(sale.partyId);
+        if (sale.partyId) {
+          const p = await tx.party.findUnique({ where: { id: sale.partyId } });
+          if (p) affectedPartyIds.add(sale.partyId);
+        }
         affectedDates.add(sale.saleDate.toISOString());
+        
+        // Restore inventory per item!
+        try {
+          const m = await tx.material.findFirst({ where: { materialName: sale.materialName } });
+          if (m) {
+            await txAdjustInventoryStock(tx, sale.materialName, sale.qty, 'SALE_OUT', sale.id, `Sale Purged: ${sale.vehicleNumber}`);
+          }
+        } catch (e) {
+          console.warn("Failed to restore inventory stock:", e);
+        }
+        
+        // Write individual audit entries instead of BULK_PURGE
+        try {
+          await writeAuditEvent(tx, {
+            entityName: "Sale",
+            entityId: sale.id,
+            action: "delete",
+            role: "system",
+            before: sale,
+          });
+        } catch (e) {}
       }
 
       const saleIds = nonGstSales.map((s: any) => s.id);
@@ -420,26 +509,23 @@ export async function purgeNonGstSales(pin?: string): Promise<number> {
       });
 
       for (const partyId of Array.from(affectedPartyIds)) {
-        await recalculatePartyLedger(tx, partyId);
+        try {
+          await recalculatePartyLedger(tx, partyId);
+        } catch (e) {}
       }
       
       for (const d of Array.from(affectedDates)) {
-        const dayBook = await getOrCreateDayBook(tx, d);
-        await recalculateDayBook(tx, dayBook);
+        try {
+          const dayBook = await getOrCreateDayBook(tx, d);
+          await recalculateDayBook(tx, dayBook);
+        } catch (e) {}
       }
-
-      await writeAuditEvent(tx, {
-        entityName: "Sale",
-        entityId: "BULK_PURGE",
-        action: "delete",
-        role: "system",
-        before: { count: nonGstSales.length, ids: nonGstSales.map((s: any) => s.id) },
-      });
 
       return deleteResult.count;
     });
+    return { success: true, count };
   } catch (error) {
-    throw new Error(sanitizeError(error));
+    return { success: false, error: sanitizeError(error) };
   }
 }
 

@@ -14,7 +14,7 @@ import { SearchableSelect } from "@/components/ui/searchable-select";
 import { listIncomingBoulder, saveIncomingBoulder, deleteIncomingBoulder } from "@/app/actions/purchases";
 import { checkDuplicateSaleBookNumber as checkDuplicateBookNumber, getLastBookPage } from "@/app/actions/sales";
 import { listVehicles } from "@/app/actions/vehicles";
-import { formatCurrency, formatDate, formatQty, todayInputValue } from "@/lib/utils";
+import { cn, formatCurrency, formatDate, formatQty, todayInputValue } from "@/lib/utils";
 import { exportToExcel } from "@/lib/export";
 
 type BoulderRow = {
@@ -37,6 +37,7 @@ type BoulderRow = {
   remainingCredit: number;
   vehicleRent: number;
   combinedPayment: boolean;
+  settled: boolean;
   createdAt: string;
 };
 
@@ -45,7 +46,6 @@ function blankForm() {
   return {
     id: "",
     date: todayInputValue(),
-    time: now.toTimeString().slice(0, 5),
     bookNumber: "",
     pageNumber: "",
     vehicleId: "",
@@ -159,7 +159,7 @@ export function BoulderPurchasesPage() {
         );
         
         if (isDuplicate) {
-          const proceed = window.confirm(
+          const proceed = await confirmAction(
             `Warning: Book Number ${form.bookNumber} / Page ${form.pageNumber} already exists in the database!\n\nAre you sure you want to proceed and save a duplicate or overwrite?`
           );
           if (!proceed) {
@@ -212,30 +212,36 @@ export function BoulderPurchasesPage() {
 
       return {
         Date: formatDate(row.date),
-        Time: row.time || "-",
         "Book/Page": row.bookNumber && row.pageNumber ? `${row.bookNumber}/${row.pageNumber}` : row.bookNumber || row.pageNumber || "-",
         Vehicle: row.vehicleNumber,
         Supplier: row.partyName,
         Qty: row.qty,
         Rate: row.rockRate,
         Amount: row.amount,
-        Paid: row.paidTotal,
-        Credit: row.remainingCredit,
+        "Cash Paid": row.cashPaid,
+        "Bank/GPay": row.bankPaid + row.gPayPaid,
+        "Rent": row.vehicleRent,
+        "Paid": row.paidTotal,
+        "Credit": row.remainingCredit,
+        "Settled": row.settled ? "Yes" : "No",
         Remarks: row.remarks || "-"
       };
     });
     
     excelData.push({
       Date: "TOTAL",
-      Time: "",
       "Book/Page": "",
       Vehicle: "",
       Supplier: "",
       Qty: totalQty,
       Rate: "",
       Amount: totalAmount,
+      "Cash Paid": "",
+      "Bank/GPay": "",
+      "Rent": "",
       Paid: totalPaid,
       Credit: totalCredit,
+      Settled: "",
       Remarks: ""
     });
 
@@ -278,9 +284,6 @@ export function BoulderPurchasesPage() {
             <Field label="Date" htmlFor="date">
               <Input id="date" type="date" value={form.date} onChange={(event) => setForm((current) => ({ ...current, date: event.target.value }))} />
             </Field>
-            <Field label="Time" htmlFor="time">
-              <Input id="time" type="time" value={form.time} onChange={(event) => setForm((current) => ({ ...current, time: event.target.value }))} />
-            </Field>
             <Field label="Book No" htmlFor="bookNumber">
               <Input id="bookNumber" type="number" min="1" value={form.bookNumber} onChange={(event) => setForm((current) => ({ ...current, bookNumber: event.target.value }))} />
             </Field>
@@ -303,16 +306,45 @@ export function BoulderPurchasesPage() {
             <Field label="Party Name" htmlFor="partyName">
               <Input id="partyName" value={form.partyName} onChange={(event) => setForm((current) => ({ ...current, partyName: event.target.value }))} />
             </Field>
-            <Field label="Qty" htmlFor="qty">
-              <Input
-                id="qty"
-                className="text-right tabular-nums"
-                type="number"
-                step="0.001"
-                value={form.qty}
-                onChange={(event) => setForm((current) => ({ ...current, qty: event.target.value }))}
-              />
-            </Field>
+            <div className="space-y-2">
+              <Field label="Qty" htmlFor="qty">
+                <Input
+                  id="qty"
+                  className="text-right tabular-nums"
+                  type="number"
+                  step="0.001"
+                  value={form.qty}
+                  onChange={(event) => setForm((current) => ({ ...current, qty: event.target.value }))}
+                />
+              </Field>
+              {(() => {
+                const vehicle = vehicles.find(v => v.id === form.vehicleId);
+                if (!vehicle || (!vehicle.companyBodyQty && !vehicle.extraBodyQty)) return null;
+                
+                return (
+                  <div className="flex flex-wrap gap-2 mt-2">
+                    {vehicle.companyBodyQty ? (
+                      <button 
+                        type="button" 
+                        onClick={() => setForm((current) => ({ ...current, qty: String(vehicle.companyBodyQty) }))}
+                        className={`px-3 py-1.5 text-xs font-medium rounded-md border transition-colors ${Number(form.qty) === vehicle.companyBodyQty ? 'bg-primary text-primary-foreground border-primary shadow-sm' : 'bg-background text-muted-foreground border-input hover:bg-accent hover:text-accent-foreground'}`}
+                      >
+                        🚛 Company: {vehicle.companyBodyQty}
+                      </button>
+                    ) : null}
+                    {vehicle.extraBodyQty ? (
+                      <button 
+                        type="button" 
+                        onClick={() => setForm((current) => ({ ...current, qty: String(vehicle.extraBodyQty) }))}
+                        className={`px-3 py-1.5 text-xs font-medium rounded-md border transition-colors ${Number(form.qty) === vehicle.extraBodyQty ? 'bg-primary text-primary-foreground border-primary shadow-sm' : 'bg-background text-muted-foreground border-input hover:bg-accent hover:text-accent-foreground'}`}
+                      >
+                        📦 Extra: {vehicle.extraBodyQty}
+                      </button>
+                    ) : null}
+                  </div>
+                );
+              })()}
+            </div>
             <Field label="Rock Rate (₹)" htmlFor="rockRate">
               <Input
                 id="rockRate"
@@ -375,22 +407,30 @@ export function BoulderPurchasesPage() {
               <Textarea id="remarks" value={form.remarks} onChange={(event) => setForm((current) => ({ ...current, remarks: event.target.value }))} />
             </Field>
           </div>
-          <div className="flex gap-4 p-3 bg-muted/50 rounded-lg">
-            <div className="text-sm">
-              <span className="text-muted-foreground">Amount: </span>
-              <span className="font-semibold">{formatCurrency((Number(form.qty) || 0) * (Number(form.rockRate) || 0))}</span>
+          <div className="flex flex-col gap-2">
+            <div className="flex flex-wrap gap-1">
+              <Button type="button" variant="outline" size="sm" className="h-7 text-xs px-2 bg-green-50/50 hover:bg-green-100/50 text-green-700 border-green-200" onClick={() => setForm(f => ({ ...f, cashPaid: String((Number(f.qty) || 0) * (Number(f.rockRate) || 0)), bankPaid: "0", gPayPaid: "0" }))}>💵 Full Cash</Button>
+              <Button type="button" variant="outline" size="sm" className="h-7 text-xs px-2 bg-blue-50/50 hover:bg-blue-100/50 text-blue-700 border-blue-200" onClick={() => setForm(f => ({ ...f, cashPaid: "0", bankPaid: "0", gPayPaid: String((Number(f.qty) || 0) * (Number(f.rockRate) || 0)) }))}>📱 Full GPay</Button>
+              <Button type="button" variant="outline" size="sm" className="h-7 text-xs px-2 bg-purple-50/50 hover:bg-purple-100/50 text-purple-700 border-purple-200" onClick={() => setForm(f => ({ ...f, cashPaid: "0", bankPaid: String((Number(f.qty) || 0) * (Number(f.rockRate) || 0)), gPayPaid: "0" }))}>🏦 Full Bank</Button>
+              <Button type="button" variant="outline" size="sm" className="h-7 text-xs px-2 bg-amber-50/50 hover:bg-amber-100/50 text-amber-700 border-amber-200" onClick={() => setForm(f => ({ ...f, cashPaid: "0", bankPaid: "0", gPayPaid: "0" }))}>📝 Full Credit</Button>
             </div>
-            <div className="text-sm">
-              <span className="text-muted-foreground">Paid Total: </span>
-              <span className="font-semibold text-emerald-600">
-                {formatCurrency((Number(form.cashPaid) || 0) + (Number(form.bankPaid) || 0) + (Number(form.gPayPaid) || 0))}
-              </span>
-            </div>
-            <div className="text-sm">
-              <span className="text-muted-foreground">Credit Balance: </span>
-              <span className="font-semibold text-destructive">
-                {formatCurrency(((Number(form.qty) || 0) * (Number(form.rockRate) || 0)) - ((Number(form.cashPaid) || 0) + (Number(form.bankPaid) || 0) + (Number(form.gPayPaid) || 0)))}
-              </span>
+            <div className="flex gap-4 p-3 bg-muted/50 rounded-lg">
+              <div className="text-sm">
+                <span className="text-muted-foreground">Amount: </span>
+                <span className="font-semibold">{formatCurrency((Number(form.qty) || 0) * (Number(form.rockRate) || 0))}</span>
+              </div>
+              <div className="text-sm">
+                <span className="text-muted-foreground">Paid Total: </span>
+                <span className="font-semibold text-emerald-600">
+                  {formatCurrency((Number(form.cashPaid) || 0) + (Number(form.bankPaid) || 0) + (Number(form.gPayPaid) || 0))}
+                </span>
+              </div>
+              <div className="text-sm">
+                <span className="text-muted-foreground">Credit Balance: </span>
+                <span className="font-semibold text-destructive">
+                  {formatCurrency(((Number(form.qty) || 0) * (Number(form.rockRate) || 0)) - ((Number(form.cashPaid) || 0) + (Number(form.bankPaid) || 0) + (Number(form.gPayPaid) || 0)))}
+                </span>
+              </div>
             </div>
           </div>
           {error ? <p className="text-sm text-destructive">{error}</p> : null}
@@ -423,39 +463,52 @@ export function BoulderPurchasesPage() {
           </div>
         </CardHeader>
         <CardContent className="print:p-0">
-          <div className="overflow-x-auto rounded-md border print:border-none">
+          <div className="overflow-x-auto overflow-y-auto max-h-[calc(100vh-[350px])] sm:max-h-[60vh] rounded-md border print:border-none print:overflow-visible print:max-h-none">
           <Table>
-            <TableHeader className="bg-muted/50 print:bg-transparent print:border-b-2 print:border-black">
+            <TableHeader className="bg-muted/50 sticky top-0 z-10 shadow-sm print:bg-transparent print:border-b-2 print:border-black print:relative print:shadow-none">
               <TableRow>
-                <TableHead>Date</TableHead>
-                <TableHead>Time</TableHead>
-                <TableHead>Book/Page</TableHead>
-                <TableHead>Vehicle</TableHead>
-                <TableHead>Supplier</TableHead>
+                <TableHead className="sm:sticky sm:left-0 z-20 bg-muted/50 w-[110px] min-w-[110px] max-w-[110px] print:static print:w-auto">Date</TableHead>
+                <TableHead className="sm:sticky sm:left-[110px] z-20 bg-muted/50 w-[100px] min-w-[100px] max-w-[100px] print:static print:w-auto">Book/Page</TableHead>
+                <TableHead className="sm:sticky sm:left-[210px] z-20 bg-muted/50 w-[130px] min-w-[130px] max-w-[130px] print:static print:w-auto">Vehicle</TableHead>
+                <TableHead className="sm:sticky sm:left-[340px] z-20 bg-muted/50 w-[150px] min-w-[150px] max-w-[150px] print:static print:w-auto sm:border-r border-border">Supplier</TableHead>
                 <TableHead className="text-right">Qty</TableHead>
                 <TableHead className="text-right">Rate</TableHead>
                 <TableHead className="text-right">Amount</TableHead>
+                <TableHead className="text-right">Cash</TableHead>
+                <TableHead className="text-right">Bank/GPay</TableHead>
+                <TableHead className="text-right">Rent</TableHead>
                 <TableHead className="text-right">Paid</TableHead>
                 <TableHead className="text-right">Credit</TableHead>
+                <TableHead className="text-center">Settled</TableHead>
                 <TableHead>Remarks</TableHead>
                 <TableHead className="w-24 text-right print:hidden">Actions</TableHead>
               </TableRow>
             </TableHeader>
             <TableBody>
               {rows.map((row) => (
-                <TableRow key={row.id} className="print:border-b print:border-gray-200">
-                  <TableCell>{formatDate(row.date)}</TableCell>
-                  <TableCell>{row.time || "-"}</TableCell>
-                  <TableCell>
+                <TableRow key={row.id} className="print:border-b print:border-gray-200 group bg-background hover:bg-muted/50">
+                  <TableCell className="sm:sticky sm:left-0 z-10 bg-inherit w-[110px] min-w-[110px] max-w-[110px] print:static print:w-auto group-hover:bg-accent/50">{formatDate(row.date)}</TableCell>
+                  <TableCell className="sm:sticky sm:left-[110px] z-10 bg-inherit w-[100px] min-w-[100px] max-w-[100px] print:static print:w-auto group-hover:bg-accent/50">
                     {row.bookNumber && row.pageNumber ? `${row.bookNumber}/${row.pageNumber}` : row.bookNumber || row.pageNumber || "-"}
                   </TableCell>
-                  <TableCell>{row.vehicleNumber}</TableCell>
-                  <TableCell>{row.partyName}</TableCell>
+                  <TableCell className="sm:sticky sm:left-[210px] z-10 bg-inherit w-[130px] min-w-[130px] max-w-[130px] print:static print:w-auto group-hover:bg-accent/50">{row.vehicleNumber}</TableCell>
+                  <TableCell className="sm:sticky sm:left-[340px] z-10 bg-inherit w-[150px] min-w-[150px] max-w-[150px] print:static print:w-auto sm:border-r border-border group-hover:bg-accent/50 truncate" title={row.partyName}>{row.partyName}</TableCell>
                   <TableCell className="number-cell font-medium">{formatQty(row.qty, "")}</TableCell>
                   <TableCell className="number-cell text-muted-foreground">{formatCurrency(row.rockRate)}</TableCell>
                   <TableCell className="number-cell font-medium">{formatCurrency(row.amount)}</TableCell>
-                  <TableCell className="number-cell text-emerald-600">{formatCurrency(row.paidTotal)}</TableCell>
-                  <TableCell className="number-cell text-destructive">{formatCurrency(row.remainingCredit)}</TableCell>
+                  <TableCell className="number-cell">{(row.cashPaid ?? 0) > 0 ? formatCurrency(row.cashPaid ?? 0) : <span className="text-muted-foreground">—</span>}</TableCell>
+                  <TableCell className="number-cell">{((row.bankPaid ?? 0) + (row.gPayPaid ?? 0)) > 0 ? formatCurrency((row.bankPaid ?? 0) + (row.gPayPaid ?? 0)) : <span className="text-muted-foreground">—</span>}</TableCell>
+                  <TableCell className="number-cell">
+                    {(row.vehicleRent ?? 0) > 0 ? (
+                      <div className="flex flex-col items-end">
+                        <span>{formatCurrency(row.vehicleRent ?? 0)}</span>
+                        {row.combinedPayment && <span className="text-[10px] text-muted-foreground leading-none">Incl.</span>}
+                      </div>
+                    ) : <span className="text-muted-foreground">—</span>}
+                  </TableCell>
+                  <TableCell className="number-cell text-emerald-600 font-medium">{(row.paidTotal ?? 0) > 0 ? formatCurrency(row.paidTotal ?? 0) : <span className="text-muted-foreground">—</span>}</TableCell>
+                  <TableCell className={cn("number-cell", (row.remainingCredit ?? 0) > 0 && "text-destructive font-semibold")}>{(row.remainingCredit ?? 0) > 0 ? formatCurrency(row.remainingCredit ?? 0) : <span className="text-muted-foreground">—</span>}</TableCell>
+                  <TableCell className="text-center">{row.settled ? <span className="text-emerald-600 font-bold">✓</span> : <span className="text-muted-foreground">—</span>}</TableCell>
                   <TableCell className="max-w-40 truncate print:whitespace-normal" title={row.remarks || ""}>{row.remarks}</TableCell>
                   <TableCell className="text-right print:hidden">
                     <div className="inline-flex gap-1">
@@ -471,7 +524,7 @@ export function BoulderPurchasesPage() {
               ))}
               {!rows.length ? (
                 <TableRow>
-                  <TableCell colSpan={12} className="h-24 text-center text-muted-foreground">
+                  <TableCell colSpan={15} className="h-24 text-center text-muted-foreground">
                     No boulder entries found.
                   </TableCell>
                 </TableRow>

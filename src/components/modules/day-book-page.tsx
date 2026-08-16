@@ -137,38 +137,38 @@ export function DayBookPage() {
       </div>
 
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
-        <Card className="bg-blue-50/50">
+        <Card className="bg-blue-50/50 dark:bg-blue-950/30">
           <CardHeader className="pb-2">
-            <CardTitle className="text-sm text-blue-800">Opening Cash</CardTitle>
+            <CardTitle className="text-sm text-blue-800 dark:text-blue-200">Opening Cash</CardTitle>
           </CardHeader>
           <CardContent className="flex justify-between items-center">
-            <span className="text-2xl font-bold text-blue-900">{formatCurrency(data?.openingCash || 0)}</span>
+            <span className="text-2xl font-bold text-blue-900 dark:text-blue-100">{formatCurrency(data?.openingCash || 0)}</span>
             <Button variant="ghost" size="sm" onClick={() => handleOpeningBalanceEdit("cash")} className="print:hidden h-8 px-2 text-blue-700">Edit</Button>
           </CardContent>
         </Card>
-        <Card className="bg-blue-50/50">
+        <Card className="bg-blue-50/50 dark:bg-blue-950/30">
           <CardHeader className="pb-2">
-            <CardTitle className="text-sm text-blue-800">Opening Bank</CardTitle>
+            <CardTitle className="text-sm text-blue-800 dark:text-blue-200">Opening Bank</CardTitle>
           </CardHeader>
           <CardContent className="flex justify-between items-center">
-            <span className="text-2xl font-bold text-blue-900">{formatCurrency(data?.openingBank || 0)}</span>
+            <span className="text-2xl font-bold text-blue-900 dark:text-blue-100">{formatCurrency(data?.openingBank || 0)}</span>
             <Button variant="ghost" size="sm" onClick={() => handleOpeningBalanceEdit("bank")} className="print:hidden h-8 px-2 text-blue-700">Edit</Button>
           </CardContent>
         </Card>
-        <Card className="bg-green-50/50">
+        <Card className="bg-green-50/50 dark:bg-green-950/30">
           <CardHeader className="pb-2">
-            <CardTitle className="text-sm text-green-800">Closing Cash</CardTitle>
+            <CardTitle className="text-sm text-green-800 dark:text-green-200">Closing Cash</CardTitle>
           </CardHeader>
           <CardContent>
-            <span className="text-2xl font-bold text-green-900">{formatCurrency(data?.closingCash || 0)}</span>
+            <span className="text-2xl font-bold text-green-900 dark:text-green-100">{formatCurrency(data?.closingCash || 0)}</span>
           </CardContent>
         </Card>
-        <Card className="bg-green-50/50">
+        <Card className="bg-green-50/50 dark:bg-green-950/30">
           <CardHeader className="pb-2">
-            <CardTitle className="text-sm text-green-800">Closing Bank</CardTitle>
+            <CardTitle className="text-sm text-green-800 dark:text-green-200">Closing Bank</CardTitle>
           </CardHeader>
           <CardContent>
-            <span className="text-2xl font-bold text-green-900">{formatCurrency(data?.closingBank || 0)}</span>
+            <span className="text-2xl font-bold text-green-900 dark:text-green-100">{formatCurrency(data?.closingBank || 0)}</span>
           </CardContent>
         </Card>
       </div>

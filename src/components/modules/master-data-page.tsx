@@ -120,10 +120,15 @@ export function MasterDataPage({ resource, title, description, fields, columns }
     }
     setError("");
     try {
+      let res: any;
       if (resource === "vehicles") {
-        await deleteVehicle(id);
+        res = await deleteVehicle(id, password);
       } else {
-        await deleteParty(id);
+        res = await deleteParty(id, password);
+      }
+      if (res && !res.success) {
+        setError(res.error || "Delete failed.");
+        return;
       }
       setMessage("Record deleted.");
       await load();

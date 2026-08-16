@@ -114,17 +114,28 @@ export function deriveSalesEngine(draft: SalesDraft, deps: SalesEngineDeps) {
       ? parseNumber(draft.ratePerCft, "Rate")
       : null;
 
-  const autoQty = deps.vehicle?.companyBodyQty ?? deps.vehicle?.extraBodyQty ?? null;
+  const companyQty = deps.vehicle?.companyBodyQty ?? null;
+  const extraQty = deps.vehicle?.extraBodyQty ?? null;
+  
   const originalQty = qtyInput;
   const qty = qtyInput;
-  const qtyChanged = autoQty !== null && autoQty !== undefined && autoQty > 0 && roundMoney(autoQty) !== roundMoney(qty);
+  
+  const isCompanyQty = companyQty !== null && companyQty > 0 && roundMoney(companyQty) === roundMoney(qty);
+  const isExtraQty = extraQty !== null && extraQty > 0 && roundMoney(extraQty) === roundMoney(qty);
+  const hasDefaultQty = (companyQty !== null && companyQty > 0) || (extraQty !== null && extraQty > 0);
+  
+  const qtyChanged = hasDefaultQty && !isCompanyQty && !isExtraQty;
   const quantityReason = qtyChanged ? cleanText(draft.quantityReason) : null;
 
   if (qty <= 0) throw new Error("Qty must be greater than 0.");
-  if (qtyChanged && !quantityReason) throw new Error("Quantity reason is required when quantity differs from vehicle default.");
+  if (qtyChanged && !quantityReason) throw new Error("Quantity reason is required when quantity differs from vehicle defaults.");
 
   const ratePerCft = rateInput !== null ? rateInput : material.ratePerCft;
   if (ratePerCft < 0) throw new Error("Rate must be zero or greater.");
+  const rateChanged = rateInput !== null && roundMoney(rateInput) !== roundMoney(material.ratePerCft);
+  if (rateChanged && !cleanText(draft.remarks)) {
+    throw new Error("Remarks are required when the rate differs from the material's default rate.");
+  }
 
   const cashPaid = parseNumber(draft.cashPaid, "Cash Paid", false) ?? 0;
   const bankPaid = parseNumber(draft.bankPaid, "Bank Paid", false) ?? 0;
@@ -141,6 +152,9 @@ export function deriveSalesEngine(draft: SalesDraft, deps: SalesEngineDeps) {
   const discountAmount =
     draft.discountType === "percentage" ? roundMoney((amount * discountValue) / 100) : roundMoney(discountValue);
   if (discountAmount > amount) throw new Error("Discount cannot be greater than amount.");
+  if (discountAmount > 0 && !cleanText(draft.remarks)) {
+    throw new Error("Remarks are required when a discount is applied.");
+  }
 
   const subtotal = roundMoney(amount - discountAmount);
   

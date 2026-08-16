@@ -208,9 +208,9 @@ export function PartyCreditPage() {
         </CardHeader>
         <CardContent className="print:p-0">
           {error ? <p className="mb-3 text-sm text-destructive print:hidden">{error}</p> : null}
-          <div className="overflow-x-auto rounded-md border print:border-none">
+          <div className="overflow-x-auto overflow-y-auto max-h-[calc(100vh-[350px])] sm:max-h-[60vh] rounded-md border print:border-none print:overflow-visible print:max-h-none">
           <Table>
-            <TableHeader className="bg-muted/50 print:bg-transparent print:border-b-2 print:border-black">
+            <TableHeader className="bg-muted/50 sticky top-0 z-10 shadow-sm print:bg-transparent print:border-b-2 print:border-black print:relative print:shadow-none">
               <TableRow>
                 <TableHead>Party Name</TableHead>
                 <TableHead className="text-right">Total Credit</TableHead>
@@ -344,7 +344,11 @@ export function EmployeeCreditPage() {
     }
     setError("");
     try {
-      await deleteEmployeeCredit(id);
+      const res = await deleteEmployeeCredit(id, password);
+      if (res && !res.success) {
+        setError(res.error || "Delete failed.");
+        return;
+      }
       if (form.id === id) setForm(blankEmployeeForm());
       await load();
     } catch (err) {
@@ -483,9 +487,9 @@ export function EmployeeCreditPage() {
           {error ? <p className="text-sm text-destructive print:hidden">{error}</p> : null}
           {message ? <p className="text-sm text-success print:hidden">{message}</p> : null}
 
-          <div className="overflow-x-auto rounded-md border print:border-none">
+          <div className="overflow-x-auto overflow-y-auto max-h-[calc(100vh-[350px])] sm:max-h-[60vh] rounded-md border print:border-none print:overflow-visible print:max-h-none">
           <Table>
-            <TableHeader className="bg-muted/50 print:bg-transparent print:border-b-2 print:border-black">
+            <TableHeader className="bg-muted/50 sticky top-0 z-10 shadow-sm print:bg-transparent print:border-b-2 print:border-black print:relative print:shadow-none">
               <TableRow>
                 <TableHead>Employee Name</TableHead>
                 <TableHead className="text-right">Amount</TableHead>
@@ -575,6 +579,35 @@ export function PartyCollectionPage() {
     return query ? summary.filter((row) => row.partyName.toLowerCase().includes(query)) : summary;
   }, [search, summary]);
 
+  function handleExportExcel() {
+    if (visibleSummary.length === 0) return;
+    
+    let totalOutstanding = 0;
+    let totalCollected = 0;
+    let totalCredit = 0;
+
+    const excelData = visibleSummary.map(row => {
+      totalOutstanding += row.outstanding;
+      totalCollected += row.collected;
+      totalCredit += row.totalCredit;
+      return {
+        "Party Name": row.partyName,
+        "Outstanding": row.outstanding,
+        "Collected": row.collected,
+        "Total Credit": row.totalCredit
+      };
+    });
+    
+    excelData.push({
+      "Party Name": "TOTAL",
+      "Outstanding": totalOutstanding,
+      "Collected": totalCollected,
+      "Total Credit": totalCredit
+    });
+
+    exportToExcel(excelData, `Party_Collections_Summary_${new Date().toISOString().slice(0,10)}`);
+  }
+
   async function submit() {
     setError("");
     setMessage("");
@@ -602,9 +635,15 @@ export function PartyCollectionPage() {
       <Card>
         <CardHeader className="flex-row flex-wrap items-center justify-between gap-3">
           <CardTitle>Party Outstanding</CardTitle>
-          <div className="relative w-full sm:w-80">
-            <Search className="pointer-events-none absolute left-3 top-3 h-4 w-4 text-muted-foreground" />
-            <Input id="partyCollectionSearch" aria-label="Search party collection" className="pl-9" placeholder="Search party..." value={search} onChange={(event) => setSearch(event.target.value)} />
+          <div className="flex w-full sm:w-auto gap-2 items-center">
+            <div className="relative w-full sm:w-80">
+              <Search className="pointer-events-none absolute left-3 top-3 h-4 w-4 text-muted-foreground" />
+              <Input id="partyCollectionSearch" aria-label="Search party collection" className="pl-9" placeholder="Search party..." value={search} onChange={(event) => setSearch(event.target.value)} />
+            </div>
+            <Button variant="outline" size="sm" onClick={handleExportExcel} className="text-xs gap-1.5 whitespace-nowrap">
+              <Download className="h-3.5 w-3.5" />
+              Export
+            </Button>
           </div>
         </CardHeader>
         <CardContent>
@@ -767,7 +806,11 @@ export function OtherCreditPage() {
     }
     setError("");
     try {
-      await deleteOtherCredit(id);
+      const res = await deleteOtherCredit(id, password);
+      if (res && !res.success) {
+        setError(res.error || "Delete failed.");
+        return;
+      }
       if (form.id === id) setForm(blankOtherForm());
       await load();
     } catch (err) {
@@ -906,9 +949,9 @@ export function OtherCreditPage() {
           {error ? <p className="text-sm text-destructive print:hidden">{error}</p> : null}
           {message ? <p className="text-sm text-success print:hidden">{message}</p> : null}
 
-          <div className="overflow-x-auto rounded-md border print:border-none">
+          <div className="overflow-x-auto overflow-y-auto max-h-[calc(100vh-[350px])] sm:max-h-[60vh] rounded-md border print:border-none print:overflow-visible print:max-h-none">
           <Table>
-            <TableHeader className="bg-muted/50 print:bg-transparent print:border-b-2 print:border-black">
+            <TableHeader className="bg-muted/50 sticky top-0 z-10 shadow-sm print:bg-transparent print:border-b-2 print:border-black print:relative print:shadow-none">
               <TableRow>
                 <TableHead>Name</TableHead>
                 <TableHead className="text-right">Amount</TableHead>

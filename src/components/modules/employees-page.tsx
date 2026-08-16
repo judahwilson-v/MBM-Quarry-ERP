@@ -1,4 +1,5 @@
 "use client";
+import { usePrompt } from "@/components/ui/prompt-provider";
 
 import { useEffect, useState } from "react";
 import { Search, Check, User, ChevronRight } from "lucide-react";
@@ -6,6 +7,7 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { listEmployees, saveEmployee, deleteEmployee } from "@/app/actions/employees";
+import { verifyEditPassword } from "@/app/actions/auth";
 import { formatCurrency } from "@/lib/utils";
 import Link from "next/link";
 
@@ -84,8 +86,20 @@ export function EmployeesPage() {
 
   async function remove(id: string) {
     if (!confirm("Are you sure? This will delete the employee. Their ledger records will also be deleted.")) return;
+    const password = prompt("Enter delete PIN:");
+    if (!password) return;
+    const isAuth = await verifyEditPassword(password, "delete");
+    if (!isAuth) {
+      setError("❌ Incorrect Delete PIN. Delete cancelled.");
+      return;
+    }
+    setError("");
     try {
-      await deleteEmployee(id);
+      const res = await deleteEmployee(id, password);
+      if (res && !res.success) {
+        setError(res.error || "Delete failed.");
+        return;
+      }
       await load();
     } catch (e: any) {
       setError(e.message);
@@ -161,9 +175,9 @@ export function EmployeesPage() {
           </CardHeader>
           <CardContent>
             <div className="rounded-md border">
-              <div className="overflow-x-auto">
+              <div className="overflow-x-auto overflow-y-auto max-h-[calc(100vh-[350px])] sm:max-h-[60vh]">
                 <table className="w-full text-sm">
-                  <thead>
+                  <thead className="sticky top-0 z-10 shadow-sm print:relative print:shadow-none print:z-0">
                     <tr className="border-b bg-muted/50 text-left font-medium text-muted-foreground">
                       <th className="p-4">Name</th>
                       <th className="p-4">Role</th>

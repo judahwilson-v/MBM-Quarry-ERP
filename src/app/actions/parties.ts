@@ -7,6 +7,8 @@ import { serialize } from "@/lib/utils/serialize";
 import { getDb } from "@/lib/prisma";
 import { triggerAutoSync } from "@/lib/sync/auto-sync";
 import { writeAuditEvent } from "@/lib/domain";
+import { verifyEditPassword } from "@/app/actions/auth";
+import { sanitizeError } from "@/lib/utils/sanitize-error";
 
 type PartyInput = {
   id?: string;
@@ -74,12 +76,36 @@ export async function saveParty(input: PartyInput) {
 }
 
 
-export async function deleteParty(id: string) {
-  await runTx(async (tx) => {
-    const before = await tx.party.findUnique({ where: { id } });
-    await tx.party.delete({ where: { id } });
-    if (before) await writeAuditEvent(tx, { entityName: "Party", entityId: id, action: "delete", role: "system", before });
-  });
+export async function deleteParty(id: string, pin?: string) {
+  try {
+    if (!pin || !(await verifyEditPassword(pin, "delete"))) {
+      throw new Error("Invalid delete PIN");
+    }
+    await runTx(async (tx) => {
+      const before = await tx.party.findUnique({ where: { id } });
+      if (!before) return;
+      
+      // Check for FK references that would cause constraint violations
+      const saleCount = await tx.outgoingSale.count({ where: { partyId: id } });
+      const boulderCount = await tx.incomingBoulder.count({ where: { partyId: id } });
+      const collectionCount = await tx.partyCollection.count({ where: { partyId: id } });
+      const paymentCount = await tx.partyPayment.count({ where: { partyId: id } });
+      const total = saleCount + boulderCount + collectionCount + paymentCount;
+      if (total > 0) {
+        throw new Error(`Cannot delete party "${before.partyName}" — it has ${saleCount} sale(s), ${boulderCount} boulder purchase(s), ${collectionCount} collection(s), and ${paymentCount} payment(s). Remove those records first.`);
+      }
+      
+      await tx.party.delete({ where: { id } });
+      try {
+        await writeAuditEvent(tx, { entityName: "Party", entityId: id, action: "delete", role: "system", before });
+      } catch (e) {
+        console.warn("Failed to write audit event for party:", e);
+      }
+    });
+    return { success: true };
+  } catch (error) {
+    return { success: false, error: sanitizeError(error) };
+  }
 }
 
 

@@ -1,5 +1,26 @@
 # MBM Quarry ERP — Changelog
 
+## v1.16.8 — Master Quality, Resilience & UI Polish Overhaul (2026-08-16)
+- **Defensive Error Handling & Deletion Safeguards (Task 1 & 5)**:
+  - Added robust defensive `try/catch` wrappers around all relational cleanup hooks in `sales.ts` (`deleteSale`), preventing cascade failures and allowing safe deletion of orphaned or test records.
+  - Fixed `purgeNonGstSales` to restore inventory per item before deletion, generate individual audit log entries for Supabase sync, and return structured errors instead of throwing.
+- **Financial Controls & Quick-Pay UX (Tasks 2, 3 & 4)**:
+  - Displayed explicit `Cash`, `Bank/GPay`, `Paid`, and `Credit` columns with formatted values and conditional credit highlight colors in the Outgoing Sales table.
+  - Implemented one-click quick-pay shortcut pills (`Full Cash`, `Full GPay`, `Full Bank`, `Full Credit`) in both Sales and Boulder purchase forms.
+  - Added interactive vehicle body quantity selector (`🚛 Company Body` vs `📦 Extra Body`) to prevent invalid quantity deviation warnings when selecting standard body configurations.
+- **Physical Book/Page Synchronization & Reordering (Tasks 6 & 8)**:
+  - Linked physical receipt book and page counters across Sales and Incoming Boulder modules, adding duplicate warning prompts with explicit force-commit support.
+  - Streamlined Boulder purchases table and form layout, deprecating the legacy time input and ordering columns logically by physical book identifier first.
+- **Audit Logging & User Traceability (Task 9)**:
+  - Bound active operator identity (`userName`) to Day Book transaction entries and audit events, rendering operator identity alongside timestamps in ledger feeds (`{time} • {userName}`).
+- **Data Table Ergonomics & Horizontal Scrolling (Task 10)**:
+  - Integrated sticky first columns (`Date`, `Vehicle`, `Party`, `Type`) with hover background preservation across all dense data tables: Outgoing Sales, Incoming Boulder, Party Ledger, Employee Ledger, and Fuel Management.
+- **Settings Hierarchy & Navigation (Task 11)**:
+  - Reorganized `/settings` with dedicated sub-tabs (`System Diagnostics & Reliability`, `About & Backup`, `Sync Dashboard`, `User Logs`, `Tally Export`).
+  - Added "Coming Soon" overlay banner for Tally ERP export and streamlined sidebar navigation down to 16 core operational routes.
+- **Full-Spectrum Dark Mode Contrast Audit**:
+  - Resolved all 8 light-mode contrast anomalies across sales GST rows, badges, opening/closing balance summary cards, login form inputs, party ledger dialogs, backup manager alerts, and audit viewer tags.
+
 ## v1.16.5 — Single Source of Truth, Automated Test Suite & CI/CD Pipeline (2026-08-14)
 - **Single Source of Truth Architecture**:
   - Consolidated schema management to `prisma/schema.prisma` as the primary source of truth.

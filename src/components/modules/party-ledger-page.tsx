@@ -33,6 +33,9 @@ type PartyLedgerEntry = {
   debitAmount: number;
   creditAmount: number;
   balance: number;
+  cashPaid?: number;
+  bankPaid?: number;
+  gPayPaid?: number;
   createdAt?: string | Date;
 };
 
@@ -229,9 +232,11 @@ export function PartyLedgerPage() {
       Time: entry.time || "-",
       Type: entry.type.replace("_", " "),
       Description: entry.description || "-",
-      Method: entry.paymentMethod || "-",
       Debit: entry.debitAmount > 0 ? entry.debitAmount : 0,
       Credit: entry.creditAmount > 0 ? entry.creditAmount : 0,
+      Cash: entry.cashPaid || 0,
+      Bank: entry.bankPaid || 0,
+      GPay: entry.gPayPaid || 0,
       Balance: entry.balance
     }));
     
@@ -241,9 +246,11 @@ export function PartyLedgerPage() {
       Time: "",
       Type: "",
       Description: "",
-      Method: "",
       Debit: selectedParty.balance > 0 ? selectedParty.balance : 0,
       Credit: selectedParty.balance < 0 ? Math.abs(selectedParty.balance) : 0,
+      Cash: "" as any,
+      Bank: "" as any,
+      GPay: "" as any,
       Balance: selectedParty.balance
     });
 
@@ -274,9 +281,9 @@ export function PartyLedgerPage() {
             </CardHeader>
             <CardContent className="px-0 sm:px-6">
               {error ? <p className="mb-3 px-4 text-sm text-destructive sm:px-0">{error}</p> : null}
-              <div className="overflow-x-auto">
+              <div className="overflow-x-auto overflow-y-auto max-h-[calc(100vh-[350px])] sm:max-h-[60vh]">
                 <Table>
-                  <TableHeader>
+                  <TableHeader className="bg-muted/50 sticky top-0 z-10 shadow-sm print:bg-transparent print:border-b-2 print:border-black print:relative print:shadow-none">
                     <TableRow>
                       <TableHead>Party</TableHead>
                       <TableHead className="text-right">Balance</TableHead>
@@ -350,7 +357,7 @@ export function PartyLedgerPage() {
                     <Printer className="mr-2 h-4 w-4" />
                     Print Statement
                   </Button>
-                  <Button variant="outline" onClick={() => setPaymentMode("payment")} className="print:hidden bg-red-50 text-red-700 hover:bg-red-100 border-red-200">
+                  <Button variant="outline" onClick={() => setPaymentMode("payment")} className="print:hidden bg-red-50 text-red-700 hover:bg-red-100 border-red-200 dark:bg-red-950/30 dark:text-red-200 dark:hover:bg-red-900/40 dark:border-red-900/50">
                     <Plus className="mr-2 h-4 w-4" />
                     Debit Receipt (Give)
                   </Button>
@@ -363,7 +370,7 @@ export function PartyLedgerPage() {
 
               {paymentMode && (
                 <div className="print:hidden">
-                <Card className="border-blue-200 bg-blue-50/50 shadow-sm">
+                <Card className="border-blue-200 bg-blue-50/50 shadow-sm dark:bg-blue-950/30 dark:border-blue-900/50">
                   <CardHeader className="pb-3">
                     <CardTitle className="text-blue-900">
                       {paymentMode === "collection" ? "Record Collection (Money In)" : "Record Debit Receipt (Money Out)"}
@@ -432,31 +439,40 @@ export function PartyLedgerPage() {
 
               <Card className="print:border-none print:shadow-none">
                 <CardContent className="p-0 sm:p-0 overflow-hidden">
-                  <div className="overflow-x-auto">
+                  <div className="overflow-x-auto overflow-y-auto max-h-[calc(100vh-[350px])] sm:max-h-[60vh]">
                     <Table>
-                      <TableHeader className="bg-muted/50 print:bg-transparent print:border-b-2 print:border-black">
+                      <TableHeader className="bg-muted/50 sticky top-0 z-10 shadow-sm print:bg-transparent print:border-b-2 print:border-black print:relative print:shadow-none">
                         <TableRow>
-                          <TableHead>Date</TableHead>
-                          <TableHead>Time</TableHead>
-                          <TableHead>Type</TableHead>
+                          <TableHead className="sm:sticky sm:left-0 z-20 bg-muted/50 w-[110px] min-w-[110px] max-w-[110px] print:static print:w-auto">Date</TableHead>
+                          <TableHead className="sm:sticky sm:left-[110px] z-20 bg-muted/50 w-[80px] min-w-[80px] max-w-[80px] print:static print:w-auto">Time</TableHead>
+                          <TableHead className="sm:sticky sm:left-[190px] z-20 bg-muted/50 w-[140px] min-w-[140px] max-w-[140px] print:static print:w-auto sm:border-r border-border">Type</TableHead>
                           <TableHead>Description</TableHead>
-                          <TableHead>Method</TableHead>
                           <TableHead className="text-right">Debit (+)</TableHead>
                           <TableHead className="text-right">Credit (-)</TableHead>
+                          <TableHead className="text-right">Cash</TableHead>
+                          <TableHead className="text-right">Bank/GPay</TableHead>
                           <TableHead className="text-right">Balance</TableHead>
                           <TableHead className="w-10 print:hidden"></TableHead>
                         </TableRow>
                       </TableHeader>
                       <TableBody>
                         {entries.map((entry) => (
-                          <TableRow key={entry.id}>
-                            <TableCell className="whitespace-nowrap print:border-b print:border-gray-200">{formatDate(entry.date)}</TableCell>
-                            <TableCell className="whitespace-nowrap print:border-b print:border-gray-200">{entry.time || "-"}</TableCell>
-                            <TableCell className="whitespace-nowrap print:border-b print:border-gray-200">{entry.type.replace("_", " ")}</TableCell>
+                          <TableRow key={entry.id} className="group bg-background hover:bg-muted/50">
+                            <TableCell className="sm:sticky sm:left-0 z-10 bg-inherit w-[110px] min-w-[110px] max-w-[110px] whitespace-nowrap print:static print:w-auto print:border-b print:border-gray-200 group-hover:bg-accent/50">{formatDate(entry.date)}</TableCell>
+                            <TableCell className="sm:sticky sm:left-[110px] z-10 bg-inherit w-[80px] min-w-[80px] max-w-[80px] whitespace-nowrap print:static print:w-auto print:border-b print:border-gray-200 group-hover:bg-accent/50">{entry.time || "-"}</TableCell>
+                            <TableCell className="sm:sticky sm:left-[190px] z-10 bg-inherit w-[140px] min-w-[140px] max-w-[140px] whitespace-nowrap print:static print:w-auto sm:border-r border-border print:border-b print:border-gray-200 group-hover:bg-accent/50">{entry.type.replace("_", " ")}</TableCell>
                             <TableCell className="max-w-[200px] print:max-w-none print:whitespace-normal print:border-b print:border-gray-200" title={entry.description}>{entry.description}</TableCell>
-                            <TableCell className="whitespace-nowrap print:border-b print:border-gray-200">{entry.paymentMethod || "-"}</TableCell>
                             <TableCell className="number-cell text-green-600 print:text-black print:border-b print:border-gray-200">{entry.debitAmount > 0 ? formatCurrency(entry.debitAmount) : "-"}</TableCell>
                             <TableCell className="number-cell text-destructive print:text-black print:border-b print:border-gray-200">{entry.creditAmount > 0 ? formatCurrency(entry.creditAmount) : "-"}</TableCell>
+                            <TableCell className="number-cell print:text-black print:border-b print:border-gray-200">{entry.cashPaid ? formatCurrency(entry.cashPaid) : "-"}</TableCell>
+                            <TableCell className="number-cell print:text-black print:border-b print:border-gray-200">
+                              {(entry.bankPaid || entry.gPayPaid) ? (
+                                <div className="flex flex-col text-xs gap-0.5">
+                                  {entry.bankPaid ? <span>Bank: {formatCurrency(entry.bankPaid)}</span> : null}
+                                  {entry.gPayPaid ? <span>GPay: {formatCurrency(entry.gPayPaid)}</span> : null}
+                                </div>
+                              ) : "-"}
+                            </TableCell>
                             <TableCell className="number-cell font-medium print:border-b print:border-gray-200">
                               {formatCurrency(Math.abs(entry.balance))}
                               <span className="ml-1 text-[10px] font-normal text-muted-foreground">
