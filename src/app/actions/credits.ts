@@ -261,25 +261,17 @@ export async function deletePartyCollection(id: string, pin?: string) {
       await tx.partyCollection.delete({ where: { id } });
       
       // Cascade delete events
-      try {
-        await tx.financialEvent.deleteMany({ where: { entityId: id } });
-      } catch (e) {
-        console.warn("Failed to delete financial events for collection:", e);
-      }
+      await tx.financialEvent.deleteMany({ where: { entityId: id } });
       
       if (collection.partyId) {
-        try {
-          const p = await tx.party.findUnique({ where: { id: collection.partyId } });
-          if (p) await recalculatePartyLedger(tx, collection.partyId);
-        } catch (e) {
-          console.warn("Failed to recalculate party ledger for collection:", e);
-        }
+        const p = await tx.party.findUnique({ where: { id: collection.partyId } });
+        if (p) await recalculatePartyLedger(tx, collection.partyId);
       }
 
       try {
         await writeAuditEvent(tx, { entityName: "PartyCollection", entityId: id, action: "delete", role: "system", before: collection });
-      } catch (e) {
-        console.warn("Failed to write audit event for collection:", e);
+      } catch {
+        console.warn(`[Audit Log Warning] Failed to write audit event for PartyCollection deletion (ID: ${id})`);
       }
     });
     return { success: true };
@@ -306,25 +298,17 @@ export async function deletePartyPayment(id: string, pin?: string) {
       await tx.partyPayment.delete({ where: { id } });
       
       // Cascade delete events
-      try {
-        await tx.financialEvent.deleteMany({ where: { entityId: id } });
-      } catch (e) {
-        console.warn("Failed to delete financial events for payment:", e);
-      }
+      await tx.financialEvent.deleteMany({ where: { entityId: id } });
       
       if (payment.partyId) {
-        try {
-          const p = await tx.party.findUnique({ where: { id: payment.partyId } });
-          if (p) await recalculatePartyLedger(tx, payment.partyId);
-        } catch (e) {
-          console.warn("Failed to recalculate party ledger for payment:", e);
-        }
+        const p = await tx.party.findUnique({ where: { id: payment.partyId } });
+        if (p) await recalculatePartyLedger(tx, payment.partyId);
       }
 
       try {
         await writeAuditEvent(tx, { entityName: "PartyPayment", entityId: id, action: "delete", role: "system", before: payment });
-      } catch (e) {
-        console.warn("Failed to write audit event for payment:", e);
+      } catch {
+        console.warn(`[Audit Log Warning] Failed to write audit event for PartyPayment deletion (ID: ${id})`);
       }
     });
     return { success: true };

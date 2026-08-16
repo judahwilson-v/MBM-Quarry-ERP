@@ -107,8 +107,11 @@ autoUpdater.on('update-not-available', (info) => {
   if (mainWindow) mainWindow.webContents.send('updater-event', { type: 'not-available', info });
 });
 autoUpdater.on('error', (err) => {
-  console.log("✓ error event");
-  if (mainWindow) mainWindow.webContents.send('updater-event', { type: 'error', error: err.message });
+  const errMsg = err ? (err.message || String(err)) : 'Unknown update error';
+  console.error("✓ autoUpdater error:", errMsg);
+  if (mainWindow && !mainWindow.isDestroyed()) {
+    mainWindow.webContents.send('updater-event', { type: 'error', error: errMsg });
+  }
 });
 autoUpdater.on('download-progress', (progressObj) => {
   console.log("✓ download-progress event");
@@ -131,7 +134,9 @@ function waitForServer(url, timeoutMs = 60000) {
       }
       
       const req = http.get(url, (res) => {
-        if (res.statusCode === 200 || res.statusCode === 404) {
+        // Accept any 2xx (success) or 3xx (redirect) as "server is alive".
+        // Next.js may return 307 when page.tsx redirects to /setup.
+        if (res.statusCode >= 200 && res.statusCode < 400) {
           resolve();
         } else {
           setTimeout(checkServer, 500);

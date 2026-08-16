@@ -279,45 +279,29 @@ export async function deleteIncomingBoulder(id: string, pin?: string) {
         
         try {
           await writeAuditEvent(tx, { entityName: "IncomingBoulder", entityId: id, action: "delete", role: "system", before });
-        } catch (e) {
-          console.warn("Failed to write audit event:", e);
+        } catch {
+          console.warn(`[Audit Log Warning] Failed to write audit event for IncomingBoulder deletion (ID: ${id})`);
         }
 
         if (before.partyId) {
-          try {
-            const p = await tx.party.findUnique({ where: { id: before.partyId } });
-            if (p) await recalculatePartyLedger(tx, before.partyId);
-          } catch (e) {
-            console.warn("Failed to recalculate party ledger:", e);
-          }
+          const p = await tx.party.findUnique({ where: { id: before.partyId } });
+          if (p) await recalculatePartyLedger(tx, before.partyId);
         }
 
         // Revert inventory
-        try {
-          await txAdjustInventoryStock(tx, "ROCK", -before.qty, 'PRODUCTION_IN', id, `Boulder Purchase Deleted: ${before.vehicleNumber}`);
-        } catch (e) {
-          console.warn("Failed to adjust inventory stock:", e);
-        }
+        await txAdjustInventoryStock(tx, "ROCK", -before.qty, 'PRODUCTION_IN', id, `Boulder Purchase Deleted: ${before.vehicleNumber}`);
         
         // Cascade delete associated daybook expense
-        try {
-          const expenseDesc = `Paid for Boulder Purchase (${before.vehicleNumber}) - ${before.partyName}`;
-          const expenses = await tx.dayBookExpenseEntry.findMany({ where: { description: expenseDesc } });
-          if (expenses.length > 0) {
-            await tx.dayBookExpenseEntry.deleteMany({ where: { description: expenseDesc } });
-            const sourceEventIds = expenses.map((e: any) => e.sourceEventId);
-            await tx.financialEvent.deleteMany({ where: { eventId: { in: sourceEventIds } } });
-          }
-        } catch (e) {
-          console.warn("Failed to delete daybook expenses:", e);
+        const expenseDesc = `Paid for Boulder Purchase (${before.vehicleNumber}) - ${before.partyName}`;
+        const expenses = await tx.dayBookExpenseEntry.findMany({ where: { description: expenseDesc } });
+        if (expenses.length > 0) {
+          await tx.dayBookExpenseEntry.deleteMany({ where: { description: expenseDesc } });
+          const sourceEventIds = expenses.map((e: any) => e.sourceEventId);
+          await tx.financialEvent.deleteMany({ where: { eventId: { in: sourceEventIds } } });
         }
 
-        try {
-          const dayBook = await getOrCreateDayBook(tx, before.date.toISOString());
-          await recalculateDayBook(tx, dayBook);
-        } catch (e) {
-          console.warn("Failed to recalculate daybook:", e);
-        }
+        const dayBook = await getOrCreateDayBook(tx, before.date.toISOString());
+        await recalculateDayBook(tx, dayBook);
       }
     });
     return { success: true };

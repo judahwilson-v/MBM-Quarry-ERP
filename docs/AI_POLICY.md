@@ -1,8 +1,14 @@
+---
+schema_version: 2
+type: policy
+last_updated: "2026-08-16 20:00:30"
+---
+
 # AI Documentation & Memory Policy
 
 ## Objective
 
-The documentation is part of the codebase. Its purpose is to reduce future repository exploration and token usage by acting as persistent architectural memory. Documentation should remain synchronized with the current implementation.
+Documentation acts as persistent architectural memory to reduce token usage and hallucination risk. It must stay synchronized with the current implementation.
 
 ---
 
@@ -10,12 +16,29 @@ The documentation is part of the codebase. Its purpose is to reduce future repos
 
 Before searching the repository:
 1. Always start by reading `docs/AI_INDEX.md`. This is the central index.
-2. Follow the links in `AI_INDEX.md` to read the documentation relevant to the requested task.
-3. Determine whether the existing documentation is sufficient.
-4. Search the codebase only for the specific implementation details required.
+2. Pick the **workflow guide** matching your task (Debug, Feature, Release, Organize).
+3. Follow the workflow's read order to load only relevant docs.
+4. Search the codebase only for specific implementation details required.
 5. Never perform a full repository search unless explicitly requested.
 
-The documentation exists to reduce unnecessary code traversal.
+### Three-Layer Loading Model
+
+| Layer | What | Budget |
+|:------|:-----|:-------|
+| **0** | `AI_INDEX.md` + `AI_POLICY.md` | Always read |
+| **1** | Workflow guides + context files (HANDOFF, MODULE_INDEX, etc.) | 1-2 files per task |
+| **2** | Detail references (DATABASE_MAP, FINANCIAL_EVENT_ARCHITECTURE) | Only when specifically needed |
+
+**Rule**: No task should require reading more than 4-5 docs total.
+
+### Lower-Model Instructions
+
+If you are a smaller/faster model being used for code fixes:
+- Read ONLY `AI_INDEX.md` + the ONE workflow file relevant to your task
+- Do NOT attempt to read all docs
+- Do NOT rewrite docs — only append or edit specific lines
+- Do NOT reorganize file structures
+- Focus exclusively on the code change requested
 
 ---
 
@@ -26,19 +49,19 @@ After completing any task:
 2. Update only affected documents.
 3. Leave unrelated documents unchanged.
 4. Never rewrite documents unnecessarily.
-5. Never duplicate information.
-6. Prefer references over repeated explanations.
-7. A fix verified in-session with actual command output (git diff + git status) is finalized and is not re-audited in a future session unless the file changes again.
+5. Never duplicate information across files.
+6. Prefer references (links) over repeated explanations.
+7. A fix verified in-session with `git diff` + `git status` is finalized and is not re-audited unless the file changes again.
 
-## When NOT to Update Documentation
+### When NOT to Update Documentation
 
 Do NOT update documentation for:
-- formatting changes
-- comments
-- refactoring with identical behavior
+- Formatting changes
+- Comments
+- Refactoring with identical behavior
 - CSS styling
-- typo fixes
-- test-only changes
+- Typo fixes
+- Test-only changes
 
 Only update documentation when architecture, business logic, database, API, workflow, or developer behavior changes.
 
@@ -46,76 +69,93 @@ Only update documentation when architecture, business logic, database, API, work
 
 ## Documentation Ownership
 
-Each document has a single responsibility.
+Each document has a single responsibility. See `AI_INDEX.md` § File Registry for the complete list.
 
-- **`docs/AI_INDEX.md`**
-  - **The core AI entry point.** Links to everything else.
-- **`docs/architecture/SYSTEM_BLUEPRINT.md`**
-  - Overall architecture, module relationships, and high-level data flow.
-- **`docs/database/DATABASE_MAP.md`**
-  - Prisma, SQLite, Supabase, migrations, and sync relationships.
-- **`docs/reference/VARIABLE_MAP.md`**
-  - Important application variables, cross-layer mappings, and canonical field names.
-- **`docs/reference/MODULE_INDEX.md`**
-  - Module ownership, entry points, and dependencies.
-- **`docs/reference/SOURCE_OF_TRUTH.md`**
-  - Canonical locations, ownership rules, and duplicate prevention.
-- **`docs/decisions/DECISION_LOG.md`**
-  - Architectural decisions, design rationale, and trade-offs.
-- **`docs/handoff/AI_HANDOFF.md`**
-  - Current project state, active work, known issues, and next recommended tasks.
-- **`docs/CHANGELOG.md`**
-  - User-visible and architectural changes.
+**Key ownership rules:**
+- `AI_INDEX.md` → Central entry point and file registry
+- `AI_HANDOFF.md` → Current project state (version, status, blockers)
+- `CHANGELOG.md` → Version history
+- `DATABASE_MAP.md` → Schema and migration strategy
+- `VARIABLE_MAP.md` → Canonical field names
+- `MODULE_INDEX.md` → Module ownership and entry points
+- `DECISION_LOG.md` → Architectural decisions
+- `KNOWN_BUGS.md` → Active bugs and resolved postmortems
+
+---
+
+## YAML Frontmatter Standard
+
+**Every documentation file MUST include YAML frontmatter** for machine-parseable metadata:
+
+### Permanent docs:
+```yaml
+---
+type: reference | architecture | policy | handoff | decision
+last_updated: "YYYY-MM-DD HH:MM:SS" # Include Date AND Time (since docs are updated multiple times a day)
+---
+```
+
+### Temp/working files:
+```yaml
+---
+type: temp
+task: "Brief description of what this file is for"
+created: "YYYY-MM-DDTHH:MM:SSZ"
+expires: "YYYY-MM-DDTHH:MM:SSZ"
+parent_workflow: "debug | feature | release | organize"
+---
+```
+
+**Rule**: Any AI session that encounters a temp file past its `expires:` date MUST delete it immediately.
 
 ---
 
 ## Folder Structure
 
-All documentation must strictly conform to the following directory structure:
-
 ```text
 docs/
-├── AI_INDEX.md          # Central AI Memory Index (Start Here)
-├── architecture/      # High-level architecture, flow, design patterns
-├── database/          # DB maps, schemas, Supabase/SQLite sync info
-├── reference/         # Variables, indexes, lists, guides, APIs
-├── handoff/           # Active/next tasks, project state trackers
-├── decisions/         # Architecture Decision Records (ADRs)
-├── audit/             # Code audit reports
-│   ├── current/       # Latest audit reports
-│   └── archive/       # Old audit snapshots
-├── archive/           # Deprecated docs, old plans, obsolete handoffs
-└── _temp/             # Disposable AI working files & incident reports
+├── AI_INDEX.md              # Layer 0: Entry point (Start Here)
+├── AI_POLICY.md             # Layer 0: This file (AI behavior rules)
+├── CHANGELOG.md             # Version history
+├── workflows/               # Layer 1: Task-specific workflow guides
+│   ├── WORKFLOW_DEBUG.md    #   SET 1: Debug & root cause
+│   ├── WORKFLOW_FEATURE.md  #   SET 2: Feature addition
+│   ├── WORKFLOW_RELEASE.md  #   SET 3: Release & deploy
+│   └── WORKFLOW_ORGANIZE.md #   SET 4: Full reorganization
+├── architecture/            # Layer 2: System design
+├── database/                # Layer 2: Schema, SQL, migrations
+├── reference/               # Layer 2: Lookups, rules, variables
+├── handoff/                 # Active state tracking
+├── decisions/               # Architecture Decision Records
+├── audit/                   # Code audit reports
+│   ├── current/             # Latest audits
+│   └── archive/             # Old audit snapshots
+├── archive/                 # Deprecated/obsolete docs
+└── _temp/                   # Disposable AI working files
 ```
 
-**Rule**: AI must not create new top-level Markdown files freely. Any new document must either fit into an existing category or require justification as to why a new permanent category/document is strictly needed. **Incident reports must never be left in the root directory.**
+**Rules:**
+- AI must not create new top-level Markdown files outside this structure.
+- New documents must fit into an existing category or require explicit justification.
+- Incident reports and temp files must NEVER be placed in the project root.
 
 ---
 
 ## Search Policy
 
-- Documentation first.
-- Repository second.
-- Never perform a full repository crawl unless:
-  - Explicitly requested.
-  - Documentation is outdated.
-  - Documentation cannot answer the question.
-
----
-
-## Documentation Quality Rules
-
-- Documentation must describe the current implementation.
-- Do not speculate.
-- Do not duplicate information.
-- Prefer references over repeated explanations.
-- Every document should have one clear purpose.
+1. Documentation first.
+2. Repository second.
+3. Never perform a full repository crawl unless:
+   - Explicitly requested by the user.
+   - Documentation is outdated.
+   - Documentation cannot answer the question.
 
 ---
 
 ## Source of Truth Rule
 
-Code remains the ultimate source of truth. Documentation is synchronized memory.
+Code is the ultimate source of truth. Documentation is synchronized memory.
+
 If documentation conflicts with code:
 - Trust the code.
 - Update the documentation.
@@ -127,16 +167,18 @@ If documentation conflicts with code:
 
 - Always minimize repository traversal.
 - Prefer documentation over repository search whenever possible.
-- Only inspect files that are required for the requested task.
+- Only inspect files required for the current task.
 - Avoid re-reading files whose information already exists in maintained documentation.
+- Budget: Layer 0 + 1-2 Layer 1 files + 0-2 Layer 2 files = max 5 files per task.
 
 ---
 
 ## Temporary Working Files & Incident Reports
 
-Temporary analysis files, debugging logs, and incident reports must **never** be stored with permanent documentation or in the project root. Use `docs/_temp/` (e.g., `docs/_temp/incident_report_X.md`, `docs/_temp/audit/`, `docs/_temp/debug/`).
-These files are disposable. Permanent documentation must never depend on temporary files.
-After the task is completed:
-- Archive useful findings into permanent documentation or `docs/archive/`.
-- Delete obsolete temporary files.
-- Keep the project root and `docs/` root perfectly clean.
+- Temporary files go in `docs/_temp/` — NEVER in the project root or `docs/` root.
+- Every temp file MUST have YAML frontmatter with `created:` and `expires:` timestamps.
+- Permanent documentation must never depend on temporary files.
+- After task completion:
+  - Archive useful findings into permanent docs or `docs/archive/`.
+  - Delete obsolete temporary files.
+  - Keep the project root and `docs/` root clean.

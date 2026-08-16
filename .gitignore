@@ -56,3 +56,5 @@ next-env.d.ts
 _archive_/
 docs/raw data
 latest.yml
+.agents/
+!.agents/skills/

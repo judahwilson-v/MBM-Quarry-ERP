@@ -180,33 +180,25 @@ export async function deleteExpense(id: string, pin?: string) {
       if (!row) throw new Error("Expense not found");
 
       // Clean up financial event
-      try {
-        const financialEvent = await tx.financialEvent.findFirst({ where: { entityId: id } });
-        const eventIdToDelete = financialEvent?.eventId;
-        if (financialEvent) await tx.financialEvent.delete({ where: { id: financialEvent.id } });
+      const financialEvent = await tx.financialEvent.findFirst({ where: { entityId: id } });
+      const eventIdToDelete = financialEvent?.eventId;
+      if (financialEvent) await tx.financialEvent.delete({ where: { id: financialEvent.id } });
 
-        // Clean up orphaned DayBookExpenseEntry records
-        const sourceIdsToDelete = [id, row.sourceEventId, eventIdToDelete].filter(Boolean) as string[];
-        await tx.dayBookExpenseEntry.deleteMany({
-          where: { sourceEventId: { in: sourceIdsToDelete } }
-        });
-      } catch (e) {
-        console.warn("Failed to clean up financial events for expense:", e);
-      }
+      // Clean up orphaned DayBookExpenseEntry records
+      const sourceIdsToDelete = [id, row.sourceEventId, eventIdToDelete].filter(Boolean) as string[];
+      await tx.dayBookExpenseEntry.deleteMany({
+        where: { sourceEventId: { in: sourceIdsToDelete } }
+      });
 
       await tx.expense.delete({ where: { id } });
 
-      try {
-        const dayBook = await getOrCreateDayBook(tx, row.expenseDate.toISOString());
-        await recalculateDayBook(tx, dayBook);
-      } catch (e) {
-        console.warn("Failed to recalculate daybook for expense:", e);
-      }
+      const dayBook = await getOrCreateDayBook(tx, row.expenseDate.toISOString());
+      await recalculateDayBook(tx, dayBook);
 
       try {
         await writeAuditEvent(tx, { entityName: "Expense", entityId: id, action: "delete", role: "system", before: row, after: null });
-      } catch (e) {
-        console.warn("Failed to write audit event for expense:", e);
+      } catch {
+        console.warn(`[Audit Log Warning] Failed to write audit event for Expense deletion (ID: ${id})`);
       }
       return row;
     })) };

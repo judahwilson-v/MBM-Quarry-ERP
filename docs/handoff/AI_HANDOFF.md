@@ -1,66 +1,53 @@
+---
+type: handoff
+project_version: "2.3.0"
+status: "STABLE"
+last_updated: "2026-08-16 20:30:00"
+blocking_issues: 0
+---
+
 # MBM Quarry ERP — Project State
 
-**Status**: v2.2.0 ACID Atomicity Fixes, Next.js Boot Fix & Structural Refactoring (STABLE / FULLY OPERATIONAL)
-**Version**: `v2.2.0`
-**Phase**: Field-Test Remediation & Data Table Ergonomics (STABLE / FULLY OPERATIONAL)
-**Last Updated**: 2026-08-16
+## Current State
 
-## Status
+- **Version**: v2.3.0
+- **Status**: Stable / Fully Operational
+- **Phase**: Auto-Updater Pipeline Hardening & 2.3.0 Release (all systems green)
+- **Blocking Issues**: None
+
+---
+
+## Last Completed (Recent)
+
+| Version | What | Date |
+|:--------|:-----|:-----|
+| v2.3.0 | Auto-updater pipeline hardening (`latest.yml` sync fix), graceful updater error handling | 2026-08-16 |
+| v2.2.0 | ACID atomicity fixes, Next.js boot fix, structural refactoring, ESLint cleanup | 2026-08-16 |
+| v2.1.0 | Architecture polish, build fixes, settings route repair | 2026-08-16 |
+| v2.0.0 | Master quality overhaul: defensive deletes, quick-pay, dark mode, sticky columns | 2026-08-16 |
+| v1.16.5 | Single source of truth architecture, automated test suite, CI/CD pipeline | 2026-08-14 |
+
+> Full history: see `docs/CHANGELOG.md`
+
+---
+
+## All Systems Status
+
 | Area | Status |
-|------|--------|
-| Sync Engine System | ✅ STABLE / FULLY OPERATIONAL (Milestones 1, 2, 3, & 4 Complete) |
-| Cloud Schema & Root Cause Fixes (M1) | ✅ Complete (`weighbridge_tickets`, `@map("ticket_type")`, Int ID arithmetic) |
-| Multi-Tier Error Isolation (M2) | ✅ Complete (Service, Table, Row boundaries + adaptive UI backoff) |
-| Topological Order & Constraints (M3) | ✅ Complete (29-table parent-first order, conflict keys, FK queue, ISO dates) |
-| Verification & Documentation (M4) | ✅ Complete (`tsc --noEmit` & `eslint` 0 errors, docs synchronized) |
-| Structured Summary Contract | ✅ Non-throwing `SyncResult` summary objects returned |
-| Row Quarantine & Cursor | ✅ Failures logged & skipped; cursors advance progressively |
-| Adaptive UI Polling | ✅ Polling exponential backoff on error (`app-shell.tsx`) |
-| Multi-PC Sync & Realtime | ✅ Supabase Realtime Auto-Refresh & Duplicate Prevention Added |
-| Sales Engine Audit | ✅ Audit Completed & Hotfixed |
-| Boulder Purchases Audit | ✅ Audit Completed & Hotfixed (runTx fixed) |
-| Vehicles & Bootstrap Audit | ✅ Audit Completed & Hotfixed (engine_hours added) |
-| Parties & Ledger Audit | ✅ Audit Completed & Hotfixed (N+1 query loop optimized) |
-| Materials Master | ✅ Audit Completed |
-| Expenses & DayBook Audit | ✅ Audit Completed & Hotfixed (Orphaned daybook expenses fixed) |
-| Sync Engine & Supabase Audit | ✅ Audit Completed & Hotfixed (Missing tables synced) |
-| Server Actions Security | ✅ Audit Completed & Hotfixed (Delete PIN & rate limiter added) |
-| React UI & Hydration | ✅ Audit Completed & Hotfixed (Hydration warnings fixed) |
-| Responsive Mobile UI | ✅ KB-010 Resolved (Grid layout squishing & bottom nav fixed) |
-| Form Accessibility | ✅ KB-009 Resolved (aria-label, htmlFor, and id bindings added) |
-| Runtime Input Validation | ✅ KB-021 Resolved (Shared Zod schemas across 5 server actions) |
-| TypeScript & Lint Cleanup | ✅ KB-014 & KB-015 Resolved (window.electron typed, unused imports purged) |
-| DayBook Array Guarding | ✅ KB-016 Resolved (Nullish coalescing default added) |
-| Weighbridge Ticket Sequence | ✅ KB-025 Resolved (Atomic `$transaction` + 5-retry loop) |
-| Database Indexing | ✅ KB-026 Resolved (@@index annotations + bootstrap CREATE INDEX) |
-| Error Sanitization | ✅ KB-023 Resolved (sanitizeError utility across server actions) |
-| Settings & Sync Dashboard | ✅ Complete (Tabbed UI `/settings/sync`, Live diagnostics, controls) |
-| Sync Diagnostics Engine | ✅ Complete (`src/lib/sync/sync-diagnostics.ts` health evaluation) |
-| Detailed Sync Status | ✅ Complete (`getDetailedSyncStatus()` deep inspection API) |
-| Force-Pushed Parent Records | ✅ Complete (Resolved FK ordering edge cases by force-pushing missing parents) |
-| Field-Test Hotfixes (Tasks 1-12)| ✅ Complete (Defensive deletes, Quick-pay, Body qty, Sticky columns, Dark mode) |
+|:-----|:-------|
+| Sync Engine (M1-M4) | ✅ Complete |
+| Sales / Purchases / Credits / Expenses | ✅ Operational |
 | Electron Desktop | ✅ Working |
-| Documentation | ✅ Updated & Consolidated |
+| TypeScript / Lint / Tests | ✅ Zero errors |
+| Dark Mode | ✅ Audited |
+| Documentation | ✅ Synchronized (2026-08-16) |
 
-## Current Task
-Phase 14 Field-Test Remediation and the UX Polish Initiative are now 100% complete. All sync loop issues, schema mismatches, error handling, topological dependency ordering, constraint conflict resolution features, and the live Settings Dashboard (`/settings/*`) with `sync-diagnostics.ts` are fully operational and verified with `vitest` and `tsc`.
-
-## Blocking Issues
-- None (All critical runtime, type safety, linting, and accessibility issues resolved).
+---
 
 ## Completed Phases
-- Phase 0: Foundation (SQLite, Prisma, offline-first)
-- Phase 1: Sales engine (business logic, payments, credit, vehicle trips, audit)
-- Phase 2: Boulder Purchases
-- Phase 3: Ledger + Day Book
-- Phase 4: Credit & Collections
-- Phase 5: Supabase Sync
-- Phase 6: Electron Desktop Packaging (Windows & macOS)
-- Phase 7: Tally Integration (GST billing XML export)
-- Phase A: Robust Cloud Sync, Live Operational Dashboards, and Real-Time Health Diagnostics
-- RC1: Settings, Backup Manager, VERSION stamping, Documentation cleanup
-- Phase 11-13: Enterprise Safeguards, Master Audits, Defect Remediation & CI/CD Pipeline
-- Phase 14: Master Quality, Resilience & UI Polish Overhaul (v2.0.0 Field-Test Hotfixes)
 
-## Next Confirmed Phases
-- **Phase 15 (Future Scaling)**: Data warehousing and predictive analytics integration.
+Phase 0–7, Phase A, RC1, Phases 11–14 — all complete. See `CHANGELOG.md` for details.
+
+## Next Up
+
+- **Phase 15 (Future)**: Data warehousing and predictive analytics integration.

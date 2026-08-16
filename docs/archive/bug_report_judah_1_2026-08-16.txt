@@ -1,0 +1,242 @@
+The Brutal Reality: Why You Are Trapped in the AI Loop
+You are exhausted because you have been caught in the AI Whack-a-Mole Death Loop.
+Here is what is actually happening behind the scenes:
+Context Overload: An offline-first desktop app running Next.js App Router, SQLite (Prisma), Electron IPC, and Supabase cloud synchronization is an extremely interconnected stack[cite: 1, 2].
+The "Full Audit" Trap: When you ask an AI to do a "full system audit" or fix 5 different bugs at once (like KB-001 through KB-005), the AI tries to rewrite 6–10 files across different layers (UI, Server Actions, Schema, Sync engine).
+Silent Hallucinations & Drift: Because it touches multiple domains simultaneously, the AI fixes the visual bug in React, but silently breaks a background sync hook or a transaction wrapper in SQLite. You test it, find the new error, paste it back, and the next AI run breaks the UI again to fix the database.
+To finish this app and preserve your sanity, you must switch from "bulldozer coding" (fixing everything at once) to "surgical coding" (1 task, 1 file group, 1 verification, 1 git commit)[cite: 1, 2].
+🤖 Model Division: When to Use Opus vs. Gemini
+Using Claude Opus for simple UI tweaks wastes your limited high-tier quota, while using fast models for database schema migrations risks breaking your sync engine.
+
+
+
+                ┌──────────────────────────────────────────────┐
+                │             CLAUDE OPUS 4.6                  │
+                │        (10–15% - The Staff Architect)        │
+                │   • Root cause analysis on database locks    │
+                │   • Supabase ↔ SQLite schema drift & DDL     │
+                │   • Multi-table transaction integrity        │
+                └──────────────────────┬───────────────────────┘
+                                       │ Plans & Audits
+                                       ▼
+                ┌──────────────────────────────────────────────┐
+                │          GEMINI 3.7 / 3.1 PRO                │
+                │         (85–90% - The Senior Coder)          │
+                │   • Writing UI components & Tailwind CSS     │
+                │   • Building Server Actions & Zod schemas    │
+                │   • Writing test suites & refactoring files  │
+                │   • Full app debugging & iterative edits     │
+                └──────────────────────────────────────────────┘
+
+
+Task-to-Model Assignment Matrix (From Your Analysis Document)
+
+Priority
+Task #
+Summary MD
+Model to Use
+Why
+🚨 P1
+Task 1
+Cannot delete TEST-SYNC-9999 rows
+Gemini 3.7 / 3.1 Pro
+Isolated to deleteSale() cascading try/catches in src/app/actions/sales.ts.
+🚨 P1
+Task 5
+Purge non-GST server crash & ghost rows
+Opus 4.6 (Plan) → Gemini (Code)
+High risk: touches SQLite bulk deletes, inventory stock recalculation, and Supabase audit sync.
+🚨 P1
+Task 7
+Dark mode unreadable in sales table
+Gemini 3.1 Pro / 3.7
+Zero risk: Tailwind utility classes (dark:bg-red-950/30).
+🚨 P1
+Task 12
+Valorant splash / setup wizard
+Gemini 3.7
+Electron window bootstrap & basic onboarding routing.
+⚡ P2
+Task 2
+Credit/Cash columns in sales table
+Gemini (UI) OR Opus (Schema)
+If Interpretation A (UI display): Gemini. If Interpretation B (DB Schema migration): Opus review mandatory[cite: 1, 2].
+⚡ P2
+Task 8
+Link Book/Page numbers & warning dialog
+Gemini 3.7
+UI <Dialog> override + passing forceCommit: true.
+🛠️ P3
+Task 4
+Vehicle body qty pill selector
+Gemini 3.1 Pro
+Form state toggle in sales-entry-form.tsx.
+🛠️ P3
+Task 3
+Quick-pay one-click buttons
+Gemini 3.1 Pro
+UI state setter (cashPaid = finalAmount).
+🛠️ P3
+Task 6
+Reorder Boulder columns & drop time
+Gemini 3.1 Pro
+Table column array reorder & Zod optional modifier.
+🛠️ P3
+Task 9
+Day Book user name → Audit logs
+Gemini 3.7
+React Context (UserContext) to pass performedBy.
+🎨 P4
+Task 10
+Sales table sticky horizontal scroll
+Gemini 3.1 Pro
+CSS (sticky left-0).
+🎨 P4
+Task 11
+Reorganize Settings page tabs
+Gemini 3.1 Pro
+Component extraction & navigation cleanup.
+
+🛡️ The "Zero-Crash" Prompting Framework
+When you are vague, the AI fills in the blanks by guessing, and AI guesses will break Next.js server actions and Prisma sync hooks[cite: 1, 2]. Use this exact prompt formula whenever you start a task.
+Copy-Paste Prompt Template for Coding Tasks
+
+
+
+Markdown
+### SYSTEM CONTEXT & ARCHITECTURE RULES
+- Project: MBM Quarry ERP (Next.js 14 App Router, Electron 42, SQLite Prisma, Supabase Sync).
+- Strictly Offline-First: All operations write to local SQLite first[cite: 1, 2].
+- Strict CFT Units: Never convert or mention MT.
+- Protected Infrastructure: DO NOT touch prisma/schema.prisma, scripts/generate-*, or src/lib/sync/ unless explicitly instructed.
+
+### THE SPECIFIC OBJECTIVE (ONE TASK ONLY)
+[Describe in plain English what you want to happen on screen, e.g.:
+"On the Sales Entry page, when a vehicle is selected that has both companyBodyQty and extraBodyQty, render two pill buttons: [Company Body: X CFT] and [Extra Body: Y CFT]. Clicking either must update the quantity field without requiring a quantityReason validation."]
+
+### TARGET FILES TO MODIFY (DO NOT TOUCH ANY OTHER FILES)
+- `src/components/modules/sales-entry-form.tsx`
+- `src/lib/sales-engine.ts`
+
+### ERROR TRACE / CODE CONTEXT (IF APPLICABLE)
+[Paste terminal error or the specific snippet here]
+
+### STRICT OUTPUT RULES
+1. Provide the complete, drop-in replacement code for ONLY the specified target files.
+2. DO NOT refactor surrounding functions, change database models, or alter sync behavior.
+3. List the exact 3-4 manual steps I must do in the UI to verify that this fix worked.
+
+
+🗺️ The Tactical Execution Roadmap (Phase-by-Phase)
+Do not jump straight into the hardest database tasks. Tackle them in 4 distinct waves to build momentum, lock in stability, and ensure you have working Git save states.
+
+
+
+  ┌──────────────────────────────────────────────────────────────┐
+  │ PHASE A: Zero-Risk Quick Wins                                │
+  │ Task 7 (Dark Mode) ➔ Task 3 (Quick Pay) ➔ Task 10 (Sticky CSS)│
+  └──────────────────────────────┬───────────────────────────────┘
+                                 │ Git Commit & Verify
+                                 ▼
+  ┌──────────────────────────────────────────────────────────────┐
+  │ PHASE B: UI & Workflow Logic Refinements                     │
+  │ Task 4 (Body Qty) ➔ Task 6 (Boulder) ➔ Task 11 (Settings)     │
+  └──────────────────────────────┬───────────────────────────────┘
+                                 │ Git Commit & Verify
+                                 ▼
+  ┌──────────────────────────────────────────────────────────────┐
+  │ PHASE C: Critical Bug Surgery (Server Actions)               │
+  │ Task 1 (Delete Test Rows) ➔ Task 5 (Purge Non-GST)           │
+  │ ➔ Task 8 (Book/Page Duplicate Dialog)                        │
+  └──────────────────────────────┬───────────────────────────────┘
+                                 │ Git Commit & Full Test Suite
+                                 ▼
+  ┌──────────────────────────────────────────────────────────────┐
+  │ PHASE D: Core Architecture & Packaging                       │
+  │ Task 9 (User Audit Log) ➔ Task 2 (Payment Table Columns)     │
+  │ ➔ Task 12 (Setup Wizard & Splash Packaging)                  │
+  └──────────────────────────────────────────────────────────────┘
+
+
+Phase A: Zero-Risk Quick Wins (Time: ~30 mins)
+Step 1 — Task 7 (Dark Mode Fixes): Run Gemini to patch the 8 missing dark: Tailwind classes across sales-page.tsx, day-book-page.tsx, and sales-entry-form.tsx.
+Step 2 — Task 3 (Quick-Pay Buttons): Add the [Full Cash], [Full GPay], [Full Credit] one-click helpers in sales-entry-form.tsx.
+Step 3 — Task 10 (Sticky Columns): Add sticky left-0 bg-background to the Date, Vehicle, and Party columns in the Sales table.
+Verification: Run npm run dev, verify dark mode contrast, click the Quick-Pay buttons, test horizontal scrolling[cite: 1, 2]. Commit to Git: git commit -m "feat: quick-pay, dark-mode fixes, and sticky table columns".
+Phase B: Workflow & UI Logic (Time: ~45 mins)
+Step 4 — Task 4 (Vehicle Body Qty Selection): Add Company vs. Extra Body toggle buttons in sales-entry-form.tsx and relax quantityReason enforcement in sales-engine.ts when toggling.
+Step 5 — Task 6 (Boulder Reordering & Time Removal): Remove the Time input field from boulder-purchases-page.tsx and reorder the table header array to Book/Page → Date → Vehicle → Supplier.
+Step 6 — Task 11 (Settings Page Reorganization): Group Diagnostics, Backup, Sync Dashboard, and User Logs into tabs inside the Settings page.
+Verification: Run npx tsc --noEmit[cite: 1, 2]. Commit to Git: git commit -m "feat: vehicle body selector, boulder UI reorder, settings tabs".
+Phase C: Server Action & Domain Bug Fixes (Time: ~1 hour)
+Step 7 — Task 1 (Fix deleteSale for orphaned/test records):
+
+
+In src/app/actions/sales.ts, wrap recalculatePartyLedger, txAdjustInventoryStock, and recalculateDayBook in defensive try/catch or existence checks.
+Delete the 4 TEST-SYNC-9999 rows from the UI.
+Step 8 — Task 5 (Purge Non-GST Fix):
+
+
+In src/app/actions/sales.ts purgeNonGstSales(), change throw new Error() to return { success: false, error }.
+Restore inventory balances via txAdjustInventoryStock() before calling deleteMany.
+Log individual deletion IDs instead of BULK_PURGE for the sync engine.
+Step 9 — Task 8 (Book/Page Duplicate Confirmation Dialog):
+
+
+In sales-entry-form.tsx and boulder-purchases-page.tsx, hook into checkDuplicateSaleBookNumber() to show a confirmation dialog with a "Force Commit" button that passes forceCommit: true to the server action.
+Verification: Delete test sales, run a non-GST purge, trigger a sync cycle. Commit: git commit -m "fix(sales): deletion cascade resilience, non-gst purge inventory restoration, book-page duplicate warning".
+Phase D: High-Value Architecture & Desktop Polish (Time: ~1.5 hours)
+Step 10 — Task 9 (User Audit Context): Wrap the app in a UserContext loaded from localStorage('mbm_user_name'), passing performedBy into audit logs during create/update actions.
+Step 11 — Task 2 (Payment Display Columns):
+
+
+Decision: Use Interpretation A. Add existing columns (cashPaid, gPayPaid, bankPaid, remainingCredit) directly to the sales table component in sales-page.tsx[cite: 1]. Avoids unnecessary Prisma/Supabase DDL migrations[cite: 1].
+Step 12 — Task 12 (Electron Splash & First-Boot Wizard):
+[cite: 1]
+Verify desktop/main.js loads desktop/splash.html during the boot sequence[cite: 1].
+Add a simple onboarding route /setup triggered when GlobalSettings.needsSetup === true[cite: 1].
+Final Verification: Run npm run test (all 17 sync & drift tests) and package the desktop app via npm run build:electron[cite: 1, 2].
+🔒 The "Fail-Proof" Verification Protocol (Your Daily Routine)
+Whenever you prompt an AI to implement any task from this plan, follow this exact 5-step loop:
+
+
+
+Bash
+# 1. Create a safe temporary branch
+git checkout -b task-step
+
+# 2. Paste AI code into the target files
+
+# 3. Check for TypeScript and Build Errors
+npx tsc --noEmit
+npm run build
+
+# 4. If Build Fails: DO NOT ask the AI to "fix everything".
+# Roll back immediately and re-prompt with the exact compiler error:
+git checkout .
+
+# 5. If Build Passes and UI Test Works: Commit and Merge!
+git add .
+git commit -m "completed task step"
+git checkout main
+git merge task-step
+
+
+Which single task from Phase A (Task 7 Dark Mode, Task 3 Quick-Pay, or Task 10 Sticky Columns) would you like to knock out first?
+
+
+
+
+1.Fuel Management Page (src/components/modules/fuel-management-page.tsx)
+Table hides numeric paidAmount and creditAmount behind a string status badge ("Paid"/"Partial"/"Credit").
+No Excel export functionality exists.
+2.Party Ledger Page (src/components/modules/party-ledger-page.tsx)
+Table shows aggregate debit/credit but hides the per-method split breakdown (cashPaid, bankPaid, gPayPaid).
+3.Expenses Page (src/components/modules/expenses-page.tsx)
+No Excel export functionality exists.
+4.Vehicle Expenses Page (src/components/modules/vehicle-expenses-page.tsx)
+No Excel export functionality exists.
+5.Party Collections Page (src/components/modules/credit-pages.tsx)
+No Excel export functionality exists.
+6 Report Page Summary Sheets (src/components/modules/report-page.tsx & service.ts)
+Purchases, Collections, and Expenses summary Excel sheets completely omit the split payment columns (unlike the Sales sheet which includes them).

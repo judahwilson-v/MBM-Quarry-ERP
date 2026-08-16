@@ -13,7 +13,7 @@ import {
   ReceiptText,
   Truck,
   UserCircle,
-  X, Cloud, CloudOff, LayoutDashboard, Info, Settings, BookOpen, Fuel, Wallet, FileJson, Package, FileText, RefreshCw
+  X, Cloud, CloudOff, LayoutDashboard, Settings, BookOpen, Fuel, Wallet, Package
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";

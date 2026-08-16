@@ -1,6 +1,6 @@
 {
   "name": "mbm-quarry-erp",
-  "version": "2.2.0",
+  "version": "2.3.0",
   "private": true,
   "scripts": {
     "dev": "next dev -p 3005",
@@ -144,7 +144,7 @@
         "provider": "github",
         "owner": "judahwilson-v",
         "repo": "MBM-Quarry-ERP",
-        "releaseType": "draft"
+        "releaseType": "release"
       }
     ]
   }

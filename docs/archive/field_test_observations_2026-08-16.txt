@@ -1,0 +1,39 @@
+dont fix these all at once, first identify the root cuz, then search for similar problem 
+
+1. An unexpected error occurred. Please try again.
+when i tired to delele a certain row 
+
+these were the row 
+1:42 am	TEST-SYNC-9999	Sync Test Party	ROCK	100	₹10.00	₹1,000.00	₹0.00	₹1,000.00	E2E Sync Test Sale	9999/9999	
+
+—	14 Aug 2026	11:41 am	TEST-SYNC-9999	Sync Test Party	ROCK	100	₹10.00	₹1,000.00	₹0.00	₹1,000.00	E2E Sync Test Sale	9999/9999	
+
+—	14 Aug 2026	11:40 am	TEST-SYNC-9999	Sync Test Party	ROCK	100	₹10.00	₹1,000.00	₹0.00	₹1,000.00	E2E Sync Test Sale	9999/9999	
+
+—	14 Aug 2026	10:23 am	TEST-SYNC-9999	Sync Test Party	ROCK	100	₹10.00	₹1,000.00	₹0.00	₹1,000.00	E2E Sync Test Sale	9999/9999
+
+rest all row were deletable , but these were not 
+these were the data which ai agent add in remote chrome debug 
+
+2.major handle very carefully , like once u change one thing 
+its going to have chain reaction - Prisma, SQLite bootstrap, Supabase SQL, sync-map, Zod validators ,UI frontent , idk what else left 
+i want add two coloumn in table of sale record , reason basically i want to know whether something is credit or cash , column for credit and credit then , make sure that it may contina null value as you know like some people pay full money , some dont 
+
+3.this another thing in sale thing , purpose easy way enter , like after the amount is shown , for the button or smth like this click this then cash paid fully or if this gpay paid fully , so they dont have to manually enter the amount paid there , for quick thing
+
+4. in the qty once the user enter the vehical no it always show company body part , we need option to select the extra body part . for example a guy come use extra body qty , so they need to select that one.
+
+5.for purge non gst - ⚠️ RAID MODE: Delete ALL non-GST sales? Only GST sales will remain. This cannot be undone. after i enter the correct password i see this error "An error occurred in the Server Components render. The specific message is omitted in production builds to avoid leaking sensitive details. A digest property is included on this error instance which may provide additional details about the nature of the error."
+
+6.look campare the sales section incoming bolder section - you copy these thing from sales to incoming boulder section A)no need put time there when enter only in the boulder table b) both for incoming boulder and the sale i want the order to be like this book no , date time , then vehicals then order as usuall 
+
+7.ui fix - after adding the gst , in dark mode , i cant see anything cuz letters and the background same colour in the sale tables.
+
+8. also this book/page is sales and boulder are actually connected , , if one added there , then continue here from that number only , incase the same number added give a warning to like force commit to like having same book/page number 
+
+9. i dont understant the relevance of user in day book - look how i meant to use it , if you type ur name there then click or like ok or smth - then in the user logs that name appears , like that person changed this 
+
+10.look sale table is wide , you we cant fully see other other side , in order for that i have scroll down to find that blue bar to to move to right 
+
+11 can u move these thing to section to inside the setting ,in setting first thing i want to see is "System Diagnostics & Reliability" that part  rest all think be there i want you add these section " about and backup" , " sync  dashboard ","user logs ", also "tally export" for tally export after clicking just say this thing like its not completed upcoming feature just small banner down or somewhere  
+12. check about what happne to valouratn style restat , not even wizard setup showed up 

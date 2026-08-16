@@ -1,5 +1,10 @@
 # MBM Quarry ERP — Changelog
 
+## v2.3.0 — Auto-Updater Pipeline Hardening & Release Synchronization (2026-08-16)
+- **Auto-Updater Release Synchronization**: Fixed root cause of 404 errors on `latest.yml` where duplicate draft releases caused release metadata to detach from GitHub releases. Reconfigured `electron-builder` to publish directly with `releaseType: "release"` so `latest.yml`, installer `.exe`, and blockmap files are atomically published to GitHub releases in a single pass.
+- **CI/CD Release Workflow Simplification**: Streamlined `.github/workflows/release.yml` by removing conflicting draft release steps and adding an automatic artifact verification step (`gh release view`).
+- **Defensive Error Handling in Desktop Updater**: Added safe error parsing and graceful failure handling in `desktop/main.js` so network glitches or missing metadata do not disrupt user workflows or crash the desktop client.
+
 ## v2.2.0 — ACID Atomicity Fixes, Next.js Boot Fix & Structural Refactoring (2026-08-16)
 - **ACID Transaction Atomicity Fixes**: Removed swallowed `try/catch` wrappers around relational cleanup hooks (e.g., `decrementVehicleTrips`, `recalculatePartyLedger`, `txAdjustInventoryStock`) across all domain actions. This allows Prisma to natively abort and rollback the `$transaction` on error, ensuring ledgers and inventory remain in perfect parity.
 - **Next.js Boot Sequence Fix**: Converted the dynamic `require("./generated/bootstrap-ddl.json")` in `bootstrap.ts` to a static ES6 import, permanently resolving the Next.js timeout crash during Electron boot in production.

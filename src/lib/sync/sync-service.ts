@@ -4,10 +4,8 @@ import {
   DIRECT_PUSH_MODELS,
   extractEntityData,
   getRowTimestamp,
-  LOCAL_CONFLICT_FIELDS,
   PULL_ORDER,
   PUSH_PRIORITY,
-  REMOTE_CONFLICT_COLUMNS,
   resolveSyncModel,
   SYNC_MODEL_CONFIG,
 } from "./sync-config";

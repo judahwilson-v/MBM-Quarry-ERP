@@ -33,6 +33,7 @@ function blankForm() {
 }
 
 export function EmployeesPage() {
+  const { confirmAction, promptPassword } = usePrompt();
   const [data, setData] = useState<EmployeeRow[]>([]);
   const [search, setSearch] = useState("");
   const [loading, setLoading] = useState(true);
@@ -85,8 +86,8 @@ export function EmployeesPage() {
   }
 
   async function remove(id: string) {
-    if (!confirm("Are you sure? This will delete the employee. Their ledger records will also be deleted.")) return;
-    const password = prompt("Enter delete PIN:");
+    if (!(await confirmAction("Are you sure? This will delete the employee. Their ledger records will also be deleted."))) return;
+    const password = await promptPassword("Enter delete PIN:");
     if (!password) return;
     const isAuth = await verifyEditPassword(password, "delete");
     if (!isAuth) {

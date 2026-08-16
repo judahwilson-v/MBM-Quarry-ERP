@@ -42,7 +42,6 @@ type BoulderRow = {
 };
 
 function blankForm() {
-  const now = new Date();
   return {
     id: "",
     date: todayInputValue(),

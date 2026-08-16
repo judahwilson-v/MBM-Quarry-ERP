@@ -1,6 +1,16 @@
+---
+type: reference
+last_updated: "2026-08-16"
+active_count: 0
+resolved_count: 35
+---
+
 # MBM Quarry ERP — Known Bugs & Edge Cases
 
 ## Active Issues
+*No active bugs at this time.*
+
+## Resolved Issues
 
 ### Category 1: Type Safety & Linting Bugs
 
@@ -198,3 +208,11 @@ Prisma logs warning during static generation if dev database is not synced.
 **Severity**: Low (Resolved in v2.0.0)  
 **Root Cause**: Settings modules were loosely organized across root routes, book/page tracking allowed silent duplicates, and DayBook logs lacked operator attribution.
 **Resolution**: Consolidated routes under `/settings/*` with a unified layout. Added duplicate check warnings (with force-commit) to Book/Page fields. Injected `userName` into DayBook transaction logic for audit traceability.
+
+### KB-PM-006: Auto-Updater 404 Error on `latest.yml` Release Asset
+**Severity**: High (Resolved in v2.3.0)  
+**Root Cause**: In CI/CD (`release.yml`), creating a draft GitHub release with `gh release create --draft` collided with `electron-builder` running with `releaseType: "draft"`. `electron-builder` uploaded artifacts (`latest.yml`, installer `.exe`, `.blockmap`) to an untagged draft release while `gh release edit --draft=false` published the empty draft release. When Electron clients queried GitHub for latest releases, `latest.yml` returned 404.
+**Resolution**: 
+1. Reconfigured `package.json` with `"releaseType": "release"` so `electron-builder` atomically creates and publishes the GitHub release with all assets (`latest.yml`, `.exe`, `.blockmap`) in a single step.
+2. Removed redundant `gh release create`/`edit` commands from `.github/workflows/release.yml` and added an artifact verification check (`gh release view`).
+3. Added robust error parsing in `desktop/main.js` so updater errors fail gracefully without interrupting user operation.

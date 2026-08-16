@@ -1,5 +1,6 @@
 import { PrismaClient, Prisma } from "@prisma/client";
 import { randomUUID } from "crypto";
+import bootstrapDDL from "./generated/bootstrap-ddl.json";
 
 const defaultMaterials = [
   ["6 MM", 38],
@@ -173,8 +174,6 @@ export async function initializeDatabase(prisma: PrismaClient) {
   // The single source of truth is prisma/schema.prisma. This JSON is generated
   // by: node scripts/generate-bootstrap-ddl.js (runs during prebuild)
   // ---------------------------------------------------------------------------
-  // eslint-disable-next-line @typescript-eslint/no-var-requires
-  const bootstrapDDL = require("./generated/bootstrap-ddl.json");
 
   const statements = [
     // Internal migration tracking table (not in Prisma schema)

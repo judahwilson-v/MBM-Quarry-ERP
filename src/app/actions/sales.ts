@@ -38,8 +38,8 @@ async function upsertPartyByName(partyName: string) {
       const row = await tx.party.create({ data: { partyName: name } });
       try {
         await writeAuditEvent(tx, { entityName: "Party", entityId: row.id, action: "create", role: "system", after: row });
-      } catch (e) {
-        console.warn("Failed to write audit event for party upsert:", e);
+      } catch {
+        console.warn("Failed to write audit event for party upsert");
       }
       return row;
     });
@@ -68,8 +68,8 @@ async function upsertVehicleByNumber(vehicleNumber: string, partyName?: string, 
       });
       try {
         await writeAuditEvent(tx, { entityName: "Vehicle", entityId: row.id, action: "create", role: "system", after: row });
-      } catch (e) {
-        console.warn("Failed to write audit event for vehicle create:", e);
+      } catch {
+        console.warn("Failed to write audit event for vehicle create");
       }
       return row;
     });
@@ -88,8 +88,8 @@ async function upsertVehicleByNumber(vehicleNumber: string, partyName?: string, 
         });
         try {
           await writeAuditEvent(tx, { entityName: "Vehicle", entityId: row.id, action: "update", role: "system", before, after: row });
-        } catch (e) {
-          console.warn("Failed to write audit event for vehicle update:", e);
+        } catch {
+          console.warn("Failed to write audit event for vehicle update");
         }
         return row;
       });
@@ -378,12 +378,8 @@ export async function deleteSale(id: string, pin?: string) {
         await tx.outgoingSale.delete({ where: { id } });
         
         if (existing.vehicleId) {
-          try {
-            const v = await tx.vehicle.findUnique({ where: { id: existing.vehicleId } });
-            if (v) await decrementVehicleTrips(tx, existing.vehicleId, existing.tripDelta ?? 1);
-          } catch (e) {
-            console.warn("Failed to decrement vehicle trips:", e);
-          }
+          const v = await tx.vehicle.findUnique({ where: { id: existing.vehicleId } });
+          if (v) await decrementVehicleTrips(tx, existing.vehicleId, existing.tripDelta ?? 1);
         }
         
         try {
@@ -394,48 +390,32 @@ export async function deleteSale(id: string, pin?: string) {
             role: "system",
             before: existing,
           });
-        } catch (e) {
-          console.warn("Failed to write audit event:", e);
+        } catch {
+          console.warn(`[Audit Log Warning] Failed to write audit event for Sale deletion (ID: ${id})`);
         }
 
         if (existing.partyId) {
-          try {
-            const p = await tx.party.findUnique({ where: { id: existing.partyId } });
-            if (p) await recalculatePartyLedger(tx, existing.partyId);
-          } catch (e) {
-            console.warn("Failed to recalculate party ledger:", e);
-          }
+          const p = await tx.party.findUnique({ where: { id: existing.partyId } });
+          if (p) await recalculatePartyLedger(tx, existing.partyId);
         }
 
         // Restore inventory
-        try {
-          const m = await tx.material.findFirst({ where: { materialName: existing.materialName } });
-          if (m) {
-            await txAdjustInventoryStock(tx, existing.materialName, existing.qty, 'SALE_OUT', id, `Sale Deleted: ${existing.vehicleNumber}`);
-          }
-        } catch (e) {
-          console.warn("Failed to adjust inventory stock:", e);
+        const m = await tx.material.findFirst({ where: { materialName: existing.materialName } });
+        if (m) {
+          await txAdjustInventoryStock(tx, existing.materialName, existing.qty, 'SALE_OUT', id, `Sale Deleted: ${existing.vehicleNumber}`);
         }
         
         // Cascade delete financial events and ledger entries
-        try {
-          const events = await tx.financialEvent.findMany({ where: { entityId: id } });
-          const eventIds = events.map((e: any) => e.eventId);
-          if (eventIds.length > 0) {
-            await tx.ledgerEntry.deleteMany({ where: { financialEventId: { in: eventIds } } });
-            await tx.financialEvent.deleteMany({ where: { eventId: { in: eventIds } } });
-          }
-        } catch (e) {
-          console.warn("Failed to delete financial events:", e);
+        const events = await tx.financialEvent.findMany({ where: { entityId: id } });
+        const eventIds = events.map((e: any) => e.eventId);
+        if (eventIds.length > 0) {
+          await tx.ledgerEntry.deleteMany({ where: { financialEventId: { in: eventIds } } });
+          await tx.financialEvent.deleteMany({ where: { eventId: { in: eventIds } } });
         }
 
         // Recalculate daybook for the sale date
-        try {
-          const dayBook = await getOrCreateDayBook(tx, existing.saleDate.toISOString());
-          await recalculateDayBook(tx, dayBook);
-        } catch (e) {
-          console.warn("Failed to recalculate daybook:", e);
-        }
+        const dayBook = await getOrCreateDayBook(tx, existing.saleDate.toISOString());
+        await recalculateDayBook(tx, dayBook);
       }
     });
     return { success: true };
@@ -461,12 +441,8 @@ export async function purgeNonGstSales(pin?: string) {
       
       for (const sale of nonGstSales) {
         if (sale.vehicleId) {
-          try {
-            const v = await tx.vehicle.findUnique({ where: { id: sale.vehicleId } });
-            if (v) await decrementVehicleTrips(tx, sale.vehicleId, sale.tripDelta ?? 1);
-          } catch (e) {
-            console.warn("Failed to decrement vehicle trips:", e);
-          }
+          const v = await tx.vehicle.findUnique({ where: { id: sale.vehicleId } });
+          if (v) await decrementVehicleTrips(tx, sale.vehicleId, sale.tripDelta ?? 1);
         }
         if (sale.partyId) {
           const p = await tx.party.findUnique({ where: { id: sale.partyId } });
@@ -475,13 +451,9 @@ export async function purgeNonGstSales(pin?: string) {
         affectedDates.add(sale.saleDate.toISOString());
         
         // Restore inventory per item!
-        try {
-          const m = await tx.material.findFirst({ where: { materialName: sale.materialName } });
-          if (m) {
-            await txAdjustInventoryStock(tx, sale.materialName, sale.qty, 'SALE_OUT', sale.id, `Sale Purged: ${sale.vehicleNumber}`);
-          }
-        } catch (e) {
-          console.warn("Failed to restore inventory stock:", e);
+        const m = await tx.material.findFirst({ where: { materialName: sale.materialName } });
+        if (m) {
+          await txAdjustInventoryStock(tx, sale.materialName, sale.qty, 'SALE_OUT', sale.id, `Sale Purged: ${sale.vehicleNumber}`);
         }
         
         // Write individual audit entries instead of BULK_PURGE
@@ -493,7 +465,9 @@ export async function purgeNonGstSales(pin?: string) {
             role: "system",
             before: sale,
           });
-        } catch (e) {}
+        } catch {
+          console.warn(`[Audit Log Warning] Failed to write audit event for Purged Sale (ID: ${sale.id})`);
+        }
       }
 
       const saleIds = nonGstSales.map((s: any) => s.id);
@@ -509,16 +483,12 @@ export async function purgeNonGstSales(pin?: string) {
       });
 
       for (const partyId of Array.from(affectedPartyIds)) {
-        try {
-          await recalculatePartyLedger(tx, partyId);
-        } catch (e) {}
+        await recalculatePartyLedger(tx, partyId);
       }
       
       for (const d of Array.from(affectedDates)) {
-        try {
-          const dayBook = await getOrCreateDayBook(tx, d);
-          await recalculateDayBook(tx, dayBook);
-        } catch (e) {}
+        const dayBook = await getOrCreateDayBook(tx, d);
+        await recalculateDayBook(tx, dayBook);
       }
 
       return deleteResult.count;

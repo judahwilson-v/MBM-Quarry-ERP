@@ -200,12 +200,8 @@ export async function deleteFuelPurchase(id: string, pin?: string) {
       if (expense) {
         const financialEvent = await tx.financialEvent.findFirst({ where: { entityId: expense.id } });
         if (financialEvent) {
-          try {
-            await tx.financialEvent.delete({ where: { id: financialEvent.id } });
-            await tx.dayBookExpenseEntry.deleteMany({ where: { sourceEventId: financialEvent.eventId } });
-          } catch (e) {
-            console.warn("Failed to delete financial events for fuel purchase:", e);
-          }
+          await tx.financialEvent.delete({ where: { id: financialEvent.id } });
+          await tx.dayBookExpenseEntry.deleteMany({ where: { sourceEventId: financialEvent.eventId } });
         }
         await tx.expense.delete({ where: { id: expense.id } });
 
@@ -213,19 +209,15 @@ export async function deleteFuelPurchase(id: string, pin?: string) {
         const day = new Date(`${businessDateStr}T00:00:00`);
         const dayBook = await tx.dayBook.findUnique({ where: { businessDate: day } });
         if (dayBook) {
-          try {
-            await recalculateDayBook(tx, dayBook);
-          } catch (e) {
-            console.warn("Failed to recalculate daybook for fuel purchase:", e);
-          }
+          await recalculateDayBook(tx, dayBook);
         }
       }
       
       await tx.fuelPurchase.delete({ where: { id } });
       try {
         await writeAuditEvent(tx, { entityName: "FuelPurchase", entityId: id, action: "delete", role: "system", before: row, after: null });
-      } catch (e) {
-        console.warn("Failed to write audit event for fuel purchase:", e);
+      } catch {
+        console.warn(`[Audit Log Warning] Failed to write audit event for FuelPurchase deletion (ID: ${id})`);
       }
       return row;
     }));
@@ -234,12 +226,6 @@ export async function deleteFuelPurchase(id: string, pin?: string) {
   }
 }
 
-export type EmployeeInput = {
-  id?: string;
-  name: string;
-  phone?: string | null;
-  address?: string | null;
-  role?: string;
-};
+
 
 

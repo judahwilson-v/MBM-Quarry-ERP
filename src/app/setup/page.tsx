@@ -52,7 +52,7 @@ export default function SetupWizard() {
           </div>
           <CardTitle className="text-2xl font-bold">Welcome to MBM Quarry ERP</CardTitle>
           <CardDescription>
-            Let's configure your system for first-time use.
+            Let&apos;s configure your system for first-time use.
           </CardDescription>
         </CardHeader>
         <CardContent>

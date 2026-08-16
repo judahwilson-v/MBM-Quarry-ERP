@@ -3,7 +3,7 @@
 import { ReactNode } from "react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { Settings, Server, RefreshCw, FileText, FileJson, Info } from "lucide-react";
+import { Server, RefreshCw, FileText, FileJson, Info } from "lucide-react";
 import { cn } from "@/lib/utils";
 
 const settingsNav = [
