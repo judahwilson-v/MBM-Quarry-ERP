@@ -81,7 +81,7 @@ Output goes to `release-v2/` directory.
 
 ### ⚠️ Compulsory Release Assets (Must Be Exactly 5)
 Every published GitHub release MUST contain all 5 assets:
-1. **`latest.yml`** — Update manifest checked by `electron-updater` (contains version, sha512, file path).
+1. **`latest.yml`** — Update manifest checked by `electron-updater` (contains version, sha512, file path). **(Missing this file causes the `Cannot find latest.yml... HttpError: 404` client error).**
 2. **`MBM-Quarry-V2-Setup-X.Y.Z.exe`** — Full NSIS installer for clean installs.
 3. **`MBM-Quarry-V2-Setup-X.Y.Z.exe.blockmap`** — **COMPULSORY**: Differential binary chunk map for fast delta downloads. Enables existing clients to download only changed chunks (~2MB to 15MB) instead of the entire 180MB installer.
 4. **`Source code (zip)`** — GitHub repository snapshot.

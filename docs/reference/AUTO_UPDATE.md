@@ -60,6 +60,9 @@ Every release **must** contain exactly 5 assets on GitHub:
 
 ## Troubleshooting
 
+### Q: I receive a "Cannot find latest.yml... HttpError: 404" error.
+- **Missing Assets / Empty Release**: This error means the client found the new version tag, but the update manifest (`latest.yml`) is missing from the GitHub release. This usually happens if `gh release create` and `electron-builder` clash, resulting in an empty release. **Always verify all 5 compulsory assets are present in the release on GitHub**.
+
 ### Q: I published a release, but the client isn't updating.
 - **Check the Version**: Did you actually increment the `"version"` in `package.json` before running the publish command?
 - **Check the GitHub Release**: Is the release marked as a "Draft" or "Pre-release"? `electron-updater` only pulls from stable published releases.
