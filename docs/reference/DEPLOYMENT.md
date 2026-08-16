@@ -29,9 +29,14 @@ App code (`C:\Program Files\MBM Quarry\`) is completely decoupled from app data 
 
 ## 4. Release Workflow
 1. Bump version in `package.json`.
-2. Run `npm run electron:package` — this auto-stamps the `VERSION` file.
-3. `electron-builder` outputs: installer `.exe`, blockmap `.yml`, portable executable.
-4. Upload artifacts to a **GitHub Release** tagged `v1.0.x`.
+2. Push git tag `vX.Y.Z` or run `npm run release:patch|minor|major`.
+3. GitHub Actions builds and publishes all 5 compulsory assets:
+   - `latest.yml` (update manifest)
+   - `MBM-Quarry-V2-Setup-X.Y.Z.exe` (NSIS installer)
+   - `MBM-Quarry-V2-Setup-X.Y.Z.exe.blockmap` (differential blockmap for delta updates)
+   - `Source code (zip)`
+   - `Source code (tar.gz)`
+4. Verify all 5 assets with `gh release view vX.Y.Z`.
 
 ## 5. Auto-Updater (Active — D-011)
 Infrastructure is operational (`electron-updater`).

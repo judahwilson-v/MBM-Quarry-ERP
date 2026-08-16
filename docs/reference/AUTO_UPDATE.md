@@ -43,13 +43,18 @@ This command will:
 3. Create a Draft Release on your GitHub repository.
 4. Upload the installers directly to that release.
 
-### Step 4: Publish the Release on GitHub
-1. Go to your GitHub repository in the browser (https://github.com/mbm-quarry/MBM-Quarry-ERP).
-2. Click on **Releases** on the right side.
-3. You will see a new "Draft" release. Click the edit (pencil) icon next to it.
-4. Click **Publish Release** at the bottom.
+### Step 4: Verify the 5 Compulsory Assets on GitHub
+Every release **must** contain exactly 5 assets on GitHub:
+1. **`latest.yml`** (Update manifest)
+2. **`MBM-Quarry-V2-Setup-X.Y.Z.exe`** (Installer)
+3. **`MBM-Quarry-V2-Setup-X.Y.Z.exe.blockmap`** (Differential chunk map for delta updates)
+4. **`Source code (zip)`**
+5. **`Source code (tar.gz)`**
 
-**The moment you click Publish, all Windows clients at the quarry will detect it on their next launch and begin the auto-update process.**
+> [!IMPORTANT]
+> The `.blockmap` file is mandatory for delta updates. It allows clients with slow/limited quarry internet to download only changed binary chunks instead of the entire 180MB package.
+
+**The moment the release is published with all 5 assets, all Windows clients at the quarry will detect it on their next launch and begin the auto-update process.**
 
 ---
 

@@ -71,13 +71,26 @@ Output goes to `release-v2/` directory.
 
 ---
 
-## Step 5 — Post-Release
+## Step 5 — Post-Release & Asset Verification
 
 - [ ] Verify the installer runs and boots correctly
 - [ ] Verify the `VERSION` displayed in Settings > About matches
 - [ ] Tag the git commit: `git tag vX.Y.Z`
 - [ ] Push: `git push origin main --tags`
 - [ ] If publishing: `npm run electron:publish`
+
+### ⚠️ Compulsory Release Assets (Must Be Exactly 5)
+Every published GitHub release MUST contain all 5 assets:
+1. **`latest.yml`** — Update manifest checked by `electron-updater` (contains version, sha512, file path).
+2. **`MBM-Quarry-V2-Setup-X.Y.Z.exe`** — Full NSIS installer for clean installs.
+3. **`MBM-Quarry-V2-Setup-X.Y.Z.exe.blockmap`** — **COMPULSORY**: Differential binary chunk map for fast delta downloads. Enables existing clients to download only changed chunks (~2MB to 15MB) instead of the entire 180MB installer.
+4. **`Source code (zip)`** — GitHub repository snapshot.
+5. **`Source code (tar.gz)`** — GitHub repository snapshot.
+
+Verify with:
+```bash
+gh release view vX.Y.Z --json assets --jq ".assets[].name"
+```
 
 ---
 
@@ -87,3 +100,4 @@ Output goes to `release-v2/` directory.
 - **Auto-update setup**: `docs/reference/AUTO_UPDATE.md`
 - **Release notes format**: `docs/reference/RELEASE_NOTES.md`
 - **Release process details**: `docs/reference/RELEASE.md`
+
