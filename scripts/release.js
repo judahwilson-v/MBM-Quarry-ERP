@@ -30,11 +30,11 @@ try {
 
   // 3. Commit and tag
   console.log('Committing changes...');
-  execSync('git add package.json package-lock.json VERSION', { stdio: 'inherit' });
-  execSync(`git commit -m "Release v${newVersion} — System Reliability Update"`, { stdio: 'inherit' });
+  execSync('git add .', { stdio: 'inherit' });
+  execSync(`git commit -m "Release v${newVersion} — Full Server Restore"`, { stdio: 'inherit' });
 
   console.log('Creating Git tag...');
-  execSync(`git tag -a v${newVersion} -m "Release v${newVersion} — System Reliability Update"`, { stdio: 'inherit' });
+  execSync(`git tag -a v${newVersion} -m "Release v${newVersion} — Full Server Restore"`, { stdio: 'inherit' });
 
   // 4. Push to remote
   console.log('Pushing to GitHub...');

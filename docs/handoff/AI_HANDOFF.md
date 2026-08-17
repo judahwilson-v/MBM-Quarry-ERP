@@ -10,9 +10,9 @@ blocking_issues: 0
 
 ## Current State
 
-- **Version**: v2.3.1
+- **Version**: v2.4.0
 - **Status**: Stable / Fully Operational
-- **Phase**: System Reliability Update (5-Asset Distribution & Delta Sync)
+- **Phase**: Disaster Recovery (Full Server Restore)
 - **Blocking Issues**: None
 
 ---
@@ -21,6 +21,7 @@ blocking_issues: 0
 
 | Version | What | Date |
 |:--------|:-----|:-----|
+| v2.4.0 | Full Server Restore Engine & Sync Recovery UI | 2026-08-17 |
 | v2.3.1 | System Reliability Update (compulsory 5-asset distribution & delta chunk validation) | 2026-08-16 |
 | v2.3.0 | Auto-updater pipeline hardening (`latest.yml` sync fix), graceful updater error handling | 2026-08-16 |
 | v2.2.0 | ACID atomicity fixes, Next.js boot fix, structural refactoring, ESLint cleanup | 2026-08-16 |
@@ -41,7 +42,7 @@ blocking_issues: 0
 | Electron Desktop | ✅ Working |
 | TypeScript / Lint / Tests | ✅ Zero errors |
 | Dark Mode | ✅ Audited |
-| Documentation | ✅ Synchronized (2026-08-16) |
+| Documentation | ✅ Synchronized (2026-08-17) |
 
 ---
 

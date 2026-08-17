@@ -7,15 +7,18 @@ import {
   forcePullSync, 
   triggerSync, 
   resetSyncCursor,
-  fetchOnlineStatus
+  fetchOnlineStatus,
+  checkRestoreEligibility,
+  performFullRestore
 } from "@/app/actions/sync";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription, DialogFooter } from "@/components/ui/dialog";
 import { 
   Cloud, CloudOff, RefreshCw, AlertCircle, 
   CheckCircle2, Clock, ServerCrash, 
-  ArrowUpCircle, AlertTriangle
+  ArrowUpCircle, AlertTriangle, Download
 } from "lucide-react";
 
 type SyncData = Awaited<ReturnType<typeof fetchDetailedSyncStatus>>;
@@ -25,6 +28,58 @@ export default function SyncDashboardPage() {
   const [isOnline, setIsOnline] = useState<boolean>(true);
   const [isLoading, setIsLoading] = useState(true);
   const [actionLoading, setActionLoading] = useState<string | null>(null);
+
+  type RestorePhase = 'idle' | 'checking' | 'preview' | 'restoring' | 'success' | 'error';
+  const [restorePhase, setRestorePhase] = useState<RestorePhase>('idle');
+  const [eligibilityData, setEligibilityData] = useState<Awaited<ReturnType<typeof checkRestoreEligibility>> | null>(null);
+  const [restoreResult, setRestoreResult] = useState<{
+    success: boolean;
+    tablesRestored: number;
+    totalRows: number;
+    errors: Array<{ table: string; rowId?: string; error: string }>;
+    errorMessage?: string;
+  } | null>(null);
+
+  const handleCheckRestore = async () => {
+    setRestorePhase('checking');
+    try {
+      const result = await checkRestoreEligibility();
+      setEligibilityData(result);
+      setRestorePhase('preview');
+    } catch (error) {
+      console.error("Failed to check restore eligibility", error);
+      setRestoreResult({ success: false, tablesRestored: 0, totalRows: 0, errors: [{ table: 'global', error: String(error) }] });
+      setRestorePhase('error');
+    }
+  };
+
+  const handleConfirmRestore = async () => {
+    if (!eligibilityData) return;
+    setRestorePhase('restoring');
+    try {
+      const result = await performFullRestore({ force: eligibilityData.hasExistingData });
+      setRestoreResult(result);
+      if (result.success) {
+        setRestorePhase('success');
+      } else {
+        setRestorePhase('error');
+      }
+    } catch (error) {
+      console.error("Restore failed", error);
+      setRestoreResult({ success: false, tablesRestored: 0, totalRows: 0, errors: [{ table: 'global', error: String(error) }] });
+      setRestorePhase('error');
+    }
+  };
+
+  const handleCloseRestoreDialog = () => {
+    if (restorePhase === 'restoring') return;
+    setRestorePhase('idle');
+    setEligibilityData(null);
+    setRestoreResult(null);
+    if (restorePhase === 'success') {
+      loadData();
+    }
+  };
 
   const loadData = async () => {
     try {
@@ -94,6 +149,152 @@ export default function SyncDashboardPage() {
           )}
         </div>
       </div>
+
+      {/* Restore Section */}
+      <Card className="border-indigo-500/20 shadow-sm mb-6">
+        <CardHeader className="pb-3">
+          <CardTitle className="text-lg flex items-center gap-2">
+            <Download className="h-5 w-5 text-indigo-500" />
+            Restore from Server
+          </CardTitle>
+        </CardHeader>
+        <CardContent className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+          <p className="text-sm text-muted-foreground">
+            Download all data from the cloud server to this PC. Use this when setting up the software on a new computer.
+          </p>
+          <Button variant="outline" onClick={handleCheckRestore} className="shrink-0 border-indigo-200 hover:bg-indigo-50 dark:border-indigo-800 dark:hover:bg-indigo-950">
+            <Download className="mr-2 h-4 w-4" />
+            Restore All Data
+          </Button>
+        </CardContent>
+      </Card>
+
+      <Dialog open={restorePhase !== 'idle'} onOpenChange={(open) => !open && handleCloseRestoreDialog()}>
+        <DialogContent className="max-w-2xl" onPointerDownOutside={(e) => restorePhase === 'restoring' && e.preventDefault()} onEscapeKeyDown={(e) => restorePhase === 'restoring' && e.preventDefault()}>
+          {restorePhase === 'checking' && (
+            <div className="flex flex-col items-center justify-center py-8 space-y-4">
+              <RefreshCw className="h-10 w-10 animate-spin text-indigo-500" />
+              <div className="text-lg font-medium">Checking server data...</div>
+            </div>
+          )}
+
+          {restorePhase === 'preview' && eligibilityData && (
+            <>
+              <DialogHeader>
+                <DialogTitle>Restore Data Preview</DialogTitle>
+                <DialogDescription>
+                  Review the data available on the server before proceeding.
+                </DialogDescription>
+              </DialogHeader>
+              <div className="space-y-4 py-4">
+                <div className="flex justify-between items-center bg-muted/50 p-3 rounded-lg">
+                  <span className="font-medium">Total Server Rows</span>
+                  <Badge variant="secondary" className="text-base">{eligibilityData.totalSupabaseRows}</Badge>
+                </div>
+                
+                {eligibilityData.hasExistingData && (
+                  <div className="flex items-start gap-3 bg-destructive/10 text-destructive p-3 rounded-lg border border-destructive/20">
+                    <AlertTriangle className="h-5 w-5 shrink-0 mt-0.5" />
+                    <div className="text-sm font-medium">
+                      ⚠️ This will overwrite {eligibilityData.localRecordCount} existing local records.
+                    </div>
+                  </div>
+                )}
+
+                {eligibilityData.warnings.length > 0 && (
+                  <div className="space-y-2">
+                    {eligibilityData.warnings.map((w, i) => (
+                      <div key={i} className="text-sm text-amber-600 flex items-center gap-2">
+                        <AlertTriangle className="h-4 w-4" />
+                        {w}
+                      </div>
+                    ))}
+                  </div>
+                )}
+
+                <div className="border rounded-md max-h-[200px] overflow-auto">
+                  <table className="w-full text-sm">
+                    <thead className="bg-muted sticky top-0">
+                      <tr>
+                        <th className="text-left p-2 font-medium">Table</th>
+                        <th className="text-right p-2 font-medium">Rows</th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      {eligibilityData.supabaseTables.map(t => (
+                        <tr key={t.table} className="border-t">
+                          <td className="p-2">{t.table}</td>
+                          <td className="p-2 text-right">{t.rowCount}</td>
+                        </tr>
+                      ))}
+                    </tbody>
+                  </table>
+                </div>
+              </div>
+              <DialogFooter>
+                <Button variant="outline" onClick={handleCloseRestoreDialog}>Cancel</Button>
+                <Button variant={eligibilityData.hasExistingData ? "destructive" : "default"} onClick={handleConfirmRestore}>
+                  Yes, Restore Everything
+                </Button>
+              </DialogFooter>
+            </>
+          )}
+
+          {restorePhase === 'restoring' && (
+            <div className="flex flex-col items-center justify-center py-8 space-y-4">
+              <RefreshCw className="h-10 w-10 animate-spin text-indigo-500" />
+              <div className="text-lg font-medium">Restoring data...</div>
+              <div className="text-sm text-muted-foreground">Please do not close the application.</div>
+            </div>
+          )}
+
+          {restorePhase === 'success' && restoreResult && (
+            <>
+              <DialogHeader>
+                <DialogTitle className="flex items-center gap-2 text-green-600">
+                  <CheckCircle2 className="h-6 w-6" />
+                  Restore Complete!
+                </DialogTitle>
+              </DialogHeader>
+              <div className="py-6 flex flex-col items-center text-center space-y-2">
+                <p className="text-lg">{restoreResult.tablesRestored} tables restored successfully.</p>
+                <p className="text-muted-foreground">{restoreResult.totalRows} total rows downloaded.</p>
+              </div>
+              <DialogFooter>
+                <Button onClick={handleCloseRestoreDialog}>Done</Button>
+              </DialogFooter>
+            </>
+          )}
+
+          {restorePhase === 'error' && restoreResult && (
+            <>
+              <DialogHeader>
+                <DialogTitle className="flex items-center gap-2 text-destructive">
+                  <AlertCircle className="h-6 w-6" />
+                  Restore Failed
+                </DialogTitle>
+              </DialogHeader>
+              <div className="py-4 space-y-4">
+                <p className="text-sm">{restoreResult.errors.length > 0 ? restoreResult.errors.map(e => `${e.table}: ${e.error}`).join('; ') : "An unknown error occurred."}</p>
+                {restoreResult.errors && restoreResult.errors.length > 0 && (
+                  <div className="border rounded-md max-h-[200px] overflow-auto bg-destructive/5 p-2">
+                    {restoreResult.errors.map((e, i) => (
+                      <div key={i} className="text-sm text-destructive mb-2 pb-2 border-b border-destructive/10 last:mb-0 last:pb-0 last:border-0">
+                        <span className="font-semibold">{e.table}</span>
+                        {e.rowId && <span className="text-xs ml-2 opacity-80">(ID: {e.rowId})</span>}
+                        <div className="mt-1 text-xs opacity-90">{e.error}</div>
+                      </div>
+                    ))}
+                  </div>
+                )}
+              </div>
+              <DialogFooter>
+                <Button variant="outline" onClick={handleCloseRestoreDialog}>Close</Button>
+              </DialogFooter>
+            </>
+          )}
+        </DialogContent>
+      </Dialog>
 
       <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
         <Card>

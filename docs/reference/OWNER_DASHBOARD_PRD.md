@@ -69,10 +69,10 @@ graph TD
 3. **Owner Dashboard** fetches the latest data via Server Components.
 4. **Revalidation:** Dashboard pages should use Next.js `revalidate` (e.g., every 60 seconds) or Supabase Realtime to keep the UI fresh without killing the database.
 
-## 7. Implementation Phases
-- **Phase 9.1:** Setup Next.js project, Tailwind, and Supabase Auth.
-- **Phase 9.2:** Build the Dashboard Layout and Sync Status header.
-- **Phase 9.3:** Implement Top KPIs (Sales, Expenses, Cash).
-- **Phase 9.4:** Implement Charts (Weekly sales trend).
-- **Phase 9.5:** Implement Party Ledger lookup and Exports.
-- **Phase 9.6:** Deploy to Vercel and test with real synced data.
+## 7. Implementation Milestones (Project 2)
+- **Phase P2.1:** Setup Next.js project, Tailwind, and Supabase Auth.
+- **Phase P2.2:** Build the Dashboard Layout and Sync Status header.
+- **Phase P2.3:** Implement Top KPIs (Sales, Expenses, Cash).
+- **Phase P2.4:** Implement Charts (Weekly sales trend).
+- **Phase P2.5:** Implement Party Ledger lookup and Exports.
+- **Phase P2.6:** Deploy to Vercel and test with real synced data.

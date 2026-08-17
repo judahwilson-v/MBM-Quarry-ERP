@@ -1,6 +1,6 @@
 {
   "name": "mbm-quarry-erp",
-  "version": "2.3.5",
+  "version": "2.4.0",
   "private": true,
   "scripts": {
     "dev": "next dev -p 3005",
@@ -133,7 +133,7 @@
     },
     "nsis": {
       "oneClick": true,
-      "perMachine": true,
+      "perMachine": false,
       "createDesktopShortcut": true,
       "createStartMenuShortcut": true,
       "shortcutName": "MBM Quarry V2",

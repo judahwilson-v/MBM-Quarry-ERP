@@ -73,3 +73,16 @@ export async function resetSyncCursor() {
     return { success: false, error: sanitizeError(error) };
   }
 }
+
+export async function checkRestoreEligibility() {
+  const { checkRestoreEligibility: check } = await import("@/lib/sync/sync-service");
+  return check();
+}
+
+export async function performFullRestore(options?: { force?: boolean }) {
+  const { fullRestoreFromSupabase } = await import("@/lib/sync/sync-service");
+  const result = await fullRestoreFromSupabase(options);
+  revalidatePath("/", "layout");
+  return result;
+}
+

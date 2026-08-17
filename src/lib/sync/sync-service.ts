@@ -975,3 +975,321 @@ export async function getDetailedSyncStatus() {
     heldLogs: _lastHeldLogs
   };
 }
+
+// ---------- Full Restore from Supabase ----------
+
+/**
+ * Order for DELETING local data: reverse of PULL_ORDER (children first, parents last).
+ * This avoids FK constraint violations during cleanup.
+ */
+const DELETE_ORDER: (keyof typeof SYNC_MODEL_CONFIG)[] = [...PULL_ORDER].reverse();
+
+/**
+ * Tables to skip during full restore because they are ephemeral / retention-purged
+ * on Supabase and not essential for a working system.
+ */
+const RESTORE_SKIP_TABLES = new Set(["audit_logs"]);
+
+/**
+ * Check if the local database is effectively empty (fresh install)
+ * and if Supabase has data available to restore.
+ */
+export async function checkRestoreEligibility(): Promise<{
+  eligible: boolean;
+  localRecordCount: number;
+  supabaseTables: Array<{ table: string; rowCount: number }>;
+  totalSupabaseRows: number;
+  hasExistingData: boolean;
+  warnings: string[];
+}> {
+  const db = await getDb();
+  const supabase = createSyncClient();
+
+  // Count local records across key tables
+  let localRecordCount = 0;
+  const keyDelegates: (keyof typeof SYNC_MODEL_CONFIG)[] = [
+    "Party", "Vehicle", "Material", "OutgoingSale", "IncomingBoulder",
+    "Employee", "Supplier", "Expense", "GlobalSettings",
+  ];
+  for (const modelName of keyDelegates) {
+    const config = SYNC_MODEL_CONFIG[modelName];
+    try {
+      const count = await (db as any)[config.delegate].count();
+      localRecordCount += count;
+    } catch {
+      // Table might not exist yet
+    }
+  }
+
+  // Count Supabase records per table
+  const supabaseTables: Array<{ table: string; rowCount: number }> = [];
+  let totalSupabaseRows = 0;
+  const warnings: string[] = [];
+
+  for (const modelName of PULL_ORDER) {
+    const config = SYNC_MODEL_CONFIG[modelName];
+    if (RESTORE_SKIP_TABLES.has(config.table)) continue;
+
+    try {
+      const { count, error } = await supabase
+        .from(config.table)
+        .select("*", { count: "exact", head: true });
+
+      if (error) {
+        warnings.push(`Could not check ${config.table}: ${error.message}`);
+        supabaseTables.push({ table: config.table, rowCount: 0 });
+      } else {
+        const rowCount = count ?? 0;
+        supabaseTables.push({ table: config.table, rowCount });
+        totalSupabaseRows += rowCount;
+      }
+    } catch (err: any) {
+      warnings.push(`Error checking ${config.table}: ${err?.message || String(err)}`);
+      supabaseTables.push({ table: config.table, rowCount: 0 });
+    }
+  }
+
+  // Sort tables by row count descending for the UI
+  supabaseTables.sort((a, b) => b.rowCount - a.rowCount);
+
+  const hasExistingData = localRecordCount > 5; // Bootstrap seed creates a few default records
+
+  if (totalSupabaseRows === 0) {
+    warnings.push("No data found on the server. Nothing to restore.");
+  }
+
+  if (hasExistingData) {
+    warnings.push(`Local database has ${localRecordCount} existing records. A full restore will overwrite all local data.`);
+  }
+
+  return {
+    eligible: totalSupabaseRows > 0,
+    localRecordCount,
+    supabaseTables,
+    totalSupabaseRows,
+    hasExistingData,
+    warnings,
+  };
+}
+
+/**
+ * Fetches ALL rows from a Supabase table using range-based pagination.
+ * Supabase REST API returns max 1000 rows per request.
+ */
+async function fetchAllRows(
+  supabase: ReturnType<typeof createSyncClient>,
+  table: string,
+  timeColumn: string,
+): Promise<{ rows: any[]; error: string | null }> {
+  const PAGE_SIZE = 1000;
+  const allRows: any[] = [];
+  let offset = 0;
+  let hasMore = true;
+
+  while (hasMore) {
+    const { data, error } = await supabase
+      .from(table)
+      .select("*")
+      .order(timeColumn, { ascending: true })
+      .range(offset, offset + PAGE_SIZE - 1);
+
+    if (error) {
+      return { rows: allRows, error: `Fetch failed at offset ${offset}: ${error.message}` };
+    }
+
+    if (data && data.length > 0) {
+      allRows.push(...data);
+      offset += data.length;
+      hasMore = data.length === PAGE_SIZE;
+    } else {
+      hasMore = false;
+    }
+  }
+
+  return { rows: allRows, error: null };
+}
+
+/**
+ * Full restore: wipes local database and pulls ALL data from Supabase.
+ * Use this on a fresh PC install to clone the data from the server.
+ *
+ * @param options.force - If true, allows restore even when local DB has existing data.
+ */
+export async function fullRestoreFromSupabase(
+  options?: { force?: boolean }
+): Promise<{
+  success: boolean;
+  tablesRestored: number;
+  totalRows: number;
+  errors: SyncErrorItem[];
+}> {
+  const db = await getDb();
+  const supabase = createSyncClient();
+  const errors: SyncErrorItem[] = [];
+
+  let tablesRestored = 0;
+  let totalRows = 0;
+
+  try {
+    // Safety check: ensure local DB is empty unless forced
+    if (!options?.force) {
+      const eligibility = await checkRestoreEligibility();
+      if (eligibility.hasExistingData) {
+        return {
+          success: false,
+          tablesRestored: 0,
+          totalRows: 0,
+          errors: [{ table: "global", error: "Local database has existing data. Use force=true to overwrite." }],
+        };
+      }
+    }
+
+    // Mark sync state as restoring
+    try {
+      const existingSyncState = await db.syncState.findUnique({ where: { id: "default" } });
+      if (existingSyncState) {
+        await db.syncState.update({ where: { id: "default" }, data: { status: "SYNCING", lastError: null } });
+      } else {
+        await db.syncState.create({ data: { id: "default", lastSyncedAt: new Date(0), status: "SYNCING" } });
+      }
+    } catch {
+      // SyncState table might not exist yet on a truly fresh DB, continue anyway
+    }
+
+    // Phase 1: Clear ALL local data (in reverse FK order)
+    console.log("[Full Restore] Phase 1: Clearing local data...");
+    for (const modelName of DELETE_ORDER) {
+      const config = SYNC_MODEL_CONFIG[modelName];
+      try {
+        const delegate = (db as any)[config.delegate];
+        if (delegate) {
+          await delegate.deleteMany({});
+          console.log(`[Full Restore] Cleared local ${config.table}`);
+        }
+      } catch (err: any) {
+        console.warn(`[Full Restore] Could not clear ${config.table}: ${err?.message}`);
+        // Continue even if clearing fails — the upsert will handle conflicts
+      }
+    }
+
+    // Also clear audit_logs locally since we're starting fresh
+    try {
+      await db.auditLog.deleteMany({});
+      console.log("[Full Restore] Cleared local audit_logs");
+    } catch {
+      // OK if it fails
+    }
+
+    // Phase 2: Fetch and insert from Supabase for each table in dependency order
+    console.log("[Full Restore] Phase 2: Fetching and inserting data from Supabase...");
+    for (const modelName of PULL_ORDER) {
+      const config = SYNC_MODEL_CONFIG[modelName];
+      if (RESTORE_SKIP_TABLES.has(config.table)) continue;
+
+      try {
+        const { rows, error: fetchError } = await fetchAllRows(supabase, config.table, config.timeColumn);
+
+        if (fetchError) {
+          console.warn(`[Full Restore] Fetch error for ${config.table}: ${fetchError}`);
+          errors.push({ table: config.table, error: fetchError });
+          continue;
+        }
+
+        if (rows.length === 0) {
+          console.log(`[Full Restore] ${config.table}: 0 rows (skipping)`);
+          continue;
+        }
+
+        console.log(`[Full Restore] ${config.table}: ${rows.length} rows fetched, inserting...`);
+
+        const delegate = (db as any)[config.delegate];
+        let tableInserted = 0;
+
+        // Insert in batches of 100 to avoid SQLite limits
+        const BATCH_SIZE = 100;
+        for (let i = 0; i < rows.length; i += BATCH_SIZE) {
+          const batch = rows.slice(i, i + BATCH_SIZE);
+          const camelBatch = batch.map((row: any) => toCamelCase(row));
+
+          for (const camelRow of camelBatch) {
+            try {
+              await delegate.upsert({
+                where: { id: camelRow.id },
+                update: camelRow,
+                create: camelRow,
+              });
+              tableInserted++;
+            } catch (insertErr: any) {
+              const errMsg = insertErr?.message || String(insertErr);
+              // Handle unique constraint by trying update-only
+              if (insertErr?.code === 'P2002' || errMsg.includes('Unique constraint')) {
+                try {
+                  await delegate.update({
+                    where: { id: camelRow.id },
+                    data: camelRow,
+                  });
+                  tableInserted++;
+                } catch (updateErr: any) {
+                  console.warn(`[Full Restore] Row insert/update failed for ${config.table}:${camelRow.id}: ${updateErr?.message}`);
+                  errors.push({ table: config.table, rowId: camelRow.id, error: updateErr?.message || String(updateErr) });
+                }
+              } else {
+                console.warn(`[Full Restore] Row insert failed for ${config.table}:${camelRow.id}: ${errMsg}`);
+                errors.push({ table: config.table, rowId: camelRow.id, error: errMsg });
+              }
+            }
+          }
+        }
+
+        totalRows += tableInserted;
+        if (tableInserted > 0) tablesRestored++;
+        console.log(`[Full Restore] ${config.table}: ${tableInserted}/${rows.length} rows inserted`);
+      } catch (tableErr: any) {
+        console.error(`[Full Restore] Table ${config.table} failed:`, tableErr);
+        errors.push({ table: config.table, error: tableErr?.message || String(tableErr) });
+      }
+    }
+
+    // Phase 3: Reset sync cursors to now() so incremental sync works going forward
+    console.log("[Full Restore] Phase 3: Resetting sync cursors...");
+    const now = new Date();
+    try {
+      await db.syncState.upsert({
+        where: { id: "default" },
+        update: { lastSyncedAt: now, status: "IDLE", lastError: null },
+        create: { id: "default", lastSyncedAt: now, status: "IDLE" },
+      });
+      await db.syncState.upsert({
+        where: { id: "pull_state" },
+        update: { lastSyncedAt: now, status: "IDLE", lastError: null },
+        create: { id: "pull_state", lastSyncedAt: now, status: "IDLE" },
+      });
+    } catch (cursorErr: any) {
+      console.warn(`[Full Restore] Could not reset sync cursors: ${cursorErr?.message}`);
+      errors.push({ table: "sync_state", error: `Cursor reset failed: ${cursorErr?.message}` });
+    }
+
+    const success = errors.length === 0;
+    console.log(`[Full Restore] Complete. ${tablesRestored} tables, ${totalRows} rows. ${errors.length} errors.`);
+
+    return { success, tablesRestored, totalRows, errors };
+  } catch (e: any) {
+    console.error("[Full Restore] Fatal error:", e);
+
+    try {
+      await db.syncState.update({
+        where: { id: "default" },
+        data: { status: "ERROR", lastError: `Full restore failed: ${e?.message}` },
+      });
+    } catch {
+      // If we can't even update sync state, nothing more to do
+    }
+
+    return {
+      success: false,
+      tablesRestored,
+      totalRows,
+      errors: [{ table: "global", error: e?.message || String(e) }],
+    };
+  }
+}

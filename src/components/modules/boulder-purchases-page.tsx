@@ -463,12 +463,12 @@ export function BoulderPurchasesPage() {
         <CardContent className="print:p-0">
           <div className="overflow-x-auto overflow-y-auto max-h-[calc(100vh-[350px])] sm:max-h-[60vh] rounded-md border print:border-none print:overflow-visible print:max-h-none">
           <Table>
-            <TableHeader className="bg-muted/50 sticky top-0 z-10 shadow-sm print:bg-transparent print:border-b-2 print:border-black print:relative print:shadow-none">
+            <TableHeader className="bg-muted sticky top-0 z-10 shadow-sm print:bg-transparent print:border-b-2 print:border-black print:relative print:shadow-none">
               <TableRow>
-                <TableHead className="sm:sticky sm:left-0 z-20 bg-muted/50 w-[110px] min-w-[110px] max-w-[110px] print:static print:w-auto">Date</TableHead>
-                <TableHead className="sm:sticky sm:left-[110px] z-20 bg-muted/50 w-[100px] min-w-[100px] max-w-[100px] print:static print:w-auto">Book/Page</TableHead>
-                <TableHead className="sm:sticky sm:left-[210px] z-20 bg-muted/50 w-[130px] min-w-[130px] max-w-[130px] print:static print:w-auto">Vehicle</TableHead>
-                <TableHead className="sm:sticky sm:left-[340px] z-20 bg-muted/50 w-[150px] min-w-[150px] max-w-[150px] print:static print:w-auto sm:border-r border-border">Supplier</TableHead>
+                <TableHead className="sm:sticky sm:left-0 z-20 bg-muted w-[110px] min-w-[110px] max-w-[110px] sm:border-r border-border print:static print:w-auto print:border-none">Date</TableHead>
+                <TableHead>Book/Page</TableHead>
+                <TableHead>Vehicle</TableHead>
+                <TableHead>Supplier</TableHead>
                 <TableHead className="text-right">Qty</TableHead>
                 <TableHead className="text-right">Rate</TableHead>
                 <TableHead className="text-right">Amount</TableHead>
@@ -484,13 +484,13 @@ export function BoulderPurchasesPage() {
             </TableHeader>
             <TableBody>
               {rows.map((row) => (
-                <TableRow key={row.id} className="print:border-b print:border-gray-200 group bg-background hover:bg-muted/50">
-                  <TableCell className="sm:sticky sm:left-0 z-10 bg-inherit w-[110px] min-w-[110px] max-w-[110px] print:static print:w-auto group-hover:bg-accent/50">{formatDate(row.date)}</TableCell>
-                  <TableCell className="sm:sticky sm:left-[110px] z-10 bg-inherit w-[100px] min-w-[100px] max-w-[100px] print:static print:w-auto group-hover:bg-accent/50">
+                <TableRow key={row.id} className="print:border-b print:border-gray-200 group bg-background hover:bg-muted">
+                  <TableCell className="sm:sticky sm:left-0 z-10 bg-inherit w-[110px] min-w-[110px] max-w-[110px] sm:border-r border-border print:static print:w-auto print:border-none">{formatDate(row.date)}</TableCell>
+                  <TableCell>
                     {row.bookNumber && row.pageNumber ? `${row.bookNumber}/${row.pageNumber}` : row.bookNumber || row.pageNumber || "-"}
                   </TableCell>
-                  <TableCell className="sm:sticky sm:left-[210px] z-10 bg-inherit w-[130px] min-w-[130px] max-w-[130px] print:static print:w-auto group-hover:bg-accent/50">{row.vehicleNumber}</TableCell>
-                  <TableCell className="sm:sticky sm:left-[340px] z-10 bg-inherit w-[150px] min-w-[150px] max-w-[150px] print:static print:w-auto sm:border-r border-border group-hover:bg-accent/50 truncate" title={row.partyName}>{row.partyName}</TableCell>
+                  <TableCell>{row.vehicleNumber}</TableCell>
+                  <TableCell className="truncate max-w-[150px]" title={row.partyName}>{row.partyName}</TableCell>
                   <TableCell className="number-cell font-medium">{formatQty(row.qty, "")}</TableCell>
                   <TableCell className="number-cell text-muted-foreground">{formatCurrency(row.rockRate)}</TableCell>
                   <TableCell className="number-cell font-medium">{formatCurrency(row.amount)}</TableCell>

@@ -271,13 +271,12 @@ export function SalesPage() {
           {error ? <p className="text-sm text-destructive print:hidden">{error}</p> : null}
           <div className="overflow-x-auto overflow-y-auto max-h-[calc(100vh-[350px])] sm:max-h-[60vh] rounded-md border print:border-none print:overflow-visible print:max-h-none">
             <Table>
-              <TableHeader className="bg-muted/50 sticky top-0 z-10 shadow-sm print:bg-transparent print:border-b-2 print:border-black print:relative print:shadow-none">
+              <TableHeader className="bg-muted sticky top-0 z-10 shadow-sm print:bg-transparent print:border-b-2 print:border-black print:relative print:shadow-none">
               <TableRow>
-                <TableHead className="sm:sticky sm:left-0 z-20 bg-muted/50 w-[70px] min-w-[70px] max-w-[70px] print:static print:w-auto">GST</TableHead>
-                <SortableHead className="sm:sticky sm:left-[70px] z-20 bg-muted/50 w-[110px] min-w-[110px] max-w-[110px] print:static print:w-auto" label="Date" active={sortKey === "saleDate"} onClick={() => sortBy("saleDate")} />
+                <SortableHead className="sm:sticky sm:left-0 z-20 bg-muted w-[110px] min-w-[110px] max-w-[110px] sm:border-r border-border print:static print:w-auto print:border-none" label="Date" active={sortKey === "saleDate"} onClick={() => sortBy("saleDate")} />
                 <TableHead>Time</TableHead>
-                <SortableHead className="sm:sticky sm:left-[180px] z-20 bg-muted/50 w-[130px] min-w-[130px] max-w-[130px] print:static print:w-auto" label="Vehicle" active={sortKey === "vehicleNumber"} onClick={() => sortBy("vehicleNumber")} />
-                <SortableHead className="sm:sticky sm:left-[310px] z-20 bg-muted/50 w-[150px] min-w-[150px] max-w-[150px] print:static print:w-auto sm:border-r border-border" label="Party" active={sortKey === "partyName"} onClick={() => sortBy("partyName")} />
+                <SortableHead label="Vehicle" active={sortKey === "vehicleNumber"} onClick={() => sortBy("vehicleNumber")} />
+                <SortableHead label="Party" active={sortKey === "partyName"} onClick={() => sortBy("partyName")} />
                 <SortableHead label="Material" active={sortKey === "materialName"} onClick={() => sortBy("materialName")} />
                 <SortableHead label="Qty" active={sortKey === "qty"} alignRight onClick={() => sortBy("qty")} />
                 <TableHead className="text-right">Rate</TableHead>
@@ -296,24 +295,14 @@ export function SalesPage() {
             <TableBody>
               {visibleRows.map((row) => (
                 <TableRow key={row.id} className={cn(
-                  editingSale?.id === row.id && "bg-accent/70",
-                  row.gstEnabled ? "bg-red-50 hover:bg-red-100 dark:bg-red-950/30 dark:hover:bg-red-900/40" : "bg-background hover:bg-muted/50",
+                  editingSale?.id === row.id && "bg-accent",
+                  row.gstEnabled ? "bg-red-50 hover:bg-red-100 dark:bg-red-950 dark:hover:bg-red-900" : "bg-background hover:bg-muted",
                   "print:border-b print:border-gray-200 group"
                 )}>
-                  <TableCell className="print:hidden sm:sticky sm:left-0 z-10 bg-inherit w-[70px] min-w-[70px] max-w-[70px] group-hover:bg-accent/50">
-                    {row.gstEnabled ? (
-                      <span className="inline-flex items-center gap-1 rounded-md bg-red-600 px-2.5 py-1 text-xs font-bold text-white shadow-sm ring-2 ring-red-400/50 animate-pulse">
-                        GST
-                        <span className="text-[10px] font-normal opacity-90">{formatCurrency(row.gstAmount ?? 0)}</span>
-                      </span>
-                    ) : (
-                      <span className="text-muted-foreground text-xs">—</span>
-                    )}
-                  </TableCell>
-                  <TableCell className="sm:sticky sm:left-[70px] z-10 bg-inherit w-[110px] min-w-[110px] max-w-[110px] print:static print:w-auto group-hover:bg-accent/50">{formatDate(row.saleDate)}</TableCell>
+                  <TableCell className="sm:sticky sm:left-0 z-10 bg-inherit w-[110px] min-w-[110px] max-w-[110px] sm:border-r border-border print:static print:w-auto print:border-none">{formatDate(row.saleDate)}</TableCell>
                   <TableCell>{new Date(row.createdAt).toLocaleTimeString("en-IN", { hour: "2-digit", minute: "2-digit" })}</TableCell>
-                  <TableCell className="sm:sticky sm:left-[180px] z-10 bg-inherit w-[130px] min-w-[130px] max-w-[130px] print:static print:w-auto group-hover:bg-accent/50">{row.vehicleNumber}</TableCell>
-                  <TableCell className="sm:sticky sm:left-[310px] z-10 bg-inherit w-[150px] min-w-[150px] max-w-[150px] print:static print:w-auto sm:border-r border-border group-hover:bg-accent/50 truncate" title={row.partyName}>{row.partyName}</TableCell>
+                  <TableCell>{row.vehicleNumber}</TableCell>
+                  <TableCell className="truncate max-w-[150px]" title={row.partyName}>{row.partyName}</TableCell>
                   <TableCell>{row.materialName}</TableCell>
                   <TableCell className="number-cell">{formatQty(row.qty, "")}</TableCell>
                   <TableCell className="number-cell">{formatCurrency(row.ratePerCft)}</TableCell>
@@ -356,7 +345,7 @@ export function SalesPage() {
               ))}
               {!visibleRows.length ? (
                 <TableRow>
-                  <TableCell colSpan={18} className="h-24 text-center text-muted-foreground">
+                  <TableCell colSpan={17} className="h-24 text-center text-muted-foreground">
                     No sales found.
                   </TableCell>
                 </TableRow>

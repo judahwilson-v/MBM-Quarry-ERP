@@ -32,14 +32,14 @@ export function DayBookPage() {
   }, [date]);
 
   useEffect(() => {
-    const savedName = localStorage.getItem("mbm_user_name") || "";
+    const savedName = sessionStorage.getItem("mbm_user_name") || "";
     setUserName(savedName);
     void loadData();
   }, [loadData]);
 
   const handleNameChange = (val: string) => {
     setUserName(val);
-    localStorage.setItem("mbm_user_name", val);
+    sessionStorage.setItem("mbm_user_name", val);
   };
 
   const handleOpeningBalanceEdit = async (type: "cash" | "bank") => {
@@ -120,13 +120,13 @@ export function DayBookPage() {
           <p className="text-muted-foreground">Daily financial summary and transfers.</p>
         </div>
         <div className="flex gap-4 items-center">
-          <div className="flex items-center gap-1.5 bg-muted/50 rounded-lg px-2.5 py-1.5 mt-6" title="Your name for tracking edits">
-            <UserCircle className="h-4 w-4 text-muted-foreground flex-shrink-0" />
-            <input
+          <div className="flex items-center gap-2 mt-6" title="Your name for tracking edits">
+            <UserCircle className="h-5 w-5 text-muted-foreground" />
+            <Input
               value={userName}
               onChange={e => handleNameChange(e.target.value)}
-              placeholder="Your name"
-              className="bg-transparent border-none text-sm w-24 focus:outline-none focus:ring-0 placeholder:text-muted-foreground/60"
+              placeholder="Enter your name"
+              className="h-9 w-36"
             />
           </div>
           <Field label="Date" error="">

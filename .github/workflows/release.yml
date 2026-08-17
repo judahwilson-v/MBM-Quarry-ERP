@@ -27,6 +27,15 @@ jobs:
       - name: Generate Prisma Client
         run: npx prisma generate
         
+      - name: Create GitHub Release
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          $null = gh release view ${{ github.ref_name }} 2>&1
+          if ($LASTEXITCODE -ne 0) {
+            gh release create ${{ github.ref_name }} --title "Release ${{ github.ref_name }} — Full Server Restore" --notes "### Release ${{ github.ref_name }} — Full Server Restore`n`n- **Full Server Restore Engine**: Automatically clone the quarry database from the cloud to a fresh PC.`n- **Disaster Recovery UI**: Interactive dialog with table row counts and overwrite protection.`n- **Auto-Cursor Healing**: Background synchronization resumes seamlessly after a restore."
+          }
+
       - name: Build and Publish Electron App
         run: npm run electron:publish
         env:
@@ -36,12 +45,6 @@ jobs:
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: gh release upload ${{ github.ref_name }} (Get-Item release-v2\*.blockmap).FullName --clobber
-          
-      - name: Set Release Title and Release Notes
-        env:
-          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        run: |
-          gh release edit ${{ github.ref_name }} --title "Release ${{ github.ref_name }} — System Reliability Update" --notes "### Release ${{ github.ref_name }} — System Reliability Update`n`n- **Full 5-Asset Distribution**: Guaranteed inclusion of latest manifest, installer executable, and delta update blockmap.`n- **Auto-Updater Hardening**: High-reliability delta chunk synchronization and silent background updates.`n- **Zero 404 Invariants**: Continuous artifact verification during CI release pipeline."
 
       - name: Verify Release Artifacts
         env:

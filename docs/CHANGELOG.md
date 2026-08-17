@@ -1,5 +1,10 @@
 # MBM Quarry ERP — Changelog
 
+## v2.4.0 — Full Server Restore & Disaster Recovery (2026-08-17)
+- **Full Server Restore Engine**: Built a new `fullRestoreFromSupabase()` engine that allows cloning an entire quarry database from Supabase to a fresh local PC. The engine wipes local data in strict reverse-foreign-key order, then downloads all 28 tables using offset pagination to bypass REST limits.
+- **Sync Dashboard Recovery UI**: Added a new "Restore from Server" section to the Sync Dashboard. Includes a multi-phase managed dialog with a pre-flight eligibility check, per-table row counts, existing data overwrite warnings, and progress indicators.
+- **Automated Cursor Healing**: The restore engine automatically resets push and pull sync cursors to `now()` after a successful restore so that incremental CDC sync works flawlessly going forward.
+
 ## v2.3.1 — System Reliability Update (2026-08-16)
 - **Compulsory 5-Asset Distribution**: Fully enforced upload and verification of all 5 release artifacts on GitHub (`latest.yml`, `MBM-Quarry-V2-Setup-X.Y.Z.exe`, `MBM-Quarry-V2-Setup-X.Y.Z.exe.blockmap`, `Source code (zip)`, `Source code (tar.gz)`).
 - **Delta Chunk Binary Optimization**: Ensured the `.blockmap` differential file is permanently attached to releases to enable fast partial-chunk delta downloads for quarry desktop clients.
