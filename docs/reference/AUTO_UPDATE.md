@@ -61,7 +61,22 @@ Every release **must** contain exactly 5 assets on GitHub:
 ## Troubleshooting
 
 ### Q: I receive a "Cannot find latest.yml... HttpError: 404" error.
-- **Missing Assets / Empty Release**: This error means the client found the new version tag, but the update manifest (`latest.yml`) is missing from the GitHub release. This usually happens if `gh release create` and `electron-builder` clash, resulting in an empty release. **Always verify all 5 compulsory assets are present in the release on GitHub**.
+
+**Root Cause**: `electron-builder -p always` needs to **create** the GitHub release itself. If any other step (e.g., `gh release create` in CI) creates the release first — even as a draft — electron-builder will fail with a `422 Unprocessable Entity "already_exists"` error and crash before uploading `latest.yml`. The client then gets a 404 because the release exists but has no assets.
+
+**The Fix (applied August 2026)**: The CI pipeline (`.github/workflows/release.yml`) now:
+1. **Deletes** any pre-existing release for the tag before electron-builder runs.
+2. Lets `electron-builder -p always` create the release and upload all assets (`latest.yml`, `.exe`, `.blockmap`).
+3. Adds release notes and publishes the release (`--draft=false`) only after all assets are confirmed uploaded.
+4. **Validates** that `latest.yml` is present — fails the workflow if it's missing.
+
+> [!CAUTION]
+> **NEVER** create a GitHub release (via `gh release create`, the GitHub UI, or any other tool) for a version tag before `electron-builder` runs. electron-builder **must** be the one to create the release. If you accidentally create one, delete it before running `npm run electron:publish`.
+
+**If this happens again (emergency manual fix)**:
+1. Go to GitHub → Releases → delete the broken release for the tag.
+2. Re-run the GitHub Actions workflow, OR locally run `npm run electron:publish` with `GH_TOKEN` set.
+3. Verify all 5 assets are present, then publish the release if it's still a draft.
 
 ### Q: I published a release, but the client isn't updating.
 - **Check the Version**: Did you actually increment the `"version"` in `package.json` before running the publish command?
@@ -70,3 +85,4 @@ Every release **must** contain exactly 5 assets on GitHub:
 
 ### Q: `npm run electron:publish` fails with a GitHub error.
 - **Check your Token**: Ensure your `GH_TOKEN` environment variable is set in the terminal where you are running the command. If using VS Code, you may need to restart the terminal after exporting the token in your `.zshrc`.
+- **Check for existing release**: If you see `422 "already_exists"`, delete the existing release for that tag on GitHub, then retry.
