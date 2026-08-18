@@ -1,8 +1,8 @@
 ---
 type: handoff
-project_version: "2.4.3"
+project_version: "2.4.5"
 status: "STABLE"
-last_updated: "2026-08-18 17:05:00"
+last_updated: "2026-08-18 17:35:00"
 blocking_issues: 0
 ---
 

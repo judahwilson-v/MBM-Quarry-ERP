@@ -1,5 +1,9 @@
 # MBM Quarry ERP — Release Notes
 
+## v2.4.5 — Compare Restore Data (2026-08-18)
+- **Safe Database Restores**: Added a new "Compare Data" feature to the Sync Dashboard. Before you perform a Full Server Restore, you can now safely preview exactly which local records will be lost, which new ones will be downloaded, and which ones will be modified, side-by-side!
+- **UI Improvements**: Cleaned up the warning messages in the Sync Dashboard to be less repetitive.
+
 ## v2.3.1 — System Reliability Update (2026-08-16)
 - **Compulsory 5-Asset Distribution**: Fully enforced upload and verification of all 5 release artifacts on GitHub (`latest.yml`, `MBM-Quarry-V2-Setup-X.Y.Z.exe`, `MBM-Quarry-V2-Setup-X.Y.Z.exe.blockmap`, `Source code (zip)`, `Source code (tar.gz)`).
 - **Delta Chunk Binary Optimization**: Ensured the `.blockmap` differential file is permanently attached to releases to enable fast partial-chunk delta downloads for quarry desktop clients.

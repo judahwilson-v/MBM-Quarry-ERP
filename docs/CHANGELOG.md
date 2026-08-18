@@ -1,5 +1,11 @@
 # MBM Quarry ERP — Changelog
 
+## v2.4.5 — Sync Restore Data Comparison (2026-08-18)
+- **Read-Only Restore Compare**: Added a new Diff Engine and "Compare Data" UI that allows users to safely preview exactly which records will be lost, added, or modified before proceeding with a destructive Full Server Restore.
+
+## v2.4.4 — UI Polish (2026-08-18)
+- **Duplicate Warning Fix**: Removed redundant emoji and warning text in the Sync Restore dialog.
+
 ## v2.4.3 — GitHub Actions CI/CD Pipeline Race Condition Fix (2026-08-18)
 - **Electron Builder Race Condition Fix**: Completely resolved a `422 Validation Failed` and `tag_name already exists` CI error. By reverting `releaseType` to `draft` in `package.json` and pre-creating the draft release in `.github/workflows/release.yml`, we guarantee that `electron-builder` sequentially uploads assets (`latest.yml`, `.exe`) to the pre-created draft without attempting to create duplicate releases concurrently, ensuring a rock-solid, atomic auto-update deployment.
 
