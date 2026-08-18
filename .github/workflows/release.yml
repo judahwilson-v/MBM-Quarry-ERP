@@ -45,6 +45,7 @@ jobs:
           } else {
             Write-Host "No pre-existing release found. Proceeding."
           }
+          exit 0
 
       - name: Build and Publish Electron App
         run: npm run electron:publish
