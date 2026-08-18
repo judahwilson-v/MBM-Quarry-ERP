@@ -1,8 +1,8 @@
 ---
 type: handoff
-project_version: "2.3.1"
+project_version: "2.4.2"
 status: "STABLE"
-last_updated: "2026-08-16 20:55:00"
+last_updated: "2026-08-18 16:15:00"
 blocking_issues: 0
 ---
 
@@ -10,9 +10,9 @@ blocking_issues: 0
 
 ## Current State
 
-- **Version**: v2.4.0
+- **Version**: v2.4.2
 - **Status**: Stable / Fully Operational
-- **Phase**: Disaster Recovery (Full Server Restore)
+- **Phase**: Auto-Updater & CI/CD Hardening
 - **Blocking Issues**: None
 
 ---
@@ -21,6 +21,8 @@ blocking_issues: 0
 
 | Version | What | Date |
 |:--------|:-----|:-----|
+| v2.4.2 | GitHub Actions CI/CD Pipeline Hotfix | 2026-08-18 |
+| v2.4.1 | Release Pipeline Hardening | 2026-08-17 |
 | v2.4.0 | Full Server Restore Engine & Sync Recovery UI | 2026-08-17 |
 | v2.3.1 | System Reliability Update (compulsory 5-asset distribution & delta chunk validation) | 2026-08-16 |
 | v2.3.0 | Auto-updater pipeline hardening (`latest.yml` sync fix), graceful updater error handling | 2026-08-16 |

@@ -1,5 +1,12 @@
 # MBM Quarry ERP — Changelog
 
+## v2.4.2 — GitHub Actions CI/CD Pipeline Hotfix (2026-08-18)
+- **PowerShell Exit Code Propagation Fix**: Fixed a bug where `gh release view` returning exit code 1 (when no pre-existing release was found) was being propagated by PowerShell and killing the release workflow, preventing `electron-builder` from generating the update artifacts. Added explicit `exit 0` to workflow steps.
+
+## v2.4.1 — Release Pipeline Hardening (2026-08-17)
+- **Electron Builder Conflict Resolution**: Updated `.github/workflows/release.yml` to explicitly delete any pre-existing tags or releases before `electron-builder` runs. This prevents the `422 Unprocessable Entity "already_exists"` error that detached `latest.yml` from the GitHub release.
+- **Mandatory Asset Verification**: Added post-build workflow assertion to fail the build if `latest.yml` is missing, preventing silent deployment failures.
+
 ## v2.4.0 — Full Server Restore & Disaster Recovery (2026-08-17)
 - **Full Server Restore Engine**: Built a new `fullRestoreFromSupabase()` engine that allows cloning an entire quarry database from Supabase to a fresh local PC. The engine wipes local data in strict reverse-foreign-key order, then downloads all 28 tables using offset pagination to bypass REST limits.
 - **Sync Dashboard Recovery UI**: Added a new "Restore from Server" section to the Sync Dashboard. Includes a multi-phase managed dialog with a pre-flight eligibility check, per-table row counts, existing data overwrite warnings, and progress indicators.
