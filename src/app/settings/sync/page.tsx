@@ -9,8 +9,10 @@ import {
   resetSyncCursor,
   fetchOnlineStatus,
   checkRestoreEligibility,
-  performFullRestore
+  performFullRestore,
+  fetchRestoreDiffSummary
 } from "@/app/actions/sync";
+import TableDiffViewer from "@/components/sync/TableDiffViewer";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
@@ -18,7 +20,7 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription, Di
 import { 
   Cloud, CloudOff, RefreshCw, AlertCircle, 
   CheckCircle2, Clock, ServerCrash, 
-  ArrowUpCircle, AlertTriangle, Download
+  ArrowUpCircle, AlertTriangle, Download, ArrowLeftRight
 } from "lucide-react";
 
 type SyncData = Awaited<ReturnType<typeof fetchDetailedSyncStatus>>;
@@ -39,6 +41,23 @@ export default function SyncDashboardPage() {
     errors: Array<{ table: string; rowId?: string; error: string }>;
     errorMessage?: string;
   } | null>(null);
+
+  const [diffSummaries, setDiffSummaries] = useState<Awaited<ReturnType<typeof fetchRestoreDiffSummary>> | null>(null);
+  const [diffPhase, setDiffPhase] = useState<'idle' | 'loading' | 'summary' | 'detailed'>('idle');
+  const [selectedDiffTable, setSelectedDiffTable] = useState<string | null>(null);
+
+  const handleCompareData = async () => {
+    setDiffPhase('loading');
+    try {
+      const result = await fetchRestoreDiffSummary();
+      setDiffSummaries(result);
+      setDiffPhase('summary');
+    } catch (error) {
+      console.error("Failed to fetch diff summary", error);
+      alert("Failed to compare data: " + error);
+      setDiffPhase('idle');
+    }
+  };
 
   const handleCheckRestore = async () => {
     setRestorePhase('checking');
@@ -232,6 +251,10 @@ export default function SyncDashboardPage() {
                 </div>
               </div>
               <DialogFooter>
+                <Button variant="secondary" onClick={handleCompareData}>
+                  <ArrowLeftRight className="mr-2 h-4 w-4" />
+                  Compare Data
+                </Button>
                 <Button variant="outline" onClick={handleCloseRestoreDialog}>Cancel</Button>
                 <Button variant={eligibilityData.hasExistingData ? "destructive" : "default"} onClick={handleConfirmRestore}>
                   Yes, Restore Everything
@@ -292,6 +315,73 @@ export default function SyncDashboardPage() {
                 <Button variant="outline" onClick={handleCloseRestoreDialog}>Close</Button>
               </DialogFooter>
             </>
+          )}
+        </DialogContent>
+      </Dialog>
+
+      <Dialog open={diffPhase !== 'idle'} onOpenChange={(open) => !open && setDiffPhase('idle')}>
+        <DialogContent className="max-w-4xl" onPointerDownOutside={(e) => diffPhase === 'loading' && e.preventDefault()} onEscapeKeyDown={(e) => diffPhase === 'loading' && e.preventDefault()}>
+          {diffPhase === 'loading' && (
+            <div className="flex flex-col items-center justify-center py-12 space-y-4">
+              <RefreshCw className="h-10 w-10 animate-spin text-indigo-500" />
+              <div className="text-lg font-medium">Calculating differences...</div>
+              <div className="text-sm text-muted-foreground">This may take a moment for large databases.</div>
+            </div>
+          )}
+
+          {diffPhase === 'summary' && diffSummaries && !selectedDiffTable && (
+            <>
+              <DialogHeader>
+                <DialogTitle>Compare Data</DialogTitle>
+                <DialogDescription>
+                  Review the exact differences between your local database and the server before restoring.
+                </DialogDescription>
+              </DialogHeader>
+              <div className="py-4">
+                <div className="border rounded-md max-h-[400px] overflow-auto">
+                  <table className="w-full text-sm">
+                    <thead className="bg-muted sticky top-0">
+                      <tr>
+                        <th className="text-left p-3 font-medium">Table</th>
+                        <th className="text-center p-3 font-medium text-destructive">To be Lost (Local Only)</th>
+                        <th className="text-center p-3 font-medium text-green-600">To be Added (Server Only)</th>
+                        <th className="text-center p-3 font-medium text-amber-600">Modified</th>
+                        <th className="text-center p-3 font-medium text-muted-foreground">Identical</th>
+                        <th className="p-3"></th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      {diffSummaries.map(t => (
+                        <tr key={t.table} className="border-t hover:bg-muted/50">
+                          <td className="p-3 font-medium">{t.table}</td>
+                          <td className="p-3 text-center">{t.localOnly > 0 ? <Badge variant="destructive">{t.localOnly}</Badge> : "-"}</td>
+                          <td className="p-3 text-center">{t.serverOnly > 0 ? <Badge className="bg-green-500">{t.serverOnly}</Badge> : "-"}</td>
+                          <td className="p-3 text-center">{t.modified > 0 ? <Badge className="bg-amber-500">{t.modified}</Badge> : "-"}</td>
+                          <td className="p-3 text-center text-muted-foreground">{t.identical > 0 ? t.identical : "-"}</td>
+                          <td className="p-3 text-right">
+                            <Button size="sm" variant="outline" onClick={() => setSelectedDiffTable(t.table)}>
+                              View Details
+                            </Button>
+                          </td>
+                        </tr>
+                      ))}
+                    </tbody>
+                  </table>
+                </div>
+              </div>
+              <DialogFooter>
+                <Button variant="outline" onClick={() => setDiffPhase('idle')}>Close</Button>
+              </DialogFooter>
+            </>
+          )}
+
+          {diffPhase === 'summary' && selectedDiffTable && (
+            <div className="py-2">
+              <TableDiffViewer 
+                tableName={selectedDiffTable} 
+                onBack={() => setSelectedDiffTable(null)} 
+              />
+            </div>
           )}
         </DialogContent>
       </Dialog>

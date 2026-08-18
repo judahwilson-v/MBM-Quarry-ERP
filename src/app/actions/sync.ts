@@ -86,3 +86,14 @@ export async function performFullRestore(options?: { force?: boolean }) {
   return result;
 }
 
+export async function fetchRestoreDiffSummary() {
+  const { generateRestoreDiffSummary } = await import("@/lib/sync/diff-service");
+  return generateRestoreDiffSummary();
+}
+
+export async function fetchDetailedTableDiff(tableName: string) {
+  const { getDetailedTableDiff } = await import("@/lib/sync/diff-service");
+  return getDetailedTableDiff(tableName);
+}
+
+
