@@ -1058,10 +1058,6 @@ export async function checkRestoreEligibility(): Promise<{
     warnings.push("No data found on the server. Nothing to restore.");
   }
 
-  if (hasExistingData) {
-    warnings.push(`Local database has ${localRecordCount} existing records. A full restore will overwrite all local data.`);
-  }
-
   return {
     eligible: totalSupabaseRows > 0,
     localRecordCount,

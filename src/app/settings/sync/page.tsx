@@ -196,7 +196,7 @@ export default function SyncDashboardPage() {
                   <div className="flex items-start gap-3 bg-destructive/10 text-destructive p-3 rounded-lg border border-destructive/20">
                     <AlertTriangle className="h-5 w-5 shrink-0 mt-0.5" />
                     <div className="text-sm font-medium">
-                      ⚠️ This will overwrite {eligibilityData.localRecordCount} existing local records.
+                      This will overwrite {eligibilityData.localRecordCount} existing local records.
                     </div>
                   </div>
                 )}
