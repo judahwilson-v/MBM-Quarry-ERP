@@ -1,5 +1,13 @@
 # MBM Quarry ERP — Architecture Decisions
 
+> [!NOTE]
+> Detailed decision records are available in modular ADR files:
+> - [ADR-001: Offline-First Architecture](ADR-001-offline-first.md)
+> - [ADR-002: Sync Model Architecture](ADR-002-sync-model.md)
+> - [ADR-003: Financial Events Source of Truth](ADR-003-financial-events.md)
+> - [ADR-004: Desktop Packaging and Deployment](ADR-004-desktop-packaging.md)
+> - [ADR-005: Domain Rules and Constraints](ADR-005-domain-rules.md)
+
 This file records every long-lived or irreversible project decision.
 - **Business Rules** → see `docs/BUSINESS_RULES.md`
 - **Decisions here** → explain *why* the project is locked to a specific implementation choice.

@@ -27,25 +27,23 @@ jobs:
       - name: Generate Prisma Client
         run: npx prisma generate
 
-      # ── IMPORTANT: Do NOT create a release before electron-builder ──
-      # electron-builder -p always creates its own draft release and uploads
-      # latest.yml, the .exe, and .blockmap to it. If a release (draft or
-      # published) already exists for this tag, electron-builder will get a
-      # 422 "already_exists" error and fail — leaving latest.yml missing.
-      # We let electron-builder go first, then add notes and publish after.
+      # ── IMPORTANT: Create a draft release BEFORE electron-builder ──
+      # We create a draft release first, and configure electron-builder (in package.json)
+      # with releaseType: "draft". This forces electron-builder to upload assets to
+      # our existing draft release. This prevents a known concurrency race condition where
+      # electron-builder creates duplicate releases when publishing multiple assets.
 
-      - name: Delete Pre-existing Release (if any)
+      - name: Create Draft Release
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
           $null = gh release view ${{ github.ref_name }} 2>&1
           if ($LASTEXITCODE -eq 0) {
-            Write-Host "Found pre-existing release for ${{ github.ref_name }}. Deleting to avoid clash with electron-builder..."
+            Write-Host "Found pre-existing release for ${{ github.ref_name }}. Deleting it first..."
             gh release delete ${{ github.ref_name }} --yes
-          } else {
-            Write-Host "No pre-existing release found. Proceeding."
           }
-          exit 0
+          Write-Host "Creating Draft Release for ${{ github.ref_name }}..."
+          gh release create ${{ github.ref_name }} --draft --title "Release ${{ github.ref_name }}" --notes "### Release ${{ github.ref_name }}`n`nSee [CHANGELOG](https://github.com/judahwilson-v/MBM-Quarry-ERP/blob/main/docs/CHANGELOG.md) for details."
 
       - name: Build and Publish Electron App
         run: npm run electron:publish
@@ -57,11 +55,7 @@ jobs:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: gh release upload ${{ github.ref_name }} (Get-Item release-v2\*.blockmap).FullName --clobber
 
-      - name: Add Release Notes
-        env:
-          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        run: |
-          gh release edit ${{ github.ref_name }} --title "Release ${{ github.ref_name }}" --notes "### Release ${{ github.ref_name }}`n`nSee [CHANGELOG](https://github.com/judahwilson-v/MBM-Quarry-ERP/blob/main/docs/CHANGELOG.md) for details."
+
 
       - name: Verify Release Artifacts
         env:

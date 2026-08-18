@@ -1,6 +1,6 @@
 {
   "name": "mbm-quarry-erp",
-  "version": "2.4.2",
+  "version": "2.4.3",
   "private": true,
   "scripts": {
     "dev": "next dev -p 3005",
@@ -25,7 +25,8 @@
     "release:patch": "node scripts/release.js patch",
     "release:minor": "node scripts/release.js minor",
     "release:major": "node scripts/release.js major",
-    "test:smoke": "node scripts/smoke.js"
+    "test:smoke": "node scripts/smoke.js",
+    "verify:all": "npx tsc --noEmit && npm run lint && npm test && npx prisma validate && npm run build"
   },
   "dependencies": {
     "@prisma/client": "6.19.3",
@@ -144,7 +145,7 @@
         "provider": "github",
         "owner": "judahwilson-v",
         "repo": "MBM-Quarry-ERP",
-        "releaseType": "release"
+        "releaseType": "draft"
       }
     ]
   }

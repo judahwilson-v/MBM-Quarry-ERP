@@ -110,3 +110,20 @@ parent_workflow: organize
 - [/] Phase 2: purchases.ts cleanup (2/7 tasks)
 - [ ] Phase 3: credits.ts cleanup (0/3 tasks)
 ```
+
+---
+
+## Refactoring Cycle Guidelines
+
+> [!WARNING]
+> Refactoring must NEVER be combined with feature implementation in the same task.
+
+### Rules
+
+1. **Dedicated Refactoring Cycles**: Refactoring sweeps (renaming, restructuring, dependency cleanup) occur only in dedicated tasks decoupled from feature work.
+2. **No Opportunistic Cleanup**: Do not "fix" unrelated code style, naming, or structure while implementing a feature. If you notice something that needs cleanup, log it in `docs/reference/IDEAS.md` for a future organize cycle.
+3. **Freeze Before Refactor**: The codebase must be in a passing state (`npm run verify:all` exits 0) before starting any refactoring cycle.
+4. **Verify After Refactor**: After completing a refactoring sweep, run the full verification gate before marking complete.
+5. **Scope Isolation**: Each refactoring task must declare its scope explicitly (which files, which patterns) and must not exceed that scope.
+6. **Security Review**: Per empirical research (arXiv:2511.04824), 4.7% of AI refactorings introduce security vulnerabilities. After any refactoring cycle, perform a dedicated security posture check (see `WORKFLOW_REVIEW.md`).
+

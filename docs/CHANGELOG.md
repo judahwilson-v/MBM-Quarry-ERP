@@ -1,5 +1,8 @@
 # MBM Quarry ERP — Changelog
 
+## v2.4.3 — GitHub Actions CI/CD Pipeline Race Condition Fix (2026-08-18)
+- **Electron Builder Race Condition Fix**: Completely resolved a `422 Validation Failed` and `tag_name already exists` CI error. By reverting `releaseType` to `draft` in `package.json` and pre-creating the draft release in `.github/workflows/release.yml`, we guarantee that `electron-builder` sequentially uploads assets (`latest.yml`, `.exe`) to the pre-created draft without attempting to create duplicate releases concurrently, ensuring a rock-solid, atomic auto-update deployment.
+
 ## v2.4.2 — GitHub Actions CI/CD Pipeline Hotfix (2026-08-18)
 - **PowerShell Exit Code Propagation Fix**: Fixed a bug where `gh release view` returning exit code 1 (when no pre-existing release was found) was being propagated by PowerShell and killing the release workflow, preventing `electron-builder` from generating the update artifacts. Added explicit `exit 0` to workflow steps.
 

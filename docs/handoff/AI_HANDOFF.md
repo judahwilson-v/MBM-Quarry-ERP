@@ -1,8 +1,8 @@
 ---
 type: handoff
-project_version: "2.4.2"
+project_version: "2.4.3"
 status: "STABLE"
-last_updated: "2026-08-18 16:15:00"
+last_updated: "2026-08-18 17:05:00"
 blocking_issues: 0
 ---
 
@@ -10,7 +10,7 @@ blocking_issues: 0
 
 ## Current State
 
-- **Version**: v2.4.2
+- **Version**: v2.4.3
 - **Status**: Stable / Fully Operational
 - **Phase**: Auto-Updater & CI/CD Hardening
 - **Blocking Issues**: None
@@ -21,6 +21,7 @@ blocking_issues: 0
 
 | Version | What | Date |
 |:--------|:-----|:-----|
+| v2.4.3 | CI Race Condition Fix (Atomic Releases) | 2026-08-18 |
 | v2.4.2 | GitHub Actions CI/CD Pipeline Hotfix | 2026-08-18 |
 | v2.4.1 | Release Pipeline Hardening | 2026-08-17 |
 | v2.4.0 | Full Server Restore Engine & Sync Recovery UI | 2026-08-17 |

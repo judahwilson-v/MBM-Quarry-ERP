@@ -1,7 +1,7 @@
 ---
 schema_version: 2
 type: policy
-last_updated: "2026-08-16 20:00:30"
+last_updated: "2026-08-18 16:00:00"
 ---
 
 # AI Documentation & Memory Policy
@@ -16,10 +16,12 @@ Documentation acts as persistent architectural memory to reduce token usage and 
 
 Before searching the repository:
 1. Always start by reading `docs/AI_INDEX.md`. This is the central index.
-2. Pick the **workflow guide** matching your task (Debug, Feature, Release, Organize).
+2. Pick the **workflow guide** matching your task (Debug, Feature, Release, Organize, Review).
 3. Follow the workflow's read order to load only relevant docs.
 4. Search the codebase only for specific implementation details required.
 5. Never perform a full repository search unless explicitly requested.
+6. For implementation tasks, use the **Task Contract Template** (`docs/workflows/TASK_CONTRACT_TEMPLATE.md`) to structure your work scope.
+7. After completing work, request **Independent Review** (`docs/workflows/WORKFLOW_REVIEW.md`) to verify changes.
 
 ### Three-Layer Loading Model
 

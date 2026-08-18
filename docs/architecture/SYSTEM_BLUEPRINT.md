@@ -26,18 +26,17 @@
 *   **docs/**: Master system documentation, business rules, architectural specs, and ADR logs.
 
 ## Data Flow
-```
-Client Component
-   ↓  calls
-Server Action (src/app/actions/)
-   ↓  validates
-Domain Service / Business Engine
-   ↓  emits
-Financial Event  →  persisted to SQLite
-   ↓  projected to
-Ledger  |  Day Book  |  Reports  |  Dashboard
-   ↓  queued to
-Supabase Sync (background, offline-safe)
+```mermaid
+graph TD
+    A["Client Component"] -->|calls| B["Server Action (src/app/actions/)"]
+    B -->|validates| C["Domain Service / Business Engine"]
+    C -->|emits| D["Financial Event"]
+    D -->|persisted to| E["SQLite"]
+    D -->|projected to| F["Ledger"]
+    D -->|projected to| G["Day Book"]
+    D -->|projected to| H["Reports"]
+    D -->|projected to| I["Dashboard"]
+    E -->|queued to| J["Supabase Sync (background, offline-safe)"]
 ```
 
 ## Financial Event Invariants

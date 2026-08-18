@@ -1,10 +1,10 @@
 ---
 schema_version: 2
 project: "MBM Quarry ERP"
-project_version: "2.3.1"
+project_version: "2.4.0"
 stack: "Next.js 14 + Prisma/SQLite + Electron + Supabase"
-last_updated: "2026-08-16 20:55:00"
-total_docs: 20
+last_updated: "2026-08-18 16:00:00"
+total_docs: 28
 ---
 
 # AI_INDEX.md — Project Memory Entry Point
@@ -17,7 +17,7 @@ total_docs: 20
 
 **MBM Quarry ERP** is an offline-first desktop ERP for quarry management.
 - **Stack**: Next.js 14 (App Router) + Prisma + SQLite + Electron + Supabase (cloud sync)
-- **Version**: v2.3.1 (Stable, field-tested)
+- **Version**: v2.4.0 (Stable, field-tested)
 - **State**: All systems operational. See `handoff/AI_HANDOFF.md` for current status.
 - **Database**: 3 sources of truth — `prisma/schema.prisma`, `src/lib/bootstrap.ts`, Supabase SQL.
 
@@ -54,6 +54,8 @@ Every documentation file in the project, its purpose, and when to read it.
 | [MODULE_INDEX.md](reference/MODULE_INDEX.md) | Which module owns which files | Finding code locations |
 | [VARIABLE_MAP.md](reference/VARIABLE_MAP.md) | Canonical field names (camelCase ↔ snake_case) | Creating/renaming fields |
 | [KNOWN_BUGS.md](reference/KNOWN_BUGS.md) | Active bugs and resolved postmortems | Debugging |
+| [glossary.md](domain/glossary.md) | Authoritative domain terminology & invariants | Understanding business terms |
+| [TASK_CONTRACT_TEMPLATE.md](workflows/TASK_CONTRACT_TEMPLATE.md) | Standardized task prompt template | Starting any implementation task |
 
 ### Layer 2 — Read When Specifically Needed
 | File | Purpose | Read When |
@@ -62,7 +64,8 @@ Every documentation file in the project, its purpose, and when to read it.
 | [FINANCIAL_EVENT_ARCHITECTURE.md](architecture/FINANCIAL_EVENT_ARCHITECTURE.md) | Event sourcing, immutable facts, projections | Touching financial logic |
 | [BUSINESS_RULES.md](reference/BUSINESS_RULES.md) | Quarry domain rules (CFT, GST, credit) | Business logic changes |
 | [ENGINEERING_RULES.md](reference/ENGINEERING_RULES.md) | Code standards, patterns, conventions | Writing new code |
-| [DECISION_LOG.md](decisions/DECISION_LOG.md) | Past architectural decisions (ADRs) | Questioning "why was it done this way?" |
+| [DECISION_LOG.md](decisions/DECISION_LOG.md) | Quick-reference index of all decisions | Questioning "why was it done this way?" |
+| [ADR-001 to ADR-005](decisions/) | Modular architecture decision records | Deep-diving a specific decision |
 | [CHANGELOG.md](CHANGELOG.md) | Version history, what changed when | Updating release notes |
 | [MAINTAINERS.md](reference/MAINTAINERS.md) | Who owns what, contact info | Coordination |
 | [IDEAS.md](reference/IDEAS.md) | Unconfirmed feature ideas | Feature planning |
@@ -73,6 +76,15 @@ Every documentation file in the project, its purpose, and when to read it.
 | [OWNER_DASHBOARD_PRD.md](reference/OWNER_DASHBOARD_PRD.md) | Owner dashboard product requirements | Dashboard work |
 | [QUARRY_FIELD_NOTES.md](reference/QUARRY_FIELD_NOTES.md) | Real-world quarry observations | Understanding domain |
 | [AI_PROGRESS_TEMPLATE.md](handoff/AI_PROGRESS_TEMPLATE.md) | Template for long-running task checkpoints | Multi-session tasks |
+
+### Workflows
+| File | Purpose | Read When |
+|:-----|:--------|:----------|
+| [WORKFLOW_DEBUG.md](workflows/WORKFLOW_DEBUG.md) | Debug & root cause analysis | Fixing bugs |
+| [WORKFLOW_FEATURE.md](workflows/WORKFLOW_FEATURE.md) | Feature addition workflow | Adding features |
+| [WORKFLOW_RELEASE.md](workflows/WORKFLOW_RELEASE.md) | Release & deploy workflow | Shipping a release |
+| [WORKFLOW_ORGANIZE.md](workflows/WORKFLOW_ORGANIZE.md) | Full cleanup, audit, refactoring | Reorganization |
+| [WORKFLOW_REVIEW.md](workflows/WORKFLOW_REVIEW.md) | Independent two-stage code review | Reviewing agent work |
 
 ### Audit
 | File | Purpose |
