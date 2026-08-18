@@ -60,23 +60,23 @@ Every release **must** contain exactly 5 assets on GitHub:
 
 ## Troubleshooting
 
-### Q: I receive a "Cannot find latest.yml... HttpError: 404" error.
+### Q: I receive a "Cannot find latest.yml... HttpError: 404" error or a "HTTP 422: Validation Failed Release.tag_name already exists" error.
 
-**Root Cause**: `electron-builder -p always` needs to **create** the GitHub release itself. If any other step (e.g., `gh release create` in CI) creates the release first — even as a draft — electron-builder will fail with a `422 Unprocessable Entity "already_exists"` error and crash before uploading `latest.yml`. The client then gets a 404 because the release exists but has no assets.
+**Root Cause**: Previously, `electron-builder` was configured with `releaseType: "release"` in `package.json`. Because `electron-builder` uploads multiple assets (`latest.yml`, the `.exe`, and the `.blockmap`) concurrently in parallel threads, multiple threads would query GitHub at the exact same millisecond, see that no release existed yet, and **all of them would try to create a release simultaneously**. This race condition caused GitHub to create duplicate releases for the same tag, splitting the assets between them and causing subsequent CI steps to crash with 422 errors.
 
-**The Fix (applied August 2026)**: The CI pipeline (`.github/workflows/release.yml`) now:
-1. **Deletes** any pre-existing release for the tag before electron-builder runs.
-2. Lets `electron-builder -p always` create the release and upload all assets (`latest.yml`, `.exe`, `.blockmap`).
-3. Adds release notes and publishes the release (`--draft=false`) only after all assets are confirmed uploaded.
-4. **Validates** that `latest.yml` is present — fails the workflow if it's missing.
+**The Fix (applied in v2.4.3)**: The CI pipeline (`.github/workflows/release.yml`) now guarantees an atomic, race-free deployment by:
+1. Setting `releaseType: "draft"` in `package.json`.
+2. **Pre-creating a Draft Release** (`gh release create --draft`) before `electron-builder` runs.
+3. Letting `electron-builder` sequentially upload all assets (`latest.yml`, `.exe`, `.blockmap`) to the *already existing* draft release.
+4. Publishing the draft release (`--draft=false`) only after all assets are confirmed uploaded.
 
 > [!CAUTION]
-> **NEVER** create a GitHub release (via `gh release create`, the GitHub UI, or any other tool) for a version tag before `electron-builder` runs. electron-builder **must** be the one to create the release. If you accidentally create one, delete it before running `npm run electron:publish`.
+> **DO NOT** change `releaseType` to `"release"` in `package.json`, and **DO NOT** remove the draft pre-creation step in the CI pipeline. Reverting these will re-introduce the race condition and break the auto-updater pipeline.
 
-**If this happens again (emergency manual fix)**:
-1. Go to GitHub → Releases → delete the broken release for the tag.
-2. Re-run the GitHub Actions workflow, OR locally run `npm run electron:publish` with `GH_TOKEN` set.
-3. Verify all 5 assets are present, then publish the release if it's still a draft.
+**If a deployment breaks (emergency manual fix)**:
+1. Go to GitHub → Releases → delete any broken, empty, or duplicate releases for the tag.
+2. Re-run the GitHub Actions workflow, or manually create a draft release for the tag and run `npm run electron:publish` locally.
+3. Verify all 5 assets are present, then publish the release.
 
 ### Q: I published a release, but the client isn't updating.
 - **Check the Version**: Did you actually increment the `"version"` in `package.json` before running the publish command?
