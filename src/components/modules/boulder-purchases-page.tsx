@@ -2,7 +2,7 @@
 import { usePrompt } from "@/components/ui/prompt-provider";
 import { handlePrint } from "@/lib/utils/print";
 
-import { useCallback, useEffect, useState } from "react";
+import { useCallback, useEffect, useState, useMemo, useRef } from "react";
 import { Pencil, Save, Search, Trash2, X, Download, Printer } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
@@ -11,9 +11,11 @@ import { Input } from "@/components/ui/input";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { Textarea } from "@/components/ui/textarea";
 import { SearchableSelect } from "@/components/ui/searchable-select";
+import { InlineEditableCell } from "@/components/ui/inline-editable-cell";
 import { listIncomingBoulder, saveIncomingBoulder, deleteIncomingBoulder } from "@/app/actions/purchases";
 import { checkDuplicateSaleBookNumber as checkDuplicateBookNumber, getLastBookPage } from "@/app/actions/sales";
 import { listVehicles } from "@/app/actions/vehicles";
+import { verifyEditPassword } from "@/app/actions/auth";
 import { cn, formatCurrency, formatDate, formatQty, todayInputValue } from "@/lib/utils";
 import { exportToExcel } from "@/lib/export";
 
@@ -72,6 +74,7 @@ export function BoulderPurchasesPage() {
   const [rows, setRows] = useState<BoulderRow[]>([]);
   const [vehicles, setVehicles] = useState<any[]>([]);
   const [search, setSearch] = useState("");
+  const [dateFilter, setDateFilter] = useState("");
   const [message, setMessage] = useState("");
   const [error, setError] = useState("");
   const [isSubmitting, setIsSubmitting] = useState(false);
@@ -97,6 +100,89 @@ export function BoulderPurchasesPage() {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
+  const [activeCell, setActiveCell] = useState<{rowId: string, colKey: string} | null>(null);
+  const [pinCache, setPinCache] = useState<{pin: string, expires: number} | null>(null);
+
+  async function requestEditPin(): Promise<string | null> {
+    if (pinCache && pinCache.expires > Date.now()) return pinCache.pin;
+    const password = await promptPassword("Enter Edit PIN (caches for 15m):");
+    if (!password) return null;
+    const isAuth = await verifyEditPassword(password, "edit");
+    if (!isAuth) {
+      setError("❌ Incorrect PIN.");
+      return null;
+    }
+    setPinCache({ pin: password, expires: Date.now() + 15 * 60 * 1000 });
+    setError("");
+    return password;
+  }
+
+  async function handleInlineSave(row: BoulderRow, field: keyof BoulderRow, newValue: string) {
+    if (String(row[field] ?? "") === newValue) return true;
+    
+    const pin = await requestEditPin();
+    if (!pin) return false;
+
+    const input: any = {
+      id: row.id,
+      date: row.date,
+      vehicleNumber: row.vehicleNumber,
+      partyName: row.partyName,
+      qty: row.qty,
+      rockRate: row.rockRate,
+      cashPaid: row.cashPaid,
+      bankPaid: row.bankPaid,
+      gPayPaid: row.gPayPaid,
+      vehicleRent: row.vehicleRent,
+      combinedPayment: row.combinedPayment,
+      remarks: row.remarks,
+      bookNumber: row.bookNumber,
+      pageNumber: row.pageNumber
+    };
+    
+    const numFields = ["qty", "rockRate", "cashPaid", "bankPaid", "gPayPaid", "vehicleRent"];
+    input[field] = numFields.includes(field) ? Number(newValue) : newValue;
+
+    try {
+      const res = await saveIncomingBoulder(input, pin);
+      // saveIncomingBoulder returns the row directly on success, or { success: false, error: ... } on failure
+      if ('error' in res && res.error) {
+        setError(res.error || "Failed to update cell.");
+        return false;
+      } else {
+        await load();
+        return true;
+      }
+    } catch (e: any) {
+      setError(e.message || "Failed to update cell.");
+      return false;
+    }
+  }
+
+  const editableCols = ["date", "vehicleNumber", "partyName", "qty", "rockRate", "vehicleRent", "cashPaid", "bankPaid", "remarks"];
+
+  function handleNavigate(dir: "up" | "down" | "left" | "right" | "next" | "prev", rowId: string, colKey: string) {
+    const rowIdx = visibleRows.findIndex(r => r.id === rowId);
+    const colIdx = editableCols.indexOf(colKey);
+    if (rowIdx === -1 || colIdx === -1) return;
+
+    let nextRow = rowIdx;
+    let nextCol = colIdx;
+
+    if (dir === "up") nextRow = Math.max(0, rowIdx - 1);
+    if (dir === "down") nextRow = Math.min(visibleRows.length - 1, rowIdx + 1);
+    if (dir === "left" || dir === "prev") {
+      if (colIdx > 0) nextCol = colIdx - 1;
+      else if (rowIdx > 0) { nextCol = editableCols.length - 1; nextRow = rowIdx - 1; }
+    }
+    if (dir === "right" || dir === "next") {
+      if (colIdx < editableCols.length - 1) nextCol = colIdx + 1;
+      else if (rowIdx < visibleRows.length - 1) { nextCol = 0; nextRow = rowIdx + 1; }
+    }
+
+    setActiveCell({ rowId: visibleRows[nextRow].id, colKey: editableCols[nextCol] });
+  }
+
   const load = useCallback(async () => {
     const data = (await listIncomingBoulder(search)) as BoulderRow[];
     setRows(data);
@@ -106,6 +192,14 @@ export function BoulderPurchasesPage() {
     const timer = window.setTimeout(() => void load(), 200);
     return () => window.clearTimeout(timer);
   }, [load]);
+
+  const visibleRows = useMemo(() => {
+    let filtered = rows;
+    if (dateFilter) {
+      filtered = filtered.filter(row => row.date && row.date.startsWith(dateFilter));
+    }
+    return filtered;
+  }, [rows, dateFilter]);
 
   function edit(row: BoulderRow) {
     setForm({
@@ -178,6 +272,33 @@ export function BoulderPurchasesPage() {
     }
   }
 
+  const submitRef = useRef(submit);
+  useEffect(() => { submitRef.current = submit; }, [submit]);
+
+  useEffect(() => {
+    const down = (e: KeyboardEvent) => {
+      if (e.key === "s" && (e.metaKey || e.ctrlKey)) {
+        e.preventDefault();
+        submitRef.current();
+      }
+      if (e.key === "Escape") {
+        if (document.activeElement?.tagName === "INPUT") {
+          (document.activeElement as HTMLElement).blur();
+        } else {
+          e.preventDefault();
+          setForm(blankForm());
+        }
+      }
+      if (e.key === "n" && (e.metaKey || e.ctrlKey)) {
+        e.preventDefault();
+        setForm(blankForm());
+        setTimeout(() => document.getElementById("boulder-vehicle-search")?.focus(), 50);
+      }
+    };
+    document.addEventListener("keydown", down);
+    return () => document.removeEventListener("keydown", down);
+  }, []);
+
   async function remove(id: string) {
     const password = await promptPassword("Enter Admin/Delete PIN to remove this boulder entry:");
     if (!password) return;
@@ -195,14 +316,14 @@ export function BoulderPurchasesPage() {
   }
 
   function handleExportExcel() {
-    if (rows.length === 0) return;
+    if (visibleRows.length === 0) return;
     
     let totalQty = 0;
     let totalAmount = 0;
     let totalPaid = 0;
     let totalCredit = 0;
 
-    const excelData: Record<string, any>[] = rows.map((row) => {
+    const excelData: Record<string, any>[] = visibleRows.map((row) => {
       totalQty += row.qty;
       totalAmount += row.amount;
       totalPaid += row.paidTotal;
@@ -445,7 +566,14 @@ export function BoulderPurchasesPage() {
       <Card className="print:border-none print:shadow-none">
         <CardHeader className="flex-row flex-wrap items-center justify-between gap-3 print:hidden">
           <CardTitle>Boulder Table</CardTitle>
-          <div className="flex w-full sm:w-auto gap-2 items-center">
+          <div className="flex w-full sm:w-auto gap-2 items-center flex-wrap">
+            <Input 
+              type="date" 
+              className="w-auto h-10" 
+              value={dateFilter} 
+              onChange={(e) => setDateFilter(e.target.value)} 
+              title="Filter by date"
+            />
             <div className="relative w-full sm:w-64">
               <Search className="pointer-events-none absolute left-3 top-3 h-4 w-4 text-muted-foreground" />
               <Input id="boulderSearch" aria-label="Search boulder entries" className="pl-9" placeholder="Search boulder entries..." value={search} onChange={(event) => setSearch(event.target.value)} />
@@ -483,31 +611,42 @@ export function BoulderPurchasesPage() {
               </TableRow>
             </TableHeader>
             <TableBody>
-              {rows.map((row) => (
+              {visibleRows.map((row) => (
                 <TableRow key={row.id} className="print:border-b print:border-gray-200 group bg-background hover:bg-muted">
-                  <TableCell className="sm:sticky sm:left-0 z-10 bg-inherit w-[110px] min-w-[110px] max-w-[110px] sm:border-r border-border print:static print:w-auto print:border-none">{formatDate(row.date)}</TableCell>
+                  <TableCell className="sm:sticky sm:left-0 z-10 bg-inherit w-[110px] min-w-[110px] max-w-[110px] sm:border-r border-border print:static print:w-auto print:border-none">
+                    <InlineEditableCell rowId={row.id} colKey="date" value={row.date} displayValue={formatDate(row.date)} type="date" activeCell={activeCell} setActiveCell={setActiveCell} onSave={(val) => handleInlineSave(row, "date", val)} onNavigate={(dir) => handleNavigate(dir, row.id, "date")} />
+                  </TableCell>
                   <TableCell>
                     {row.bookNumber && row.pageNumber ? `${row.bookNumber}/${row.pageNumber}` : row.bookNumber || row.pageNumber || "-"}
                   </TableCell>
-                  <TableCell>{row.vehicleNumber}</TableCell>
-                  <TableCell className="truncate max-w-[150px]" title={row.partyName}>{row.partyName}</TableCell>
-                  <TableCell className="number-cell font-medium">{formatQty(row.qty, "")}</TableCell>
-                  <TableCell className="number-cell text-muted-foreground">{formatCurrency(row.rockRate)}</TableCell>
+                  <TableCell>
+                    <InlineEditableCell rowId={row.id} colKey="vehicleNumber" value={row.vehicleNumber} activeCell={activeCell} setActiveCell={setActiveCell} onSave={(val) => handleInlineSave(row, "vehicleNumber", val)} onNavigate={(dir) => handleNavigate(dir, row.id, "vehicleNumber")} />
+                  </TableCell>
+                  <TableCell className="truncate max-w-[150px]" title={row.partyName}>
+                    <InlineEditableCell rowId={row.id} colKey="partyName" value={row.partyName} activeCell={activeCell} setActiveCell={setActiveCell} onSave={(val) => handleInlineSave(row, "partyName", val)} onNavigate={(dir) => handleNavigate(dir, row.id, "partyName")} />
+                  </TableCell>
+                  <TableCell className="number-cell font-medium">
+                    <InlineEditableCell rowId={row.id} colKey="qty" value={row.qty} displayValue={formatQty(row.qty, "")} type="number" activeCell={activeCell} setActiveCell={setActiveCell} onSave={(val) => handleInlineSave(row, "qty", val)} onNavigate={(dir) => handleNavigate(dir, row.id, "qty")} />
+                  </TableCell>
+                  <TableCell className="number-cell text-muted-foreground">
+                    <InlineEditableCell rowId={row.id} colKey="rockRate" value={row.rockRate} displayValue={formatCurrency(row.rockRate)} type="number" activeCell={activeCell} setActiveCell={setActiveCell} onSave={(val) => handleInlineSave(row, "rockRate", val)} onNavigate={(dir) => handleNavigate(dir, row.id, "rockRate")} />
+                  </TableCell>
                   <TableCell className="number-cell font-medium">{formatCurrency(row.amount)}</TableCell>
-                  <TableCell className="number-cell">{(row.cashPaid ?? 0) > 0 ? formatCurrency(row.cashPaid ?? 0) : <span className="text-muted-foreground">—</span>}</TableCell>
-                  <TableCell className="number-cell">{((row.bankPaid ?? 0) + (row.gPayPaid ?? 0)) > 0 ? formatCurrency((row.bankPaid ?? 0) + (row.gPayPaid ?? 0)) : <span className="text-muted-foreground">—</span>}</TableCell>
                   <TableCell className="number-cell">
-                    {(row.vehicleRent ?? 0) > 0 ? (
-                      <div className="flex flex-col items-end">
-                        <span>{formatCurrency(row.vehicleRent ?? 0)}</span>
-                        {row.combinedPayment && <span className="text-[10px] text-muted-foreground leading-none">Incl.</span>}
-                      </div>
-                    ) : <span className="text-muted-foreground">—</span>}
+                    <InlineEditableCell rowId={row.id} colKey="cashPaid" value={row.cashPaid ?? 0} displayValue={(row.cashPaid ?? 0) > 0 ? formatCurrency(row.cashPaid ?? 0) : <span className="text-muted-foreground">—</span>} type="number" activeCell={activeCell} setActiveCell={setActiveCell} onSave={(val) => handleInlineSave(row, "cashPaid", val)} onNavigate={(dir) => handleNavigate(dir, row.id, "cashPaid")} />
+                  </TableCell>
+                  <TableCell className="number-cell">
+                    <InlineEditableCell rowId={row.id} colKey="bankPaid" value={row.bankPaid ?? 0} displayValue={((row.bankPaid ?? 0) + (row.gPayPaid ?? 0)) > 0 ? formatCurrency((row.bankPaid ?? 0) + (row.gPayPaid ?? 0)) : <span className="text-muted-foreground">—</span>} type="number" activeCell={activeCell} setActiveCell={setActiveCell} onSave={(val) => handleInlineSave(row, "bankPaid", val)} onNavigate={(dir) => handleNavigate(dir, row.id, "bankPaid")} />
+                  </TableCell>
+                  <TableCell className="number-cell">
+                    <InlineEditableCell rowId={row.id} colKey="vehicleRent" value={row.vehicleRent ?? 0} displayValue={(row.vehicleRent ?? 0) > 0 ? formatCurrency(row.vehicleRent ?? 0) : <span className="text-muted-foreground">—</span>} type="number" activeCell={activeCell} setActiveCell={setActiveCell} onSave={(val) => handleInlineSave(row, "vehicleRent", val)} onNavigate={(dir) => handleNavigate(dir, row.id, "vehicleRent")} />
                   </TableCell>
                   <TableCell className="number-cell text-emerald-600 font-medium">{(row.paidTotal ?? 0) > 0 ? formatCurrency(row.paidTotal ?? 0) : <span className="text-muted-foreground">—</span>}</TableCell>
                   <TableCell className={cn("number-cell", (row.remainingCredit ?? 0) > 0 && "text-destructive font-semibold")}>{(row.remainingCredit ?? 0) > 0 ? formatCurrency(row.remainingCredit ?? 0) : <span className="text-muted-foreground">—</span>}</TableCell>
                   <TableCell className="text-center">{row.settled ? <span className="text-emerald-600 font-bold">✓</span> : <span className="text-muted-foreground">—</span>}</TableCell>
-                  <TableCell className="max-w-40 truncate print:whitespace-normal" title={row.remarks || ""}>{row.remarks}</TableCell>
+                  <TableCell className="max-w-40 truncate print:whitespace-normal" title={row.remarks || ""}>
+                    <InlineEditableCell rowId={row.id} colKey="remarks" value={row.remarks || ""} activeCell={activeCell} setActiveCell={setActiveCell} onSave={(val) => handleInlineSave(row, "remarks", val)} onNavigate={(dir) => handleNavigate(dir, row.id, "remarks")} />
+                  </TableCell>
                   <TableCell className="text-right print:hidden">
                     <div className="inline-flex gap-1">
                       <Button variant="ghost" size="icon" onClick={() => edit(row)} aria-label="Edit boulder entry">
@@ -520,7 +659,7 @@ export function BoulderPurchasesPage() {
                   </TableCell>
                 </TableRow>
               ))}
-              {!rows.length ? (
+              {!visibleRows.length ? (
                 <TableRow>
                   <TableCell colSpan={15} className="h-24 text-center text-muted-foreground">
                     No boulder entries found.

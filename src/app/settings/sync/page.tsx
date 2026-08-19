@@ -10,7 +10,8 @@ import {
   fetchOnlineStatus,
   checkRestoreEligibility,
   performFullRestore,
-  fetchRestoreDiffSummary
+  fetchRestoreDiffSummary,
+  performForcePushAll
 } from "@/app/actions/sync";
 import TableDiffViewer from "@/components/sync/TableDiffViewer";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
@@ -475,6 +476,20 @@ export default function SyncDashboardPage() {
         >
           {actionLoading === "pull" && <RefreshCw className="mr-2 h-4 w-4 animate-spin" />}
           Force Pull
+        </Button>
+        <Button 
+          variant="default"
+          className="bg-blue-600 hover:bg-blue-700 text-white"
+          onClick={() => {
+            if (confirm("This will push ALL local data to the server. Existing server data will be updated (not duplicated). Continue?")) {
+              handleAction("forcePushAll", performForcePushAll);
+            }
+          }}
+          disabled={!!actionLoading || !isOnline}
+        >
+          {actionLoading === "forcePushAll" && <RefreshCw className="mr-2 h-4 w-4 animate-spin" />}
+          <ArrowUpCircle className="mr-2 h-4 w-4" />
+          Force Push All Data
         </Button>
         <Button 
           variant="destructive" 

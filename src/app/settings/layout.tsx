@@ -3,7 +3,7 @@
 import { ReactNode } from "react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { Server, RefreshCw, FileText, FileJson, Info } from "lucide-react";
+import { Server, RefreshCw, FileText, FileJson, Info, BookOpen } from "lucide-react";
 import { cn } from "@/lib/utils";
 
 const settingsNav = [
@@ -12,6 +12,7 @@ const settingsNav = [
   { href: "/settings/sync", label: "Sync Dashboard", icon: RefreshCw },
   { href: "/settings/user-logs", label: "User Logs", icon: FileText },
   { href: "/settings/tally", label: "Tally Export", icon: FileJson },
+  { href: "/settings/help", label: "Help & Training", icon: BookOpen },
 ];
 
 export default function SettingsLayout({ children }: { children: ReactNode }) {

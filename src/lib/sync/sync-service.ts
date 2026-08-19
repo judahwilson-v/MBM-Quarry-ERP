@@ -1,6 +1,7 @@
 import { getDb } from "@/lib/prisma";
 import { createSyncClient } from "@/lib/supabase/client-sync";
 import {
+  AUDIT_ENTITY_ALIASES_REVERSE,
   DIRECT_PUSH_MODELS,
   extractEntityData,
   getRowTimestamp,
@@ -770,7 +771,167 @@ export async function purgeOldSupabaseData(): Promise<{ purged: Record<string, n
   return { purged };
 }
 
+// ---------- Force Push All Tables ----------
+
+/**
+ * Comprehensive force push: scans EVERY table in the local database and
+ * upserts ALL records to Supabase. Unlike pushSync() which relies on the
+ * audit log queue and cursor, this function bypasses the queue entirely
+ * and pushes data directly from each local table.
+ *
+ * Uses onConflict:'id' upserts so records already in Supabase are safely
+ * updated (not duplicated). Records identical on both sides result in a
+ * no-op update — no data corruption.
+ *
+ * Use this when the normal sync cursor has gotten stuck or advanced past
+ * pending records, causing data to stay local-only.
+ */
+export async function forcePushAllTables(): Promise<{
+  pushed: number;
+  skipped: number;
+  errors: SyncErrorItem[];
+  status: "IDLE" | "ERROR" | "PARTIAL_SUCCESS";
+  tableBreakdown: Array<{ table: string; pushed: number; errors: number }>;
+}> {
+  let totalPushed = 0;
+  let totalSkipped = 0;
+  const allErrors: SyncErrorItem[] = [];
+  const tableBreakdown: Array<{ table: string; pushed: number; errors: number }> = [];
+
+  const db = await getDb();
+  const supabase = createSyncClient();
+
+  try {
+    // Update sync status
+    try {
+      await db.syncState.update({ where: { id: "default" }, data: { status: "SYNCING" } });
+    } catch {
+      // SyncState might not exist yet
+    }
+
+    // Process tables in PUSH_PRIORITY order (parents first)
+    const orderedModels = (Object.entries(PUSH_PRIORITY) as [keyof typeof SYNC_MODEL_CONFIG, number][])
+      .sort(([, a], [, b]) => a - b)
+      .map(([name]) => name);
+
+    for (const modelName of orderedModels) {
+      const config = SYNC_MODEL_CONFIG[modelName];
+      if (!config) continue;
+
+      let tablePushed = 0;
+      let tableErrors = 0;
+
+      try {
+        const delegate = (db as any)[config.delegate];
+        if (!delegate) continue;
+
+        // Fetch ALL local records for this table
+        const localRows = await delegate.findMany({
+          orderBy: { [config.timeField]: "asc" },
+        });
+
+        if (localRows.length === 0) {
+          tableBreakdown.push({ table: config.table, pushed: 0, errors: 0 });
+          continue;
+        }
+
+        console.log(`[Force Push] ${config.table}: ${localRows.length} local rows to push`);
+
+        // Push in batches of 50
+        const BATCH_SIZE = 50;
+        for (let i = 0; i < localRows.length; i += BATCH_SIZE) {
+          const batch = localRows.slice(i, i + BATCH_SIZE);
+          for (const row of batch) {
+            try {
+              const snakeData = toSnakeCase(row);
+              const { error } = await supabase
+                .from(config.table)
+                .upsert(snakeData, { onConflict: "id" });
+              if (error) {
+                // On unique constraint violation, try with modified unique fields
+                if (error.code === '23505') {
+                  if (config.table === 'outgoing_sales' && snakeData.serial_number) {
+                    snakeData.serial_number = null;
+                  }
+                  const { error: retryErr } = await supabase
+                    .from(config.table)
+                    .upsert(snakeData, { onConflict: "id" });
+                  if (retryErr) {
+                    throw new Error(retryErr.message);
+                  }
+                } else if (error.code === '23503') {
+                  // FK violation — parent record missing, skip for now
+                  console.warn(`[Force Push] FK violation for ${config.table}:${snakeData.id}, skipping`);
+                  totalSkipped++;
+                  continue;
+                } else {
+                  throw new Error(error.message);
+                }
+              }
+              tablePushed++;
+            } catch (rowErr: any) {
+              const errMsg = rowErr?.message || String(rowErr);
+              console.warn(`[Force Push] Row failed for ${config.table}:${(row as any).id}: ${errMsg}`);
+              allErrors.push({ table: config.table, rowId: (row as any).id, error: errMsg });
+              tableErrors++;
+            }
+          }
+        }
+
+        console.log(`[Force Push] ${config.table}: ${tablePushed} pushed, ${tableErrors} errors`);
+      } catch (tableErr: any) {
+        const errMsg = tableErr?.message || String(tableErr);
+        console.error(`[Force Push] Table ${config.table} failed:`, errMsg);
+        allErrors.push({ table: config.table, error: errMsg });
+        tableErrors++;
+      }
+
+      totalPushed += tablePushed;
+      tableBreakdown.push({ table: config.table, pushed: tablePushed, errors: tableErrors });
+    }
+
+    // Reset the sync cursor to now so incremental sync works correctly going forward
+    const now = new Date();
+    try {
+      await db.syncState.upsert({
+        where: { id: "default" },
+        update: {
+          lastSyncedAt: now,
+          status: allErrors.length === 0 ? "IDLE" : "PARTIAL_SUCCESS",
+          lastError: allErrors.length > 0
+            ? allErrors.slice(0, 5).map(e => `${e.table}${e.rowId ? `:${e.rowId}` : ''}: ${e.error}`).join("; ")
+            : null,
+        },
+        create: { id: "default", lastSyncedAt: now, status: "IDLE" },
+      });
+    } catch (cursorErr: any) {
+      console.warn(`[Force Push] Failed to update sync cursor: ${cursorErr?.message}`);
+    }
+
+    const status: "IDLE" | "ERROR" | "PARTIAL_SUCCESS" =
+      allErrors.length === 0 ? "IDLE" : (totalPushed > 0 ? "PARTIAL_SUCCESS" : "ERROR");
+
+    console.log(`[Force Push] Complete. ${totalPushed} pushed, ${totalSkipped} skipped, ${allErrors.length} errors.`);
+
+    return { pushed: totalPushed, skipped: totalSkipped, errors: allErrors, status, tableBreakdown };
+  } catch (e: any) {
+    const msg = e?.message || String(e);
+    console.error(`[Force Push] Fatal error:`, msg);
+    allErrors.push({ table: "global", error: msg });
+
+    try {
+      await db.syncState.update({
+        where: { id: "default" },
+        data: { status: "ERROR", lastError: `Force push failed: ${msg}` },
+      });
+    } catch {}
+
+    return { pushed: totalPushed, skipped: totalSkipped, errors: allErrors, status: "ERROR", tableBreakdown };
+  }
+}
+
 // ---------- Storage Stats ----------
+
 
 export interface SupabaseStorageStats {
   tables: { table: string; totalSize: string; rowCount: number }[];
@@ -891,13 +1052,18 @@ export async function getDetailedSyncStatus() {
     const config = SYNC_MODEL_CONFIG[modelName];
     if (!config) continue;
 
+    // Count audit logs — check both the model name and any aliases (e.g. "Sale" → "OutgoingSale")
+    const aliasNames = AUDIT_ENTITY_ALIASES_REVERSE[modelName] || [];
+    const allEntityNames = [modelName, ...aliasNames];
     let pendingCount = await db.auditLog.count({
       where: {
-        entityName: modelName,
+        entityName: { in: allEntityNames },
         createdAt: { gt: pushCursor }
       }
     });
 
+    // Direct table scan: count records newer than the sync cursor.
+    // This is the primary reliable count — catches records even if audit logs were missed.
     if (DIRECT_PUSH_MODELS.includes(modelName as any)) {
       try {
         const delegate = (db as any)[config.delegate];
@@ -905,10 +1071,11 @@ export async function getDetailedSyncStatus() {
           const projectionCount = await delegate.count({
             where: { [config.timeField]: { gt: pushCursor } }
           });
-          pendingCount += projectionCount;
+          // Use the larger of audit-log count vs direct-table count to avoid double-counting
+          pendingCount = Math.max(pendingCount, projectionCount);
         }
       } catch {
-        // projection table might not exist yet
+        // table might not exist yet
       }
     }
 

@@ -132,6 +132,15 @@ const AUDIT_ENTITY_ALIASES: Record<string, SyncModelName> = {
   Sale: "OutgoingSale",
 };
 
+// Reverse lookup: given a SyncModelName, find all audit entity names that alias to it
+export const AUDIT_ENTITY_ALIASES_REVERSE: Record<string, string[]> = {};
+for (const [alias, modelName] of Object.entries(AUDIT_ENTITY_ALIASES)) {
+  if (!AUDIT_ENTITY_ALIASES_REVERSE[modelName]) {
+    AUDIT_ENTITY_ALIASES_REVERSE[modelName] = [];
+  }
+  AUDIT_ENTITY_ALIASES_REVERSE[modelName].push(alias);
+}
+
 export const PULL_ORDER: SyncModelName[] = [
   "GlobalSettings",
   "Material",
@@ -164,13 +173,39 @@ export const PULL_ORDER: SyncModelName[] = [
   "WeighbridgeTicket",
 ];
 
-// These projection tables do not create audit rows of their own, so they must
-// be scanned by timestamp during push sync.
+// All tables are scanned by timestamp during push sync as a reliable fallback.
+// This ensures data is pushed even if audit logs are missed, skipped, or the
+// sync cursor advances past them due to FK errors or other transient failures.
 export const DIRECT_PUSH_MODELS: SyncModelName[] = [
+  "GlobalSettings",
+  "Material",
+  "Party",
+  "Supplier",
+  "Employee",
   "FinancialEvent",
-  "LedgerEntry",
+  "DayBook",
+  "DayBookEntry",
+  "EmployeeCredit",
+  "OtherCredit",
+  "CashTransfer",
   "InventoryStock",
+  "Vehicle",
+  "LedgerEntry",
+  "DayBookExpenseEntry",
+  "EmployeeLedger",
   "InventoryTransaction",
+  "PartyCollection",
+  "PartyPayment",
+  "PartyLedger",
+  "OutgoingSale",
+  "IncomingBoulder",
+  "Expense",
+  "FuelPurchase",
+  "MaintenanceRecord",
+  "MaintenanceSchedule",
+  "VehicleStats",
+  "PartyCredit",
+  "WeighbridgeTicket",
 ];
 
 export function resolveSyncModel(entityName: string): SyncModelName | null {

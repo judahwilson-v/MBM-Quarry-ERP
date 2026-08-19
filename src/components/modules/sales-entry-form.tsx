@@ -1,7 +1,7 @@
 "use client";
 import { usePrompt } from "@/components/ui/prompt-provider";
 
-import { useCallback, useEffect, useMemo, useState } from "react";
+import { useCallback, useEffect, useMemo, useState, useRef } from "react";
 import { Save, X } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
@@ -185,6 +185,38 @@ export function SalesEntryForm({
       }));
     }).catch(console.error);
   }, [editingSale]);
+
+  const submitRef = useRef(submit);
+  useEffect(() => { submitRef.current = submit; }, [submit]);
+
+  useEffect(() => {
+    const down = (e: KeyboardEvent) => {
+      // Ignore if user is interacting with an input and we don't want to override unless it's a specific shortcut
+      if (e.key === "s" && (e.metaKey || e.ctrlKey)) {
+        e.preventDefault();
+        submitRef.current();
+      }
+      if (e.key === "Escape") {
+        // Only clear if not in an active input that handles its own escape
+        if (document.activeElement?.tagName === "INPUT") {
+          (document.activeElement as HTMLElement).blur();
+        } else {
+          e.preventDefault();
+          if (editingSale && onCancelEdit) onCancelEdit();
+          else setForm(blankSale());
+        }
+      }
+      if (e.key === "n" && (e.metaKey || e.ctrlKey)) {
+        e.preventDefault();
+        if (editingSale && onCancelEdit) onCancelEdit();
+        else setForm(blankSale());
+        // optionally focus the first field
+        setTimeout(() => document.getElementById("vehicle-search-input")?.focus(), 50);
+      }
+    };
+    document.addEventListener("keydown", down);
+    return () => document.removeEventListener("keydown", down);
+  }, [editingSale, onCancelEdit]);
 
   const totals = useMemo(() => {
     const material = materials.find((row) => row.id === form.materialId);

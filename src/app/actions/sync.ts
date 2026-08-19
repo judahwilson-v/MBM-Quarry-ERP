@@ -96,4 +96,9 @@ export async function fetchDetailedTableDiff(tableName: string) {
   return getDetailedTableDiff(tableName);
 }
 
-
+export async function performForcePushAll() {
+  const { forcePushAllTables } = await import("@/lib/sync/sync-service");
+  const result = await forcePushAllTables();
+  revalidatePath("/", "layout");
+  return result;
+}

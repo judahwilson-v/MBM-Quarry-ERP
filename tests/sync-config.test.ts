@@ -37,12 +37,7 @@ function run() {
   assert.equal(getRowTimestamp({ createdAt: "2026-07-04T10:00:00.000Z" }, "createdAt").toISOString(), "2026-07-04T10:00:00.000Z");
   assert.throws(() => getRowTimestamp({ createdAt: "not-a-date" }, "createdAt"), /invalid createdAt timestamp/);
 
-  assert.deepEqual(DIRECT_PUSH_MODELS, [
-    "FinancialEvent",
-    "LedgerEntry",
-    "InventoryStock",
-    "InventoryTransaction",
-  ]);
+  assert.deepEqual(DIRECT_PUSH_MODELS, PULL_ORDER);
   assert.equal(REMOTE_CONFLICT_COLUMNS.LedgerEntry, "financial_event_id");
   assert.equal(LOCAL_CONFLICT_FIELDS.LedgerEntry, "financialEventId");
   assert.equal(REMOTE_CONFLICT_COLUMNS.InventoryStock, "material_name");

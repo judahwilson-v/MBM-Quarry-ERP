@@ -1,9 +1,9 @@
 ---
 schema_version: 2
 project: "MBM Quarry ERP"
-project_version: "2.4.0"
+project_version: "2.4.5"
 stack: "Next.js 14 + Prisma/SQLite + Electron + Supabase"
-last_updated: "2026-08-18 16:00:00"
+last_updated: "2026-08-19 15:45:00"
 total_docs: 28
 ---
 
@@ -76,6 +76,7 @@ Every documentation file in the project, its purpose, and when to read it.
 | [OWNER_DASHBOARD_PRD.md](reference/OWNER_DASHBOARD_PRD.md) | Owner dashboard product requirements | Dashboard work |
 | [QUARRY_FIELD_NOTES.md](reference/QUARRY_FIELD_NOTES.md) | Real-world quarry observations | Understanding domain |
 | [AI_PROGRESS_TEMPLATE.md](handoff/AI_PROGRESS_TEMPLATE.md) | Template for long-running task checkpoints | Multi-session tasks |
+| [AI_SKILLS.md](reference/AI_SKILLS.md) | Active Antigravity AI tools and plugins | Tool configuration / tool errors |
 
 ### Workflows
 | File | Purpose | Read When |

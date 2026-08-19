@@ -7,44 +7,49 @@ import { Prisma } from "@prisma/client";
 export async function getInventoryStock() {
   const db = await getDb();
   return db.inventoryStock.findMany({
-    orderBy: { materialName: 'asc' },
+    orderBy: { materialName: "asc" },
     include: {
       transactions: {
-        orderBy: { date: 'desc' },
-        take: 5
-      }
-    }
+        orderBy: { date: "desc" },
+        take: 5,
+      },
+    },
   });
 }
 
 export async function adjustInventoryStock(
   materialName: string,
   quantityChange: number,
-  type: 'PRODUCTION_IN' | 'SALE_OUT' | 'MANUAL_ADJUST',
+  type: "PRODUCTION_IN" | "SALE_OUT" | "MANUAL_ADJUST",
   description?: string,
-  unit: string = 'TONS'
+  unit: string = "TONS",
 ) {
   const db = await getDb();
-  
+
+  const normalizedMaterialName = materialName
+    .trim()
+    .toUpperCase()
+    .replace(/(\d)MM/, "$1 MM");
+
   // Find or create the stock entry
   let stock = await db.inventoryStock.findUnique({
-    where: { materialName }
+    where: { materialName: normalizedMaterialName },
   });
 
   if (!stock) {
     stock = await db.inventoryStock.create({
       data: {
-        materialName,
+        materialName: normalizedMaterialName,
         quantity: quantityChange,
-        unit
-      }
+        unit,
+      },
     });
   } else {
     stock = await db.inventoryStock.update({
       where: { id: stock.id },
       data: {
-        quantity: { increment: quantityChange }
-      }
+        quantity: { increment: quantityChange },
+      },
     });
   }
 
@@ -55,11 +60,11 @@ export async function adjustInventoryStock(
       type,
       quantityChange,
       description,
-      date: new Date()
-    }
+      date: new Date(),
+    },
   });
 
-  revalidatePath('/inventory');
+  revalidatePath("/inventory");
   return stock;
 }
 
@@ -67,31 +72,36 @@ export async function txAdjustInventoryStock(
   tx: Prisma.TransactionClient,
   materialName: string,
   quantityChange: number,
-  type: 'PRODUCTION_IN' | 'SALE_OUT' | 'MANUAL_ADJUST',
+  type: "PRODUCTION_IN" | "SALE_OUT" | "MANUAL_ADJUST",
   referenceId?: string,
   description?: string,
-  unit: string = 'TONS'
+  unit: string = "TONS",
 ) {
   if (quantityChange === 0) return;
-  
+
+  const normalizedMaterialName = materialName
+    .trim()
+    .toUpperCase()
+    .replace(/(\d)MM/, "$1 MM");
+
   let stock = await tx.inventoryStock.findUnique({
-    where: { materialName }
+    where: { materialName: normalizedMaterialName },
   });
 
   if (!stock) {
     stock = await tx.inventoryStock.create({
       data: {
-        materialName,
+        materialName: normalizedMaterialName,
         quantity: quantityChange,
-        unit
-      }
+        unit,
+      },
     });
   } else {
     stock = await tx.inventoryStock.update({
       where: { id: stock.id },
       data: {
-        quantity: { increment: quantityChange }
-      }
+        quantity: { increment: quantityChange },
+      },
     });
   }
 
@@ -102,8 +112,8 @@ export async function txAdjustInventoryStock(
       quantityChange,
       referenceId,
       description,
-      date: new Date()
-    }
+      date: new Date(),
+    },
   });
 
   return stock;
@@ -113,10 +123,10 @@ export async function getInventoryTransactions(stockId?: string) {
   const db = await getDb();
   return db.inventoryTransaction.findMany({
     where: stockId ? { stockId } : undefined,
-    orderBy: { date: 'desc' },
+    orderBy: { date: "desc" },
     include: {
-      stock: true
+      stock: true,
     },
-    take: 50
+    take: 50,
   });
 }

@@ -8,7 +8,8 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
-import { deleteSale, listSales, purgeNonGstSales } from "@/app/actions/sales";
+import { InlineEditableCell } from "@/components/ui/inline-editable-cell";
+import { deleteSale, listSales, purgeNonGstSales, saveSale } from "@/app/actions/sales";
 import { verifyEditPassword } from "@/app/actions/auth";
 import { cn, formatCurrency, formatDate, formatQty } from "@/lib/utils";
 import { exportToExcel } from "@/lib/export";
@@ -38,11 +39,94 @@ export function SalesPage() {
   const [sales, setSales] = useState<SaleRow[]>([]);
   const [editingSale, setEditingSale] = useState<SaleRow | null>(null);
   const [search, setSearch] = useState("");
+  const [dateFilter, setDateFilter] = useState("");
   const [gstFilter, setGstFilter] = useState<"ALL" | "GST" | "NON_GST">("ALL");
   const [sortKey, setSortKey] = useState<SortKey>("saleDate");
   const [sortDirection, setSortDirection] = useState<"asc" | "desc">("desc");
   const [error, setError] = useState("");
   const { promptPassword, confirmAction } = usePrompt();
+
+  const [activeCell, setActiveCell] = useState<{rowId: string, colKey: string} | null>(null);
+  const [pinCache, setPinCache] = useState<{pin: string, expires: number} | null>(null);
+
+  async function requestEditPin(): Promise<string | null> {
+    if (pinCache && pinCache.expires > Date.now()) {
+      return pinCache.pin;
+    }
+    const password = await promptPassword("Enter Edit PIN (caches for 15m):");
+    if (!password) return null;
+    const isAuth = await verifyEditPassword(password, "edit");
+    if (!isAuth) {
+      setError("❌ Incorrect PIN.");
+      return null;
+    }
+    setPinCache({ pin: password, expires: Date.now() + 15 * 60 * 1000 });
+    setError("");
+    return password;
+  }
+
+  async function handleInlineSave(row: SaleRow, field: keyof EditableSale, newValue: string) {
+    if (String(row[field as keyof SaleRow] ?? "") === newValue) return true;
+    
+    const pin = await requestEditPin();
+    if (!pin) return false;
+
+    const input: any = {
+      id: row.id,
+      saleDate: row.saleDate,
+      vehicleNumber: row.vehicleNumber,
+      partyName: row.partyName,
+      materialId: (row as any).materialId,
+      qty: row.qty,
+      ratePerCft: row.ratePerCft,
+      cashPaid: row.cashPaid,
+      bankPaid: row.bankPaid,
+      gPayPaid: row.gPayPaid,
+      discountType: row.discountType,
+      discountValue: row.discountValue,
+      remarks: row.remarks,
+    };
+    
+    const numFields = ["qty", "ratePerCft", "cashPaid", "bankPaid", "gPayPaid", "discountValue"];
+    input[field] = numFields.includes(field) ? Number(newValue) : newValue;
+
+    try {
+      const res = await saveSale(input, pin);
+      if (res.success) {
+        await loadSales();
+        return true;
+      }
+      setError(res.error || "Failed to update cell.");
+      return false;
+    } catch (e: any) {
+      setError(e.message || "Failed to update cell.");
+      return false;
+    }
+  }
+
+  const editableCols = ["saleDate", "vehicleNumber", "partyName", "qty", "ratePerCft", "discountValue", "cashPaid", "bankPaid", "remarks"];
+
+  function handleNavigate(dir: "up" | "down" | "left" | "right" | "next" | "prev", rowId: string, colKey: string) {
+    const rowIdx = visibleRows.findIndex(r => r.id === rowId);
+    const colIdx = editableCols.indexOf(colKey);
+    if (rowIdx === -1 || colIdx === -1) return;
+
+    let nextRow = rowIdx;
+    let nextCol = colIdx;
+
+    if (dir === "up") nextRow = Math.max(0, rowIdx - 1);
+    if (dir === "down") nextRow = Math.min(visibleRows.length - 1, rowIdx + 1);
+    if (dir === "left" || dir === "prev") {
+      if (colIdx > 0) nextCol = colIdx - 1;
+      else if (rowIdx > 0) { nextCol = editableCols.length - 1; nextRow = rowIdx - 1; }
+    }
+    if (dir === "right" || dir === "next") {
+      if (colIdx < editableCols.length - 1) nextCol = colIdx + 1;
+      else if (rowIdx < visibleRows.length - 1) { nextCol = 0; nextRow = rowIdx + 1; }
+    }
+
+    setActiveCell({ rowId: visibleRows[nextRow].id, colKey: editableCols[nextCol] });
+  }
 
   const loadSales = useCallback(async () => {
     const rows = (await listSales()) as SaleRow[];
@@ -57,12 +141,13 @@ export function SalesPage() {
     let filtered = sales;
     if (gstFilter === "GST") filtered = filtered.filter(row => row.gstEnabled);
     if (gstFilter === "NON_GST") filtered = filtered.filter(row => !row.gstEnabled);
+    if (dateFilter) filtered = filtered.filter(row => row.saleDate && row.saleDate.startsWith(dateFilter));
 
     const query = search.trim().toLowerCase();
     filtered = query
       ? filtered.filter((row) =>
           [
-        row.saleDate,
+            row.saleDate,
             row.vehicleNumber,
             row.partyName,
             row?.materialName,
@@ -86,7 +171,7 @@ export function SalesPage() {
           : String(left ?? "").localeCompare(String(right ?? ""));
       return sortDirection === "asc" ? result : -result;
     });
-  }, [sales, search, gstFilter, sortDirection, sortKey]);
+  }, [sales, search, dateFilter, gstFilter, sortDirection, sortKey]);
 
   const summary = useMemo(() => {
     const result: Record<string, number> = { totalRevenue: 0 };
@@ -251,7 +336,14 @@ export function SalesPage() {
               Print
             </Button>
           </div>
-          <div className="flex w-full sm:w-auto gap-2 items-center">
+          <div className="flex w-full sm:w-auto gap-2 items-center flex-wrap">
+            <Input 
+              type="date" 
+              className="w-auto h-10" 
+              value={dateFilter} 
+              onChange={(e) => setDateFilter(e.target.value)} 
+              title="Filter by date"
+            />
             <select
               className="h-10 rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background"
               value={gstFilter}
@@ -299,23 +391,39 @@ export function SalesPage() {
                   row.gstEnabled ? "bg-red-50 hover:bg-red-100 dark:bg-red-950 dark:hover:bg-red-900" : "bg-background hover:bg-muted",
                   "print:border-b print:border-gray-200 group"
                 )}>
-                  <TableCell className="sm:sticky sm:left-0 z-10 bg-inherit w-[110px] min-w-[110px] max-w-[110px] sm:border-r border-border print:static print:w-auto print:border-none">{formatDate(row.saleDate)}</TableCell>
+                  <TableCell className="sm:sticky sm:left-0 z-10 bg-inherit w-[110px] min-w-[110px] max-w-[110px] sm:border-r border-border print:static print:w-auto print:border-none">
+                    <InlineEditableCell rowId={row.id} colKey="saleDate" value={row.saleDate} displayValue={formatDate(row.saleDate)} type="date" activeCell={activeCell} setActiveCell={setActiveCell} onSave={(val) => handleInlineSave(row, "saleDate", val)} onNavigate={(dir) => handleNavigate(dir, row.id, "saleDate")} />
+                  </TableCell>
                   <TableCell>{new Date(row.createdAt).toLocaleTimeString("en-IN", { hour: "2-digit", minute: "2-digit" })}</TableCell>
-                  <TableCell>{row.vehicleNumber}</TableCell>
-                  <TableCell className="truncate max-w-[150px]" title={row.partyName}>{row.partyName}</TableCell>
+                  <TableCell>
+                    <InlineEditableCell rowId={row.id} colKey="vehicleNumber" value={row.vehicleNumber} activeCell={activeCell} setActiveCell={setActiveCell} onSave={(val) => handleInlineSave(row, "vehicleNumber", val)} onNavigate={(dir) => handleNavigate(dir, row.id, "vehicleNumber")} />
+                  </TableCell>
+                  <TableCell className="truncate max-w-[150px]" title={row.partyName}>
+                    <InlineEditableCell rowId={row.id} colKey="partyName" value={row.partyName} activeCell={activeCell} setActiveCell={setActiveCell} onSave={(val) => handleInlineSave(row, "partyName", val)} onNavigate={(dir) => handleNavigate(dir, row.id, "partyName")} />
+                  </TableCell>
                   <TableCell>{row.materialName}</TableCell>
-                  <TableCell className="number-cell">{formatQty(row.qty, "")}</TableCell>
-                  <TableCell className="number-cell">{formatCurrency(row.ratePerCft)}</TableCell>
+                  <TableCell className="number-cell font-medium text-emerald-700 dark:text-emerald-400">
+                    <InlineEditableCell rowId={row.id} colKey="qty" value={row.qty} displayValue={formatQty(row.qty, "")} type="number" activeCell={activeCell} setActiveCell={setActiveCell} onSave={(val) => handleInlineSave(row, "qty", val)} onNavigate={(dir) => handleNavigate(dir, row.id, "qty")} />
+                  </TableCell>
+                  <TableCell className="number-cell">
+                    <InlineEditableCell rowId={row.id} colKey="ratePerCft" value={row.ratePerCft} displayValue={formatCurrency(row.ratePerCft)} type="number" activeCell={activeCell} setActiveCell={setActiveCell} onSave={(val) => handleInlineSave(row, "ratePerCft", val)} onNavigate={(dir) => handleNavigate(dir, row.id, "ratePerCft")} />
+                  </TableCell>
                   <TableCell className="number-cell">{formatCurrency(row.amount)}</TableCell>
                   <TableCell className="number-cell">
-                    {row.discountType === "percentage" ? `${row.discountValue}%` : formatCurrency(row.discountValue)}
+                    <InlineEditableCell rowId={row.id} colKey="discountValue" value={row.discountValue} displayValue={row.discountType === "percentage" ? `${row.discountValue}%` : formatCurrency(row.discountValue)} type="number" activeCell={activeCell} setActiveCell={setActiveCell} onSave={(val) => handleInlineSave(row, "discountValue", val)} onNavigate={(dir) => handleNavigate(dir, row.id, "discountValue")} />
                   </TableCell>
-                  <TableCell className="number-cell font-medium">{formatCurrency(row.finalAmount)}</TableCell>
-                  <TableCell className="number-cell">{(row.cashPaid ?? 0) > 0 ? formatCurrency(row.cashPaid ?? 0) : <span className="text-muted-foreground">—</span>}</TableCell>
-                  <TableCell className="number-cell">{((row.bankPaid ?? 0) + (row.gPayPaid ?? 0)) > 0 ? formatCurrency((row.bankPaid ?? 0) + (row.gPayPaid ?? 0)) : <span className="text-muted-foreground">—</span>}</TableCell>
-                  <TableCell className="number-cell font-medium">{(row.paidTotal ?? 0) > 0 ? formatCurrency(row.paidTotal ?? 0) : <span className="text-muted-foreground">—</span>}</TableCell>
-                  <TableCell className={cn("number-cell", (row.remainingCredit ?? 0) > 0 && "text-red-600 font-semibold dark:text-red-400")}>{(row.remainingCredit ?? 0) > 0 ? formatCurrency(row.remainingCredit ?? 0) : <span className="text-muted-foreground">—</span>}</TableCell>
-                  <TableCell className="max-w-44 truncate print:hidden">{row.remarks}</TableCell>
+                  <TableCell className="number-cell font-bold">{formatCurrency(row.finalAmount)}</TableCell>
+                  <TableCell className="number-cell">
+                    <InlineEditableCell rowId={row.id} colKey="cashPaid" value={row.cashPaid ?? 0} displayValue={(row.cashPaid ?? 0) > 0 ? formatCurrency(row.cashPaid ?? 0) : <span className="text-muted-foreground">—</span>} type="number" activeCell={activeCell} setActiveCell={setActiveCell} onSave={(val) => handleInlineSave(row, "cashPaid", val)} onNavigate={(dir) => handleNavigate(dir, row.id, "cashPaid")} />
+                  </TableCell>
+                  <TableCell className="number-cell">
+                    <InlineEditableCell rowId={row.id} colKey="bankPaid" value={row.bankPaid ?? 0} displayValue={((row.bankPaid ?? 0) + (row.gPayPaid ?? 0)) > 0 ? formatCurrency((row.bankPaid ?? 0) + (row.gPayPaid ?? 0)) : <span className="text-muted-foreground">—</span>} type="number" activeCell={activeCell} setActiveCell={setActiveCell} onSave={(val) => handleInlineSave(row, "bankPaid", val)} onNavigate={(dir) => handleNavigate(dir, row.id, "bankPaid")} />
+                  </TableCell>
+                  <TableCell className="number-cell font-medium text-blue-600 dark:text-blue-400">{(row.paidTotal ?? 0) > 0 ? formatCurrency(row.paidTotal ?? 0) : <span className="text-muted-foreground">—</span>}</TableCell>
+                  <TableCell className={cn("number-cell", (row.remainingCredit ?? 0) > 0 && "text-red-600 font-bold dark:text-red-400")}>{(row.remainingCredit ?? 0) > 0 ? formatCurrency(row.remainingCredit ?? 0) : <span className="text-muted-foreground">—</span>}</TableCell>
+                  <TableCell className="max-w-44 truncate print:hidden" title={row.remarks || ""}>
+                    <InlineEditableCell rowId={row.id} colKey="remarks" value={row.remarks || ""} activeCell={activeCell} setActiveCell={setActiveCell} onSave={(val) => handleInlineSave(row, "remarks", val)} onNavigate={(dir) => handleNavigate(dir, row.id, "remarks")} />
+                  </TableCell>
                   <TableCell className="tabular-nums text-muted-foreground print:hidden">
                     {row.bookNumber && row.pageNumber ? `${row.bookNumber}/${row.pageNumber}` : row.bookNumber || row.pageNumber || "-"}
                   </TableCell>

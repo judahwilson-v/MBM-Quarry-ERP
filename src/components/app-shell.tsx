@@ -3,7 +3,7 @@
 import { useState, useEffect, useRef, useCallback } from "react";
 import { triggerSync, fetchSyncStatus, fetchOnlineStatus } from "@/app/actions/sync";
 import Link from "next/link";
-import { usePathname } from "next/navigation";
+import { usePathname, useRouter } from "next/navigation";
 import {
   Banknote,
   Boxes,
@@ -90,6 +90,37 @@ export function AppShell({ children }: { children: React.ReactNode }) {
       });
     });
   }, []);
+
+  const router = useRouter();
+  useEffect(() => {
+    const handleGlobalKeys = (e: KeyboardEvent) => {
+      // Don't trigger shortcuts if user is actively typing in an input (except if they explicitly use Alt which is safe on Windows)
+      if (e.target instanceof HTMLInputElement || e.target instanceof HTMLTextAreaElement) {
+        if (!e.altKey) return;
+      }
+      
+      // Alt+S -> /sales
+      if (e.key.toLowerCase() === "s" && e.altKey) {
+        e.preventDefault();
+        router.push("/sales");
+      }
+      
+      // Alt+B -> /purchases/boulder
+      if (e.key.toLowerCase() === "b" && e.altKey) {
+        e.preventDefault();
+        router.push("/purchases/boulder");
+      }
+
+      // Alt+V -> /masters/vehicles
+      if (e.key.toLowerCase() === "v" && e.altKey) {
+        e.preventDefault();
+        router.push("/masters/vehicles");
+      }
+    };
+    
+    document.addEventListener("keydown", handleGlobalKeys);
+    return () => document.removeEventListener("keydown", handleGlobalKeys);
+  }, [router]);
 
   return (
     <div className="min-h-screen bg-background text-foreground">

@@ -1,5 +1,15 @@
 # MBM Quarry ERP — Changelog
 
+## v2.4.7 (Unreleased / In Development)
+
+## v2.4.6 — Spreadsheet Inline Editing & Sync Reliability Fixes (2026-08-19)
+- **Global & Local Keyboard Shortcuts**: Implemented dedicated keyboard shortcuts to speed up data entry. Added local form shortcuts (`Ctrl+S` to save, `Ctrl+N` to start new, `Esc` to cancel) specifically mapped to the Sales and Boulders tables. Added global navigation hotkeys (`Alt+S` for Sales, `Alt+B` for Boulders, `Alt+V` for Vehicles) to allow instant jumping between high-traffic modules from anywhere in the app.
+- **Spreadsheets-style Inline Table Editing**: Added highly requested Excel-like inline editing directly into the Outgoing Sales and Incoming Boulder tables. Users can click any cell (like Qty, Rate, Discount, Remarks) to edit it instantly. Features a full keyboard navigation engine (Enter to save and move down, Arrow Keys to move around, Tab to switch columns) and a robust **15-Minute PIN Cache** so users only need to authenticate once per editing session instead of every single cell.
+- **Inventory Material Normalization & Deduplication**: Standardized and normalized material naming in `adjustInventoryStock` and `txAdjustInventoryStock` to canonical uppercase formatted strings (e.g. `20mm` -> `20 MM`), preventing duplicate entries in `inventory_stock`. Merged existing duplicate records and consolidated transaction histories in local SQLite.
+- **Reliable Push Sync & Direct Table Scanning**: Expanded direct table scanning during push sync from 4 tables to all 29 business tables, bypassing the fragile audit log queue mechanism to ensure data never stays local-only if the cursor skips forward. Fixed diagnostic pending counts for aliased models (e.g., "Sale" -> "OutgoingSale") and added a robust "Force Push All Data" UI button backed by an idempotent upsert engine to instantly recover any missing cloud records.
+- **Employee Help & Training UI**: Added a dedicated "Help & Training" page in the Settings navigation to assist non-technical staff. Includes simplified, plain-English explanations of all sync operations, clear warnings for destructive actions (like Full Restore), and everyday operating rules.
+- **Table Date Filtering**: Added quick date pickers to the top of both the Outgoing Sales and Incoming Boulder tables. Users can now easily filter records by a specific day directly from the UI, and Excel exports will correctly respect the active date filter.
+
 ## v2.4.5 — Sync Restore Data Comparison (2026-08-18)
 - **Read-Only Restore Compare**: Added a new Diff Engine and "Compare Data" UI that allows users to safely preview exactly which records will be lost, added, or modified before proceeding with a destructive Full Server Restore.
 

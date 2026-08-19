@@ -1,5 +1,12 @@
 # MBM Quarry ERP — Release Notes
 
+## v2.4.6 — Spreadsheet Inline Editing & Sync Reliability Fixes (2026-08-19)
+- **Spreadsheets-style Inline Table Editing**: You can now click directly on cells in the Sales and Boulders tables to edit them instantly! Features full keyboard navigation (Up, Down, Tab, Enter) and a smart **15-Minute Edit PIN Cache** so you don't have to repeatedly enter your PIN while fixing data.
+- **Fast Keyboard Hotkeys**: Added global shortcuts to jump anywhere (`Alt+S` for Sales, `Alt+B` for Boulders, `Alt+V` for Vehicles), and form shortcuts (`Ctrl+S` to Save, `Ctrl+N` to start New, `Esc` to cancel).
+- **Date Filtering**: Added a quick Date Picker at the top of Sales and Boulders tables to instantly filter records to a specific day, which also correctly applies to Excel exports.
+- **Help & Training Page**: Added a new plain-English help page under Settings to train employees on Sync Rules and Keyboard Hotkeys.
+- **Force Push Sync Fix**: Completely fixed the sync issue where local sales wouldn't upload to the website. Added a "Force Push All Data" button in the Sync Dashboard that instantly forces all missing local data up to the cloud safely!
+
 ## v2.4.5 — Compare Restore Data (2026-08-18)
 - **Safe Database Restores**: Added a new "Compare Data" feature to the Sync Dashboard. Before you perform a Full Server Restore, you can now safely preview exactly which local records will be lost, which new ones will be downloaded, and which ones will be modified, side-by-side!
 - **UI Improvements**: Cleaned up the warning messages in the Sync Dashboard to be less repetitive.

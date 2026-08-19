@@ -67,6 +67,13 @@ Do NOT update documentation for:
 
 Only update documentation when architecture, business logic, database, API, workflow, or developer behavior changes.
 
+### Versioning & Unreleased Changes Protocol
+When updating `CHANGELOG.md` or recording recent modifications during development:
+1. **Never retroactively append new code changes to an already-shipped version**: If a version (e.g. `v2.4.5`) has already been built or deployed, do not add subsequent development fixes under its header.
+2. **Stage changes under an Unreleased / In-Development version**: Create/accumulate fixes under the next upcoming patch/minor heading (e.g. `## v2.4.6 (Unreleased / In Development)` in `CHANGELOG.md`).
+3. **No automatic releases without explicit user approval**: Never trigger build/release pipelines or mark a version as released/current until the user explicitly requests/approves releasing the update.
+4. **Finalizing Release**: Only when the user explicitly triggers an app update/release do we bump `package.json`, stamp the release date in `CHANGELOG.md`, and promote it to the active deployed version.
+
 ---
 
 ## Documentation Ownership
