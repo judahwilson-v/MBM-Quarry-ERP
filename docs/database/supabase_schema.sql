@@ -1,6 +1,6 @@
 -- ==========================================================================
 -- AUTO-GENERATED from prisma/schema.prisma — DO NOT EDIT MANUALLY
--- Generated at: 2026-08-18T12:01:50.966Z
+-- Generated at: 2026-08-28T11:39:58.109Z
 -- ==========================================================================
 
 -- --------------------------------------------------------------------------
@@ -356,6 +356,27 @@ CREATE TABLE IF NOT EXISTS "fuel_purchases" (
   FOREIGN KEY ("vehicle_id") REFERENCES "vehicles"("id") ON DELETE SET NULL
 );
 
+CREATE TABLE IF NOT EXISTS "device_identity" (
+  "id" TEXT DEFAULT gen_random_uuid() PRIMARY KEY,
+  "device_id" TEXT NOT NULL UNIQUE,
+  "created_at" TIMESTAMPTZ DEFAULT now() NOT NULL
+);
+
+CREATE TABLE IF NOT EXISTS "sync_outbox_events" (
+  "id" TEXT DEFAULT gen_random_uuid() PRIMARY KEY,
+  "event_id" TEXT NOT NULL UNIQUE,
+  "device_id" TEXT NOT NULL,
+  "entity_type" TEXT NOT NULL,
+  "entity_id" TEXT NOT NULL,
+  "operation" TEXT NOT NULL,
+  "payload" TEXT NOT NULL,
+  "status" TEXT DEFAULT 'PENDING' NOT NULL,
+  "attempts" INTEGER DEFAULT 0 NOT NULL,
+  "last_error" TEXT,
+  "created_at" TIMESTAMPTZ DEFAULT now() NOT NULL,
+  "delivered_at" TIMESTAMPTZ
+);
+
 CREATE TABLE IF NOT EXISTS "global_settings" (
   "id" TEXT DEFAULT gen_random_uuid() PRIMARY KEY,
   "quarry_name" TEXT DEFAULT 'MBM Quarry' NOT NULL,
@@ -537,6 +558,11 @@ CREATE INDEX IF NOT EXISTS "idx_fuel_purchases_date" ON "fuel_purchases" ("date"
 CREATE INDEX IF NOT EXISTS "idx_fuel_purchases_vehicle_id" ON "fuel_purchases" ("vehicle_id");
 CREATE INDEX IF NOT EXISTS "idx_fuel_purchases_source_event_id" ON "fuel_purchases" ("source_event_id");
 CREATE INDEX IF NOT EXISTS "idx_fuel_purchases_updated_at" ON "fuel_purchases" ("updated_at");
+CREATE INDEX IF NOT EXISTS "idx_device_identity_device_id" ON "device_identity" ("device_id");
+CREATE INDEX IF NOT EXISTS "idx_sync_outbox_events_event_id" ON "sync_outbox_events" ("event_id");
+CREATE INDEX IF NOT EXISTS "idx_sync_outbox_events_device_id" ON "sync_outbox_events" ("device_id");
+CREATE INDEX IF NOT EXISTS "idx_sync_outbox_events_entity_id" ON "sync_outbox_events" ("entity_id");
+CREATE INDEX IF NOT EXISTS "idx_sync_outbox_events_status" ON "sync_outbox_events" ("status");
 CREATE INDEX IF NOT EXISTS "idx_global_settings_quarry_name" ON "global_settings" ("quarry_name");
 CREATE INDEX IF NOT EXISTS "idx_global_settings_updated_at" ON "global_settings" ("updated_at");
 CREATE INDEX IF NOT EXISTS "idx_inventory_stock_material_name" ON "inventory_stock" ("material_name");

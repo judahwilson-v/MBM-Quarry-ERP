@@ -6,6 +6,7 @@ import { Prisma } from "@prisma/client";
 import { serialize } from "@/lib/utils/serialize";
 import { getDb } from "@/lib/prisma";
 import { triggerAutoSync } from "@/lib/sync/auto-sync";
+import { enqueueOutboxEvent } from "@/lib/sync/outbox";
 import { writeAuditEvent } from "@/lib/domain";
 
 function parseNumber(value: string | number | null | undefined, label: string, required = true) {
@@ -49,6 +50,7 @@ export async function updateMaterialRate(id: string, ratePerCft: string | number
     const before = await tx.material.findUnique({ where: { id } });
     const row = await tx.material.update({ where: { id }, data: { ratePerCft: rate } });
     await writeAuditEvent(tx, { entityName: "Material", entityId: row.id, action: "update", role: "system", before, after: row });
+    await enqueueOutboxEvent(tx, { entityType: "Material", entityId: row.id, operation: "update", payload: row });
     return row;
   }));
 }

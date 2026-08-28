@@ -30,13 +30,11 @@
 graph TD
     A["Client Component"] -->|calls| B["Server Action (src/app/actions/)"]
     B -->|validates| C["Domain Service / Business Engine"]
-    C -->|emits| D["Financial Event"]
-    D -->|persisted to| E["SQLite"]
-    D -->|projected to| F["Ledger"]
-    D -->|projected to| G["Day Book"]
-    D -->|projected to| H["Reports"]
-    D -->|projected to| I["Dashboard"]
-    E -->|queued to| J["Supabase Sync (background, offline-safe)"]
+    C -->|atomic $transaction| D["Local SQLite Mutation + Outbox Event"]
+    D -->|persisted to| E["SQLite (quarry.db)"]
+    D -->|enqueues| F["sync_outbox_events (ACID)"]
+    F -->|delivered via withSyncLease| G["Supabase RPC (apply_outbox_event)"]
+    G -->|idempotently ingested into| H["Cloud Postgres (sync_event_inbox)"]
 ```
 
 ## Financial Event Invariants
@@ -48,34 +46,34 @@ graph TD
 ## Core Invariants
 1. Business logic belongs in domain services, never in UI components.
 2. Offline operation must always remain functional — SQLite is the primary source of truth.
-3. Cloud sync must never alter business history.
-4. Projections are disposable and rebuildable from the event stream.
-5. New features must reuse existing services whenever possible.
+3. Every local mutation must atomically record an outbox event in the same transaction.
+4. Cloud sync is strictly idempotent; retry attempts never duplicate data or rename records.
+5. Projections are disposable and rebuildable from the event stream.
+6. Restores must run via isolated staging databases (`.stage.db`) with pre-restore `.bak` backups.
 
-## Electron Data Persistence
-- On first launch, `main.js` copies the pristine `prisma/dev.db` into the OS user-data directory.
-- On subsequent launches it uses the existing `quarry.db` as-is.
+## Electron Data Persistence & Migrations
 - App code (in `Program Files` / `.app`) is fully decoupled from app data (`%APPDATA%/quarry.db`).
-- This means app upgrades **never** overwrite business data.
+- On app launch, `src/lib/migrations.ts` runs deterministic versioned migrations (`schema_migrations`), ensuring seamless forward-compatible database upgrades.
+- App upgrades **never** overwrite business data.
 
 ## Related Docs
 - `docs/reference/DEPLOYMENT.md` — packaging, release and update workflow
+- `docs/database/DATABASE_MAP.md` — database schema and migration architecture
 - `docs/architecture/FINANCIAL_EVENT_ARCHITECTURE.md` — full event system reference
 - `docs/reference/BUSINESS_RULES.md` — quarry-specific business rules
 - `docs/decisions/DECISION_LOG.md` — long-lived architecture decisions
 
 ## 🚨 MANDATORY DATABASE CHANGE PROTOCOL
 
-This project uses **three sources of truth** for its database schema:
-1. `prisma/schema.prisma`
-2. `src/lib/bootstrap.ts` (raw SQLite initialization queries)
-3. Supabase SQL migration files (for cloud sync)
+This project uses a unified, versioned migration runner for SQLite and deterministic schema generation:
+1. `prisma/schema.prisma` (Primary schema contract)
+2. `src/lib/migrations.ts` (Deterministic SQLite DDL migrations v1...vN)
+3. `supabase/migrations/` (PostgreSQL parity migrations & RPC functions)
+4. `supabase/release-manifest.json` (SHA-256 release checksum manifest)
 
-**Every DB change MUST update ALL of the following:**
-1. `prisma/schema.prisma`
-2. `src/lib/bootstrap.ts` (raw SQLite `CREATE TABLE` and `$executeRawUnsafe` initialization)
-3. Supabase migration SQL
-4. `prisma/seed.ts` (if required for base data)
-5. Sync engine (`src/lib/sync/`) if tables are being synced
-
-Failure to update all sources of truth simultaneously will result in production crashes due to schema mismatches between the initial local database, the Prisma client, and the cloud sync engine.
+**Every DB change MUST follow this protocol:**
+1. Update `prisma/schema.prisma`.
+2. Append a new versioned migration in `src/lib/migrations.ts` (`ALL_MIGRATIONS`).
+3. Run `npm run prebuild` to regenerate `bootstrap-ddl.json`, `sync-map.json`, and `schema_pg.prisma`.
+4. Run `npm run phase2:manifest` to update `supabase/release-manifest.json`.
+5. Run full verification suite (`npm run phase1:verify && npm run phase2:verify`).

@@ -23,10 +23,11 @@ The application uses **SQLite** for local, offline-first data storage and **Pris
 ---
 
 ## Migration & Sync Strategy
-Because this is an offline desktop app distributed via `.exe`, running standard `prisma migrate deploy` on the client machine is difficult.
-* Schema changes must be carefully managed.
-* Schema mismatches between the compiled Next.js standalone app and the user's local `quarry.db` will cause a fatal 500 error on boot.
-* **Sync Engine**: Local SQLite handles all immediate reads/writes for speed and offline capability. The sync engine pushes operations to the remote Supabase cloud and pulls updates down, resolving conflicts gracefully.
+- **Versioned Migration Runner (`src/lib/migrations.ts`)**: On desktop startup, the app automatically executes deterministic versioned migrations tracked in the `schema_migrations` table (v1 `001_baseline` to v5 `005_outbox_foundation`), guaranteeing schema compatibility before accepting traffic.
+- **Transactional Outbox Engine (`src/lib/sync/outbox.ts`)**: All local domain mutations (sales, purchases, expenses, master data) write an immutable record to `sync_outbox_events` atomically inside the same SQLite `$transaction`.
+- **Idempotent Ingestion (`apply_outbox_event`)**: Cloud PostgreSQL ingests events idempotently via server-side RPC and dedupes using `sync_event_inbox`, eliminating duplicate entries or collision suffix renames.
+- **Safe Staged Restore (`src/lib/sync/staged-restore.ts`)**: Database restoration downloads into an isolated `.stage.db`, verifies foreign key constraints and row counts, takes a timestamped `.bak` pre-restore backup, and performs an atomic 3-way file swap with journal recovery (`restore-files.ts`).
+- **Release Manifest (`supabase/release-manifest.json`)**: Tracks SHA-256 hashes of SQLite/PostgreSQL schemas and migrations for automated pre-release verification.
 
 ---
 
@@ -350,3 +351,31 @@ Stores aggregated live telematics and operational statistics for vehicles.
 - `engine_hours` (Float, Default `0`)
 - `created_at` (DateTime, Default `now()`)
 - `updated_at` (DateTime)
+
+### Table: `schema_migrations`
+Tracks deterministic versioned DDL migrations executed against the local SQLite database.
+- `version` (Int, PK)
+- `name` (String, Unique)
+- `checksum` (String)
+- `applied_at` (DateTime, Default `now()`)
+
+### Table: `device_identities`
+Stores persistent hardware-anchored device identifiers for multi-client event routing.
+- `device_id` (String, PK) - `uuid()`
+- `device_name` (String)
+- `registered_at` (DateTime, Default `now()`)
+
+### Table: `sync_outbox_events`
+Transactional outbox queue recording all local business mutations for cloud delivery.
+- `id` (String, PK) - `uuid()`
+- `device_id` (String, FK to `device_identities.device_id`)
+- `entity_type` (String) - e.g. `"OutgoingSale"`, `"Party"`, `"Material"`
+- `entity_id` (String) - Local primary key of the mutated entity
+- `operation` (String) - `"create" | "update" | "delete"`
+- `payload` (String / JSON) - Complete serialized snapshot of the mutated entity
+- `status` (String, Default `"PENDING"`) - `"PENDING" | "SENDING" | "ACKED" | "FAILED"`
+- `retry_count` (Int, Default `0`)
+- `last_error` (String, Nullable)
+- `acked_at` (DateTime, Nullable)
+- `created_at` (DateTime, Default `now()`)
+- `updated_at` (DateTime, Auto-updated)

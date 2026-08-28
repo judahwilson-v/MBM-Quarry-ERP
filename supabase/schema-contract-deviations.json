@@ -1,0 +1,14 @@
+{
+  "version": 1,
+  "purpose": "Temporary, explicit live-cloud deviations from the intended Prisma/Postgres contract. These are warnings in Phase 2 and must be removed by a dedicated cloud-alignment migration.",
+  "dateTime": {
+    "allowTimestampWithoutTimeZone": true,
+    "reason": "The existing cloud uses timestamp without time zone for most legacy DateTime columns while the intended Prisma PostgreSQL schema uses timestamptz."
+  },
+  "nullableRequiredColumns": [
+    { "table": "weighbridge_tickets", "column": "ticket_type" },
+    { "table": "weighbridge_tickets", "column": "status" },
+    { "table": "weighbridge_tickets", "column": "created_at" },
+    { "table": "weighbridge_tickets", "column": "updated_at" }
+  ]
+}

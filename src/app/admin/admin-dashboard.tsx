@@ -4,7 +4,7 @@ import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { useToast } from "@/components/ui/use-toast";
-import { forceSync, resetSyncQueue, getDatabaseInfo } from "@/app/actions/admin";
+import { forceSync, getDatabaseInfo } from "@/app/actions/admin";
 import { Database, RefreshCw, AlertTriangle } from "lucide-react";
 
 export function AdminDashboard({ expectedPin }: { expectedPin: string }) {
@@ -18,14 +18,18 @@ export function AdminDashboard({ expectedPin }: { expectedPin: string }) {
     e.preventDefault();
     if (pin === expectedPin) {
       setIsAuthenticated(true);
-      fetchDbInfo();
+      loadDbInfo();
     } else {
-      toast({ title: "Access Denied", description: "Incorrect PIN", variant: "destructive" });
+      toast({
+        title: "Access Denied",
+        description: "Invalid PIN entered.",
+        variant: "destructive"
+      });
       setPin("");
     }
   };
 
-  const fetchDbInfo = async () => {
+  const loadDbInfo = async () => {
     const res = await getDatabaseInfo();
     if (res.success) {
       setDbInfo(res.data);
@@ -38,18 +42,6 @@ export function AdminDashboard({ expectedPin }: { expectedPin: string }) {
     setIsLoading(false);
     toast({
       title: res.success ? "Sync Complete" : "Sync Failed",
-      description: res.message,
-      variant: res.success ? "default" : "destructive"
-    });
-  };
-
-  const handleResetQueue = async () => {
-    if (!confirm("Are you sure? This will force the app to re-download all data from Supabase. It may take a while.")) return;
-    setIsLoading(true);
-    const res = await resetSyncQueue();
-    setIsLoading(false);
-    toast({
-      title: res.success ? "Queue Reset" : "Reset Failed",
       description: res.message,
       variant: res.success ? "default" : "destructive"
     });
@@ -104,12 +96,6 @@ export function AdminDashboard({ expectedPin }: { expectedPin: string }) {
               Force Immediate Sync
             </Button>
             <p className="text-xs text-muted-foreground">Bypasses the 5-minute timer and pushes local changes to Supabase immediately.</p>
-            
-            <Button onClick={handleResetQueue} disabled={isLoading} className="w-full justify-start" variant="destructive">
-              <AlertTriangle className="w-4 h-4 mr-2" />
-              Reset Sync Cursor
-            </Button>
-            <p className="text-xs text-muted-foreground">If the sync engine gets permanently stuck, this forces a complete re-download of all cloud data.</p>
           </div>
         </div>
       </div>

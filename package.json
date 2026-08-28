@@ -1,6 +1,6 @@
 {
   "name": "mbm-quarry-erp",
-  "version": "2.4.6",
+  "version": "2.4.7",
   "private": true,
   "scripts": {
     "dev": "next dev -p 3005",
@@ -16,6 +16,14 @@
     "prisma:push": "prisma db push --accept-data-loss",
     "prisma:migrate": "prisma migrate dev",
     "prisma:deploy": "prisma migrate deploy",
+    "phase1:verify": "tsx scripts/test-phase1-suite.ts",
+    "phase2:manifest": "node scripts/generate-release-manifest.js",
+    "phase2:verify": "node scripts/generate-pg-schema.js --check && node scripts/generate-release-manifest.js --verify && tsx scripts/test-phase2-parity.ts --offline",
+    "phase3:verify": "tsx scripts/test-phase3-staged-restore.ts",
+    "phase4:verify": "tsx scripts/test-phase4-outbox.ts",
+    "phase5:verify": "tsx scripts/test-phase5-outbox.ts",
+    "phase6:verify": "tsx scripts/test-phase6-observability.ts",
+    "phase7:verify": "tsx scripts/test-phase7-release-rollback.ts",
     "electron:dev": "node scripts/electron-dev.js",
     "electron:build": "npm run build",
     "electron:package": "node scripts/validate-build.js && electron-builder",

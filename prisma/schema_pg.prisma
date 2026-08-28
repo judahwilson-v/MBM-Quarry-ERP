@@ -503,6 +503,37 @@ model SyncState {
   @@map("sync_state")
 }
 
+// Phase 4: local-only identity. It is deliberately not synchronized; it
+// namespaces immutable outbox events produced by this installation.
+model DeviceIdentity {
+  id        String   @id @default("default")
+  deviceId  String   @unique @map("device_id")
+  createdAt DateTime @default(now()) @map("created_at") @db.Timestamptz
+
+  @@map("device_identity")
+}
+
+// Phase 4: durable local outbox. A business mutation and its event are written
+// in the same SQLite transaction; delivery state is updated separately.
+model SyncOutboxEvent {
+  id          String    @id @default(dbgenerated("gen_random_uuid()"))
+  eventId     String    @unique @map("event_id")
+  deviceId    String    @map("device_id")
+  entityType  String    @map("entity_type")
+  entityId    String    @map("entity_id")
+  operation   String
+  payload     String
+  status      String    @default("PENDING")
+  attempts    Int       @default(0)
+  lastError   String?   @map("last_error")
+  createdAt   DateTime  @default(now()) @map("created_at") @db.Timestamptz
+  deliveredAt DateTime? @map("delivered_at") @db.Timestamptz
+
+  @@index([status, createdAt])
+  @@index([entityType, entityId])
+  @@map("sync_outbox_events")
+}
+
 model GlobalSettings {
   id                     String   @id @default("default")
   quarryName             String   @default("MBM Quarry") @map("quarry_name")

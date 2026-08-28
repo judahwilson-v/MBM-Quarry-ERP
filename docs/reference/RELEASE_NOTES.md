@@ -1,5 +1,12 @@
 # MBM Quarry ERP — Release Notes
 
+## v2.4.7 — Database & Synchronization Overhaul (2026-08-28)
+- **Transactional Sync Outbox**: Built a robust new sync engine that records every sale, boulder, expense, and master data edit directly into a local outbox inside the same database transaction. Your data is 100% protected against sudden power cuts, Wi-Fi drops, and app restarts.
+- **Idempotent Cloud Delivery**: Cloud sync now automatically deduplicates records, completely preventing duplicate entries or collision suffixing (like "(Merge 1234)").
+- **Safe Staged Server Restore**: Full server restore is now completely safe! It downloads and tests cloud data in a temporary staging area first and creates a timestamped backup before swapping, protecting your database against partial restore corruption.
+- **Automated Local Migrations**: The app now applies database updates smoothly on startup with zero data loss.
+- **Enhanced Sync Health Dashboard**: Check exact pending outbox events, delivery retry status, and export sanitized diagnostics directly from the Sync Settings page.
+
 ## v2.4.6 — Spreadsheet Inline Editing & Sync Reliability Fixes (2026-08-19)
 - **Spreadsheets-style Inline Table Editing**: You can now click directly on cells in the Sales and Boulders tables to edit them instantly! Features full keyboard navigation (Up, Down, Tab, Enter) and a smart **15-Minute Edit PIN Cache** so you don't have to repeatedly enter your PIN while fixing data.
 - **Fast Keyboard Hotkeys**: Added global shortcuts to jump anywhere (`Alt+S` for Sales, `Alt+B` for Boulders, `Alt+V` for Vehicles), and form shortcuts (`Ctrl+S` to Save, `Ctrl+N` to start New, `Esc` to cancel).

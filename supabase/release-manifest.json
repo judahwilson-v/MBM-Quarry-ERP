@@ -1,0 +1,24 @@
+{
+  "version": 1,
+  "sqlite": {
+    "latestMigration": "005_outbox_foundation",
+    "migrationChecksums": {
+      "001_baseline": "029854b95a91543b926dd4848756a26126789b1f18668b8631fc88d66df6bc35",
+      "002_repair_weighbridge_columns": "df585e766502ffd6270332406893db2961bd27b6ab5fa0e87cf953af4ada6c73",
+      "003_ensure_legacy_columns": "2cb8157cdc27910c6d3e7461ec9e8fad19714ffcc6133050eeb2e50e0eb72988",
+      "004_backfill_timestamps": "f26cf2fc3d5cfcaf740a5a641d7a434e229179edc3656ee58c64b81a31744719",
+      "005_outbox_foundation": "7066e2cd3e0be97b0d2d86a59bd26c06854090c945cd61aa142188e4dcb62ed1"
+    }
+  },
+  "postgres": {
+    "latestMigration": "20260828031041_phase5_generic_outbox_dispatch",
+    "migrationChecksums": {
+      "20260827180958_phase2_baseline_schema_contract": "1f9bdfa93750475dd96f6d58ecaf8eb8f49f8f00b6238dd044f21c22ca5a16da",
+      "20260827190147_phase4_party_outbox_pilot": "c944127e3c09e7aaff2ea623b2c7bd438261597f3d580e94997677e34ee1a90e",
+      "20260828031041_phase5_generic_outbox_dispatch": "7aeca90fd6b71a9eb579638fcb0c2a1c9d739e2ca3870f8b3c84fa8e72700bbe"
+    }
+  },
+  "prismaSchemaChecksum": "c8a11e9b49f842b23c2e30231c49f073e0a73a3df64deb3625b8826039a5e088",
+  "prismaPostgresSchemaChecksum": "613e8c52d776e135256f8430c3a38e3f078efaab90728b1b0306d93695a5905f",
+  "deviationsChecksum": "c27f4371bba1e2fe4e6dcc3191770cbdd9b9b251ea5fcf80e08b0e95593c418d"
+}

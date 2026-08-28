@@ -33,11 +33,12 @@ This document maps module ownership, primary entry points, and dependencies acro
   * `/settings/user-logs`: Operator Audit Logs
   * `/settings/tally`: Tally ERP Export
 * **Server Actions (`src/app/actions/`)**:
-  * `sales.ts`: Handles customer sales records and event creation.
-  * `purchases.ts`: Handles supplier boulder purchase logs.
-  * `expenses.ts`: Handles operational expenses and Day Book bindings.
+  * `sales.ts`: Handles customer sales records, event creation, and outbox emission.
+  * `purchases.ts`: Handles supplier boulder purchase logs and outbox emission.
+  * `expenses.ts`: Handles operational expenses, Day Book bindings, and outbox emission.
   * `credits.ts`: Handles ledger and payment/collection actions.
   * `weighbridge.ts`: Handles weighbridge ticketing inputs.
+  * `sync.ts`: Handles sync health metrics, delivery triggers, diagnostics export, and safe restore actions.
 
 #### B. UI Components (`src/components/`)
 * **Reusable UI Components**: `src/components/ui/`
@@ -48,12 +49,21 @@ This document maps module ownership, primary entry points, and dependencies acro
   * `weighbridge-forms.tsx`
 
 #### C. Business & Sync Logic (`src/lib/`)
-* **Sync Engine (`src/lib/sync/`)**:
-  * `sync-config.ts`: Defines topological order (`PUSH_PRIORITY`), conflict resolution mapping, and synced models.
-  * `sync-service.ts`: Implements row-level push and pull sync loops with error boundaries.
-* **Domain Logics (`src/lib/domain/`)**:
-  * Isolates business services from actions (e.g., party balance computation, financial event creation).
-* **Database Instance (`src/lib/prisma.ts`)**:
-  * Initiates Prisma client and executes raw fallback SQLite DDL setup.
+* **Database & Migration Pipeline (`src/lib/`)**:
+  * `migrations.ts`: Deterministic versioned SQLite DDL migration runner (`ALL_MIGRATIONS`, v1...v5).
+  * `bootstrap.ts`: Startup schema compatibility gate and initialization.
+  * `prisma.ts`: Prisma Client factory and SQLite connection lifecycle.
+* **Transactional Outbox Engine (`src/lib/sync/`)**:
+  * `outbox.ts`: Atomic outbox event enqueueing (`enqueueOutboxEvent`), delivery dispatcher (`deliverPendingOutbox`), and retry engine.
+  * `delivery-gate.ts`: Domain-by-domain cutover gate (`isOutboxDeliveryEnabled`, `isLegacyPushMutationEnabled`, `isLegacyPullRowCopyEnabled`).
+  * `staged-restore.ts` & `restore-files.ts`: Safe staged restore, staging validation, pre-restore backups (`.bak`), and atomic file swapping.
+  * `sync-health.ts`: Pure read sync health summary (`getDetailedSyncHealth`), outbox backlog metrics, and machine error classification.
+  * `cutover-manifest.ts`: 29-model cutover readiness and migration status ledger.
+  * `device-identity.ts`: Hardware-anchored persistent device registration.
+  * `lease.ts`: Sync lease mutual exclusion wrapper (`withSyncLease`).
+  * `sync-config.ts`: Synced model definitions and priority order.
+  * `sync-service.ts`: Legacy CDC push/pull loop (with safe cutover bypasses and retired operation guards).
+* **Domain Services (`src/lib/domain/`)**:
+  * Isolates business services from actions (party balance, daybook, inventory stock, financial events).
 * **Pricing Engine (`src/lib/sales-engine.ts`)**:
   * MBM-wide rules for CFT, discount value, CGST/SGST calculations.

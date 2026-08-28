@@ -1,10 +1,10 @@
 ---
 schema_version: 2
 project: "MBM Quarry ERP"
-project_version: "2.4.5"
+project_version: "2.4.7"
 stack: "Next.js 14 + Prisma/SQLite + Electron + Supabase"
-last_updated: "2026-08-19 15:45:00"
-total_docs: 28
+last_updated: "2026-08-28 08:15:00"
+total_docs: 29
 ---
 
 # AI_INDEX.md — Project Memory Entry Point
@@ -43,6 +43,7 @@ Every documentation file in the project, its purpose, and when to read it.
 ### Layer 0 — Always Read
 | File | Purpose |
 |:-----|:--------|
+| `AGENT_DIRECTIVE.md` | Core operating principles, invariants, pre-modification protocol & completion gates |
 | `AI_INDEX.md` (this file) | Entry point, navigation, file registry |
 | `AI_POLICY.md` | Rules for AI behavior, doc updates, temp files |
 
@@ -50,6 +51,7 @@ Every documentation file in the project, its purpose, and when to read it.
 | File | Purpose | Read When |
 |:-----|:--------|:----------|
 | [AI_HANDOFF.md](handoff/AI_HANDOFF.md) | Current project version, status, blockers | Starting any task |
+| [codex_phase_delegation_plan.md](archive/codex_phase_delegation_plan.md) | Phased Database & Sync Overhaul Plan (All Phases 0-6 Completed & Verified) | Database, migration & sync overhaul reference |
 | [SYSTEM_BLUEPRINT.md](architecture/SYSTEM_BLUEPRINT.md) | Architecture, folder structure, runtime stack | Touching architecture |
 | [MODULE_INDEX.md](reference/MODULE_INDEX.md) | Which module owns which files | Finding code locations |
 | [VARIABLE_MAP.md](reference/VARIABLE_MAP.md) | Canonical field names (camelCase ↔ snake_case) | Creating/renaming fields |

@@ -43,14 +43,6 @@ exports.default = async function(context) {
     fs.writeFileSync(serverJsPath, serverJs, 'utf-8');
     console.log('[afterPack] Successfully stripped absolute paths from server.js.');
   }
-
-  // Copy migrate.js
-  const srcMigrate = path.join(__dirname, 'migrate.js');
-  const destMigrate = path.join(resourcesPath, 'standalone', 'migrate.js');
-  if (fs.existsSync(srcMigrate)) {
-    fs.copyFileSync(srcMigrate, destMigrate);
-    console.log('[afterPack] Successfully copied migrate.js.');
-  }
 };
 
 function copyDirSync(src, dest) {

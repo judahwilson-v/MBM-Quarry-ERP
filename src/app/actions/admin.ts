@@ -15,16 +15,13 @@ export async function forceSync() {
 }
 
 export async function resetSyncQueue() {
-  try {
-    const db = await getDb();
-    // Never delete financial events to reset sync. Rewind only the cursors so
-    // the immutable local records are pushed/pulled again.
-    await db.$executeRawUnsafe(`UPDATE sync_state SET last_synced_at = '1970-01-01T00:00:00.000Z'`);
-    
-    return { success: true, message: "Sync cursor reset to origin. Next sync will be a full pull." };
-  } catch (error: any) {
-    return { success: false, message: sanitizeError(error) };
-  }
+  return {
+    success: false,
+    code: "RETIRED_OPERATION" as const,
+    error: "resetSyncQueue has been retired. Rewinding the sync cursor causes duplicate re-pushes and collision merge suffixes.",
+    safeReplacement: "forceSync",
+    message: "Operation retired. Use normal sync or staged restore.",
+  };
 }
 
 export async function getDatabaseInfo() {

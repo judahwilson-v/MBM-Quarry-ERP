@@ -4,6 +4,7 @@ import { Prisma } from "@prisma/client";
 import { serialize } from "@/lib/utils/serialize";
 import { getDb } from "@/lib/prisma";
 import { triggerAutoSync } from "@/lib/sync/auto-sync";
+import { enqueueOutboxEvent } from "@/lib/sync/outbox";
 import { writeAuditEvent } from "@/lib/domain";
 import { verifyEditPassword } from "@/app/actions/auth";
 import { sanitizeError } from "@/lib/utils/sanitize-error";
@@ -100,12 +101,14 @@ export async function saveVehicle(input: VehicleInput) {
       const before = await tx.vehicle.findUnique({ where: { id: input.id } });
       const row = await tx.vehicle.update({ where: { id: input.id }, data });
       await writeAuditEvent(tx, { entityName: "Vehicle", entityId: row.id, action: "update", role: "system", before, after: row });
+      await enqueueOutboxEvent(tx, { entityType: "Vehicle", entityId: row.id, operation: "update", payload: row });
       return row;
     }));
   }
   return serialize(await runTx(async (tx) => {
     const row = await tx.vehicle.create({ data });
     await writeAuditEvent(tx, { entityName: "Vehicle", entityId: row.id, action: "create", role: "system", after: row });
+    await enqueueOutboxEvent(tx, { entityType: "Vehicle", entityId: row.id, operation: "create", payload: row });
     return row;
   }));
 }
@@ -134,6 +137,7 @@ export async function deleteVehicle(id: string, pin?: string) {
       } catch (e) {
         console.warn("Failed to write audit event for vehicle:", e);
       }
+      await enqueueOutboxEvent(tx, { entityType: "Vehicle", entityId: id, operation: "delete", payload: before });
     });
     return { success: true };
   } catch (error) {

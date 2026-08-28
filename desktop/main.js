@@ -301,20 +301,6 @@ async function createWindow() {
         NEXT_PUBLIC_BUILD_DATE: buildDate
       };
 
-      // 2.5 Run Auto-Migrator
-      const migratePath = path.join(process.resourcesPath, "standalone", "migrate.js");
-      if (fs.existsSync(migratePath)) {
-        updateSplashStatus("MIGRATING DATABASE SCHEMA...");
-        console.log("Running auto-migrator...");
-        const migrateResult = require('child_process').spawnSync(process.execPath, [migratePath], { env });
-        console.log("Migrator Output:", migrateResult.stdout?.toString());
-        if (migrateResult.status !== 0) {
-          const errText = migrateResult.stderr?.toString() || migrateResult.stdout?.toString();
-          console.error("Migrator Error:", errText);
-          throw new Error(`Database auto-migration failed.\nReason: ${errText}`);
-        }
-      }
-
       nextProcess = spawn(process.execPath, [serverPath], {
         env,
         cwd: path.join(process.resourcesPath, "standalone"),

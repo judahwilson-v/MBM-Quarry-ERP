@@ -5,6 +5,7 @@
 import { Prisma } from "@prisma/client";
 import { getDb } from "@/lib/prisma";
 import { triggerAutoSync } from "@/lib/sync/auto-sync";
+import { enqueueOutboxEvent } from "@/lib/sync/outbox";
 import { writeAuditEvent } from "@/lib/domain";
 import { emitFinancialEvent } from "@/lib/domain/financial-events";
 import { projectDayBookExpense, recalculateDayBook } from "@/lib/domain/daybook";
@@ -161,6 +162,7 @@ export async function saveEmployee(input: any) {
       } catch (e) {
         console.warn("Failed to write audit event for employee update:", e);
       }
+      await enqueueOutboxEvent(tx, { entityType: "Employee", entityId: row.id, operation: "update", payload: row });
       return row;
     }));
   } else {
@@ -171,6 +173,7 @@ export async function saveEmployee(input: any) {
       } catch (e) {
         console.warn("Failed to write audit event for employee create:", e);
       }
+      await enqueueOutboxEvent(tx, { entityType: "Employee", entityId: row.id, operation: "create", payload: row });
       return row;
     }));
   }
@@ -191,6 +194,7 @@ export async function deleteEmployee(id: string, pin?: string) {
       } catch (e) {
         console.warn("Failed to write audit event for employee:", e);
       }
+      await enqueueOutboxEvent(tx, { entityType: "Employee", entityId: id, operation: "delete", payload: before });
     });
     return { success: true };
   } catch (error) {

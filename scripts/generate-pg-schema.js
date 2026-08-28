@@ -102,6 +102,16 @@ function generate() {
   }
 
   const output = HEADER + '\n' + outputLines.join('\n');
+  if (process.argv.includes('--check')) {
+    const existing = fs.existsSync(outputPath) ? fs.readFileSync(outputPath, 'utf-8') : null;
+    if (existing !== output) {
+      console.error('❌ PostgreSQL schema is stale. Run node scripts/generate-pg-schema.js and commit prisma/schema_pg.prisma.');
+      process.exit(1);
+    }
+    console.log('✅ PostgreSQL schema is reproducible and current.');
+    return;
+  }
+
   fs.writeFileSync(outputPath, output, 'utf-8');
 
   console.log('✅ PostgreSQL schema generated successfully!');

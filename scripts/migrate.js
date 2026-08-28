@@ -1,53 +1,8 @@
-const path = require('path');
-const fs = require('fs');
+// DEPRECATED: This script has been retired.
+// All database migrations are now handled by the versioned migration runner
+// located in src/lib/migrations/ and executed automatically on startup via
+// initializeDatabase() in src/lib/bootstrap.ts.
+//
+// Do not execute raw ALTER statements here.
 
-async function migrate() {
-  const standaloneDir = __dirname;
-  const prismaPath = path.join(standaloneDir, 'node_modules', '@prisma', 'client');
-  
-  if (!fs.existsSync(prismaPath)) {
-    console.error('[Migrate] Prisma Client not found at', prismaPath);
-    return;
-  }
-
-  const { PrismaClient } = require(prismaPath);
-  
-  const prisma = new PrismaClient({
-    datasources: {
-      db: {
-        url: process.env.DATABASE_URL
-      }
-    }
-  });
-
-  console.log('[Migrate] Connecting to database:', process.env.DATABASE_URL);
-
-  try {
-    // 1. Add time column to party_ledger if missing
-    console.log('[Migrate] Checking party_ledger schema for time column...');
-    await prisma.$executeRawUnsafe(`ALTER TABLE "party_ledger" ADD COLUMN "time" TEXT;`);
-    console.log('[Migrate] Successfully added time column to party_ledger.');
-  } catch (err) {
-    if (!err.message?.includes('duplicate column name') && !err.message?.includes('duplicate column')) {
-      console.error('[Migrate] Error adding time column:', err.message);
-      process.exit(1);
-    }
-  }
-
-  try {
-    // 2. Add payment_method column to party_ledger if missing
-    console.log('[Migrate] Checking party_ledger schema for payment_method column...');
-    await prisma.$executeRawUnsafe(`ALTER TABLE "party_ledger" ADD COLUMN "payment_method" TEXT;`);
-    console.log('[Migrate] Successfully added payment_method column to party_ledger.');
-  } catch (err) {
-    if (!err.message?.includes('duplicate column name') && !err.message?.includes('duplicate column')) {
-      console.error('[Migrate] Error adding time column:', err.message);
-      process.exit(1);
-    }
-  }
-
-  await prisma.$disconnect();
-  console.log('[Migrate] Database auto-migration completed.');
-}
-
-migrate().catch(console.error);
+console.log("[Migrate] Notice: scripts/migrate.js is retired. Migrations are managed by src/lib/migrations.");

@@ -1,6 +1,15 @@
 # MBM Quarry ERP — Changelog
 
-## v2.4.7 (Unreleased / In Development)
+## v2.4.7 — Database & Synchronization Overhaul (2026-08-28)
+- **Transactional Outbox Engine (Phases 4–5)**: Replaced fragile audit-log CDC synchronization with an ACID-compliant transactional outbox pattern (`sync_outbox_events`). Every business write atomically enqueues an immutable outbox event inside the same SQLite transaction, eliminating lost sync records, shadow mutations, and race conditions.
+- **Idempotent Cloud RPC Ingestion**: Built server-side `apply_outbox_event()` PostgreSQL RPC with durable event deduplication (`sync_event_inbox`), ensuring retry attempts and interrupted network reconnections never create duplicate records or conflict corruptions.
+- **Durable Local Device Identity**: Added hardware-anchored device registration (`device_identities`) persisted across SQLite upgrades, guaranteeing traceable multi-device event routing.
+- **Strict Sync Lease Mutual Exclusion**: Implemented unified in-memory and state-backed lease management (`withSyncLease`) preventing concurrent pushes, pulls, restores, and outbox dispatches from colliding.
+- **Safe Staged Restore Engine (Phase 3)**: Replaced destructive in-place restore with an isolated staging database workflow (`.stage.db`). Automatically generates timestamped `.bak` pre-restore backups, validates foreign keys and row counts in staging, and executes atomic 3-way file swaps with journal recovery (`restore-files.ts`).
+- **Versioned Local Migration Runner (Phase 1)**: Built a deterministic DDL migration pipeline (`schema_migrations`) executing migrations v1 through v5 on startup, guaranteeing schema synchronization between Prisma models and SQLite without data loss.
+- **Observability, Health Contracts & Diagnostics (Phase 6)**: Added pure read-only health metrics (`getDetailedSyncHealth`), outbox delivery queues, retry distribution tracking, and structured diagnostics export with full credential/PII sanitization.
+- **Unsafe Sync Operations Retired**: Safely retired brute-force table scanning (`forcePushAllTables`) and timestamp rewinds (`resetSyncCursor`, `resetSyncQueue`) with typed `RETIRED_OPERATION` responses, eliminating collision merge suffixes (`(Merge XXXX)`).
+- **Domain Cutover Gate (Material Pilot)**: Successfully cut over `Material` master data to outbox delivery with shadow reconciliation and fail-closed legacy fallbacks.
 
 ## v2.4.6 — Spreadsheet Inline Editing & Sync Reliability Fixes (2026-08-19)
 - **Global & Local Keyboard Shortcuts**: Implemented dedicated keyboard shortcuts to speed up data entry. Added local form shortcuts (`Ctrl+S` to save, `Ctrl+N` to start new, `Esc` to cancel) specifically mapped to the Sales and Boulders tables. Added global navigation hotkeys (`Alt+S` for Sales, `Alt+B` for Boulders, `Alt+V` for Vehicles) to allow instant jumping between high-traffic modules from anywhere in the app.

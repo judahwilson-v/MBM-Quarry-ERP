@@ -1,6 +1,8 @@
 import path from "path";
 import { PrismaClient } from "@prisma/client";
 import { initializeDatabase } from "./bootstrap";
+import { assertRestoreIsNotInProgress } from "./sync/restore-state";
+import { recoverInterruptedRestore } from "./sync/restore-files";
 
 const globalForPrisma = globalThis as unknown as {
   prisma?: PrismaClient;
@@ -39,13 +41,24 @@ export function getPrisma() {
 
 export async function ensureDatabase() {
   if (!globalForPrisma.databaseReady) {
-    globalForPrisma.databaseReady = initializeDatabase(getPrisma());
+    globalForPrisma.databaseReady = (async () => {
+      recoverInterruptedRestore(getDatabaseFilePath());
+      await initializeDatabase(getPrisma());
+    })();
   }
 
   return globalForPrisma.databaseReady;
 }
 
 export async function getDb() {
+  assertRestoreIsNotInProgress();
   await ensureDatabase();
   return getPrisma();
+}
+
+/** Disconnect the active client before an atomic database-file replacement. */
+export async function disconnectDatabase() {
+  if (globalForPrisma.prisma) await globalForPrisma.prisma.$disconnect();
+  globalForPrisma.prisma = undefined;
+  globalForPrisma.databaseReady = undefined;
 }

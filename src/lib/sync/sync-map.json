@@ -351,6 +351,25 @@
     "lastError": "last_error",
     "updatedAt": "updated_at"
   },
+  "DeviceIdentity": {
+    "id": "id",
+    "deviceId": "device_id",
+    "createdAt": "created_at"
+  },
+  "SyncOutboxEvent": {
+    "id": "id",
+    "eventId": "event_id",
+    "deviceId": "device_id",
+    "entityType": "entity_type",
+    "entityId": "entity_id",
+    "operation": "operation",
+    "payload": "payload",
+    "status": "status",
+    "attempts": "attempts",
+    "lastError": "last_error",
+    "createdAt": "created_at",
+    "deliveredAt": "delivered_at"
+  },
   "GlobalSettings": {
     "id": "id",
     "quarryName": "quarry_name",

@@ -1,6 +1,7 @@
 "use server";
 
 import { pushSync } from "./sync-service";
+import { deliverPendingOutbox } from "./outbox";
 import { checkOnlineStatus } from "./connectivity";
 
 /**
@@ -15,6 +16,9 @@ export async function triggerAutoSync(): Promise<void> {
     const online = await checkOnlineStatus();
     if (!online) return; // offline — skip silently
 
+    await deliverPendingOutbox().catch((err) =>
+      console.warn("[Auto-Sync] Outbox delivery notice:", err?.message || err)
+    );
     await pushSync();
   } catch (error) {
     // Never throw from auto-sync — it must not break the caller's save flow

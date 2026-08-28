@@ -4,6 +4,7 @@ import { getDb } from "@/lib/prisma";
 import { revalidatePath } from "next/cache";
 import { writeAuditEvent } from "@/lib/domain";
 import { triggerAutoSync } from "@/lib/sync/auto-sync";
+import { enqueueOutboxEvent } from "@/lib/sync/outbox";
 import { sanitizeError } from "@/lib/utils/sanitize-error";
 
 export async function getGlobalSettings() {
@@ -14,8 +15,22 @@ export async function getGlobalSettings() {
 
   if (!settings) {
     try {
-      settings = await prisma.globalSettings.create({
-        data: { id: "default" }
+      settings = await prisma.$transaction(async (tx) => {
+        const row = await tx.globalSettings.create({ data: { id: "default" } });
+        await writeAuditEvent(tx, {
+          entityName: "GlobalSettings",
+          entityId: row.id,
+          action: "create",
+          role: "system",
+          after: row,
+        });
+        await enqueueOutboxEvent(tx, {
+          entityType: "GlobalSettings",
+          entityId: row.id,
+          operation: "create",
+          payload: row,
+        });
+        return row;
       });
     } catch {
       // Fallback for read-only environments (e.g. Vercel dashboard)
@@ -37,10 +52,11 @@ export async function getGlobalSettings() {
 export async function updateGlobalSettings(data: any) {
   try {
     const prisma = await getDb();
-    const before = await prisma.globalSettings.findUnique({ where: { id: "default" } });
-    const settings = await prisma.globalSettings.upsert({
-      where: { id: "default" },
-      update: {
+    const settings = await prisma.$transaction(async (tx) => {
+      const before = await tx.globalSettings.findUnique({ where: { id: "default" } });
+      const row = await tx.globalSettings.upsert({
+        where: { id: "default" },
+        update: {
         quarryName: data.quarryName,
         gstNumber: data.gstNumber,
         address: data.address,
@@ -54,7 +70,7 @@ export async function updateGlobalSettings(data: any) {
         enableCustomerPortal: data.enableCustomerPortal ?? before?.enableCustomerPortal ?? false,
         enableCreditLocks: data.enableCreditLocks ?? before?.enableCreditLocks ?? false,
       },
-      create: {
+        create: {
         id: "default",
         quarryName: data.quarryName || "MBM Quarry",
         gstNumber: data.gstNumber || "",
@@ -68,15 +84,23 @@ export async function updateGlobalSettings(data: any) {
         enableFleetMaintenance: data.enableFleetMaintenance ?? false,
         enableCustomerPortal: data.enableCustomerPortal ?? false,
         enableCreditLocks: data.enableCreditLocks ?? false,
-      }
-    });
-    await writeAuditEvent(prisma, {
-      entityName: "GlobalSettings",
-      entityId: settings.id,
-      action: before ? "update" : "create",
-      role: "system",
-      before,
-      after: settings,
+        }
+      });
+      await writeAuditEvent(tx, {
+        entityName: "GlobalSettings",
+        entityId: row.id,
+        action: before ? "update" : "create",
+        role: "system",
+        before,
+        after: row,
+      });
+      await enqueueOutboxEvent(tx, {
+        entityType: "GlobalSettings",
+        entityId: row.id,
+        operation: before ? "update" : "create",
+        payload: row,
+      });
+      return row;
     });
     // Fire-and-forget: don't block the server action response with sync
     setTimeout(() => triggerAutoSync().catch(console.error), 0);

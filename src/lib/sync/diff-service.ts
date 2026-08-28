@@ -109,13 +109,7 @@ export async function getDetailedTableDiff(tableName: string): Promise<DetailedD
   const supabase = createSyncClient();
 
   // Find the model config for this table name
-  let config: any = null;
-  for (const modelName of Object.keys(SYNC_MODEL_CONFIG)) {
-    if (SYNC_MODEL_CONFIG[modelName].table === tableName) {
-      config = SYNC_MODEL_CONFIG[modelName];
-      break;
-    }
-  }
+  const config = Object.values(SYNC_MODEL_CONFIG).find((cfg) => cfg.table === tableName);
 
   if (!config) {
     throw new Error(`Unknown table: ${tableName}`);

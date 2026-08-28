@@ -1,43 +1,42 @@
 ---
 type: adr
-last_updated: 2026-08-18
+last_updated: 2026-08-28
+status: SUPERSEDED_IN_PART (Phased Outbox Architecture)
 ---
-# ADR-002: Sync Model Architecture
+# ADR-002: Sync Model Architecture & Transactional Outbox
 
 ## Context
-Operating offline-first with a local SQLite database requires a mechanism to periodically synchronize data with a central cloud database (Supabase) to support multi-device scenarios and the separate Owner Dashboard. The synchronization process must handle foreign key dependencies carefully, resolve data conflicts gracefully, and manage large volumes of audit data efficiently without overwhelming either the local or remote systems.
+Operating offline-first with a local SQLite database requires a mechanism to periodically synchronize data with a central cloud database (Supabase) to support multi-device scenarios and the separate Owner Dashboard. 
+
+The legacy sync model relied on CDC audit log triggers and timestamp cursors (`lastSyncedAt`). Under flaky network conditions and high transaction loads, this caused lost records, race conditions during auto-sync, and undesirable collision name mutations (e.g. `(Merge XXXX)`).
 
 ## Decision
-We implement a custom synchronization model with the following specific rules:
+We evolved the synchronization model into an **ACID-Compliant Transactional Outbox Engine** with the following principles:
 
-- **Push/Pull Priority Order**: 
-  - To avoid Foreign Key (FK) violations, parent models must be pushed and pulled first. 
-  - Push priority order: GlobalSettings(1), Material(2), Party(3), Supplier(4), Employee(5), FinancialEvent(6)... down to WeighbridgeTicket(29).
-  - Pull order mirrors the push priority in reverse to ensure the same FK safety.
-- **Direct Push Models**: FinancialEvent, LedgerEntry, InventoryStock, and InventoryTransaction are pushed directly to the remote server without generating audit row triggers.
-- **Conflict Resolution Strategies**:
-  - *Materials*: If a P2002 name conflict occurs, the system updates the rate and timestamp on the existing record.
-  - *Sales & Boulders*: Compares timestamps; the remote record wins if it is newer, but the local record is preserved if it is newer.
-  - *Entities (Party, Vehicle, Supplier, Employee)*: Appends ` (Merge <last 4 of ID>)` to the entity names on collision.
-  - *WeighbridgeTickets*: Adds 900000 to the `ticketNumber` on collision.
-- **Retention Policies**: 
-  - Remote (Supabase): `audit_logs` older than 3 days are deleted. `financial_events`, `ledger_entries`, and `inventory_transactions` older than 30 days are deleted.
-  - Local (SQLite): Retains all data indefinitely.
-- **Cursor Safety**: A 10-second `SAFETY_WINDOW_MS` is subtracted from sync cursors to protect against device clock skew and ensure no records are missed during sync sweeps.
-- **FK Holding Queue**: Incorporates an `earliestSkippedTime` mechanism for re-evaluating skipped child records that failed to sync due to missing parents.
+1. **Transactional Outbox (`sync_outbox_events`)**:
+   - Every local domain mutation (create, update, delete) atomically records an immutable event in `sync_outbox_events` inside the primary SQLite `$transaction`.
+   - Business data changes and outbox events succeed or fail together.
 
-## Alternatives Considered
-- *Standard ORM Sync Tools*: Often lack the granular conflict resolution strategies needed for quarry-specific edge cases (like merging entity names or handling ticket number collisions).
-- *Strict Last-Write-Wins for Everything*: Rejected because it leads to silent data loss for entities and materials; custom merge logic provides better traceability.
-- *Infinite Cloud Retention*: Rejected to save cloud storage costs and maintain sync performance, given the local SQLite acts as the true long-term archive.
+2. **Idempotent Cloud Ingestion (`apply_outbox_event` RPC)**:
+   - Events are dispatched with a UUID primary key, hardware-anchored `deviceId`, entity type, operation, and JSON payload.
+   - The cloud database validates incoming events against `sync_event_inbox`. Duplicate deliveries (e.g., due to network ACK drop) are acknowledged safely with zero duplicate writes.
+
+3. **Domain Cutover Gate (`src/lib/sync/delivery-gate.ts`)**:
+   - Master data and transactional models are cut over domain-by-domain from legacy push to outbox delivery.
+   - For cut-over models, legacy push mutations and unverified pull row-copying are disabled.
+
+4. **Sync Lease Mutual Exclusion (`withSyncLease`)**:
+   - In-memory and state-backed leases prevent concurrent pushes, pulls, restores, and outbox dispatches from colliding.
+
+5. **Retired Operations**:
+   - `forcePushAllTables`, `resetSyncCursor`, and `resetSyncQueue` are permanently hard-disabled and fail closed with `{ success: false, code: "RETIRED_OPERATION" }`.
+   - Silent entity renaming (`(Merge XXXX)`) is eliminated.
+
+6. **Safe Staged Restore Engine (`src/lib/sync/staged-restore.ts`)**:
+   - Cloud restores populate an isolated `.stage.db` temporary database, verify foreign key integrity, create a `.bak` local backup, and execute an atomic file swap.
 
 ## Consequences
-- Synchronization is resilient against FK constraint errors and clock drift.
-- Conflicts are resolved deterministically with minimal user intervention.
-- The cloud database remains lean and performant, while the local database serves as the complete historical archive.
-- The custom sync logic adds complexity and requires careful testing, especially the holding queue and cursor management.
-
-## Immutability Rules
-- Parent entities must always sync before child entities.
-- Direct push models must never trigger audit rows.
-- Local SQLite data must never be pruned by the sync retention policies.
+- Zero data loss from interrupted network connections or background sync races.
+- Deterministic, traceable audit trail for all multi-device updates.
+- No silent renaming or data mutation of business records.
+- Staged recovery protects production SQLite databases against corrupt network downloads.
