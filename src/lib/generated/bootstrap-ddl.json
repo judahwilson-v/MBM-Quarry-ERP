@@ -1,5 +1,5 @@
 {
-  "generatedAt": "2026-08-28T11:39:57.993Z",
+  "generatedAt": "2026-08-28T18:02:06.799Z",
   "tables": {
     "vehicles": "CREATE TABLE IF NOT EXISTS vehicles (\n  id TEXT PRIMARY KEY NOT NULL,\n  vehicle_number TEXT NOT NULL UNIQUE,\n  party_id TEXT,\n  party_name TEXT,\n  company_body_qty REAL,\n  extra_body_qty REAL,\n  vehicle_type TEXT,\n  trip_count INTEGER NOT NULL DEFAULT 0,\n  engine_hours REAL,\n  created_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,\n  updated_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP\n)",
     "parties": "CREATE TABLE IF NOT EXISTS parties (\n  id TEXT PRIMARY KEY NOT NULL,\n  party_name TEXT NOT NULL UNIQUE,\n  phone TEXT,\n  address TEXT,\n  party_group TEXT,\n  created_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,\n  updated_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP\n)",
