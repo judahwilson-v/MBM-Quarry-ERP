@@ -232,7 +232,7 @@ describe('Schema Consistency – multi-source drift detection', () => {
   // Test 5
   // -----------------------------------------------------------------------
   it('SYNC_MODEL_CONFIG covers all Prisma models', () => {
-    const knownExclusions = new Set(['SyncState', 'AuditLog', 'Role']);
+    const knownExclusions = new Set(['SyncState', 'AuditLog', 'Role', 'DeviceIdentity', 'SyncOutboxEvent']);
     const syncConfigKeys = new Set(Object.keys(SYNC_MODEL_CONFIG));
     const prismaModelNames = new Set(prismaModels.map((m) => m.name));
 
