@@ -1,3 +1,5 @@
+import { projectSyncRecord } from "./credential-hygiene";
+import { findLegacyRowsAfter, isActiveOutboxEntity } from './legacy-pending';
 import { getDb } from "@/lib/prisma";
 import { createSyncClient } from "@/lib/supabase/client-sync";
 import {
@@ -33,6 +35,7 @@ for (const model of Object.values(SYNC_MAP)) {
 
 // Convert camelCase object keys to database columns for Supabase REST API
 function toSnakeCase(obj: any): any {
+  obj = projectSyncRecord(obj);
   if (obj instanceof Date) {
     return obj.toISOString();
   }
@@ -108,12 +111,11 @@ export async function pushSync(): Promise<SyncResult> {
 
       // 2. Fetch new audit logs since last sync
       let unsyncedLogs: any[] = [];
+      let auditReadFailed = false;
       try {
-        unsyncedLogs = await db.auditLog.findMany({
-          where: { createdAt: { gt: syncState.lastSyncedAt } },
-          orderBy: { createdAt: 'asc' }
-        });
+        unsyncedLogs = await findLegacyRowsAfter(db.auditLog, "createdAt", syncState.lastSyncedAt);
       } catch (fetchErr: any) {
+        auditReadFailed = true;
         console.error("[Sync Push] Failed to fetch audit logs:", fetchErr);
         errorsList.push({ table: "audit_logs", error: fetchErr?.message || String(fetchErr) });
       }
@@ -138,6 +140,10 @@ export async function pushSync(): Promise<SyncResult> {
         }
       };
 
+      // Unread audit work may include deletions with no direct-scan row.
+      // Its timestamps are unknown, so retain the starting push watermark.
+      if (auditReadFailed) recordSkippedTime(new Date(syncState.lastSyncedAt.getTime() + 1));
+
       await db.syncState.update({ where: { id: "default" }, data: { status: "SYNCING" } });
 
       for (const log of unsyncedLogs) {
@@ -155,11 +161,9 @@ export async function pushSync(): Promise<SyncResult> {
             // Push the audit log trail only, without modifying the entity table or collision renaming.
             try {
               const { error: auditError } = await supabase.from("audit_logs").upsert(toSnakeCase(log));
-              if (auditError) {
-                console.warn(`[Sync Push] Audit log push failed for cut-over model ${modelName}:${log.id}: ${auditError.message}`);
-              }
+              if (auditError) throw new Error(`Audit acknowledgement failed for ${log.id}: ${auditError.message}`);
             } catch (auditErr: any) {
-              console.warn(`[Sync Push] Audit log push exception for cut-over model:`, auditErr);
+              throw new Error(auditErr?.message || String(auditErr));
             }
             if (log.createdAt > lastProcessedTime) {
               lastProcessedTime = log.createdAt;
@@ -232,11 +236,9 @@ export async function pushSync(): Promise<SyncResult> {
           // Push the audit log itself to Supabase so other PCs know about deletions
           try {
             const { error: auditError } = await supabase.from("audit_logs").upsert(toSnakeCase(log));
-            if (auditError) {
-              console.warn(`[Sync Push] Audit log push failed for ${log.id}: ${auditError.message}`);
-            }
+            if (auditError) throw new Error(`Audit acknowledgement failed for ${log.id}: ${auditError.message}`);
           } catch (auditErr: any) {
-            console.warn(`[Sync Push] Audit log push exception:`, auditErr);
+            throw new Error(auditErr?.message || String(auditErr));
           }
 
           if (log.createdAt > lastProcessedTime) {
@@ -292,9 +294,8 @@ export async function pushSync(): Promise<SyncResult> {
                 throw new Error(`Upsert failed for ${config.table}:${log.entityId}: ${error.message}`);
               }
             }
-            try {
-              await supabase.from("audit_logs").upsert(toSnakeCase(log));
-            } catch {}
+            const { error: auditError } = await supabase.from("audit_logs").upsert(toSnakeCase(log));
+            if (auditError) throw new Error(`Audit acknowledgement failed for ${log.id}: ${auditError.message}`);
             pushedCount++;
             if (log.createdAt > lastProcessedTime) {
               lastProcessedTime = log.createdAt;
@@ -310,11 +311,18 @@ export async function pushSync(): Promise<SyncResult> {
       if (currentHeld.length > 0) {
         skippedCount += currentHeld.length;
         for (const heldLog of currentHeld) {
-          if (heldLog.createdAt > lastProcessedTime) {
-            lastProcessedTime = heldLog.createdAt;
-          }
+          // A held deletion may have no live row for the direct-scan fallback.
+          // Keep its audit timestamp eligible for the next push instead of
+          // acknowledging it through a cursor that has passed it.
+          recordSkippedTime(heldLog.createdAt);
+          const heldModel = resolveSyncModel(heldLog.entityName);
+          errorsList.push({
+            table: heldModel ? SYNC_MODEL_CONFIG[heldModel].table : heldLog.entityName,
+            rowId: heldLog.entityId,
+            error: "Delivery not acknowledged; record remains pending for retry.",
+          });
         }
-        console.warn(`[Sync Push] ${currentHeld.length} logs remain held due to missing parent foreign keys. Cursor will advance past them to prevent deadlock.`);
+        console.warn(`[Sync Push] ${currentHeld.length} logs remain unacknowledged. Cursor retained for retry.`);
 
         _lastHeldLogs = currentHeld.map((log: any) => {
           const heldModelName = resolveSyncModel(log.entityName);
@@ -323,7 +331,7 @@ export async function pushSync(): Promise<SyncResult> {
             table: heldConfig?.table || log.entityName,
             entityId: log.entityId,
             action: log.action,
-            reason: `Missing parent FK — parent record not found in Supabase`,
+            reason: `Delivery not acknowledged after retries`,
             createdAt: log.createdAt?.toISOString?.() || String(log.createdAt),
           };
         });
@@ -338,10 +346,7 @@ export async function pushSync(): Promise<SyncResult> {
         if (!config) continue;
         try {
           const delegate = (db as any)[config.delegate];
-          const rows = await delegate.findMany({
-            where: { [config.timeField]: { gt: syncState.lastSyncedAt } },
-            orderBy: { [config.timeField]: "asc" },
-          });
+          const rows = await findLegacyRowsAfter(delegate, config.timeField, syncState.lastSyncedAt);
 
           for (const row of rows as Record<string, unknown>[]) {
             try {
@@ -372,6 +377,7 @@ export async function pushSync(): Promise<SyncResult> {
           }
         } catch (projModelErr: any) {
           console.error(`[Sync Push] Projection model fetch/push failed for ${config.table}:`, projModelErr);
+          recordSkippedTime(new Date(syncState.lastSyncedAt.getTime() + 1));
           errorsList.push({
             table: config.table,
             error: projModelErr?.message || String(projModelErr),
@@ -405,10 +411,6 @@ export async function pushSync(): Promise<SyncResult> {
           lastError: lastErrorMessage,
         }
       });
-
-      purgeOldSupabaseData().catch((e) =>
-        console.warn("[Retention] Background purge failed:", e?.message)
-      );
 
       return {
         pushed: pushedCount,
@@ -505,6 +507,7 @@ export async function pullSync(): Promise<SyncResult> {
               if (logDate > lastProcessedTime) lastProcessedTime = logDate;
             } catch (rowDelErr: any) {
               console.warn(`[Sync Pull] Exception processing delete log:`, rowDelErr);
+              errorsList.push({ table: "audit_logs", rowId: log?.id, error: rowDelErr?.message || String(rowDelErr) });
               skippedCount++;
             }
           }
@@ -670,7 +673,10 @@ export async function pullSync(): Promise<SyncResult> {
       const SAFETY_WINDOW_MS = 0;
       let finalPullCursor = pullState.lastSyncedAt;
 
-      if (lastProcessedTime > pullState.lastSyncedAt) {
+      // One cursor covers every legacy table and deletion marker. A failed
+      // fetch can hide rows of unknown age, so no newer global watermark is safe.
+      // Successful idempotent upserts may repeat until the failed work recovers.
+      if (errorsList.length === 0 && lastProcessedTime > pullState.lastSyncedAt) {
         finalPullCursor = new Date(Math.max(pullState.lastSyncedAt.getTime(), lastProcessedTime.getTime() - SAFETY_WINDOW_MS));
       }
 
@@ -721,17 +727,18 @@ export async function getSyncStatus() {
   const pullState = await db.syncState.findUnique({ where: { id: "pull_state" } });
   
   const pushCursor = pushState?.lastSyncedAt || new Date(0);
-  const [auditCount, outboxPending, ...projectionCounts] = await Promise.all([
-    db.auditLog.count({ where: { createdAt: { gt: pushCursor } } }),
-    db.syncOutboxEvent.count({ where: { status: { in: ["PENDING", "SENDING"] } } }),
+  const [auditRows, outboxEvents, ...projectionRows] = await Promise.all([
+    findLegacyRowsAfter(db.auditLog, "createdAt", pushCursor, {}, true),
+    db.syncOutboxEvent.findMany({ where: { status: { in: ["PENDING", "SENDING"] } }, select: { entityType: true } }),
     ...DIRECT_PUSH_MODELS.map((modelName) => {
+      if (!isLegacyPushMutationEnabled(modelName)) return Promise.resolve([]);
       const config = SYNC_MODEL_CONFIG[modelName];
-      return (db as any)[config.delegate].count({
-        where: { [config.timeField]: { gt: pushCursor } },
-      }) as Promise<number>;
+      return findLegacyRowsAfter((db as any)[config.delegate], config.timeField, pushCursor, {}, true);
     }),
   ]);
-  const pendingCount = auditCount + outboxPending + projectionCounts.reduce((total, count) => total + count, 0);
+  const activeOutboxCount = outboxEvents.filter(event => isActiveOutboxEntity(event.entityType)).length;
+  const parkedOutboxCount = outboxEvents.length - activeOutboxCount;
+  const pendingCount = auditRows.length + activeOutboxCount + projectionRows.reduce((total, rows) => total + rows.length, 0);
 
   return {
     lastSyncedAt: pushState?.lastSyncedAt || null,
@@ -740,49 +747,23 @@ export async function getSyncStatus() {
             pushState?.status === "PARTIAL_SUCCESS" || pullState?.status === "PARTIAL_SUCCESS" ? "PARTIAL_SUCCESS" :
             pushState?.status === "SYNCING" || pullState?.status === "SYNCING" ? "SYNCING" : "IDLE",
     lastError: pushState?.lastError || pullState?.lastError || null,
-    pendingCount
+    pendingCount,
+    parkedOutboxCount,
   };
 }
 
 // ---------- Data Retention ----------
 
-const RETENTION_POLICY: { table: string; days: number }[] = [
-  { table: "audit_logs",              days: 3  },
-  { table: "financial_events",        days: 30 },
-  { table: "ledger_entries",          days: 30 },
-  { table: "inventory_transactions",  days: 30 },
-];
-
-export async function purgeOldSupabaseData(): Promise<{ purged: Record<string, number> }> {
-  const supabase = createSyncClient();
-  const purged: Record<string, number> = {};
-
-  for (const { table, days } of RETENTION_POLICY) {
-    try {
-      const cutoff = new Date();
-      cutoff.setDate(cutoff.getDate() - days);
-
-      const { count, error } = await supabase
-        .from(table as any)
-        .delete({ count: "exact" })
-        .lt("created_at", cutoff.toISOString());
-
-      if (error) {
-        console.warn(`[Retention] Failed to purge ${table}: ${error.message}`);
-        purged[table] = 0;
-      } else {
-        purged[table] = count ?? 0;
-        if (count && count > 0) {
-          console.log(`[Retention] Purged ${count} old rows from ${table}`);
-        }
-      }
-    } catch (e: any) {
-      console.warn(`[Retention] Error purging ${table}: ${e?.message}`);
-      purged[table] = 0;
-    }
-  }
-
-  return { purged };
+export async function purgeOldSupabaseData() {
+  // Compatibility entry point is fail-closed. Ordinary sync never deletes
+  // history by age. A future maintenance policy needs explicit review of
+  // offline clients, archival and recovery before any cleanup can run.
+  return {
+    success: false as const,
+    code: "RETENTION_POLICY_REQUIRED" as const,
+    message: "Age-based cloud cleanup is paused. No records were deleted. A reviewed retention and recovery policy is required before cleanup.",
+    purged: {} as Record<string, number>,
+  };
 }
 
 // ---------- Force Push All Tables (RETIRED) ----------
@@ -903,7 +884,8 @@ export async function getDetailedSyncStatus() {
     models: health.models.map((m) => ({
       name: m.name,
       table: m.table,
-      pendingCount: m.pendingLegacyCount + m.outboxPendingCount,
+      pendingCount: m.pendingLegacyCount + (m.deliveryMode === "outbox" ? m.outboxPendingCount : 0),
+      parkedOutboxCount: m.deliveryMode === "outbox" ? 0 : m.outboxPendingCount,
       deliveryMode: m.deliveryMode,
       lastError: null,
       status: m.status,

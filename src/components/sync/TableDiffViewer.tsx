@@ -2,6 +2,7 @@
 
 import { useEffect, useState } from "react";
 import { fetchDetailedTableDiff } from "@/app/actions/sync";
+import { getSessionToken } from "@/lib/session-client";
 import { Badge } from "@/components/ui/badge";
 import { RefreshCw, Trash2, PlusCircle, ArrowLeftRight } from "lucide-react";
 
@@ -22,7 +23,7 @@ export default function TableDiffViewer({ tableName, onBack }: { tableName: stri
   useEffect(() => {
     async function load() {
       try {
-        const data = await fetchDetailedTableDiff(tableName);
+        const data = await fetchDetailedTableDiff(tableName, getSessionToken());
         setDiffs(data);
       } catch (e: any) {
         setError(e.message || String(e));

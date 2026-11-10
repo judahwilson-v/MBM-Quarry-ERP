@@ -11,7 +11,7 @@ async function main() {
   });
   console.log(`Deleted ${partiesResult.count} dummy parties.`);
   
-  const dummyVehicles = ['KA01AB1234', 'TN02CD5678', 'MH03EF9012'];
+  const dummyVehicles = ['ZZQATEST0001', 'ZZQATEST0002', 'MH03EF9012'];
   const vehiclesResult = await prisma.vehicle.deleteMany({
     where: { vehicleNumber: { in: dummyVehicles } }
   });

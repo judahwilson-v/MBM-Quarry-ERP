@@ -1,3 +1,4 @@
+import { findLegacyRowsAfter, isActiveOutboxEntity } from './legacy-pending';
 import type { PrismaClient } from "@prisma/client";
 import { getDb } from "@/lib/prisma";
 import { getCurrentLeaseHolder, type SyncLeaseHolder } from "./sync-lease";
@@ -113,6 +114,7 @@ export interface DetailedSyncHealth {
     lastOutboxDeliveredAt: string | null;
     totalPendingLegacy: number;
     totalPendingOutbox: number;
+    parkedOutboxCount: number;
     totalPending: number;
     lastError: string | null;
   };
@@ -219,9 +221,10 @@ export async function getDetailedSyncHealth(
   // 2. Outbox counts and distribution
   const outboxEvents = await db.syncOutboxEvent.findMany({
     orderBy: { createdAt: "desc" },
-    take: 500,
   });
 
+  let activeOutboxCount = 0;
+  let parkedOutboxCount = 0;
   let pendingOutboxCount = 0;
   let sendingOutboxCount = 0;
   let ackedOutboxCount = 0;
@@ -236,6 +239,11 @@ export async function getDetailedSyncHealth(
   const recentErrors: RecentSyncError[] = [];
 
   for (const event of outboxEvents) {
+    const active = isActiveOutboxEntity(event.entityType);
+    if (event.status === "PENDING" || event.status === "SENDING") {
+      if (active) activeOutboxCount++;
+      else parkedOutboxCount++;
+    }
     if (event.status === "PENDING") {
       pendingOutboxCount++;
       perModelOutboxPending[event.entityType] = (perModelOutboxPending[event.entityType] || 0) + 1;
@@ -246,7 +254,7 @@ export async function getDetailedSyncHealth(
       else if (event.attempts <= 3) attempts1to3++;
       else attempts4plus++;
 
-      if (event.lastError && recentErrors.length < 20) {
+      if (active && event.lastError && recentErrors.length < 20) {
         recentErrors.push({
           eventId: event.eventId,
           entityType: event.entityType,
@@ -290,25 +298,11 @@ export async function getDetailedSyncHealth(
 
     const aliasNames = AUDIT_ENTITY_ALIASES_REVERSE[modelName] || [];
     const allEntityNames = [modelName, ...aliasNames];
-    let pendingLegacyCount = await db.auditLog.count({
-      where: {
-        entityName: { in: allEntityNames },
-        createdAt: { gt: pushCursor },
-      },
-    });
+    let pendingLegacyCount = (await findLegacyRowsAfter(db.auditLog, "createdAt", pushCursor, { entityName: { in: allEntityNames } }, true)).length;
 
-    if (DIRECT_PUSH_MODELS.includes(modelName as any)) {
-      try {
-        const delegate = (db as any)[config.delegate];
-        if (delegate) {
-          const projectionCount = await delegate.count({
-            where: { [config.timeField]: { gt: pushCursor } },
-          });
-          pendingLegacyCount = Math.max(pendingLegacyCount, projectionCount);
-        }
-      } catch {
-        // Table or delegate may not exist in test mock
-      }
+    if (DIRECT_PUSH_MODELS.includes(modelName as any) && getDeliveryMode(modelName) !== "outbox") {
+      const projectionCount = (await findLegacyRowsAfter((db as any)[config.delegate], config.timeField, pushCursor, {}, true)).length;
+      pendingLegacyCount = Math.max(pendingLegacyCount, projectionCount);
     }
 
     const outboxPending = perModelOutboxPending[modelName] || 0;
@@ -323,7 +317,7 @@ export async function getDetailedSyncHealth(
       outboxPendingCount: outboxPending,
       outboxAckedCount: outboxAcked,
       deliveryMode: getDeliveryMode(modelName),
-      status: (pendingLegacyCount > 0 || outboxPending > 0) ? "pending" : "synced",
+      status: (pendingLegacyCount > 0 || (getDeliveryMode(modelName) === "outbox" && outboxPending > 0)) ? "pending" : "synced",
     });
   }
 
@@ -350,7 +344,7 @@ export async function getDetailedSyncHealth(
       ? ("SYNCING" as const)
       : recentErrors.length > 0 || syncState.lastError
       ? ("ERROR" as const)
-      : totalPendingLegacy > 0 || pendingOutboxCount > 0
+      : totalPendingLegacy > 0 || activeOutboxCount > 0
       ? ("PARTIAL_SUCCESS" as const)
       : ("IDLE" as const);
 
@@ -362,8 +356,9 @@ export async function getDetailedSyncHealth(
       lastPulledAt: pullState?.lastSyncedAt?.toISOString() || null,
       lastOutboxDeliveredAt: latestAckedDeliveredAt?.toISOString() || null,
       totalPendingLegacy,
-      totalPendingOutbox: pendingOutboxCount + sendingOutboxCount,
-      totalPending: totalPendingLegacy + pendingOutboxCount + sendingOutboxCount,
+      totalPendingOutbox: activeOutboxCount,
+      parkedOutboxCount,
+      totalPending: totalPendingLegacy + activeOutboxCount,
       lastError: syncState.lastError ? sanitizeErrorMessage(syncState.lastError) : null,
     },
     outbox: {

@@ -8,7 +8,7 @@ import { triggerAutoSync } from "@/lib/sync/auto-sync";
 import { writeAuditEvent } from "@/lib/domain";
 import { emitFinancialEvent } from "@/lib/domain/financial-events";
 import { recalculatePartyLedger } from "@/lib/domain/ledger/party-ledger-service";
-import { verifyEditPassword } from "@/app/actions/auth";
+import { verifyEditPassword, requireActor } from "@/app/actions/auth";
 import {
   validateWithSchema,
   PartyCollectionInputSchema,
@@ -18,7 +18,9 @@ import {
   OtherCreditInputSchema,
   DeleteOtherCreditSchema,
 } from "@/lib/validators/schemas";
+import { getOrCreateDayBook, recalculateDayBook } from "@/lib/domain/daybook";
 import { sanitizeError } from "@/lib/utils/sanitize-error";
+import { businessTimestampForWrite } from "@/lib/domain/daybook/business-date";
 
 function roundMoney(value: number) {
   return Math.round((value + Number.EPSILON) * 100) / 100;
@@ -112,8 +114,13 @@ export async function listPartyCollectionHistory(partyName: string) {
 }
 
 
-export async function savePartyCollection(input: any) {
+export async function savePartyCollection(input: any, sessionToken?: string) {
   try {
+    // Fail closed BEFORE any transactional work: once enrollment is complete a
+    // valid session is mandatory, and the refusal returns as a normal failure
+    // instead of an uncaught throw.
+    const actor = await requireActor(sessionToken);
+    const actorName = actor?.name ?? "system";
     const validated = validateWithSchema(PartyCollectionInputSchema, input);
     const partyName = validated.partyName.trim();
     const cashPaid = validated.cashPaid ?? 0;
@@ -121,7 +128,7 @@ export async function savePartyCollection(input: any) {
     const gPayPaid = validated.gPayPaid ?? 0;
     const totalAmount = roundMoney(cashPaid + bankPaid + gPayPaid);
     if (totalAmount <= 0) throw new Error("Collection amount must be greater than 0.");
-    const collectionDate = validated.collectionDate ? new Date(validated.collectionDate) : new Date();
+    const collectionDate = validated.collectionDate ? businessTimestampForWrite(validated.collectionDate) : new Date();
 
     return serialize(
       await runTx(async (tx: Prisma.TransactionClient) => {
@@ -165,6 +172,11 @@ export async function savePartyCollection(input: any) {
         });
         
         await recalculatePartyLedger(tx, party.id);
+        const book=await getOrCreateDayBook(tx, (validated as any).collectionDate || (validated as any).paymentDate || new Date().toISOString());
+        await recalculateDayBook(tx,book);
+        // FULL53: a collection is a money entry - its creation is recorded with
+        // the acting worker, like every other money mutation.
+        await writeAuditEvent(tx, { entityName: "PartyCollection", entityId: collection.id, action: "create", role: actorName, after: collection });
         return financialEvent;
       }),
     );
@@ -182,8 +194,13 @@ async function getPartyOutstandingBalance(tx: Prisma.TransactionClient, partyId:
 }
 
 
-export async function savePartyPayment(input: any) {
+export async function savePartyPayment(input: any, sessionToken?: string) {
   try {
+    // Fail closed BEFORE any transactional work: once enrollment is complete a
+    // valid session is mandatory, and the refusal returns as a normal failure
+    // instead of an uncaught throw.
+    const actor = await requireActor(sessionToken);
+    const actorName = actor?.name ?? "system";
     const validated = validateWithSchema(PartyPaymentInputSchema, input);
     const partyName = validated.partyName.trim();
     const cashPaid = validated.cashPaid ?? 0;
@@ -191,7 +208,7 @@ export async function savePartyPayment(input: any) {
     const gPayPaid = validated.gPayPaid ?? 0;
     const totalAmount = roundMoney(cashPaid + bankPaid + gPayPaid);
     if (totalAmount <= 0) throw new Error("Payment amount must be greater than 0.");
-    const paymentDate = validated.paymentDate ? new Date(validated.paymentDate) : new Date();
+    const paymentDate = validated.paymentDate ? businessTimestampForWrite(validated.paymentDate) : new Date();
 
     return serialize(
       await runTx(async (tx: Prisma.TransactionClient) => {
@@ -235,6 +252,9 @@ export async function savePartyPayment(input: any) {
         });
         
         await recalculatePartyLedger(tx, party.id);
+        const book=await getOrCreateDayBook(tx, (validated as any).collectionDate || (validated as any).paymentDate || new Date().toISOString());
+        await recalculateDayBook(tx,book);
+        await writeAuditEvent(tx, { entityName: "PartyPayment", entityId: payment.id, action: "create", role: actorName, after: payment });
         return financialEvent;
       }),
     );
@@ -244,8 +264,13 @@ export async function savePartyPayment(input: any) {
 }
 
 
-export async function deletePartyCollection(id: string, pin?: string) {
+export async function deletePartyCollection(id: string, pin?: string, sessionToken?: string) {
   try {
+    // Fail closed BEFORE any transactional work: once enrollment is complete a
+    // valid session is mandatory, and the refusal returns as a normal failure
+    // instead of an uncaught throw.
+    const actor = await requireActor(sessionToken);
+    const actorName = actor?.name ?? "system";
     validateWithSchema(DeletePartyCollectionSchema, { id, pin });
     if (!pin) {
       throw new Error("Admin/Delete PIN is required to delete records.");
@@ -259,6 +284,7 @@ export async function deletePartyCollection(id: string, pin?: string) {
       const collection = await tx.partyCollection.findUnique({ where: { id } });
       if (!collection) return;
       await tx.partyCollection.delete({ where: { id } });
+      const affected=await getOrCreateDayBook(tx,collection.collectionDate);await recalculateDayBook(tx,affected);
       
       // Cascade delete events
       await tx.financialEvent.deleteMany({ where: { entityId: id } });
@@ -269,7 +295,7 @@ export async function deletePartyCollection(id: string, pin?: string) {
       }
 
       try {
-        await writeAuditEvent(tx, { entityName: "PartyCollection", entityId: id, action: "delete", role: "system", before: collection });
+        await writeAuditEvent(tx, { entityName: "PartyCollection", entityId: id, action: "delete", role: actorName, before: collection });
       } catch {
         console.warn(`[Audit Log Warning] Failed to write audit event for PartyCollection deletion (ID: ${id})`);
       }
@@ -281,8 +307,13 @@ export async function deletePartyCollection(id: string, pin?: string) {
 }
 
 
-export async function deletePartyPayment(id: string, pin?: string) {
+export async function deletePartyPayment(id: string, pin?: string, sessionToken?: string) {
   try {
+    // Fail closed BEFORE any transactional work: once enrollment is complete a
+    // valid session is mandatory, and the refusal returns as a normal failure
+    // instead of an uncaught throw.
+    const actor = await requireActor(sessionToken);
+    const actorName = actor?.name ?? "system";
     validateWithSchema(DeletePartyPaymentSchema, { id, pin });
     if (!pin) {
       throw new Error("Admin/Delete PIN is required to delete records.");
@@ -296,6 +327,7 @@ export async function deletePartyPayment(id: string, pin?: string) {
       const payment = await tx.partyPayment.findUnique({ where: { id } });
       if (!payment) return;
       await tx.partyPayment.delete({ where: { id } });
+      const affected=await getOrCreateDayBook(tx,payment.paymentDate);await recalculateDayBook(tx,affected);
       
       // Cascade delete events
       await tx.financialEvent.deleteMany({ where: { entityId: id } });
@@ -306,7 +338,7 @@ export async function deletePartyPayment(id: string, pin?: string) {
       }
 
       try {
-        await writeAuditEvent(tx, { entityName: "PartyPayment", entityId: id, action: "delete", role: "system", before: payment });
+        await writeAuditEvent(tx, { entityName: "PartyPayment", entityId: id, action: "delete", role: actorName, before: payment });
       } catch {
         console.warn(`[Audit Log Warning] Failed to write audit event for PartyPayment deletion (ID: ${id})`);
       }
@@ -416,8 +448,13 @@ export async function listOtherCredits(search = "") {
 }
 
 
-export async function saveOtherCredit(input: any) {
+export async function saveOtherCredit(input: any, sessionToken?: string) {
   try {
+    // Fail closed BEFORE any transactional work: once enrollment is complete a
+    // valid session is mandatory, and the refusal returns as a normal failure
+    // instead of an uncaught throw.
+    const actor = await requireActor(sessionToken);
+    const actorName = actor?.name ?? "system";
     const validated = validateWithSchema(OtherCreditInputSchema, input);
     const data = {
       name: validated.name,
@@ -431,13 +468,13 @@ export async function saveOtherCredit(input: any) {
       return serialize(await runTx(async (tx: Prisma.TransactionClient) => {
         const before = await tx.otherCredit.findUnique({ where: { id: validated.id! } });
         const row = await tx.otherCredit.update({ where: { id: validated.id! }, data });
-        await writeAuditEvent(tx, { entityName: "OtherCredit", entityId: row.id, action: "update", role: "system", before, after: row });
+        await writeAuditEvent(tx, { entityName: "OtherCredit", entityId: row.id, action: "update", role: actorName, before, after: row });
         return row;
       }));
     }
     return serialize(await runTx(async (tx: Prisma.TransactionClient) => {
       const row = await tx.otherCredit.create({ data });
-      await writeAuditEvent(tx, { entityName: "OtherCredit", entityId: row.id, action: "create", role: "system", after: row });
+      await writeAuditEvent(tx, { entityName: "OtherCredit", entityId: row.id, action: "create", role: actorName, after: row });
       return row;
     }));
   } catch (error) {
@@ -446,8 +483,13 @@ export async function saveOtherCredit(input: any) {
 }
 
 
-export async function deleteOtherCredit(id: string, pin?: string) {
+export async function deleteOtherCredit(id: string, pin?: string, sessionToken?: string) {
   try {
+    // Fail closed BEFORE any transactional work: once enrollment is complete a
+    // valid session is mandatory, and the refusal returns as a normal failure
+    // instead of an uncaught throw.
+    const actor = await requireActor(sessionToken);
+    const actorName = actor?.name ?? "system";
     validateWithSchema(DeleteOtherCreditSchema, { id });
     if (!pin || !(await verifyEditPassword(pin, "delete"))) {
       throw new Error("Invalid delete PIN");
@@ -457,7 +499,7 @@ export async function deleteOtherCredit(id: string, pin?: string) {
       if (!before) return;
       await tx.otherCredit.delete({ where: { id } });
       try {
-        await writeAuditEvent(tx, { entityName: "OtherCredit", entityId: id, action: "delete", role: "system", before });
+        await writeAuditEvent(tx, { entityName: "OtherCredit", entityId: id, action: "delete", role: actorName, before });
       } catch (e) {
         console.warn("Failed to write audit event for other credit:", e);
       }

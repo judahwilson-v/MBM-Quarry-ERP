@@ -9,6 +9,7 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { deleteExpense, listExpenses } from "@/app/actions/expenses";
+import { getSessionToken } from "@/lib/session-client";
 import { verifyEditPassword } from "@/app/actions/auth";
 import { cn, formatCurrency, formatDate } from "@/lib/utils";
 import { exportToExcel } from "@/lib/export";
@@ -45,7 +46,7 @@ export function ExpensesPage() {
     const query = search.trim().toLowerCase();
     const filtered = query
       ? expenses.filter((row) =>
-          [row.expenseDate, row.expenseType, row.amount, row.paymentMode, row.partyName, row.vehicleNumber, row.description]
+          [row.businessDateLabel, row.expenseDate, row.expenseType, row.amount, row.paymentMode, row.partyName, row.vehicleNumber, row.description]
             .join(" ")
             .toLowerCase()
             .includes(query)
@@ -80,7 +81,7 @@ export function ExpensesPage() {
     }
     setError("");
     try {
-      const res = await deleteExpense(id);
+      const res = await deleteExpense(id, password, getSessionToken() ?? undefined);
       if (res.success) {
         if (editingExpense?.id === id) setEditingExpense(null);
         await loadExpenses();
@@ -99,7 +100,7 @@ export function ExpensesPage() {
     const excelData: Record<string, any>[] = visibleRows.map((row) => {
       totalAmount += row.amount;
       return {
-        Date: formatDate(row.expenseDate),
+        Date: row.businessDateLabel ?? formatDate(row.expenseDate),
         Type: row.expenseType,
         Amount: row.amount,
         "Payment Mode": row.paymentMode,
@@ -170,7 +171,7 @@ export function ExpensesPage() {
             <TableBody>
               {visibleRows.map((row) => (
                 <TableRow key={row.id} className={cn(editingExpense?.id === row.id && "bg-accent/70")}>
-                  <TableCell className="whitespace-nowrap">{formatDate(row.expenseDate)}</TableCell>
+                  <TableCell className="whitespace-nowrap">{row.businessDateLabel ?? formatDate(row.expenseDate)}</TableCell>
                   <TableCell>
                     <span className="inline-flex items-center rounded-full bg-secondary px-2.5 py-0.5 text-xs font-semibold text-secondary-foreground">
                       {row.expenseType}

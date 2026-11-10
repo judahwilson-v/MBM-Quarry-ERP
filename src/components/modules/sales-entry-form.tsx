@@ -12,6 +12,7 @@ import { SearchableSelect } from "@/components/ui/searchable-select";
 import { listMaterials } from "@/app/actions/materials";
 import { listVehicles } from "@/app/actions/vehicles";
 import { saveSale, getLastBookPage, checkDuplicateSaleBookNumber } from "@/app/actions/sales";
+import { getSessionToken } from "@/lib/session-client";
 import { deriveSalesEngine } from "@/lib/sales-engine";
 import { verifyEditPassword } from "@/app/actions/auth";
 import { formatCurrency, todayInputValue } from "@/lib/utils";
@@ -105,10 +106,12 @@ const HIDDEN_MATERIALS = new Set(["OPENING BALANCE", "RAW SALE"]);
 
 export function SalesEntryForm({
   editingSale,
+  messageResetSignal,
   onSaved,
   onCancelEdit,
 }: {
   editingSale?: EditableSale | null;
+  messageResetSignal?: number;
   onSaved?: () => void;
   onCancelEdit?: () => void;
 }) {
@@ -119,6 +122,14 @@ export function SalesEntryForm({
   const [error, setError] = useState("");
   const [isSubmitting, setIsSubmitting] = useState(false);
   const { promptPassword, confirmAction } = usePrompt();
+
+  // An inline edit attempt elsewhere on the page supersedes this form's prior
+  // success message; clear it so the old green cannot imply the latest edit
+  // saved. The signal is a monotonic counter, so this also re-clears after the
+  // form's own newer success.
+  useEffect(() => {
+    if (messageResetSignal) setMessage("");
+  }, [messageResetSignal]);
 
   const loadMasters = useCallback(async () => {
     try {
@@ -306,11 +317,15 @@ export function SalesEntryForm({
         }
       }
 
+      // The verified edit PIN must reach the server action: saveSale is the
+      // authorization boundary and refuses any edit without it.
+      let editPin: string | undefined;
       if (form.id) {
         const password = await promptPassword("Enter edit password:");
         if (!password || !(await verifyEditPassword(password))) {
           throw new Error("Edit password is invalid.");
         }
+        editPin = password;
       }
       const res = await saveSale({
         id: form.id,
@@ -330,7 +345,7 @@ export function SalesEntryForm({
         remarks: form.remarks,
         bookNumber: form.bookNumber,
         pageNumber: form.pageNumber,
-      });
+      }, editPin, getSessionToken() ?? undefined);
       if (res.success) {
         setMessage(form.id ? "Sale updated." : "Sale saved.");
         setForm(blankSale());

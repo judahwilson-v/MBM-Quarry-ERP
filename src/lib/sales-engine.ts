@@ -97,11 +97,28 @@ function parseNumber(value: string | number | null | undefined, label: string, r
 
 function parseDateInput(value?: string | null) {
   if (!value) return new Date();
-  const date = new Date(`${value}T00:00:00`);
-  if (Number.isNaN(date.getTime())) throw new Error("Date is invalid.");
-  return date;
+  const text = value.trim();
+  // Exactly two accepted input shapes, no input expansion over baseline:
+  // - A date-only label ("2026-11-10") is a business date chosen by the user:
+  //   canonical local-midnight write, unchanged.
+  // - A timezone-qualified serialized datetime ("2026-11-09T18:30:00.000Z",
+  //   offset forms included) is an exact instant - typically a stored Date
+  //   resent by an inline editor that did not change the date - preserved
+  //   as-is on any host, never reduced to a host-local day.
+  // Timezone-less datetimes, partial strings and bare numbers keep the
+  // baseline rejection: no new date policy.
+  if (/^\d{4}-\d{2}-\d{2}$/.test(text)) {
+    const date = new Date(`${text}T00:00:00`);
+    if (Number.isNaN(date.getTime())) throw new Error("Date is invalid.");
+    return date;
+  }
+  if (/^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}(\.\d{1,3})?(Z|[+-]\d{2}:?\d{2})$/.test(text)) {
+    const instant = new Date(text);
+    if (Number.isNaN(instant.getTime())) throw new Error("Date is invalid.");
+    return instant;
+  }
+  throw new Error("Date is invalid.");
 }
-
 export function deriveSalesEngine(draft: SalesDraft, deps: SalesEngineDeps) {
   const vehicleNumber = normalizeVehicleNumber(cleanText(draft.vehicleNumber) ?? "");
   const partyName = cleanText(draft.partyName) ?? "";

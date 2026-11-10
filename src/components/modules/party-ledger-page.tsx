@@ -12,7 +12,9 @@ import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@
 import { Textarea } from "@/components/ui/textarea";
 import { listPartiesWithBalances, listPartyLedgerEntries, savePartyCollection, savePartyPayment, deletePartyCollection, deletePartyPayment } from "@/app/actions/credits";
 import { cn, formatCurrency, formatDate } from "@/lib/utils";
+import { resolveSelectedPartyAfterRefresh, canExportOrPrintLedger } from "@/lib/party-selection";
 import { exportToExcel } from "@/lib/export";
+import { getSessionToken } from "@/lib/session-client";
 
 type PartySummary = {
   id: string;
@@ -41,6 +43,10 @@ type PartyLedgerEntry = {
 
 export function PartyLedgerPage() {
   const [summary, setSummary] = useState<PartySummary[]>([]);
+  // ISS-02 v2: true while the party summary is UNVERIFIED (a summary reload
+  // failed). The heading must not show the last known balance as current truth
+  // and exports/prints stay blocked until a verified summary arrives.
+  const [summaryStale, setSummaryStale] = useState(false);
   const [selectedParty, setSelectedParty] = useState<PartySummary | null>(null);
   const [entries, setEntries] = useState<PartyLedgerEntry[]>([]);
   const [search, setSearch] = useState("");
@@ -58,11 +64,28 @@ export function PartyLedgerPage() {
 
   const loadSummary = useCallback(async () => {
     try {
-      setSummary((await listPartiesWithBalances()) as PartySummary[]);
+      const rows = (await listPartiesWithBalances()) as PartySummary[];
+      setSummary(rows);
+      setSummaryStale(false);
+      // Recovered: a verified summary clears the previous failure message.
+      setError("");
+      return rows;
     } catch (err) {
       setError(err instanceof Error ? err.message : "Failed to load party balances.");
+      setSummaryStale(true);
+      return undefined;
     }
   }, []);
+
+  // Retry after a failed summary reload: on success, reselect from the fresh
+  // rows so the heading shows the verified balance again.
+  async function handleSummaryRetry() {
+    const rows = await loadSummary();
+    if (rows && selectedParty) {
+      const resolution = resolveSelectedPartyAfterRefresh(rows, selectedParty);
+      await loadEntries(resolution.party);
+    }
+  }
 
   const loadEntries = useCallback(async (party: PartySummary) => {
     setSelectedParty(party);
@@ -96,28 +119,33 @@ export function PartyLedgerPage() {
       }
 
       if (paymentMode === "collection") {
-        await savePartyCollection({
+        const res = await savePartyCollection({
           partyName: selectedParty.partyName,
           collectionDate: finalDate.toISOString(),
           cashPaid,
           bankPaid,
           gPayPaid,
           remarks: paymentForm.remarks,
-        });
+        }, getSessionToken() ?? undefined);
+        if (res && "error" in res) throw new Error(String(res.error || "Collection save failed."));
       } else if (paymentMode === "payment") {
-        await savePartyPayment({
+        const res = await savePartyPayment({
           partyName: selectedParty.partyName,
           paymentDate: finalDate.toISOString(),
           cashPaid,
           bankPaid,
           gPayPaid,
           remarks: paymentForm.remarks,
-        });
+        }, getSessionToken() ?? undefined);
+        if (res && "error" in res) throw new Error(String(res.error || "Payment save failed."));
       }
       setPaymentMode(null);
       setPaymentForm({ date: "", time: "", amount: "", paymentMethod: "Cash", remarks: "" });
-      await loadSummary();
-      await loadEntries(selectedParty);
+      // ISS-02: re-select from the fresh summary, not the click-time row, so the
+      // Current Balance heading (and export) reflects the write just recorded.
+      const rows = await loadSummary();
+      const resolution = resolveSelectedPartyAfterRefresh(rows, selectedParty);
+      await loadEntries(resolution.party);
     } catch (err) {
       setError(err instanceof Error ? err.message : "Could not process payment.");
     }
@@ -137,13 +165,15 @@ export function PartyLedgerPage() {
     try {
         let __res;
         if (entry.type === "PAYMENT_RECEIVED") {
-          __res = await deletePartyCollection(entry.refId, password);
+          __res = await deletePartyCollection(entry.refId, password, getSessionToken() ?? undefined);
         } else {
-          __res = await deletePartyPayment(entry.refId, password);
+          __res = await deletePartyPayment(entry.refId, password, getSessionToken() ?? undefined);
         }
         if (__res && !__res.success) throw new Error(__res.error || "Delete failed");
-      await loadSummary();
-      await loadEntries(selectedParty);
+      // ISS-02: re-select from the fresh summary, not the click-time row.
+      const rows = await loadSummary();
+      const resolution = resolveSelectedPartyAfterRefresh(rows, selectedParty);
+      await loadEntries(resolution.party);
     } catch (err) {
       setError(err instanceof Error ? err.message : `Could not delete ${typeLabel.toLowerCase()}.`);
     }
@@ -224,7 +254,8 @@ export function PartyLedgerPage() {
   }
 
   function handleExportExcel() {
-    if (!selectedParty || entries.length === 0) return;
+    // ISS-02 v2: never export an UNVERIFIED balance as the closing balance.
+    if (!canExportOrPrintLedger(summaryStale, selectedParty) || entries.length === 0) return;
     
     // Map entries to a clean format for Excel
     const excelData = entries.map(entry => ({
@@ -280,7 +311,16 @@ export function PartyLedgerPage() {
               </div>
             </CardHeader>
             <CardContent className="px-0 sm:px-6">
-              {error ? <p className="mb-3 px-4 text-sm text-destructive sm:px-0">{error}</p> : null}
+              {error ? (
+                <p className="mb-3 px-4 text-sm text-destructive sm:px-0">
+                  {error}{" "}
+                  {summaryStale ? (
+                    <button type="button" className="underline font-medium" onClick={() => void handleSummaryRetry()}>
+                      Retry
+                    </button>
+                  ) : null}
+                </p>
+              ) : null}
               <div className="overflow-x-auto overflow-y-auto max-h-[calc(100vh-[350px])] sm:max-h-[60vh]">
                 <Table>
                   <TableHeader className="bg-muted/50 sticky top-0 z-10 shadow-sm print:bg-transparent print:border-b-2 print:border-black print:relative print:shadow-none">
@@ -308,7 +348,7 @@ export function PartyLedgerPage() {
                     {!visibleSummary.length ? (
                       <TableRow>
                         <TableCell colSpan={2} className="h-24 text-center text-muted-foreground">
-                          No active party ledgers found.
+                          {summaryStale ? "Party summary unavailable - refresh failed. Use Retry above." : "No active party ledgers found."}
                         </TableCell>
                       </TableRow>
                     ) : null}
@@ -342,18 +382,24 @@ export function PartyLedgerPage() {
                   <h2 className="text-xl font-bold">{selectedParty.partyName} Ledger</h2>
                   <p className="text-sm text-muted-foreground">
                     Current Balance:{" "}
-                    <span className={cn("font-bold", selectedParty.balance < 0 ? "text-destructive" : "text-green-600")}>
-                      {formatCurrency(Math.abs(selectedParty.balance))}
-                      {selectedParty.balance > 0 ? " Dr (Asset)" : selectedParty.balance < 0 ? " Cr (Liability)" : ""}
-                    </span>
+                    {summaryStale ? (
+                      <span className="font-bold text-muted-foreground">
+                        unavailable - summary refresh failed; use Retry. Ledger entries below are current.
+                      </span>
+                    ) : (
+                      <span className={cn("font-bold", selectedParty.balance < 0 ? "text-destructive" : "text-green-600")}>
+                        {formatCurrency(Math.abs(selectedParty.balance))}
+                        {selectedParty.balance > 0 ? " Dr (Asset)" : selectedParty.balance < 0 ? " Cr (Liability)" : ""}
+                      </span>
+                    )}
                   </p>
                 </div>
                 <div className="flex flex-wrap gap-2">
-                  <Button variant="outline" onClick={handleExportExcel} className="print:hidden">
+                  <Button variant="outline" onClick={handleExportExcel} className="print:hidden" disabled={summaryStale} title={summaryStale ? "Balance unverified - summary refresh failed; use Retry before exporting." : undefined}>
                     <Download className="mr-2 h-4 w-4" />
                     Export Excel
                   </Button>
-                  <Button variant="outline" onClick={() => handlePrint()} className="print:hidden">
+                  <Button variant="outline" onClick={() => handlePrint()} className="print:hidden" disabled={summaryStale} title={summaryStale ? "Balance unverified - summary refresh failed; use Retry before printing." : undefined}>
                     <Printer className="mr-2 h-4 w-4" />
                     Print Statement
                   </Button>
@@ -520,12 +566,18 @@ export function PartyLedgerPage() {
                         <div className="w-64">
                           <div className="flex justify-between font-bold text-lg">
                             <span>Closing Balance:</span>
-                            <span>
-                              {formatCurrency(Math.abs(selectedParty.balance))}
-                              <span className="text-sm ml-1 font-normal text-muted-foreground">
-                                {selectedParty.balance > 0 ? "Dr" : selectedParty.balance < 0 ? "Cr" : ""}
+                            {summaryStale ? (
+                              <span className="text-sm font-normal text-muted-foreground">
+                                unavailable - summary refresh failed at print time; entries above are current.
                               </span>
-                            </span>
+                            ) : (
+                              <span>
+                                {formatCurrency(Math.abs(selectedParty.balance))}
+                                <span className="text-sm ml-1 font-normal text-muted-foreground">
+                                  {selectedParty.balance > 0 ? "Dr" : selectedParty.balance < 0 ? "Cr" : ""}
+                                </span>
+                              </span>
+                            )}
                           </div>
                         </div>
                       </div>

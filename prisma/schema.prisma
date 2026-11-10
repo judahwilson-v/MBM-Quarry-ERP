@@ -662,3 +662,73 @@ model VehicleStats {
 
   @@map("vehicle_stats")
 }
+
+model AppUser {
+  id        String   @id @default(cuid())
+  name      String   @unique
+  pinHash   String   @map("pin_hash")
+  pinSalt   String   @map("pin_salt")
+  role      String   @default("worker")
+  active    Boolean  @default(true)
+  createdAt DateTime @default(now()) @map("created_at")
+  updatedAt DateTime @updatedAt @map("updated_at")
+
+  sessions AuthSession[]
+
+  @@map("app_users")
+}
+
+model AuthSession {
+  id        String   @id @default(cuid())
+  userId    String   @map("user_id")
+  token     String   @unique
+  createdAt DateTime @default(now()) @map("created_at")
+  expiresAt DateTime @map("expires_at")
+
+  user AppUser @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId])
+  @@map("auth_sessions")
+}
+
+model AppMeta {
+  key   String @id
+  value String
+
+  @@map("app_meta")
+}
+
+// Edit/delete request-approval trail. LOCAL-ONLY by design (like the identity
+// tables): excluded from sync-map and remote DDL generators. One immutable
+// append-only row per request; decided rows are never rewritten. The FULL56
+// proof wires only operation "edit_remarks" on OutgoingSale; monetary edits
+// and deletes stay gated policy work.
+model ChangeRequest {
+  id              String    @id @default(cuid())
+  idempotencyKey  String    @unique @map("idempotency_key")
+  entityName      String    @map("entity_name")
+  entityId        String    @map("entity_id")
+  operation       String
+  originalValue   String?   @map("original_value")
+  proposedValue   String?   @map("proposed_value")
+  reason          String
+  status          String    @default("PENDING") // PENDING | APPLIED | REJECTED | CANCELLED | CONFLICT
+  requestedById   String?   @map("requested_by_id")
+  requestedByName String    @map("requested_by_name")
+  decidedById     String?   @map("decided_by_id")
+  decidedByName   String?   @map("decided_by_name")
+  decisionNote    String?   @map("decision_note")
+  appliedAuditId  String?   @map("applied_audit_id")
+  // FULL57: canonical fingerprint of the target record's business state at
+  // filing time (SHA-256 hex). State-drift guard only - it is NOT
+  // change-since-request (ABA) detection and not full concurrency control.
+  // NULL on requests filed before this column existed; those fail closed.
+  recordFingerprint String? @map("record_fingerprint")
+  createdAt       DateTime  @default(now()) @map("created_at")
+  decidedAt       DateTime? @map("decided_at")
+  appliedAt       DateTime? @map("applied_at")
+
+  @@index([entityName, entityId])
+  @@index([status])
+  @@map("change_requests")
+}

@@ -5,6 +5,7 @@ import { updateGlobalSettings } from "@/app/actions/settings";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Save, Loader2, CheckCircle2 } from "lucide-react";
+import { getSessionToken } from "@/lib/session-client";
 
 export function SettingsForm({ initialData }: { initialData: any }) {
   const [formData, setFormData] = useState({
@@ -20,6 +21,7 @@ export function SettingsForm({ initialData }: { initialData: any }) {
   });
 
   const [isSaving, setIsSaving] = useState(false);
+  const [settingsPin, setSettingsPin] = useState("");
   const [saveStatus, setSaveStatus] = useState<"idle" | "success" | "error">("idle");
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -33,7 +35,7 @@ export function SettingsForm({ initialData }: { initialData: any }) {
     setIsSaving(true);
     setSaveStatus("idle");
     
-    const result = await updateGlobalSettings(formData);
+    const result = await updateGlobalSettings(formData, settingsPin || undefined, getSessionToken() ?? undefined);
     
     if (result.success) {
       setSaveStatus("success");
@@ -47,6 +49,18 @@ export function SettingsForm({ initialData }: { initialData: any }) {
 
   return (
     <form onSubmit={handleSubmit} className="rounded-xl border bg-card text-card-foreground shadow">
+      <div className="p-4 border-b bg-muted/30">
+        <label htmlFor="settingsPin" className="text-sm font-medium">Admin PIN (required to save settings)</label>
+        <input
+          id="settingsPin"
+          type="password"
+          value={settingsPin}
+          onChange={(e) => setSettingsPin(e.target.value)}
+          className="mt-1 flex h-9 w-48 rounded-md border border-input bg-background px-3 py-1 text-sm"
+          placeholder="Current admin PIN"
+          autoComplete="off"
+        />
+      </div>
       <div className="p-6 pb-4 border-b flex justify-between items-center">
         <h3 className="tracking-tight text-lg font-semibold">Business Profile</h3>
       </div>

@@ -15,6 +15,7 @@ import { listPartyCreditEntries, listPartyCreditSummary, listPartyCollectionHist
 import { cn, formatCurrency, formatDate } from "@/lib/utils";
 import { exportToExcel } from "@/lib/export";
 import { verifyEditPassword } from "@/app/actions/auth";
+import { getSessionToken } from "@/lib/session-client";
 
 type PartySummary = {
   partyName: string;
@@ -613,7 +614,8 @@ export function PartyCollectionPage() {
     setMessage("");
     try {
       const savedPartyName = form.partyName;
-      await savePartyCollection(form);
+      const res = await savePartyCollection(form, getSessionToken() ?? undefined);
+      if (res && "error" in res) throw new Error(String(res.error || "Collection save failed."));
       setMessage("Collection recorded.");
       setForm(blankCollectionForm());
       if (savedPartyName) {
@@ -787,7 +789,8 @@ export function OtherCreditPage() {
     setError("");
     setMessage("");
     try {
-      await saveOtherCredit(form);
+      const res = await saveOtherCredit(form, getSessionToken() ?? undefined);
+      if (res && "error" in res) throw new Error(String(res.error || "Credit save failed."));
       setMessage(form.id ? "Other credit updated." : "Other credit added.");
       setForm(blankOtherForm());
       setShowForm(false);
@@ -806,7 +809,7 @@ export function OtherCreditPage() {
     }
     setError("");
     try {
-      const res = await deleteOtherCredit(id, password);
+      const res = await deleteOtherCredit(id, password, getSessionToken() ?? undefined);
       if (res && !res.success) {
         setError(res.error || "Delete failed.");
         return;

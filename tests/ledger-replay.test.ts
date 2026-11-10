@@ -54,8 +54,22 @@ function createMockTx(events: FinancialEventRecord[], initialLedger: Record<stri
         ledgerEntries.push({ ...create });
         return create;
       },
-      deleteMany: async () => {
-        ledgerEntries.splice(0, ledgerEntries.length);
+      deleteMany: async (args: any = {}) => {
+        const where = args?.where;
+        // FULL73: rebuild wipes all (deleteMany({})); a correction projection
+        // supersedes selectively (entityId + eventType, excluding the new
+        // event's own row). The double must honor the filter.
+        if (!where || Object.keys(where).length === 0) {
+          ledgerEntries.splice(0, ledgerEntries.length);
+          return;
+        }
+        for (let i = ledgerEntries.length - 1; i >= 0; i--) {
+          const e = ledgerEntries[i] as any;
+          if (where.entityId !== undefined && e.entityId !== where.entityId) continue;
+          if (where.eventType !== undefined && e.eventType !== where.eventType) continue;
+          if (where.financialEventId?.not !== undefined && e.financialEventId === where.financialEventId.not) continue;
+          ledgerEntries.splice(i, 1);
+        }
       },
       create: async ({ data }: { data: any }) => {
         ledgerEntries.push({ ...data });
@@ -94,6 +108,38 @@ async function run() {
 
     assert.equal(ledgerEntries.length, 1, "duplicate projection must not create duplicate rows");
     assert.equal(ledgerEntries[0].financialEventId, "evt-dup");
+  }
+
+  {
+    // FULL73: an approved correction APPENDS a new SALE_CREATED event for the
+    // same sale (history immutable); the projection supersedes the original
+    // event's row. Rebuild replays in createdAt order, so the latest event's
+    // projection is the one that survives.
+    const original = makeSaleEvent("evt-orig", "sale-sup", "2026-06-26T10:00:00.000Z", 150);
+    const correctionBase = makeSaleEvent("evt-corr", "sale-sup", "2026-06-27T10:00:00.000Z", 120);
+    // FULL73R: production correction events carry the supersedes marker.
+    const correction = { ...correctionBase, payload: { ...correctionBase.payload, supersedesEventId: "evt-orig" } };
+    const { tx, ledgerEntries } = createMockTx([original, correction]);
+
+    await rebuildLedger(tx);
+    assert.equal(ledgerEntries.length, 1, "correction projection supersedes the original row");
+    assert.equal(ledgerEntries[0].financialEventId, "evt-corr");
+    assert.equal(ledgerEntries[0].totalAmount, 120);
+  }
+
+  {
+    // FULL73R (QA tie finding): identical createdAt on both revisions, and
+    // the correction replaying FIRST. The supersedesEventId marker - not the
+    // clock, eventId ordering or insertion order - decides the survivor.
+    const original = makeSaleEvent("evt-orig2", "sale-sup2", "2026-06-26T10:00:00.000Z", 150);
+    const correctionBase = makeSaleEvent("evt-corr2", "sale-sup2", "2026-06-26T10:00:00.000Z", 120);
+    const correction = { ...correctionBase, payload: { ...correctionBase.payload, supersedesEventId: "evt-orig2" } };
+    const { tx, ledgerEntries } = createMockTx([correction, original]);
+
+    await rebuildLedger(tx);
+    assert.equal(ledgerEntries.length, 1, "tie + reversed replay must still yield one row");
+    assert.equal(ledgerEntries[0].financialEventId, "evt-corr2", "marker decides, never UUID order");
+    assert.equal(ledgerEntries[0].totalAmount, 120);
   }
 
   {

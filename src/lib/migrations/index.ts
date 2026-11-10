@@ -6,6 +6,9 @@ import repairWeighbridge from "./definitions/002_repair_weighbridge_columns";
 import legacyColumns from "./definitions/003_ensure_legacy_columns";
 import backfillTimestamps from "./definitions/004_backfill_timestamps";
 import outboxFoundation from "./definitions/005_outbox_foundation";
+import workerIdentity from "./definitions/006_worker_identity";
+import changeRequests from "./definitions/007_change_requests";
+import changeRequestFingerprint from "./definitions/008_change_request_fingerprint";
 
 // ---------------------------------------------------------------------------
 // Migration Registry
@@ -25,7 +28,10 @@ export const ALL_MIGRATIONS: Migration[] = [
   repairWeighbridge,  // v2: Fix weighbridge_tickets ticketType → ticket_type
   legacyColumns,      // v3: Add all columns from ensureSQLiteColumn + migrate.js
   backfillTimestamps, // v4: Set NULL updated_at to CURRENT_TIMESTAMP
-  outboxFoundation,   // v5: Add device identity and durable outbox
+  outboxFoundation, // v5: Add device identity and durable outbox
+  workerIdentity,   // v6: Local-only worker identity, sessions and app meta
+  changeRequests,   // v7: Local-only edit/delete change request trail
+  changeRequestFingerprint, // v8: Additive record-context fingerprint column
 ];
 
 export { runMigrations } from "./runner";

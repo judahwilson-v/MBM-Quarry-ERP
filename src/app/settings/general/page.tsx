@@ -1,4 +1,4 @@
-import { getGlobalSettings } from "@/app/actions/settings";
+import { getPublicSettings } from "@/app/actions/settings";
 import { SettingsForm } from "./settings-form";
 import { AuditLogManager } from "./audit-log-manager";
 import { SystemDiagnostics } from "./system-diagnostics";
@@ -10,7 +10,7 @@ import path from "path";
 export const dynamic = 'force-dynamic';
 
 export default async function SettingsPage() {
-  const settings = await getGlobalSettings();
+  const settings = await getPublicSettings();
   
   let appVersion = process.env.NEXT_PUBLIC_APP_VERSION;
   

@@ -72,6 +72,8 @@ export async function saveDayBookExpense(input: any) {
     await runTx(async (tx: Prisma.TransactionClient) => addDayBookExpense(tx, {
       businessDate: input.businessDate,
       expenseType: input.expenseType,
+      sourceKind: "MANUAL_CASH",
+      paymentMode: "CASH",
       amount,
       description: input.description,
     })),

@@ -13,7 +13,7 @@ type AuditInput = {
 type AuditClient = Pick<PrismaClient, "auditLog"> | Prisma.TransactionClient;
 
 export async function writeAuditEvent(db: AuditClient, input: AuditInput) {
-  await db.auditLog.create({
+  return db.auditLog.create({
     data: {
       entityName: input.entityName,
       entityId: input.entityId,

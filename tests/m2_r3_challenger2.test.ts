@@ -101,7 +101,7 @@ async function runChallenger2Verification() {
     
     // Create a ticket
     const createRes = await createWeighbridgeTicket({
-      vehicleNumber: "TEST-KA-04-XYZ-1234",
+      vehicleNumber: "TEST-ZZQATEST0007",
       weight: 12000,
       ticketType: "OUTGOING"
     });
@@ -144,7 +144,7 @@ async function runChallenger2Verification() {
     console.log("\nTest 5: Ticket Complete Lifecycle (Create -> Complete -> Attempt Void/Complete again)...");
     
     const createRes = await createWeighbridgeTicket({
-      vehicleNumber: "TEST-KA-05-ABC-5678",
+      vehicleNumber: "TEST-ZZQATEST0008",
       weight: 10000,
       ticketType: "OUTGOING"
     });

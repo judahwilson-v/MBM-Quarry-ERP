@@ -10,7 +10,7 @@ import { writeAuditEvent } from "@/lib/domain";
 import { addDayBookExpense, recalculateDayBook, getOrCreateDayBook } from "@/lib/domain/daybook";
 import { recalculatePartyLedger } from "@/lib/domain/ledger/party-ledger-service";
 import { txAdjustInventoryStock } from "@/lib/domain/inventory/service";
-import { verifyEditPassword } from "@/app/actions/auth";
+import { verifyEditPassword, requireActor } from "@/app/actions/auth";
 import { validateWithSchema, IncomingBoulderInputSchema, DeleteIncomingBoulderSchema } from "@/lib/validators/schemas";
 import { sanitizeError } from "@/lib/utils/sanitize-error";
 
@@ -44,65 +44,77 @@ function cleanText(value?: string | null) {
 function parseDateInput(value?: string | Date | null) {
   if (!value) return new Date();
   if (value instanceof Date) return value;
-  const date = new Date(`${value}T00:00:00`);
-  if (Number.isNaN(date.getTime())) throw new Error("Date is invalid.");
-  return date;
+  const text = value.trim();
+  // Exactly two accepted input shapes, no input expansion over baseline:
+  // - A date-only label ("2026-11-10") is a business date chosen by the user:
+  //   canonical local-midnight write, unchanged.
+  // - A timezone-qualified serialized datetime ("2026-11-09T18:30:00.000Z",
+  //   offset forms included) is an exact instant - typically a stored Date
+  //   resent by an inline editor that did not change the date - preserved
+  //   as-is on any host, never reduced to a host-local day.
+  // Timezone-less datetimes, partial strings and bare numbers keep the
+  // baseline rejection: no new date policy.
+  if (/^\d{4}-\d{2}-\d{2}$/.test(text)) {
+    const date = new Date(`${text}T00:00:00`);
+    if (Number.isNaN(date.getTime())) throw new Error("Date is invalid.");
+    return date;
+  }
+  if (/^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}(\.\d{1,3})?(Z|[+-]\d{2}:?\d{2})$/.test(text)) {
+    const instant = new Date(text);
+    if (Number.isNaN(instant.getTime())) throw new Error("Date is invalid.");
+    return instant;
+  }
+  throw new Error("Date is invalid.");
 }
-
 function containsSearch(row: Record<string, unknown>, search?: string) {
   const query = search?.trim().toLowerCase();
   if (!query) return true;
   return Object.values(row).some((value) => String(value ?? "").toLowerCase().includes(query));
 }
 
-async function upsertPartyByName(partyName: string) {
-  const db = await getDb();
+// F08(a): master upserts run inside the caller's business transaction so a
+// failed sale/purchase never leaves a committed orphan Party/Vehicle row.
+async function upsertPartyByName(tx: Prisma.TransactionClient, partyName: string) {
   const name = partyName.trim();
   if (!name) return;
-  const existing = await db.party.findFirst({
+  const existing = await tx.party.findFirst({
     where: { partyName: { equals: name } },
     select: { id: true },
   });
   if (!existing) {
-    return await runTx(async (tx) => {
-      const row = await tx.party.create({ data: { partyName: name } });
-      try {
-        await writeAuditEvent(tx, { entityName: "Party", entityId: row.id, action: "create", role: "system", after: row });
-      } catch (e) {
-        console.warn("Failed to write audit event for party upsert:", e);
-      }
-      return row;
-    });
+    const row = await tx.party.create({ data: { partyName: name } });
+    try {
+      await writeAuditEvent(tx, { entityName: "Party", entityId: row.id, action: "create", role: "system", after: row });
+    } catch (e) {
+      console.warn("Failed to write audit event for party upsert:", e);
+    }
+    return row;
   }
   return existing;
 }
 
-async function upsertVehicleByNumber(vehicleNumber: string, partyName?: string, partyId?: string | null, qty?: number | null) {
-  const db = await getDb();
+async function upsertVehicleByNumber(tx: Prisma.TransactionClient, vehicleNumber: string, partyName?: string, partyId?: string | null, qty?: number | null) {
   const normalized = normalizeVehicleNumber(vehicleNumber);
   if (!normalized) return null;
 
-  let existing = await db.vehicle.findUnique({
+  let existing = await tx.vehicle.findUnique({
     where: { vehicleNumber: normalized },
   });
 
   if (!existing) {
-    existing = await runTx(async (tx) => {
-      const row = await tx.vehicle.create({
-        data: {
-          vehicleNumber: normalized,
-          partyName: partyName || null,
-          partyId: partyId || null,
-          companyBodyQty: qty || null,
-        },
-      });
-      try {
-        await writeAuditEvent(tx, { entityName: "Vehicle", entityId: row.id, action: "create", role: "system", after: row });
-      } catch (e) {
-        console.warn("Failed to write audit event for vehicle create:", e);
-      }
-      return row;
+    existing = await tx.vehicle.create({
+      data: {
+        vehicleNumber: normalized,
+        partyName: partyName || null,
+        partyId: partyId || null,
+        companyBodyQty: qty || null,
+      },
     });
+    try {
+      await writeAuditEvent(tx, { entityName: "Vehicle", entityId: existing.id, action: "create", role: "system", after: existing });
+    } catch (e) {
+      console.warn("Failed to write audit event for vehicle create:", e);
+    }
   } else {
     const updateData: any = {};
     if (partyName && !existing.partyName) updateData.partyName = partyName;
@@ -110,19 +122,16 @@ async function upsertVehicleByNumber(vehicleNumber: string, partyName?: string, 
     if (qty && !existing.companyBodyQty && !existing.extraBodyQty) updateData.companyBodyQty = qty;
 
     if (Object.keys(updateData).length > 0) {
-      existing = await runTx(async (tx) => {
-        const before = existing;
-        const row = await tx.vehicle.update({
-          where: { id: existing!.id },
-          data: updateData,
-        });
-        try {
-          await writeAuditEvent(tx, { entityName: "Vehicle", entityId: row.id, action: "update", role: "system", before, after: row });
-        } catch (e) {
-          console.warn("Failed to write audit event for vehicle update:", e);
-        }
-        return row;
+      const before = existing;
+      existing = await tx.vehicle.update({
+        where: { id: existing.id },
+        data: updateData,
       });
+      try {
+        await writeAuditEvent(tx, { entityName: "Vehicle", entityId: existing.id, action: "update", role: "system", before, after: existing });
+      } catch (e) {
+        console.warn("Failed to write audit event for vehicle update:", e);
+      }
     }
   }
 
@@ -147,8 +156,13 @@ export async function listIncomingBoulder(search = "") {
 }
 
 
-export async function saveIncomingBoulder(input: IncomingBoulderInput, pin?: string) {
+export async function saveIncomingBoulder(input: IncomingBoulderInput, pin?: string, sessionToken?: string) {
   try {
+    // Fail closed BEFORE any transactional work: once enrollment is complete a
+    // valid session is mandatory, and the refusal returns as a normal failure
+    // instead of an uncaught throw.
+    const actor = await requireActor(sessionToken);
+    const actorName = actor?.name ?? "system";
     const validated = validateWithSchema(IncomingBoulderInputSchema, input);
     const qty = validated.qty;
     const rockRate = validated.rockRate ?? 26;
@@ -186,20 +200,9 @@ export async function saveIncomingBoulder(input: IncomingBoulderInput, pin?: str
     const normalizedVehicle = normalizeVehicleNumber(cleanText(validated.vehicleNumber) ?? "");
     const partyName = cleanText(validated.partyName) ?? "";
     
-    let partyId = null;
-    if (partyName) {
-      const party = await upsertPartyByName(partyName);
-      partyId = party?.id || null;
-    }
-    
-    const vehicle = await upsertVehicleByNumber(normalizedVehicle, partyName, partyId, qty);
-    const vehicleId = vehicle?.id || null;
-
-    data.vehicleNumber = normalizedVehicle;
-    data.partyName = partyName;
-    
-    const finalData = { ...data, partyId, vehicleId };
-
+    // F08(a): an edit attempt is authorized BEFORE any committed master,
+    // financial, or audit write (previously the party/vehicle upserts ran
+    // and committed before this PIN check).
     if (validated.id) {
       if (!pin) {
         throw new Error("Admin PIN is required to edit records.");
@@ -208,10 +211,26 @@ export async function saveIncomingBoulder(input: IncomingBoulderInput, pin?: str
       if (!isAuth) {
         throw new Error("Invalid Admin PIN");
       }
-      return serialize(await runTx(async (tx) => {
+    }
+
+    data.vehicleNumber = normalizedVehicle;
+    data.partyName = partyName;
+
+    return serialize(await runTx(async (tx) => {
+      // F08(a): master upserts inside the business transaction, so a failed
+      // purchase never leaves a committed orphan Party/Vehicle row.
+      let partyId = null;
+      if (partyName) {
+        const party = await upsertPartyByName(tx, partyName);
+        partyId = party?.id || null;
+      }
+      const vehicle = await upsertVehicleByNumber(tx, normalizedVehicle, partyName, partyId, qty);
+      const finalData = { ...data, partyId, vehicleId: vehicle?.id || null };
+
+      if (validated.id) {
         const before = await tx.incomingBoulder.findUnique({ where: { id: validated.id! } });
         const row = await tx.incomingBoulder.update({ where: { id: validated.id! }, data: finalData });
-        await writeAuditEvent(tx, { entityName: "IncomingBoulder", entityId: row.id, action: "update", role: "system", before, after: row });
+        await writeAuditEvent(tx, { entityName: "IncomingBoulder", entityId: row.id, action: "update", role: actorName, before, after: row });
         
         if (row.partyId) await recalculatePartyLedger(tx, row.partyId);
 
@@ -220,6 +239,9 @@ export async function saveIncomingBoulder(input: IncomingBoulderInput, pin?: str
           await addDayBookExpense(tx, {
             businessDate: data.date.toISOString(),
             expenseType: "MISCELLANEOUS",
+            sourceKind: "BOULDER_IMMEDIATE",
+            sourceEntityId: row.id,
+            paymentBreakdown: { cashPaid: data.cashPaid, bankPaid: data.bankPaid, gPayPaid: data.gPayPaid },
             amount: data.paidTotal,
             description: `Paid for Boulder Purchase (${row.vehicleNumber}) - ${data.partyName}`
           });
@@ -232,11 +254,9 @@ export async function saveIncomingBoulder(input: IncomingBoulderInput, pin?: str
         }
 
         return row;
-      }));
-    }
-    return serialize(await runTx(async (tx) => {
+      }
       const row = await tx.incomingBoulder.create({ data: finalData });
-      await writeAuditEvent(tx, { entityName: "IncomingBoulder", entityId: row.id, action: "create", role: "system", after: row });
+      await writeAuditEvent(tx, { entityName: "IncomingBoulder", entityId: row.id, action: "create", role: actorName, after: row });
       
       if (row.partyId) await recalculatePartyLedger(tx, row.partyId);
 
@@ -245,6 +265,9 @@ export async function saveIncomingBoulder(input: IncomingBoulderInput, pin?: str
         await addDayBookExpense(tx, {
           businessDate: data.date.toISOString(),
           expenseType: "MISCELLANEOUS",
+            sourceKind: "BOULDER_IMMEDIATE",
+            sourceEntityId: row.id,
+            paymentBreakdown: { cashPaid: data.cashPaid, bankPaid: data.bankPaid, gPayPaid: data.gPayPaid },
           amount: data.paidTotal,
           description: `Paid for Boulder Purchase (${row.vehicleNumber}) - ${data.partyName}`
         });
@@ -261,8 +284,13 @@ export async function saveIncomingBoulder(input: IncomingBoulderInput, pin?: str
 }
 
 
-export async function deleteIncomingBoulder(id: string, pin?: string) {
+export async function deleteIncomingBoulder(id: string, pin?: string, sessionToken?: string) {
   try {
+    // Fail closed BEFORE any transactional work: once enrollment is complete a
+    // valid session is mandatory, and the refusal returns as a normal failure
+    // instead of an uncaught throw.
+    const actor = await requireActor(sessionToken);
+    const actorName = actor?.name ?? "system";
     validateWithSchema(DeleteIncomingBoulderSchema, { id, pin });
     if (!pin) {
       throw new Error("Admin/Delete PIN is required to delete records.");
@@ -278,7 +306,7 @@ export async function deleteIncomingBoulder(id: string, pin?: string) {
         await tx.incomingBoulder.delete({ where: { id } });
         
         try {
-          await writeAuditEvent(tx, { entityName: "IncomingBoulder", entityId: id, action: "delete", role: "system", before });
+          await writeAuditEvent(tx, { entityName: "IncomingBoulder", entityId: id, action: "delete", role: actorName, before });
         } catch {
           console.warn(`[Audit Log Warning] Failed to write audit event for IncomingBoulder deletion (ID: ${id})`);
         }

@@ -5,6 +5,7 @@ import { Button } from "@/components/ui/button";
 import { RefreshCw, HardDrive, FileText, Loader2, Database } from "lucide-react";
 import { useToast } from "@/components/ui/use-toast";
 import { initializeSupabaseSchema } from "@/app/actions/setup-supabase";
+import { getSessionToken } from "@/lib/session-client";
 
 export function SystemDiagnostics({ 
   appVersion, 
@@ -145,7 +146,7 @@ export function SystemDiagnostics({
     setIsInitializing(true);
     setUpdateStatus("Initializing cloud schema...");
     try {
-      const result = await initializeSupabaseSchema();
+      const result = await initializeSupabaseSchema(getSessionToken());
       if (result.success) {
         toast({
           title: "Success",

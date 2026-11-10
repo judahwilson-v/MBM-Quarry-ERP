@@ -1,3 +1,4 @@
+import { omitCredentialFields } from "./credential-hygiene";
 import { randomUUID } from "crypto";
 import { Prisma, type PrismaClient } from "@prisma/client";
 import { getDb } from "@/lib/prisma";
@@ -30,7 +31,7 @@ function serializeOutboxPayload(entityType: SyncModelName, payload: unknown): st
   const mapping = SYNC_MAP[entityType] as Record<string, string> | undefined;
   if (!mapping) throw new Error(`Missing column mapping for outbox entity type: ${entityType}`);
   const converted: Record<string, unknown> = {};
-  for (const [key, value] of Object.entries(payload as Record<string, unknown>)) {
+  for (const [key, value] of Object.entries(omitCredentialFields(payload) as Record<string, unknown>)) {
     if (!scalarFields.has(key)) throw new Error(`Outbox payload for ${entityType} contains unsupported field: ${key}`);
     converted[mapping[key] ?? key] = value;
   }
@@ -117,7 +118,7 @@ export async function deliverPendingOutbox(
       attempted++;
       await db.syncOutboxEvent.update({ where: { id: event.id }, data: { status: "SENDING", lastError: null } });
       try {
-        const payload = JSON.parse(event.payload) as Record<string, unknown>;
+        const payload = omitCredentialFields(JSON.parse(event.payload)) as Record<string, unknown>;
         if (payload.id !== event.entityId) throw new Error("Outbox payload ID does not match its entity ID.");
         const { error } = await remote.rpc("apply_outbox_event", {
           p_event_id: event.eventId,

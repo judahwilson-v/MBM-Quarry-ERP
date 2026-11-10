@@ -11,6 +11,11 @@ export type FinancialEventEntityType = "Sale" | "DayBookExpense" | "PartyCollect
   | "PartyPayment" | "Expense";
 
 export type SaleFinancialEventPayload = {
+  // FULL73R: set only on a correction event - the eventId of the revision it
+  // supersedes. Absent/null on the original sale event. Replay, rebuild and
+  // sync use this marker, never clock or insertion order, to pick the current
+  // revision.
+  supersedesEventId?: string | null;
   saleId: string;
   bookNumber: number | null;
   pageNumber: number | null;
@@ -47,6 +52,10 @@ export type DayBookExpensePayload = {
   dayBookId: string;
   businessDate: string;
   expenseType: "DIESEL" | "LABOUR" | "REPAIRS" | "LOADING" | "MISCELLANEOUS";
+  sourceKind?: "MANUAL_CASH" | "BOULDER_IMMEDIATE";
+  sourceEntityId?: string;
+  paymentMode?: "CASH";
+  paymentBreakdown?: { cashPaid: number; bankPaid: number; gPayPaid: number };
   amount: number;
   description: string | null;
 };

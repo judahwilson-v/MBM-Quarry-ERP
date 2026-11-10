@@ -16,7 +16,7 @@ const models = Prisma.dmmf.datamodel.models;
 // ---------------------------------------------------------------------------
 // Constants
 // ---------------------------------------------------------------------------
-const EXCLUDED_MODELS = ['SyncState'];
+const EXCLUDED_MODELS = ['SyncState', 'AppUser', 'AuthSession', 'AppMeta', 'ChangeRequest']; // identity/credential/session/request-trail tables are local-only
 
 const TYPE_MAP = {
   String: 'TEXT',

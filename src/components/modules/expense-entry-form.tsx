@@ -12,12 +12,14 @@ import { Textarea } from "@/components/ui/textarea";
 import { listParties } from "@/app/actions/parties";
 import { listVehicles } from "@/app/actions/vehicles";
 import { saveExpense } from "@/app/actions/expenses";
+import { getSessionToken } from "@/lib/session-client";
 import { verifyEditPassword } from "@/app/actions/auth";
 import { todayInputValue } from "@/lib/utils";
 
 export type EditableExpense = {
   id: string;
   expenseDate: string;
+  businessDateLabel?: string | null;
   expenseType: string;
   amount: number;
   paymentMode: string;
@@ -93,7 +95,7 @@ export function ExpenseEntryForm({
     }
     setForm({
       id: editingExpense.id,
-      expenseDate: new Date(editingExpense.expenseDate).toISOString().split("T")[0],
+      expenseDate: editingExpense.businessDateLabel ?? "",
       expenseType: editingExpense.expenseType,
       amount: String(editingExpense.amount),
       paymentMode: editingExpense.paymentMode,
@@ -104,7 +106,7 @@ export function ExpenseEntryForm({
       description: editingExpense.description ?? "",
     });
     setMessage("");
-    setError("");
+    setError(editingExpense.businessDateLabel ? "" : "This expense has no clear saved business date. Choose the correct date before saving.");
   }, [editingExpense]);
 
   function updateForm<K extends keyof ExpenseForm>(key: K, value: ExpenseForm[K]) {
@@ -131,18 +133,24 @@ export function ExpenseEntryForm({
 
   async function submit(e: React.FormEvent) {
     e.preventDefault();
+    if (!form.expenseDate) {
+      setError("Choose the expense date before saving.");
+      return;
+    }
+    let editPassword: string | undefined;
     if (editingExpense) {
       const password = await promptPassword("Enter edit password to save changes:");
       if (!password || !(await verifyEditPassword(password))) {
         setError("Edit password is invalid.");
         return;
       }
+      editPassword = password;
     }
     setError("");
     setMessage("");
     setLoading(true);
     try {
-      const res = await saveExpense(form);
+      const res = await saveExpense(form, editPassword, getSessionToken() ?? undefined);
       if (res.success) {
         setMessage(editingExpense ? "Expense updated successfully." : "Expense saved successfully.");
         setForm(blankForm());
@@ -186,6 +194,9 @@ export function ExpenseEntryForm({
                 onChange={(e) => updateForm("expenseType", e.target.value)}
                 required
               >
+                {!["DIESEL", "GREASE_OIL", "HOUSE_EXPENSE", "LOCAL_EXPENSE", "KSEB_BILL", "PHONE_BILL", "LABOUR", "REPAIRS", "LOADING", "MISCELLANEOUS"].includes(form.expenseType) && (
+                  <option value={form.expenseType}>{form.expenseType} (saved type)</option>
+                )}
                 <option value="DIESEL">Diesel</option>
                 <option value="GREASE_OIL">Grease Oil</option>
                 <option value="HOUSE_EXPENSE">House Expense</option>

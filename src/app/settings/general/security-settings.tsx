@@ -7,6 +7,7 @@ import { Input } from "@/components/ui/input";
 import { useToast } from "@/components/ui/use-toast";
 import { Lock, ShieldAlert, KeyRound } from "lucide-react";
 import { updateGlobalSettings } from "@/app/actions/settings";
+import { getSessionToken } from "@/lib/session-client";
 
 const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL || "";
 const supabaseKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY || "";
@@ -19,8 +20,9 @@ export function SecuritySettings({ initialSettings }: { initialSettings: any }) 
   const [isLoading, setIsLoading] = useState(false);
   
   const [authError, setAuthError] = useState("");
-  const [adminPin, setAdminPin] = useState(initialSettings?.adminPin || "8888");
-  const [deletePin, setDeletePin] = useState(initialSettings?.deletePin || "7711");
+  const [currentAdminPin, setCurrentAdminPin] = useState("");
+  const [adminPin, setAdminPin] = useState("");
+  const [deletePin, setDeletePin] = useState("");
   const [isSaving, setIsSaving] = useState(false);
   const { toast } = useToast();
 
@@ -60,13 +62,17 @@ export function SecuritySettings({ initialSettings }: { initialSettings: any }) 
 
   const handleSavePins = async (e: React.FormEvent) => {
     e.preventDefault();
+    if (adminPin.length < 4 || deletePin.length < 4) {
+      toast({ title: "PINs Required", description: "Enter both new PINs (at least 4 digits). Current values are never displayed.", variant: "destructive" });
+      return;
+    }
     setIsSaving(true);
     
     const res = await updateGlobalSettings({
       ...initialSettings,
       adminPin,
       deletePin
-    });
+    }, currentAdminPin || undefined, getSessionToken() ?? undefined);
     
     setIsSaving(false);
     
@@ -157,6 +163,24 @@ export function SecuritySettings({ initialSettings }: { initialSettings: any }) 
             <p className="text-xs text-muted-foreground">Used to access the /admin page.</p>
           </div>
           
+          <div className="space-y-2 pt-2">
+            <label htmlFor="currentAdminPin" className="text-sm font-medium flex items-center">
+              <KeyRound className="w-4 h-4 mr-2 text-muted-foreground"/>
+              Current Admin PIN (required to change PINs)
+            </label>
+            <Input
+              id="currentAdminPin"
+              aria-label="Current Admin PIN"
+              type="password"
+              value={currentAdminPin}
+              onChange={(e) => setCurrentAdminPin(e.target.value)}
+              maxLength={10}
+              className="font-mono text-lg tracking-widest"
+              required
+            />
+            <p className="text-xs text-muted-foreground">Changing PINs now requires the current admin PIN.</p>
+          </div>
+
           <div className="space-y-2 pt-2">
             <label htmlFor="deletePin" className="text-sm font-medium flex items-center">
               <KeyRound className="w-4 h-4 mr-2 text-muted-foreground"/>

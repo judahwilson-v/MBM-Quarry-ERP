@@ -12,6 +12,8 @@ import { verifyEditPassword } from "@/app/actions/auth";
 import { formatCurrency } from "@/lib/utils";
 import { exportToExcel } from "@/lib/export";
 import { SearchableSelect } from "@/components/ui/searchable-select";
+import { dateInputValue } from "@/lib/date-label";
+import { getSessionToken } from "@/lib/session-client";
 
 interface FuelPurchaseRow {
   id: string;
@@ -42,8 +44,7 @@ function todayInputValue() {
 
 function dateInput(value: string | Date) {
   if (!value) return todayInputValue();
-  const iso = value instanceof Date ? value.toISOString() : String(value);
-  return iso.split("T")[0];
+  return dateInputValue(value);
 }
 
 function blankForm() {
@@ -110,8 +111,17 @@ export function FuelManagementPage() {
     setMessage("");
     try {
       if (!form.amount) throw new Error("Amount is required");
-      
-      await saveFuelPurchase(form);
+      let pin: string | undefined;
+      if (form.id) {
+        const password = prompt("Enter edit PIN:");
+        if (!password) return;
+        if (!(await verifyEditPassword(password, "edit"))) {
+          setError("❌ Incorrect Edit PIN. Edit cancelled.");
+          return;
+        }
+        pin = password;
+      }
+      await saveFuelPurchase(form, pin, getSessionToken() ?? undefined);
       setMessage("Fuel purchase saved successfully!");
       setForm(blankForm());
       setIsEditing(false);
@@ -132,7 +142,7 @@ export function FuelManagementPage() {
     }
     setError("");
     try {
-      const res = await deleteFuelPurchase(id, password);
+      const res = await deleteFuelPurchase(id, password, getSessionToken() ?? undefined);
       if (res && "error" in res) {
         setError(res.error || "Delete failed.");
         return;
@@ -202,7 +212,7 @@ export function FuelManagementPage() {
       </div>
 
       <div className="grid gap-6 md:grid-cols-3">
-        <Card className="md:col-span-1 h-fit">
+        <Card className="md:col-span-1 h-fit min-w-0">
           <CardHeader>
             <CardTitle>{isEditing ? "Edit Fuel Purchase" : "New Fuel Purchase"}</CardTitle>
           </CardHeader>
@@ -281,7 +291,7 @@ export function FuelManagementPage() {
           </CardContent>
         </Card>
 
-        <Card className="md:col-span-2">
+        <Card className="md:col-span-2 min-w-0">
           <CardHeader className="flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between pb-2">
             <CardTitle>Recent Fuel Purchases</CardTitle>
             <div className="flex w-full sm:w-auto gap-2 items-center">
@@ -298,12 +308,12 @@ export function FuelManagementPage() {
           <CardContent>
             <div className="rounded-md border">
               <div className="overflow-x-auto overflow-y-auto max-h-[calc(100vh-[350px])] sm:max-h-[60vh]">
-                <table className="w-full text-sm">
+                <table className="w-full min-w-[900px] table-fixed text-sm">
                   <thead className="sticky top-0 z-10 shadow-sm print:relative print:shadow-none print:z-0">
-                    <tr className="border-b bg-muted/50 text-left font-medium text-muted-foreground">
-                      <th className="p-4 sm:sticky sm:left-0 z-20 bg-muted/50 w-[110px] min-w-[110px] max-w-[110px] print:static print:w-auto">Date</th>
-                      <th className="p-4 sm:sticky sm:left-[110px] z-20 bg-muted/50 w-[100px] min-w-[100px] max-w-[100px] print:static print:w-auto">Type</th>
-                      <th className="p-4 sm:sticky sm:left-[210px] z-20 bg-muted/50 w-[140px] min-w-[140px] max-w-[140px] print:static print:w-auto sm:border-r border-border">Target</th>
+                    <tr className="border-b bg-muted text-left font-medium text-muted-foreground">
+                      <th className="p-4 sm:sticky sm:left-0 z-20 bg-muted w-[110px] min-w-[110px] max-w-[110px] print:static print:w-auto">Date</th>
+                      <th className="p-4 sm:sticky sm:left-[110px] z-20 bg-muted w-[100px] min-w-[100px] max-w-[100px] print:static print:w-auto">Type</th>
+                      <th className="p-4 sm:sticky sm:left-[210px] z-20 bg-muted w-[140px] min-w-[140px] max-w-[140px] print:static print:w-auto sm:border-r border-border">Target</th>
                       <th className="p-4 text-right">Qty/Price</th>
                       <th className="p-4 text-right">Amount</th>
                       <th className="p-4 text-right">Paid</th>

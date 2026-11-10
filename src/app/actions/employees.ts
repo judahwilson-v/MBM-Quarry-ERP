@@ -8,7 +8,7 @@ import { triggerAutoSync } from "@/lib/sync/auto-sync";
 import { enqueueOutboxEvent } from "@/lib/sync/outbox";
 import { writeAuditEvent } from "@/lib/domain";
 import { emitFinancialEvent } from "@/lib/domain/financial-events";
-import { projectDayBookExpense, recalculateDayBook } from "@/lib/domain/daybook";
+import { projectDayBookExpense, recalculateDayBook, getOrCreateDayBook } from "@/lib/domain/daybook";
 import { verifyEditPassword } from "@/app/actions/auth";
 import { sanitizeError } from "@/lib/utils/sanitize-error";
 
@@ -216,7 +216,15 @@ export async function saveEmployeeLedgerEntry(input: EmployeeLedgerInput) {
   const amount = parseNumber(input.amount, "Amount") || 0;
   const cashPaid = parseNumber(input.cashPaid, "Cash Paid", false) || 0;
   const date = parseDateInput(input.date);
-  
+  // A Day Book key is a date label at UTC midnight, not a local timestamp.
+  // Keep the employee/expense timestamp unchanged; never round-trip it through UTC
+  // to discover the label, which moves IST midnight into the previous date.
+  const businessDay = new Date(`${input.date}T00:00:00.000Z`);
+  if (!/^\d{4}-\d{2}-\d{2}$/.test(input.date) ||
+      Number.isNaN(businessDay.getTime()) || businessDay.toISOString().slice(0, 10) !== input.date) {
+    throw new Error("Date is invalid.");
+  }
+
   return serialize(await runTx(async (tx) => {
     const employee = await tx.employee.findUnique({ where: { id: input.employeeId } });
     if (!employee) throw new Error("Employee not found");
@@ -260,24 +268,7 @@ export async function saveEmployeeLedgerEntry(input: EmployeeLedgerInput) {
         payload: { ...expense, expenseDate: date.toISOString() }
       });
 
-      const businessDateStr = date.toISOString().split("T")[0];
-      const day = new Date(`${businessDateStr}T00:00:00`);
-      let dayBook = await tx.dayBook.findUnique({ where: { businessDate: day } });
-      if (!dayBook) {
-        dayBook = await tx.dayBook.create({
-          data: {
-            businessDate: day,
-            openingCashBalance: 0,
-            openingBankBalance: 0,
-            cashSalesTotal: 0,
-            bankSalesTotal: 0,
-            gPaySalesTotal: 0,
-            expenseTotal: 0,
-            closingCashBalance: 0,
-            closingBankBalance: 0,
-          },
-        });
-      }
+      const dayBook = await getOrCreateDayBook(tx, input.date);
 
       const projected = projectDayBookExpense(financialEvent, dayBook.id);
       await tx.dayBookExpenseEntry.upsert({
@@ -295,11 +286,21 @@ export async function saveEmployeeLedgerEntry(input: EmployeeLedgerInput) {
 
 export async function getEmployeeLedger(employeeId: string) {
   const db = await getDb();
-  const rows = await db.employeeLedger.findMany({
-    where: { employeeId },
-    orderBy: [{ date: 'asc' }, { id: 'asc' }]
+  return db.$transaction(async (tx) => {
+    const employee = await tx.employee.findUnique({ where: { id: employeeId } });
+    const rows = await tx.employeeLedger.findMany({
+      where: { employeeId },
+      orderBy: [{ date: 'asc' }, { id: 'asc' }]
+    });
+    // Persisted row.balance is an insertion-time snapshot. Backdated rows make
+    // those snapshots unsuitable for a chronological statement. Derive the
+    // read model instead, preserving any balance not represented by these rows.
+    // Read both sources in one transaction and do not rewrite history or totals.
+    const delta = (row: typeof rows[number]) => row.type === 'SALARY' ? row.amount : -row.amount;
+    let balance = (employee?.balance ?? 0) - rows.reduce((sum, row) => sum + delta(row), 0);
+    return serialize(rows.map((row) => {
+      balance += delta(row);
+      return { ...row, balance };
+    }));
   });
-  return serialize(rows);
 }
-
-

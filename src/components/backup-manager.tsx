@@ -2,6 +2,7 @@
 
 import { useState, useEffect } from "react";
 import { createLocalBackup, listLocalBackups, restoreLocalBackup } from "@/app/actions/database";
+import { getSessionToken } from "@/lib/session-client";
 import { useRouter } from "next/navigation";
 import { Button } from "@/components/ui/button";
 import { Save, Upload, Download, RotateCcw, AlertTriangle } from "lucide-react";
@@ -17,14 +18,14 @@ export function BackupManager() {
   }, []);
 
   async function loadBackups() {
-    const list = await listLocalBackups();
+    const list = await listLocalBackups(getSessionToken());
     setBackups(list);
   }
 
   async function handleBackup() {
     setIsLoading(true);
     setMessage(null);
-    const result = await createLocalBackup();
+    const result = await createLocalBackup(getSessionToken());
     setMessage({ text: result.message, type: result.success ? "success" : "error" });
     if (result.success) await loadBackups();
     setIsLoading(false);
@@ -34,7 +35,7 @@ export function BackupManager() {
     if (!confirm(`Are you sure you want to restore ${filename}? Current database will be overwritten.`)) return;
     setIsLoading(true);
     setMessage(null);
-    const result = await restoreLocalBackup(filename);
+    const result = await restoreLocalBackup(filename, getSessionToken());
     setMessage({ text: result.message, type: result.success ? "success" : "error" });
     if (result.success) {
       alert("Database restored successfully. The application will now reload.");
@@ -56,6 +57,7 @@ export function BackupManager() {
     try {
       const res = await fetch("/api/database/import", {
         method: "POST",
+        headers: { Authorization: `Bearer ${getSessionToken() ?? ""}` },
         body: formData,
       });
       const data = await res.json();
@@ -71,6 +73,38 @@ export function BackupManager() {
     } finally {
       setIsLoading(false);
       e.target.value = ""; // Reset input
+    }
+  }
+
+  async function handleExport() {
+    setIsLoading(true);
+    setMessage(null);
+    try {
+      const res = await fetch("/api/database/export", {
+        headers: { Authorization: `Bearer ${getSessionToken() ?? ""}` },
+      });
+      if (!res.ok) {
+        let text = "Export failed";
+        try {
+          const data = await res.json();
+          if (data?.message) text = data.message;
+        } catch {
+          // non-JSON error body
+        }
+        setMessage({ text, type: "error" });
+        return;
+      }
+      const blob = await res.blob();
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement("a");
+      a.href = url;
+      a.download = "quarry-export.db";
+      a.click();
+      URL.revokeObjectURL(url);
+    } catch (err: any) {
+      setMessage({ text: err?.message || "Export failed", type: "error" });
+    } finally {
+      setIsLoading(false);
     }
   }
 
@@ -94,11 +128,9 @@ export function BackupManager() {
             Import Database
           </Button>
         </div>
-        <Button variant="outline" asChild className="gap-2">
-          <a href="/api/database/export" download="quarry-export.db">
-            <Download className="h-4 w-4" />
-            Export Database
-          </a>
+        <Button variant="outline" onClick={handleExport} disabled={isLoading} className="gap-2">
+          <Download className="h-4 w-4" />
+          Export Database
         </Button>
       </div>
 

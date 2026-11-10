@@ -1,5 +1,5 @@
 {
-  "generatedAt": "2026-08-28T18:02:06.799Z",
+  "generatedAt": "2026-11-10T07:52:17.560Z",
   "tables": {
     "vehicles": "CREATE TABLE IF NOT EXISTS vehicles (\n  id TEXT PRIMARY KEY NOT NULL,\n  vehicle_number TEXT NOT NULL UNIQUE,\n  party_id TEXT,\n  party_name TEXT,\n  company_body_qty REAL,\n  extra_body_qty REAL,\n  vehicle_type TEXT,\n  trip_count INTEGER NOT NULL DEFAULT 0,\n  engine_hours REAL,\n  created_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,\n  updated_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP\n)",
     "parties": "CREATE TABLE IF NOT EXISTS parties (\n  id TEXT PRIMARY KEY NOT NULL,\n  party_name TEXT NOT NULL UNIQUE,\n  phone TEXT,\n  address TEXT,\n  party_group TEXT,\n  created_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,\n  updated_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP\n)",
@@ -34,7 +34,11 @@
     "weighbridge_tickets": "CREATE TABLE IF NOT EXISTS weighbridge_tickets (\n  id TEXT PRIMARY KEY NOT NULL,\n  ticket_number INTEGER NOT NULL UNIQUE,\n  vehicle_number TEXT NOT NULL,\n  vehicle_id TEXT,\n  party_id TEXT,\n  material_id TEXT,\n  ticket_type TEXT NOT NULL DEFAULT 'OUTGOING',\n  status TEXT NOT NULL DEFAULT 'FIRST_WEIGHT',\n  gross_weight REAL,\n  gross_time DATETIME,\n  tare_weight REAL,\n  tare_time DATETIME,\n  net_weight REAL,\n  linked_sale_id TEXT UNIQUE,\n  linked_boulder_id TEXT UNIQUE,\n  remarks TEXT,\n  created_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,\n  updated_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP\n)",
     "maintenance_records": "CREATE TABLE IF NOT EXISTS maintenance_records (\n  id TEXT PRIMARY KEY NOT NULL,\n  vehicle_id TEXT NOT NULL,\n  date DATETIME NOT NULL,\n  engine_hours REAL NOT NULL,\n  service_type TEXT NOT NULL,\n  description TEXT,\n  cost REAL NOT NULL DEFAULT 0,\n  created_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,\n  updated_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,\n  FOREIGN KEY (vehicle_id) REFERENCES vehicles(id) ON DELETE CASCADE\n)",
     "maintenance_schedules": "CREATE TABLE IF NOT EXISTS maintenance_schedules (\n  id TEXT PRIMARY KEY NOT NULL,\n  vehicle_id TEXT NOT NULL,\n  service_type TEXT NOT NULL,\n  interval_hours REAL,\n  interval_days INTEGER,\n  next_due_hours REAL,\n  next_due_date DATETIME,\n  created_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,\n  updated_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,\n  FOREIGN KEY (vehicle_id) REFERENCES vehicles(id) ON DELETE CASCADE\n)",
-    "vehicle_stats": "CREATE TABLE IF NOT EXISTS vehicle_stats (\n  id TEXT PRIMARY KEY NOT NULL,\n  vehicle_id TEXT NOT NULL UNIQUE,\n  engine_hours REAL NOT NULL DEFAULT 0,\n  created_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,\n  updated_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,\n  FOREIGN KEY (vehicle_id) REFERENCES vehicles(id) ON DELETE CASCADE\n)"
+    "vehicle_stats": "CREATE TABLE IF NOT EXISTS vehicle_stats (\n  id TEXT PRIMARY KEY NOT NULL,\n  vehicle_id TEXT NOT NULL UNIQUE,\n  engine_hours REAL NOT NULL DEFAULT 0,\n  created_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,\n  updated_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,\n  FOREIGN KEY (vehicle_id) REFERENCES vehicles(id) ON DELETE CASCADE\n)",
+    "app_users": "CREATE TABLE IF NOT EXISTS app_users (\n  id TEXT PRIMARY KEY NOT NULL,\n  name TEXT NOT NULL UNIQUE,\n  pin_hash TEXT NOT NULL,\n  pin_salt TEXT NOT NULL,\n  role TEXT NOT NULL DEFAULT 'worker',\n  active BOOLEAN NOT NULL DEFAULT 1,\n  created_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,\n  updated_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP\n)",
+    "auth_sessions": "CREATE TABLE IF NOT EXISTS auth_sessions (\n  id TEXT PRIMARY KEY NOT NULL,\n  user_id TEXT NOT NULL,\n  token TEXT NOT NULL UNIQUE,\n  created_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,\n  expires_at DATETIME NOT NULL,\n  FOREIGN KEY (user_id) REFERENCES app_users(id) ON DELETE CASCADE\n)",
+    "app_meta": "CREATE TABLE IF NOT EXISTS app_meta (\n  key TEXT PRIMARY KEY NOT NULL,\n  value TEXT NOT NULL\n)",
+    "change_requests": "CREATE TABLE IF NOT EXISTS change_requests (\n  id TEXT PRIMARY KEY NOT NULL,\n  idempotency_key TEXT NOT NULL UNIQUE,\n  entity_name TEXT NOT NULL,\n  entity_id TEXT NOT NULL,\n  operation TEXT NOT NULL,\n  original_value TEXT,\n  proposed_value TEXT,\n  reason TEXT NOT NULL,\n  status TEXT NOT NULL DEFAULT 'PENDING',\n  requested_by_id TEXT,\n  requested_by_name TEXT NOT NULL,\n  decided_by_id TEXT,\n  decided_by_name TEXT,\n  decision_note TEXT,\n  applied_audit_id TEXT,\n  record_fingerprint TEXT,\n  created_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,\n  decided_at DATETIME,\n  applied_at DATETIME\n)"
   },
   "indexes": [
     "CREATE INDEX IF NOT EXISTS vehicles_party_id_idx ON vehicles (party_id)",
@@ -143,6 +147,18 @@
     "CREATE INDEX IF NOT EXISTS maintenance_records_date_idx ON maintenance_records (date)",
     "CREATE INDEX IF NOT EXISTS maintenance_schedules_vehicle_id_idx ON maintenance_schedules (vehicle_id)",
     "CREATE INDEX IF NOT EXISTS maintenance_schedules_next_due_date_idx ON maintenance_schedules (next_due_date)",
-    "CREATE INDEX IF NOT EXISTS vehicle_stats_vehicle_id_idx ON vehicle_stats (vehicle_id)"
+    "CREATE INDEX IF NOT EXISTS vehicle_stats_vehicle_id_idx ON vehicle_stats (vehicle_id)",
+    "CREATE INDEX IF NOT EXISTS auth_sessions_user_id_idx ON auth_sessions (user_id)",
+    "CREATE INDEX IF NOT EXISTS auth_sessions_expires_at_idx ON auth_sessions (expires_at)",
+    "CREATE INDEX IF NOT EXISTS change_requests_entity_id_idx ON change_requests (entity_id)",
+    "CREATE INDEX IF NOT EXISTS change_requests_requested_by_id_idx ON change_requests (requested_by_id)",
+    "CREATE INDEX IF NOT EXISTS change_requests_decided_by_id_idx ON change_requests (decided_by_id)",
+    "CREATE INDEX IF NOT EXISTS change_requests_applied_audit_id_idx ON change_requests (applied_audit_id)",
+    "CREATE INDEX IF NOT EXISTS change_requests_entity_name_idx ON change_requests (entity_name)",
+    "CREATE INDEX IF NOT EXISTS change_requests_status_idx ON change_requests (status)",
+    "CREATE INDEX IF NOT EXISTS change_requests_requested_by_name_idx ON change_requests (requested_by_name)",
+    "CREATE INDEX IF NOT EXISTS change_requests_decided_by_name_idx ON change_requests (decided_by_name)",
+    "CREATE INDEX IF NOT EXISTS change_requests_decided_at_idx ON change_requests (decided_at)",
+    "CREATE INDEX IF NOT EXISTS change_requests_applied_at_idx ON change_requests (applied_at)"
   ]
 }

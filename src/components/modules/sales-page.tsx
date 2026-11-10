@@ -1,16 +1,21 @@
 "use client";
 import { usePrompt } from "@/components/ui/prompt-provider";
 
-import { useCallback, useEffect, useMemo, useState } from "react";
-import { ArrowUpDown, Pencil, Search, Shield, Trash2, Printer, Download } from "lucide-react";
+import { useCallback, useEffect, useMemo, useRef, useState } from "react";
+import { ArrowUpDown, Pencil, Search, Trash2, Printer, Download } from "lucide-react";
 import { SalesEntryForm, type EditableSale } from "@/components/modules/sales-entry-form";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { InlineEditableCell } from "@/components/ui/inline-editable-cell";
-import { deleteSale, listSales, purgeNonGstSales, saveSale } from "@/app/actions/sales";
-import { verifyEditPassword } from "@/app/actions/auth";
+import { deleteSale, listSales, saveSale } from "@/app/actions/sales";
+import { getSessionToken } from "@/lib/session-client";
+import { verifyEditPassword, isEnrollmentComplete } from "@/app/actions/auth";
+import { SaleRemarksRequestDialog } from "@/components/sale-remarks-request-dialog";
+import { SaleEditRequestDialog } from "@/components/sale-edit-request-dialog";
+import { SaleDeleteRequestDialog } from "@/components/sale-delete-request-dialog";
+import { ChangeRequestsPanel } from "@/components/change-requests-panel";
 import { cn, formatCurrency, formatDate, formatQty } from "@/lib/utils";
 import { exportToExcel } from "@/lib/export";
 import { handlePrint } from "@/lib/utils/print";
@@ -46,8 +51,29 @@ export function SalesPage() {
   const [error, setError] = useState("");
   const { promptPassword, confirmAction } = usePrompt();
 
-  const [activeCell, setActiveCell] = useState<{rowId: string, colKey: string} | null>(null);
+  const [activeCell, setActiveCellState] = useState<{rowId: string, colKey: string} | null>(null);
+  // A retained draft (save refused or still in flight) blocks switching to
+  // another cell so typed text is never silently discarded. Closing (null)
+  // stays allowed: Escape remains a deliberate discard and successful commits
+  // still navigate or close.
+  const retentionRef = useRef(false);
+  const setActiveCell = (cell: {rowId: string, colKey: string} | null) => {
+    if (cell !== null && retentionRef.current) return;
+    setActiveCellState(cell);
+  };
+  const [messageResetSignal, setMessageResetSignal] = useState(0);
   const [pinCache, setPinCache] = useState<{pin: string, expires: number} | null>(null);
+  // Once enrollment is complete, remarks changes go through the
+  // request-approval path; before enrollment the legacy inline edit remains.
+  const [enrolled, setEnrolled] = useState(false);
+  const [remarksRequestSale, setRemarksRequestSale] = useState<SaleRow | null>(null);
+  const [editRequestSale, setEditRequestSale] = useState<SaleRow | null>(null);
+  const [editRequestField, setEditRequestField] = useState<string | undefined>(undefined);
+  const [deleteRequestSale, setDeleteRequestSale] = useState<SaleRow | null>(null);
+  const [panelRefresh, setPanelRefresh] = useState(0);
+  useEffect(() => {
+    isEnrollmentComplete().then((v) => setEnrolled(!!v)).catch(() => {});
+  }, []);
 
   async function requestEditPin(): Promise<string | null> {
     if (pinCache && pinCache.expires > Date.now()) {
@@ -67,7 +93,13 @@ export function SalesPage() {
 
   async function handleInlineSave(row: SaleRow, field: keyof EditableSale, newValue: string) {
     if (String(row[field as keyof SaleRow] ?? "") === newValue) return true;
-    
+
+    // A new inline edit attempt supersedes the entry form's earlier success
+    // message; the old green must not imply this latest edit succeeded.
+    setMessageResetSignal((n) => n + 1);
+    // Likewise the previous red must not outlive a successful retry; a new
+    // attempt supersedes the earlier error either way.
+    setError("");
     const pin = await requestEditPin();
     if (!pin) return false;
 
@@ -85,13 +117,15 @@ export function SalesPage() {
       discountType: row.discountType,
       discountValue: row.discountValue,
       remarks: row.remarks,
+      bookNumber: row.bookNumber,
+      pageNumber: row.pageNumber,
     };
     
     const numFields = ["qty", "ratePerCft", "cashPaid", "bankPaid", "gPayPaid", "discountValue"];
     input[field] = numFields.includes(field) ? Number(newValue) : newValue;
 
     try {
-      const res = await saveSale(input, pin);
+      const res = await saveSale(input, pin, getSessionToken() ?? undefined);
       if (res.success) {
         await loadSales();
         return true;
@@ -201,7 +235,7 @@ export function SalesPage() {
     }
     setError("");
     try {
-      const res = await deleteSale(id, password);
+      const res = await deleteSale(id, password, getSessionToken() ?? undefined);
       if (res.success) {
         if (editingSale?.id === id) setEditingSale(null);
         await loadSales();
@@ -210,29 +244,6 @@ export function SalesPage() {
       }
     } catch (err) {
       setError(err instanceof Error ? err.message : "Delete failed.");
-    }
-  }
-
-  async function raidPurge() {
-    if (!(await confirmAction("⚠️ RAID MODE: Delete ALL non-GST sales? Only GST sales will remain. This cannot be undone."))) return;
-    const password = await promptPassword("Enter delete PIN:");
-    if (!password || !(await verifyEditPassword(password, "delete"))) {
-      setError("❌ Incorrect Delete PIN. Purge cancelled.");
-      return;
-    }
-    setError("");
-    try {
-      const res = await purgeNonGstSales(password);
-      if (!res.success) {
-        setError(res.error || "Purge failed.");
-        return;
-      }
-      setEditingSale(null);
-      await loadSales();
-      setError("");
-      alert(`Purge complete. ${res.count} non-GST sale(s) deleted. Only GST sales remain.`);
-    } catch (err) {
-      setError(err instanceof Error ? err.message : "Purge failed.");
     }
   }
 
@@ -290,6 +301,7 @@ export function SalesPage() {
       <div className="print:hidden">
         <SalesEntryForm
           editingSale={editingSale}
+          messageResetSignal={messageResetSignal}
           onSaved={() => {
             setEditingSale(null);
             void loadSales();
@@ -317,16 +329,6 @@ export function SalesPage() {
         <CardHeader className="flex-row flex-wrap items-center justify-between gap-3 print:hidden">
           <div className="flex items-center gap-3">
             <CardTitle>Sales Table</CardTitle>
-            <Button
-              variant="outline"
-              size="sm"
-              className="border-red-300 text-red-700 hover:bg-red-50 hover:text-red-800 text-xs gap-1.5"
-              onClick={() => void raidPurge()}
-              title="Purge all non-GST sales"
-            >
-              <Shield className="h-3.5 w-3.5" />
-              Purge Non-GST
-            </Button>
             <Button variant="outline" size="sm" onClick={handleExportExcel} className="text-xs gap-1.5">
               <Download className="h-3.5 w-3.5" />
               Export
@@ -392,61 +394,113 @@ export function SalesPage() {
                   "print:border-b print:border-gray-200 group"
                 )}>
                   <TableCell className="sm:sticky sm:left-0 z-10 bg-inherit w-[110px] min-w-[110px] max-w-[110px] sm:border-r border-border print:static print:w-auto print:border-none">
-                    <InlineEditableCell rowId={row.id} colKey="saleDate" value={row.saleDate} displayValue={formatDate(row.saleDate)} type="date" activeCell={activeCell} setActiveCell={setActiveCell} onSave={(val) => handleInlineSave(row, "saleDate", val)} onNavigate={(dir) => handleNavigate(dir, row.id, "saleDate")} />
+                    <InlineEditableCell rowId={row.id} colKey="saleDate" value={row.saleDate} displayValue={formatDate(row.saleDate)} type="date" activeCell={activeCell} setActiveCell={setActiveCell} retentionRef={retentionRef} onSave={(val) => handleInlineSave(row, "saleDate", val)} onNavigate={(dir) => handleNavigate(dir, row.id, "saleDate")} />
                   </TableCell>
                   <TableCell>{new Date(row.createdAt).toLocaleTimeString("en-IN", { hour: "2-digit", minute: "2-digit" })}</TableCell>
                   <TableCell>
-                    <InlineEditableCell rowId={row.id} colKey="vehicleNumber" value={row.vehicleNumber} activeCell={activeCell} setActiveCell={setActiveCell} onSave={(val) => handleInlineSave(row, "vehicleNumber", val)} onNavigate={(dir) => handleNavigate(dir, row.id, "vehicleNumber")} />
+                    <InlineEditableCell rowId={row.id} colKey="vehicleNumber" value={row.vehicleNumber} activeCell={activeCell} setActiveCell={setActiveCell} retentionRef={retentionRef} onSave={(val) => handleInlineSave(row, "vehicleNumber", val)} onNavigate={(dir) => handleNavigate(dir, row.id, "vehicleNumber")} />
                   </TableCell>
                   <TableCell className="truncate max-w-[150px]" title={row.partyName}>
-                    <InlineEditableCell rowId={row.id} colKey="partyName" value={row.partyName} activeCell={activeCell} setActiveCell={setActiveCell} onSave={(val) => handleInlineSave(row, "partyName", val)} onNavigate={(dir) => handleNavigate(dir, row.id, "partyName")} />
+                    <InlineEditableCell rowId={row.id} colKey="partyName" value={row.partyName} activeCell={activeCell} setActiveCell={setActiveCell} retentionRef={retentionRef} onSave={(val) => handleInlineSave(row, "partyName", val)} onNavigate={(dir) => handleNavigate(dir, row.id, "partyName")} />
                   </TableCell>
                   <TableCell>{row.materialName}</TableCell>
                   <TableCell className="number-cell font-medium text-emerald-700 dark:text-emerald-400">
-                    <InlineEditableCell rowId={row.id} colKey="qty" value={row.qty} displayValue={formatQty(row.qty, "")} type="number" activeCell={activeCell} setActiveCell={setActiveCell} onSave={(val) => handleInlineSave(row, "qty", val)} onNavigate={(dir) => handleNavigate(dir, row.id, "qty")} />
+                    <InlineEditableCell rowId={row.id} colKey="qty" value={row.qty} displayValue={formatQty(row.qty, "")} type="number" activeCell={activeCell} setActiveCell={setActiveCell} retentionRef={retentionRef} onSave={(val) => handleInlineSave(row, "qty", val)} onNavigate={(dir) => handleNavigate(dir, row.id, "qty")} />
                   </TableCell>
                   <TableCell className="number-cell">
-                    <InlineEditableCell rowId={row.id} colKey="ratePerCft" value={row.ratePerCft} displayValue={formatCurrency(row.ratePerCft)} type="number" activeCell={activeCell} setActiveCell={setActiveCell} onSave={(val) => handleInlineSave(row, "ratePerCft", val)} onNavigate={(dir) => handleNavigate(dir, row.id, "ratePerCft")} />
+                    <InlineEditableCell rowId={row.id} colKey="ratePerCft" value={row.ratePerCft} displayValue={formatCurrency(row.ratePerCft)} type="number" activeCell={activeCell} setActiveCell={setActiveCell} retentionRef={retentionRef} onSave={(val) => handleInlineSave(row, "ratePerCft", val)} onNavigate={(dir) => handleNavigate(dir, row.id, "ratePerCft")} />
                   </TableCell>
                   <TableCell className="number-cell">{formatCurrency(row.amount)}</TableCell>
                   <TableCell className="number-cell">
-                    <InlineEditableCell rowId={row.id} colKey="discountValue" value={row.discountValue} displayValue={row.discountType === "percentage" ? `${row.discountValue}%` : formatCurrency(row.discountValue)} type="number" activeCell={activeCell} setActiveCell={setActiveCell} onSave={(val) => handleInlineSave(row, "discountValue", val)} onNavigate={(dir) => handleNavigate(dir, row.id, "discountValue")} />
+                    {enrolled ? (
+                      <span className="inline-flex items-center gap-1">
+                        <span>{row.discountType === "percentage" ? `${row.discountValue}%` : formatCurrency(row.discountValue)}</span>
+                        <Button variant="ghost" size="sm" className="h-6 px-1 text-xs" onClick={() => { setEditRequestSale(row); setEditRequestField("discountValue"); }} aria-label="Request discount change">
+                          Request
+                        </Button>
+                      </span>
+                    ) : (
+                      <InlineEditableCell rowId={row.id} colKey="discountValue" value={row.discountValue} displayValue={row.discountType === "percentage" ? `${row.discountValue}%` : formatCurrency(row.discountValue)} type="number" activeCell={activeCell} setActiveCell={setActiveCell} retentionRef={retentionRef} onSave={(val) => handleInlineSave(row, "discountValue", val)} onNavigate={(dir) => handleNavigate(dir, row.id, "discountValue")} />
+                    )}
                   </TableCell>
                   <TableCell className="number-cell font-bold">{formatCurrency(row.finalAmount)}</TableCell>
                   <TableCell className="number-cell">
-                    <InlineEditableCell rowId={row.id} colKey="cashPaid" value={row.cashPaid ?? 0} displayValue={(row.cashPaid ?? 0) > 0 ? formatCurrency(row.cashPaid ?? 0) : <span className="text-muted-foreground">—</span>} type="number" activeCell={activeCell} setActiveCell={setActiveCell} onSave={(val) => handleInlineSave(row, "cashPaid", val)} onNavigate={(dir) => handleNavigate(dir, row.id, "cashPaid")} />
+                    {enrolled ? (
+                      <span className="inline-flex items-center gap-1">
+                        <span>{(row.cashPaid ?? 0) > 0 ? formatCurrency(row.cashPaid ?? 0) : <span className="text-muted-foreground">—</span>}</span>
+                        <Button variant="ghost" size="sm" className="h-6 px-1 text-xs" onClick={() => { setEditRequestSale(row); setEditRequestField("cashPaid"); }} aria-label="Request cash-paid change">
+                          Request
+                        </Button>
+                      </span>
+                    ) : (
+                      <InlineEditableCell rowId={row.id} colKey="cashPaid" value={row.cashPaid ?? 0} displayValue={(row.cashPaid ?? 0) > 0 ? formatCurrency(row.cashPaid ?? 0) : <span className="text-muted-foreground">—</span>} type="number" activeCell={activeCell} setActiveCell={setActiveCell} retentionRef={retentionRef} onSave={(val) => handleInlineSave(row, "cashPaid", val)} onNavigate={(dir) => handleNavigate(dir, row.id, "cashPaid")} />
+                    )}
                   </TableCell>
                   <TableCell className="number-cell">
-                    <InlineEditableCell rowId={row.id} colKey="bankPaid" value={row.bankPaid ?? 0} displayValue={((row.bankPaid ?? 0) + (row.gPayPaid ?? 0)) > 0 ? formatCurrency((row.bankPaid ?? 0) + (row.gPayPaid ?? 0)) : <span className="text-muted-foreground">—</span>} type="number" activeCell={activeCell} setActiveCell={setActiveCell} onSave={(val) => handleInlineSave(row, "bankPaid", val)} onNavigate={(dir) => handleNavigate(dir, row.id, "bankPaid")} />
+                    {enrolled ? (
+                      <span className="inline-flex items-center gap-1">
+                        <span>{((row.bankPaid ?? 0) + (row.gPayPaid ?? 0)) > 0 ? formatCurrency((row.bankPaid ?? 0) + (row.gPayPaid ?? 0)) : <span className="text-muted-foreground">—</span>}</span>
+                        <Button variant="ghost" size="sm" className="h-6 px-1 text-xs" onClick={() => { setEditRequestSale(row); setEditRequestField("bankPaid"); }} aria-label="Request bank-paid change">
+                          Request
+                        </Button>
+                      </span>
+                    ) : (
+                      <InlineEditableCell rowId={row.id} colKey="bankPaid" value={row.bankPaid ?? 0} displayValue={((row.bankPaid ?? 0) + (row.gPayPaid ?? 0)) > 0 ? formatCurrency((row.bankPaid ?? 0) + (row.gPayPaid ?? 0)) : <span className="text-muted-foreground">—</span>} type="number" activeCell={activeCell} setActiveCell={setActiveCell} retentionRef={retentionRef} onSave={(val) => handleInlineSave(row, "bankPaid", val)} onNavigate={(dir) => handleNavigate(dir, row.id, "bankPaid")} />
+                    )}
                   </TableCell>
                   <TableCell className="number-cell font-medium text-blue-600 dark:text-blue-400">{(row.paidTotal ?? 0) > 0 ? formatCurrency(row.paidTotal ?? 0) : <span className="text-muted-foreground">—</span>}</TableCell>
                   <TableCell className={cn("number-cell", (row.remainingCredit ?? 0) > 0 && "text-red-600 font-bold dark:text-red-400")}>{(row.remainingCredit ?? 0) > 0 ? formatCurrency(row.remainingCredit ?? 0) : <span className="text-muted-foreground">—</span>}</TableCell>
                   <TableCell className="max-w-44 truncate print:hidden" title={row.remarks || ""}>
-                    <InlineEditableCell rowId={row.id} colKey="remarks" value={row.remarks || ""} activeCell={activeCell} setActiveCell={setActiveCell} onSave={(val) => handleInlineSave(row, "remarks", val)} onNavigate={(dir) => handleNavigate(dir, row.id, "remarks")} />
+                    {enrolled ? (
+                      <span className="inline-flex items-center gap-1">
+                        <span>{row.remarks || ""}</span>
+                        <Button variant="ghost" size="sm" className="h-6 px-1 text-xs" onClick={() => setRemarksRequestSale(row)} aria-label="Request remarks change">
+                          Request
+                        </Button>
+                      </span>
+                    ) : (
+                      <InlineEditableCell rowId={row.id} colKey="remarks" value={row.remarks || ""} activeCell={activeCell} setActiveCell={setActiveCell} retentionRef={retentionRef} onSave={(val) => handleInlineSave(row, "remarks", val)} onNavigate={(dir) => handleNavigate(dir, row.id, "remarks")} />
+                    )}
                   </TableCell>
                   <TableCell className="tabular-nums text-muted-foreground print:hidden">
                     {row.bookNumber && row.pageNumber ? `${row.bookNumber}/${row.pageNumber}` : row.bookNumber || row.pageNumber || "-"}
                   </TableCell>
                   <TableCell className="text-right print:hidden">
                     <div className="inline-flex gap-1">
-                      <Button
-                        variant="ghost"
-                        size="icon"
-                        onClick={async () => {
-                          const password = await promptPassword("Enter edit password:");
-                          if (!password || !(await verifyEditPassword(password))) {
-                            setError("Edit password is invalid.");
-                            return;
-                          }
-                          setEditingSale(row);
-                        }}
-                        aria-label="Edit sale"
-                      >
-                        <Pencil className="h-4 w-4" />
-                      </Button>
-                      <Button variant="ghost" size="icon" onClick={() => void remove(row.id)} aria-label="Delete sale">
-                        <Trash2 className="h-4 w-4 text-destructive" />
-                      </Button>
+                      {enrolled ? (
+                        <>
+                          {/* FULL62: post-enrollment, direct edit/delete is refused
+                              server-side; the honest affordance is filing a
+                              capture-only change request. */}
+                          <Button variant="ghost" size="icon" onClick={() => { setEditRequestSale(row); setEditRequestField(undefined); }} aria-label="Request sale edit">
+                            <Pencil className="h-4 w-4" />
+                          </Button>
+                          <Button variant="ghost" size="icon" onClick={() => setDeleteRequestSale(row)} aria-label="Request sale deletion">
+                            <Trash2 className="h-4 w-4 text-destructive" />
+                          </Button>
+                        </>
+                      ) : (
+                        <>
+                          <Button
+                            variant="ghost"
+                            size="icon"
+                            onClick={async () => {
+                              const password = await promptPassword("Enter edit password:");
+                              if (!password || !(await verifyEditPassword(password))) {
+                                setError("Edit password is invalid.");
+                                return;
+                              }
+                              setEditingSale(row);
+                            }}
+                            aria-label="Edit sale"
+                          >
+                            <Pencil className="h-4 w-4" />
+                          </Button>
+                          <Button variant="ghost" size="icon" onClick={() => void remove(row.id)} aria-label="Delete sale">
+                            <Trash2 className="h-4 w-4 text-destructive" />
+                          </Button>
+                        </>
+                      )}
                     </div>
                   </TableCell>
                 </TableRow>
@@ -471,6 +525,35 @@ export function SalesPage() {
           </div>
         </CardContent>
       </Card>
+      {enrolled && (
+        <ChangeRequestsPanel
+          refreshSignal={panelRefresh}
+          onApplied={() => void loadSales()}
+        />
+      )}
+      {remarksRequestSale && (
+        <SaleRemarksRequestDialog
+          saleId={remarksRequestSale.id}
+          currentRemarks={remarksRequestSale.remarks || ""}
+          onClose={() => setRemarksRequestSale(null)}
+          onSubmitted={() => setPanelRefresh((n) => n + 1) /* a filed request appears in the panel at once; the sale row is unchanged until approval */}
+        />
+      )}
+      {editRequestSale && (
+        <SaleEditRequestDialog
+          sale={editRequestSale}
+          initialField={editRequestField}
+          onClose={() => { setEditRequestSale(null); setEditRequestField(undefined); }}
+          onSubmitted={() => setPanelRefresh((n) => n + 1) /* filed request appears at once; the sale row is unchanged until approval */}
+        />
+      )}
+      {deleteRequestSale && (
+        <SaleDeleteRequestDialog
+          sale={deleteRequestSale}
+          onClose={() => setDeleteRequestSale(null)}
+          onSubmitted={() => setPanelRefresh((n) => n + 1)}
+        />
+      )}
     </div>
   );
 }

@@ -126,8 +126,16 @@ describe('Schema Consistency – multi-source drift detection', () => {
   it('Every Prisma model has sync-map.json entries', () => {
     const syncMapModelNames = new Set(Object.keys(syncMap));
 
+    // FULL53: local-only identity models are deliberately NEVER synced
+    // (credentials and sessions must not leave the device). FULL56: the
+    // change-request approval trail is likewise local-only. Every other
+    // Prisma model must appear in sync-map.json - this stays the tripwire
+    // for any future unsynced business model.
+    const localOnlyModels = new Set(['AppUser', 'AuthSession', 'AppMeta', 'ChangeRequest']);
+
     const missingInSyncMap: string[] = [];
     for (const model of prismaModels) {
+      if (localOnlyModels.has(model.name)) continue;
       if (!syncMapModelNames.has(model.name)) {
         missingInSyncMap.push(model.name);
       }
@@ -232,7 +240,7 @@ describe('Schema Consistency – multi-source drift detection', () => {
   // Test 5
   // -----------------------------------------------------------------------
   it('SYNC_MODEL_CONFIG covers all Prisma models', () => {
-    const knownExclusions = new Set(['SyncState', 'AuditLog', 'Role', 'DeviceIdentity', 'SyncOutboxEvent']);
+    const knownExclusions = new Set(['SyncState', 'AuditLog', 'Role', 'DeviceIdentity', 'SyncOutboxEvent', 'AppUser', 'AuthSession', 'AppMeta', 'ChangeRequest']);
     const syncConfigKeys = new Set(Object.keys(SYNC_MODEL_CONFIG));
     const prismaModelNames = new Set(prismaModels.map((m) => m.name));
 

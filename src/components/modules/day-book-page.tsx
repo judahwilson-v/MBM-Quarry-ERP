@@ -11,11 +11,13 @@ import { fetchDayBookData, saveCashTransfer, logDayBookAudit } from "@/lib/daybo
 import { saveDayBookOpeningBalances } from "@/app/actions/daybook_offline";
 import { usePrompt } from "@/components/ui/prompt-provider";
 import { handlePrint } from "@/lib/utils/print";
+import { parseTransferDraft, restoreTransferDraft, transferDraftNotice, TRANSFER_DRAFT_KEY, type TransferDraft } from "@/lib/transfer-draft";
 
 export function DayBookPage() {
   const [date, setDate] = useState<string>(todayInputValue());
   const [userName, setUserName] = useState<string>("");
   const [data, setData] = useState<any>(null);
+  const [loadError, setLoadError] = useState("");
   const [loading, setLoading] = useState(true);
   const { promptNumber, confirmAction } = usePrompt();
 
@@ -24,8 +26,14 @@ export function DayBookPage() {
     try {
       const result = await fetchDayBookData(date);
       setData(result);
+      setLoadError("");
     } catch (e) {
+      // Server actions return a generic digest message in production, so the
+      // raw error text is never useful or safe to render. Keep diagnostics in
+      // the console and show one truthful, static reason instead of wrong totals.
       console.error(e);
+      setData(null);
+      setLoadError("unverified");
     } finally {
       setLoading(false);
     }
@@ -84,6 +92,31 @@ export function DayBookPage() {
 
   const [transferForm, setTransferForm] = useState({ type: "CASH_TO_BANK", amount: "", remarks: "" });
 
+  // FULL68: a transfer attempt is persisted with its client-generated
+  // submission reference BEFORE sending. An ambiguous outcome (dropped
+  // response, reload) retries the same reference, and the server returns the
+  // original row instead of duplicating the transfer. The draft clears only on
+  // a settled success; editing the form while a draft is pending keeps the same
+  // reference, so the server refuses a changed intent honestly and the history
+  // can be checked first. Discarding a draft never deletes a saved record.
+  const [pendingTransferDraft, setPendingTransferDraft] = useState<TransferDraft | null>(null);
+
+  // FULL70: restore the original attempt visibly, including its date. The
+  // datepicker must show the day the attempt was made for - never silently
+  // today - so an unchanged-looking retry carries the same intent.
+  useEffect(() => {
+    const draft = parseTransferDraft(sessionStorage.getItem(TRANSFER_DRAFT_KEY));
+    if (!draft) {
+      sessionStorage.removeItem(TRANSFER_DRAFT_KEY);
+      return;
+    }
+    const restored = restoreTransferDraft(draft);
+    setTransferForm({ type: restored.type, amount: restored.amount, remarks: restored.remarks });
+    setDate(restored.date);
+    setPendingTransferDraft(draft);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
+
   const handleTransfer = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!userName) {
@@ -91,24 +124,63 @@ export function DayBookPage() {
       return;
     }
     if (!transferForm.amount || isNaN(Number(transferForm.amount)) || Number(transferForm.amount) <= 0) return;
-    
-    try {
-      await saveCashTransfer({
+
+    let draft = parseTransferDraft(sessionStorage.getItem(TRANSFER_DRAFT_KEY));
+    if (!draft) {
+      draft = {
+        submissionId: crypto.randomUUID(),
         type: transferForm.type,
         amount: Number(transferForm.amount),
         time: new Date().toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit', hour12: true }),
         date,
         remarks: transferForm.remarks,
         userName
+      };
+    }
+    // Send the current form content under the persisted reference: unchanged
+    // retry completes idempotently; changed intent is refused by the server.
+    const attempt: TransferDraft = { ...draft, type: transferForm.type, amount: Number(transferForm.amount), date, remarks: transferForm.remarks, userName, attempted: true };
+    sessionStorage.setItem(TRANSFER_DRAFT_KEY, JSON.stringify(attempt));
+    try {
+      await saveCashTransfer({
+        submissionId: attempt.submissionId,
+        type: attempt.type,
+        amount: attempt.amount,
+        time: attempt.time,
+        date: attempt.date,
+        remarks: attempt.remarks,
+        userName: attempt.userName
       });
+      sessionStorage.removeItem(TRANSFER_DRAFT_KEY);
+      setPendingTransferDraft(null);
       setTransferForm({ type: "CASH_TO_BANK", amount: "", remarks: "" });
       await loadData();
-    } catch {
-      alert("Failed to save transfer.");
+    } catch (err) {
+      setPendingTransferDraft(attempt);
+      alert(err instanceof Error && err.message ? err.message : "Failed to save transfer.");
     }
   };
 
+  // Discarding clears only the local reminder. It never deletes a record that
+  // may already be saved, and the notice wording says so.
+  const discardTransferDraft = () => {
+    sessionStorage.removeItem(TRANSFER_DRAFT_KEY);
+    setPendingTransferDraft(null);
+    setTransferForm({ type: "CASH_TO_BANK", amount: "", remarks: "" });
+  };
+
   if (loading && !data) return <div className="p-6">Loading Day Book...</div>;
+  if (loadError) {
+    return (
+      <div role="alert" className="space-y-3 p-6">
+        <p className="font-medium text-destructive">This day's balance cannot be shown.</p>
+        <p className="text-sm text-muted-foreground">
+          Some financial records for this day could not be verified, so no totals are shown instead of showing wrong figures. Please ask the administrator to review the day's records.
+        </p>
+        <Button variant="outline" onClick={() => void loadData()}>Try again</Button>
+      </div>
+    );
+  }
 
   const transfers = data?.transfers ?? [];
 
@@ -264,6 +336,12 @@ export function DayBookPage() {
                   <Input placeholder="Optional..." value={transferForm.remarks} onChange={e => setTransferForm({...transferForm, remarks: e.target.value})} />
                 </Field>
                 <Button type="submit" className="w-full">Record Transfer</Button>
+                {pendingTransferDraft && (
+                  <div className="rounded-md border border-amber-300 bg-amber-50 p-2 text-xs text-amber-900">
+                    {transferDraftNotice(pendingTransferDraft).message}
+                    <button type="button" className="ml-2 underline" onClick={discardTransferDraft}>{transferDraftNotice(pendingTransferDraft).discardLabel}</button>
+                  </div>
+                )}
               </form>
             </CardContent>
           </Card>

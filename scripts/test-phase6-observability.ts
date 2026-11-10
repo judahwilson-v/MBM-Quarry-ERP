@@ -112,7 +112,7 @@ async function main() {
           entityType: "Vehicle",
           entityId: "veh-1",
           operation: "create",
-          payload: JSON.stringify({ id: "veh-1", vehicle_number: "KA-01-AB-1234" }),
+          payload: JSON.stringify({ id: "veh-1", vehicle_number: "ZZQATEST0001" }),
           status: "SENDING",
           attempts: 1,
           lastError: null,

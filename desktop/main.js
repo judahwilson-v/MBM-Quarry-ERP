@@ -38,6 +38,7 @@ let mainWindow;
 let splashWindow = null;
 let nextProcess = null;
 let serverPort = null;
+let backupBootToken = null; // FULL66: module scope so the global backup function can present it
 let isManualUpdateCheck = false;
 
 // Function to find a free port
@@ -290,9 +291,18 @@ async function createWindow() {
 
       const productionEnvVars = loadProductionEnv();
 
+      // FULL66: per-boot machine credential for the consistent-backup endpoint.
+      // Generated fresh each launch, passed only to our own child via env,
+      // never persisted and never logged. MBM_BACKUP_DIR fixes the only
+      // directory the server may write backups to.
+      backupBootToken = require("crypto").randomBytes(32).toString("hex");
+      const backupDirForServer = path.join(app.getPath('documents'), 'MBM-Backups');
+
       const env = {
         ...process.env,
         ...productionEnvVars,
+        MBM_BACKUP_BOOT_TOKEN: backupBootToken,
+        MBM_BACKUP_DIR: backupDirForServer,
         PORT: serverPort.toString(),
         NODE_ENV: "production",
         DATABASE_URL: databaseUrl,
@@ -541,14 +551,37 @@ if (!gotTheLock) {
 
       const userDataPath = app.getPath("userData");
       const dbPath = path.join(userDataPath, "quarry.db");
-      
+
       if (!fs.existsSync(dbPath)) return false;
 
-      const timestamp = new Date().toISOString().replace(/[:.]/g, '-');
-      const backupFilename = `MBM_Backup_${prefix}_${timestamp}.sqlite`;
-      const backupPath = path.join(backupDir, backupFilename);
-
-      fs.copyFileSync(dbPath, backupPath);
+      // FULL66: the server produces a consistent transaction-boundary snapshot
+      // (VACUUM INTO) instead of a raw byte copy of the live database, which
+      // could tear or corrupt when writes coincided. Failure is loud (false),
+      // never a silent possibly-torn backup. The server enforces the boot
+      // credential, the fixed backup directory and no-overwrite.
+      const controller = new AbortController();
+      const timeout = setTimeout(() => controller.abort(), 5 * 60 * 1000);
+      let backupPath;
+      try {
+        const res = await fetch(`http://localhost:${serverPort}/api/database/backup-snapshot`, {
+          method: 'POST',
+          headers: { 'content-type': 'application/json', 'x-mbm-backup-token': backupBootToken || '' },
+          body: JSON.stringify({ prefix }),
+          signal: controller.signal,
+        });
+        const data = await res.json().catch(() => ({}));
+        if (!res.ok || !data || data.success !== true || typeof data.filename !== 'string') {
+          console.error(`Backup snapshot refused (${res.status}): ${data && data.message ? data.message : 'unknown'}`);
+          return false;
+        }
+        if (!/^MBM_Backup_[a-z0-9.-]+_\d{4}-\d{2}-\d{2}T[0-9-]+Z\.sqlite$/.test(data.filename)) {
+          console.error('Backup snapshot returned an unexpected filename; refusing.');
+          return false;
+        }
+        backupPath = path.join(backupDir, data.filename);
+      } finally {
+        clearTimeout(timeout);
+      }
       console.log(`Successfully created backup: ${backupPath}`);
       
       const files = fs.readdirSync(backupDir)

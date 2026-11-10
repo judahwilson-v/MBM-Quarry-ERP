@@ -3,9 +3,11 @@
 import { getDb } from "@/lib/prisma";
 import { pushSync, pullSync, purgeOldSupabaseData, getSupabaseStorageStats } from "@/lib/sync/sync-service";
 import { sanitizeError } from "@/lib/utils/sanitize-error";
+import { requireControlActor } from "@/lib/identity/control";
 
-export async function forceSync() {
+export async function forceSync(sessionToken?: string | null) {
   try {
+    await requireControlActor(sessionToken);
     const pushResult = await pushSync();
     const pullResult = await pullSync();
     return { success: true, message: `Sync triggered. Pushed: ${pushResult.pushed}, Pulled: ${pullResult.pulled}` };
@@ -24,8 +26,9 @@ export async function resetSyncQueue() {
   };
 }
 
-export async function getDatabaseInfo() {
+export async function getDatabaseInfo(sessionToken?: string | null) {
   try {
+    await requireControlActor(sessionToken);
     const db = await getDb();
     
     // Get counts
@@ -48,8 +51,9 @@ export async function getDatabaseInfo() {
   }
 }
 
-export async function getSupabaseStorageUsage() {
+export async function getSupabaseStorageUsage(sessionToken?: string | null) {
   try {
+    await requireControlActor(sessionToken);
     const stats = await getSupabaseStorageStats();
     return { success: true, data: stats };
   } catch (error: any) {
@@ -57,12 +61,13 @@ export async function getSupabaseStorageUsage() {
   }
 }
 
-export async function triggerSupabaseDataPurge() {
+export async function triggerSupabaseDataPurge(sessionToken?: string | null) {
   try {
+    await requireControlActor(sessionToken);
     const result = await purgeOldSupabaseData();
-    return { success: true, data: result };
+    return result;
   } catch (error: any) {
-    return { success: false, message: sanitizeError(error) };
+    return { success: false as const, message: sanitizeError(error) };
   }
 }
 

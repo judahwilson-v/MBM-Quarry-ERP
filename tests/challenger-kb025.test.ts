@@ -46,7 +46,7 @@ async function runChallengerTestSuite() {
         return { id: "ticket-101", ticketNumber: 501, status: "FIRST_WEIGHT" };
       });
 
-      const res = await createWeighbridgeTicket({ vehicleNumber: "KA-01-AB-1234", weight: 12000 });
+      const res = await createWeighbridgeTicket({ vehicleNumber: "ZZQATEST0001", weight: 12000 });
       const totalAttempts = getAttemptCount();
       restoreRealPrisma();
 
@@ -78,7 +78,7 @@ async function runChallengerTestSuite() {
         throw err;
       });
 
-      const res = await createWeighbridgeTicket({ vehicleNumber: "KA-01-AB-1234", weight: 12000 });
+      const res = await createWeighbridgeTicket({ vehicleNumber: "ZZQATEST0001", weight: 12000 });
       const totalAttempts = getAttemptCount();
       restoreRealPrisma();
 
@@ -129,7 +129,7 @@ async function runChallengerTestSuite() {
         return { id: "ticket-102", ticketNumber: 502, status: "FIRST_WEIGHT" };
       });
 
-      const res = await createWeighbridgeTicket({ vehicleNumber: "KA-02-CD-5678", weight: 14000 });
+      const res = await createWeighbridgeTicket({ vehicleNumber: "ZZQATEST0004", weight: 14000 });
       const totalAttempts = getAttemptCount();
       restoreRealPrisma();
 
@@ -170,7 +170,7 @@ async function runChallengerTestSuite() {
         throw err;
       });
 
-      const res = await createWeighbridgeTicket({ vehicleNumber: "KA-03-EF-9012", weight: 16000 });
+      const res = await createWeighbridgeTicket({ vehicleNumber: "ZZQATEST0005", weight: 16000 });
       const totalAttempts = getAttemptCount();
       restoreRealPrisma();
 
@@ -213,7 +213,7 @@ async function runChallengerTestSuite() {
 
     // revalidatePath in weighbridge.ts is called inside safeRevalidatePath.
     // In node environment outside Next.js request, revalidatePath throws or is mocked.
-    const res = await createWeighbridgeTicket({ vehicleNumber: "KA-04-GH-3456", weight: 18000 });
+    const res = await createWeighbridgeTicket({ vehicleNumber: "ZZQATEST0006", weight: 18000 });
     restoreRealPrisma();
 
     assert.equal(res.success, true, "Ticket creation must succeed even if safeRevalidatePath fails");

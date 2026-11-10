@@ -44,14 +44,18 @@ export async function fetchDetailedSyncStatus() {
   return getDetailedSyncStatus();
 }
 
-export async function forcePushSync() {
+export async function forcePushSync(sessionToken?: string | null) {
+  const { requireControlActor } = await import("@/lib/identity/control");
+  await requireControlActor(sessionToken);
   const { pushSync } = await import("@/lib/sync/sync-service");
   const result = await pushSync();
   revalidatePath("/", "layout");
   return result;
 }
 
-export async function forcePullSync() {
+export async function forcePullSync(sessionToken?: string | null) {
+  const { requireControlActor } = await import("@/lib/identity/control");
+  await requireControlActor(sessionToken);
   const { pullSync } = await import("@/lib/sync/sync-service");
   const result = await pullSync();
   revalidatePath("/", "layout");
@@ -67,24 +71,36 @@ export async function resetSyncCursor() {
   };
 }
 
-export async function checkRestoreEligibility() {
+export async function checkRestoreEligibility(sessionToken?: string | null) {
+  const { requireControlActor } = await import("@/lib/identity/control");
+  await requireControlActor(sessionToken);
   const { checkRestoreEligibility: check } = await import("@/lib/sync/sync-service");
   return check();
 }
 
-export async function performFullRestore(options?: { force?: boolean; acknowledgeUnsynced?: boolean }) {
+export async function performFullRestore(options?: { force?: boolean; acknowledgeUnsynced?: boolean }, sessionToken?: string | null) {
+  try {
+    const { requireControlActor } = await import("@/lib/identity/control");
+    await requireControlActor(sessionToken);
+  } catch (error: any) {
+    return { success: false as const, tablesRestored: 0, totalRows: 0, errors: [{ table: "global", error: error?.message || "Not authorized." }] };
+  }
   const { fullRestoreFromSupabase } = await import("@/lib/sync/sync-service");
   const result = await fullRestoreFromSupabase(options);
   revalidatePath("/", "layout");
   return result;
 }
 
-export async function fetchRestoreDiffSummary() {
+export async function fetchRestoreDiffSummary(sessionToken?: string | null) {
+  const { requireControlActor } = await import("@/lib/identity/control");
+  await requireControlActor(sessionToken);
   const { generateRestoreDiffSummary } = await import("@/lib/sync/diff-service");
   return generateRestoreDiffSummary();
 }
 
-export async function fetchDetailedTableDiff(tableName: string) {
+export async function fetchDetailedTableDiff(tableName: string, sessionToken?: string | null) {
+  const { requireControlActor } = await import("@/lib/identity/control");
+  await requireControlActor(sessionToken);
   const { getDetailedTableDiff } = await import("@/lib/sync/diff-service");
   return getDetailedTableDiff(tableName);
 }

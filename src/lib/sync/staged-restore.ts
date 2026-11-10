@@ -5,11 +5,12 @@ import { Prisma, PrismaClient } from "@prisma/client";
 import { ALL_MIGRATIONS, runMigrations } from "@/lib/migrations";
 import { verifySchemaSync } from "@/lib/bootstrap";
 import { createSyncClient } from "@/lib/supabase/client-sync";
-import { disconnectDatabase, getDatabaseFilePath } from "@/lib/prisma";
+import { disconnectDatabase, getDatabaseFilePath, getTrustedRestoreClient, GATED_CLIENT_MARKER } from "@/lib/prisma";
 import { PULL_ORDER, SYNC_MODEL_CONFIG } from "./sync-config";
 import SYNC_MAP from "./sync-map.json";
-import { beginRestore, endRestore } from "./restore-state";
+import { abandonRestartIntent, beginRestartIntent, beginRestore, endRestore } from "./restore-state";
 import { cleanupDatabaseFiles, clearRestoreJournal, moveDatabaseFiles, startRestoreJournal, updateRestoreJournal } from "./restore-files";
+import { snapshotIdentity, isEnrolledSnapshot, applyIdentitySnapshot } from "@/lib/identity/preserve";
 
 export type RestoreError = { table: string; rowId?: string; error: string };
 export type StagedRestoreOptions = { force?: boolean; acknowledgeUnsynced?: boolean };
@@ -145,7 +146,13 @@ export async function stagedRestoreFromSupabase(
   options: StagedRestoreOptions = {},
   dependencies: StagedRestoreDependencies = {},
 ): Promise<StagedRestoreResult> {
-  if (!beginRestore()) return { success: false, tablesRestored: 0, totalRows: 0, errors: [{ table: "global", error: "A restore is already in progress." }] };
+  const restoreToken = beginRestore();
+  if (!restoreToken) return { success: false, tablesRestored: 0, totalRows: 0, errors: [{ table: "global", error: "A restore is already in progress." }] };
+  // The public query-layer client is barrier-gated and refuses while a restore is in
+  // progress - that includes this restore. The restore owner reaches the database
+  // through its scoped session token instead. A caller-supplied non-gated client
+  // (tests, fixtures) is honored as-is.
+  const internalDb = (activeDb as any)[GATED_CLIENT_MARKER] ? getTrustedRestoreClient(restoreToken) : activeDb;
   const activePath = dependencies.activePath ?? getDatabaseFilePath();
   const stagePath = stagingPathFor(activePath);
   const errors: RestoreError[] = [];
@@ -156,12 +163,12 @@ export async function stagedRestoreFromSupabase(
 
   try {
     if (!fs.existsSync(activePath)) throw new Error(`Active database file does not exist: ${activePath}`);
-    const pending = await pendingLocalSyncCount(activeDb);
+    const pending = await pendingLocalSyncCount(internalDb);
     if (pending > 0 && !options.acknowledgeUnsynced) {
       throw new Error(`Restore refused: ${pending} local audit event(s) have not been synced. Export/resolve them, then explicitly acknowledge the overwrite.`);
     }
     if (!options.force) {
-      const localData = await activeDb.auditLog.count();
+      const localData = await internalDb.auditLog.count();
       if (localData > 0) throw new Error("Restore refused: local data exists. Use force=true only after reviewing the backup that will be created.");
     }
 
@@ -189,14 +196,43 @@ export async function stagedRestoreFromSupabase(
     const now = new Date();
     await stage.syncState.upsert({ where: { id: "default" }, update: { lastSyncedAt: now, status: "IDLE", lastError: null }, create: { id: "default", lastSyncedAt: now, status: "IDLE" } });
     await stage.syncState.upsert({ where: { id: "pull_state" }, update: { lastSyncedAt: now, status: "IDLE", lastError: null }, create: { id: "pull_state", lastSyncedAt: now, status: "IDLE" } });
+    // Device identity is never pulled from the cloud (excluded from PULL_ORDER
+    // and the sync map), so a staged restore would otherwise produce a
+    // database with empty identity tables: every login session gone and the
+    // completed enrollment reopened. Carry the CURRENT device's identity
+    // snapshot into staging before validation and swap. When this device has
+    // not completed enrollment there is nothing to carry and the restored
+    // database stays unenrolled.
+    const identitySnapshot = await snapshotIdentity(internalDb);
+    if (isEnrolledSnapshot(identitySnapshot)) {
+      await applyIdentitySnapshot(stage, identitySnapshot);
+    }
     await validateStage(stage, expectedCounts);
     await stage.$disconnect();
     stage = undefined;
 
-    await activeDb.$queryRawUnsafe("PRAGMA wal_checkpoint(TRUNCATE)");
+    // FULL59: hold the durable restart-intent marker across the whole swap
+    // window. restoreInProgress is per-bundle module state and the shared
+    // globalThis client cache is cleared at disconnect, so without a
+    // cross-bundle barrier another bundle could open a client against a
+    // missing or half-swapped database file mid-swap. The contract for a
+    // cloud staged restore is refresh-and-CONTINUE (unlike a local .bak
+    // restore, which requires restart), so the marker is RELEASED on success
+    // below - not retained as a restart barrier. If the intent cannot be
+    // persisted, the restore aborts here with the active database untouched.
+    let intentToken: string;
+    try {
+      intentToken = beginRestartIntent("cloud staged restore");
+    } catch (intentError) {
+      throw new Error(`Could not prepare the restore safely. The database was not changed. (${intentError instanceof Error ? intentError.message : String(intentError)})`);
+    }
+    await internalDb.$queryRawUnsafe("PRAGMA wal_checkpoint(TRUNCATE)");
     await (dependencies.disconnectActive ?? disconnectDatabase)();
     backupPath = `${activePath}.pre-restore-${timestampForFileName()}.bak`;
     startRestoreJournal(activePath, backupPath, stagePath);
+    // Durable record BEFORE the first active rename: a journal-write fault can
+    // never leave phase 'prepared' with the active database already moved aside.
+    updateRestoreJournal(activePath, "moving-active");
     moveDatabaseFiles(activePath, backupPath);
     updateRestoreJournal(activePath, "backup-moved");
     try {
@@ -209,11 +245,22 @@ export async function stagedRestoreFromSupabase(
       if (fs.existsSync(activePath)) moveDatabaseFiles(activePath, failedPath);
       moveDatabaseFiles(backupPath, activePath);
       clearRestoreJournal(activePath);
+      // The rollback completed: the original database is back in place, so OUR
+      // intent marker is released (never another operation's). If any rollback
+      // step above failed, this line never runs and the barrier stays: fail
+      // closed until restart.
+      abandonRestartIntent(intentToken);
       throw swapError;
     }
 
+    // Success - refresh-and-continue contract: release OUR intent marker so
+    // queries resume against the staged database.
+    abandonRestartIntent(intentToken);
     return { success: true, tablesRestored, totalRows, errors, backupPath };
   } catch (error) {
+    // Errors after the intent was persisted and NOT covered by a completed
+    // rollback keep the marker in place: fail closed until restart rather
+    // than risk queries against an uncertain database-file state.
     errors.push({ table: "global", error: error instanceof Error ? error.message : String(error) });
     return { success: false, tablesRestored, totalRows, errors, backupPath };
   } finally {

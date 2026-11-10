@@ -1,164 +1,122 @@
 "use server";
 
+import { getOrCreateDayBook, recalculateDayBook } from "@/lib/domain/daybook";
+import { paymentCashBook } from "@/lib/domain/daybook/payment-summary";
 import { getDb } from "./prisma";
 import { writeAuditEvent } from "@/lib/domain";
 import { triggerAutoSync } from "@/lib/sync/auto-sync";
-function getDayBounds(dateString?: string) {
-  const d = dateString ? new Date(dateString) : new Date();
-  
-  const start = new Date(d);
-  start.setHours(0, 0, 0, 0);
-  
-  const end = new Date(d);
-  end.setHours(23, 59, 59, 999);
-  
-  return { start, end };
-}
-
-function getBusinessDate(dateString?: string) {
-  const d = dateString ? new Date(dateString) : new Date();
-  const dateStr = d.toISOString().split("T")[0];
-  return new Date(`${dateStr}T00:00:00.000Z`);
-}
-
+import { businessDateKey, businessDayBounds, businessTimestampForWrite } from "@/lib/domain/daybook/business-date";
 export async function fetchDayBookData(dateString?: string) {
-  const db = await getDb();
-  const { start, end } = getDayBounds(dateString);
-  const businessDate = getBusinessDate(dateString);
-
-  // 1. Opening Balances
-  let dayBook = await db.dayBook.findUnique({
-    where: { businessDate },
-  });
-
-  if (!dayBook) {
-    // Check for previous day's closing balance to use as default opening
-    const prevDay = new Date(businessDate);
-    prevDay.setDate(prevDay.getDate() - 1);
-    const prevDayBook = await db.dayBook.findUnique({
-      where: { businessDate: prevDay },
-    });
-    
-    dayBook = {
-      openingCashBalance: prevDayBook?.closingCashBalance || 0,
-      openingBankBalance: prevDayBook?.closingBankBalance || 0,
-    } as any;
-  }
-
-  // 2. Sales
-  const sales = await db.outgoingSale.findMany({
-    where: { saleDate: { gte: start, lte: end } },
-  });
-  
-  let cashSales = 0;
-  let bankSales = 0;
-  let creditSales = 0;
-  
-  sales.forEach(sale => {
-    cashSales += sale.cashPaid || 0;
-    bankSales += (sale.bankPaid || 0) + (sale.gPayPaid || 0);
-    creditSales += sale.remainingCredit || 0;
-  });
-
-  // 3. Party Collections
-  const collections = await db.partyCollection.findMany({
-    where: { collectionDate: { gte: start, lte: end } },
-  });
-
-  let cashCollections = 0;
-  let bankCollections = 0;
-
-  collections.forEach(c => {
-    cashCollections += c.cashPaid || 0;
-    bankCollections += (c.bankPaid || 0) + (c.gPayPaid || 0);
-  });
-
-  // 4. Expenses
-  // We look up the dayBook object if it exists to find expenses
-  let expenses: any[] = [];
-  if (dayBook && dayBook.id) {
-    expenses = await db.dayBookExpenseEntry.findMany({
-      where: { dayBookId: dayBook.id },
-    });
-  }
-
-  let dieselExp = 0;
-  let labourExp = 0;
-  let vehicleExp = 0;
-  let otherExp = 0;
-  let cashExp = 0; // Assuming all expenses are cash for now
-
-  expenses.forEach(e => {
-    cashExp += e.amount;
-    const type = e.expenseType.toLowerCase();
-    if (type.includes("diesel")) dieselExp += e.amount;
-    else if (type.includes("labour")) labourExp += e.amount;
-    else if (type.includes("vehicle")) vehicleExp += e.amount;
-    else otherExp += e.amount;
-  });
-
-  // 5. Transfers
-  const transfers = await db.cashTransfer.findMany({
-    where: { date: { gte: start, lte: end } },
-  });
-
-  let cashToBank = 0;
-  let bankToCash = 0;
-
-  transfers.forEach(t => {
-    if (t.type === "CASH_TO_BANK") cashToBank += t.amount;
-    else if (t.type === "BANK_TO_CASH") bankToCash += t.amount;
-  });
-
-  // 6. Calculate Closings
-  const closingCash = (dayBook?.openingCashBalance || 0) + cashSales + cashCollections + bankToCash - cashExp - cashToBank;
-  const closingBank = (dayBook?.openingBankBalance || 0) + bankSales + bankCollections + cashToBank - bankToCash;
-
-  return JSON.parse(JSON.stringify({
-    openingCash: dayBook?.openingCashBalance || 0,
-    openingBank: dayBook?.openingBankBalance || 0,
-    cashSales,
-    bankSales,
-    creditSales,
-    cashCollections,
-    bankCollections,
-    dieselExp,
-    labourExp,
-    vehicleExp,
-    otherExp,
-    cashExp,
-    cashToBank,
-    bankToCash,
-    closingCash,
-    closingBank,
-    expenses,
-    transfers
-  }));
+ const db=await getDb();return db.$transaction(async(tx)=>{
+  const key=businessDateKey(dateString),label=key.toISOString().slice(0,10);const {start,endExclusive}=businessDayBounds(label);
+  const book=await tx.dayBook.findUnique({where:{businessDate:key}});const previous=new Date(key);previous.setUTCDate(previous.getUTCDate()-1);
+  const prior=book?null:await tx.dayBook.findUnique({where:{businessDate:previous}});
+  const openingCash=book?.openingCashBalance??prior?.closingCashBalance??0,openingBank=book?.openingBankBalance??prior?.closingBankBalance??0;
+  const sales=await tx.outgoingSale.findMany({where:{saleDate:{gte:start,lt:endExclusive}}});
+  const cashSales=sales.reduce((sum,r)=>sum+r.cashPaid,0),bankSales=sales.reduce((sum,r)=>sum+r.bankPaid+r.gPayPaid,0),creditSales=sales.reduce((sum,r)=>sum+r.remainingCredit,0);
+  const result=await paymentCashBook(tx,label,openingCash,openingBank,book?.id,cashSales,bankSales);
+  if(!result.available)throw new Error(result.unresolved.join("; "));
+  const cashCollections=result.collections.reduce((sum,r)=>sum+r.cashPaid,0),bankCollections=result.collections.reduce((sum,r)=>sum+r.bankPaid+r.gPayPaid,0);
+  const categories={dieselExp:0,labourExp:0,vehicleExp:0,otherExp:0};for(const e of result.entries){const type=e.expenseType.toLowerCase();if(type.includes('diesel'))categories.dieselExp+=e.amount;else if(type.includes('labour'))categories.labourExp+=e.amount;else if(type.includes('vehicle'))categories.vehicleExp+=e.amount;else categories.otherExp+=e.amount;}
+  const cashToBank=result.transfers.filter(r=>r.type==='CASH_TO_BANK').reduce((sum,r)=>sum+r.amount,0),bankToCash=result.transfers.filter(r=>r.type==='BANK_TO_CASH').reduce((sum,r)=>sum+r.amount,0);
+  return JSON.parse(JSON.stringify({openingCash,openingBank,cashSales,bankSales,creditSales,cashCollections,bankCollections,...categories,cashExp:result.expenseTotal,expenseTotal:result.expenseTotal,cashToBank,bankToCash,closingCash:result.closingCash,closingBank:result.closingBank,expenses:result.entries,transfers:result.transfers}));
+ });
 }
 
-export async function saveCashTransfer(data: { type: string; amount: number; time: string; date: string; remarks: string; userName: string }) {
+function matchesSavedTransfer(prior: { type: string; amount: number; time: string; remarks: string | null; userName: string; date: Date }, data: { type: string; amount: number; time: string; remarks: string; userName: string; date: string }) {
+  return prior.type === data.type
+    && prior.amount === Number(data.amount)
+    && prior.time === data.time
+    && prior.remarks === data.remarks
+    && prior.userName === data.userName
+    && prior.date.getTime() === businessTimestampForWrite(data.date).getTime();
+}
+
+const CHANGED_INTENT_MESSAGE = 'A transfer with different details was already saved with this reference. Check the day\'s history before trying again.';
+
+export async function saveCashTransfer(data: { submissionId: string; type: string; amount: number; time: string; date: string; remarks: string; userName: string }) {
+  // FULL68: the client-generated submission reference IS the transfer row id.
+  // An ambiguous retry of the SAME transfer returns the original row instead of
+  // writing a duplicate; the same reference with changed details is refused
+  // honestly so the bookkeeper checks the history first (Judah's audit intent:
+  // no duplicate money movements). Narrow port of the R7 guard pattern only -
+  // no funds-cover, balance, paise or opening policy is added here.
+  if (!data || typeof data.submissionId !== 'string' || !/^[a-f0-9]{8}-[a-f0-9]{4}-4[a-f0-9]{3}-[89ab][a-f0-9]{3}-[a-f0-9]{12}$/i.test(data.submissionId)) {
+    throw new Error('A valid transfer reference is required.');
+  }
   const db = await getDb();
-  const transfer = await db.cashTransfer.create({
-    data: {
-      type: data.type,
-      amount: Number(data.amount),
-      time: data.time,
-      date: new Date(data.date),
-      remarks: data.remarks,
-      userName: data.userName,
+  const runAttempt = () => db.$transaction(async (tx) => {
+    const prior = await tx.cashTransfer.findUnique({ where: { id: data.submissionId } });
+    if (prior) {
+      if (!matchesSavedTransfer(prior, data)) {
+        throw new Error(CHANGED_INTENT_MESSAGE);
+      }
+      return { row: prior, created: false };
     }
+    const created = await tx.cashTransfer.create({
+      data: {
+        id: data.submissionId,
+        type: data.type,
+        amount: Number(data.amount),
+        time: data.time,
+        date: businessTimestampForWrite(data.date),
+        remarks: data.remarks,
+        userName: data.userName,
+      }
+    });
+    const book = await getOrCreateDayBook(tx, data.date);
+    await recalculateDayBook(tx, book);
+    // FULL69: the audit row is part of the SAME transaction as the transfer
+    // and the Day Book recalculation. An audit fault aborts everything - a
+    // transfer is never saved without its trail (record-every-change intent).
+    await writeAuditEvent(tx, {
+      entityName: "CashTransfer",
+      entityId: created.id,
+      action: "create",
+      role: data.userName || "system",
+      after: created,
+    });
+    return { row: created, created: true };
   });
 
-  await writeAuditEvent(db, {
-    entityName: "CashTransfer",
-    entityId: transfer.id,
-    action: "create",
-    role: data.userName || "system",
-    after: transfer,
-  });
+  let row: Awaited<ReturnType<typeof runAttempt>>["row"];
+  let created: boolean;
+  try {
+    ({ row, created } = await runAttempt());
+  } catch (error) {
+    // A concurrent identical attempt lost the unique race: the winner already
+    // committed the same fact (row + Day Book + audit in ONE transaction).
+    // Return the original row for identical content; a changed intent is
+    // still refused honestly, and no ORM error text reaches the caller.
+    if (error instanceof Error && error.message === CHANGED_INTENT_MESSAGE) throw error;
+    // FULL71: raw ORM/driver text never crosses the server-action boundary.
+    // The caller gets one honest retryable message; the original error is
+    // preserved as the cause for server-side diagnostics.
+    if ((error as { code?: string } | null)?.code !== "P2002") {
+      throw new Error("Could not save the transfer right now; please retry.", { cause: error });
+    }
+    // FULL72: the re-read itself is inside the same sanitized boundary - a
+    // storage fault here must not leak raw ORM/driver text either.
+    let prior: Awaited<ReturnType<typeof db.cashTransfer.findUnique>>;
+    try {
+      prior = await db.cashTransfer.findUnique({ where: { id: data.submissionId } });
+    } catch (rereadError) {
+      throw new Error("Could not save the transfer right now; please retry.", { cause: rereadError });
+    }
+    if (!prior) {
+      throw new Error("Could not save the transfer right now; please retry.", { cause: error });
+    }
+    if (!matchesSavedTransfer(prior, data)) {
+      throw new Error(CHANGED_INTENT_MESSAGE);
+    }
+    row = prior;
+    created = false;
+  }
 
-  // Fire-and-forget: don't block the server action response with sync
+  // Fire-and-forget: don't block the server action response with sync. A retry
+  // of an already-saved transfer re-triggers delivery of the same fact.
   setTimeout(() => triggerAutoSync().catch(console.error), 0);
+  return row;
 }
 
 export async function logDayBookAudit(data: { userName: string; date: string; time: string; oldValue: any; newValue: any; action: string; module: string }) {
@@ -174,12 +132,10 @@ export async function logDayBookAudit(data: { userName: string; date: string; ti
 }
 
 export async function purgeOldAuditLogs() {
-  const db = await getDb();
-  const oneMonthAgo = new Date();
-  oneMonthAgo.setMonth(oneMonthAgo.getMonth() - 1);
-  await db.auditLog.deleteMany({
-    where: {
-      createdAt: { lt: oneMonthAgo }
-    }
-  });
+  // auditLog also carries delivery intent, including unsent deletions.
+  return {
+    success: false as const,
+    code: "RETENTION_POLICY_REQUIRED" as const,
+    message: "Age-based local audit cleanup is paused. No records were deleted. Delivery and recovery requirements must be reviewed before cleanup.",
+  };
 }

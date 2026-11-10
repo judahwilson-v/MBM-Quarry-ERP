@@ -50,7 +50,7 @@ export function MaterialRatesPage() {
     setError("");
     setMessage("");
     try {
-      await updateMaterialRate(id, draftRates[id]);
+      await updateMaterialRate(id, draftRates[id], password);
       setEditingId("");
       setMessage("Rate updated. New sales will use the updated rate.");
       await load();

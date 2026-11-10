@@ -1,4 +1,4 @@
-import { getGlobalSettings } from "@/app/actions/settings";
+import { getPublicSettings } from "@/app/actions/settings";
 import { getPendingTickets } from "@/app/actions/weighbridge";
 import { redirect } from "next/navigation";
 import { Scale } from "lucide-react";
@@ -8,7 +8,7 @@ import { NewTicketDialog } from "./weighbridge-forms";
 export const dynamic = "force-dynamic";
 
 export default async function WeighbridgePage() {
-  const settings = await getGlobalSettings();
+  const settings = await getPublicSettings();
 
   if (!settings.enableWeighbridge) {
     redirect("/");

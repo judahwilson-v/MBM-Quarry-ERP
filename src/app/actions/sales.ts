@@ -12,7 +12,7 @@ import { emitFinancialEvent } from "@/lib/domain/financial-events";
 import { getOrCreateDayBook, recalculateDayBook } from "@/lib/domain/daybook";
 import { recalculatePartyLedger } from "@/lib/domain/ledger/party-ledger-service";
 import { txAdjustInventoryStock } from "@/lib/domain/inventory/service";
-import { verifyEditPassword } from "@/app/actions/auth";
+import { verifyEditPassword, requireActor, isEnrollmentComplete } from "@/app/actions/auth";
 import { validateWithSchema, SaleInputSchema, DeleteSaleSchema } from "@/lib/validators/schemas";
 import { sanitizeError } from "@/lib/utils/sanitize-error";
 
@@ -25,54 +25,49 @@ function normalizeVehicleNumber(value: string) {
   return value.trim().replace(/\s+/g, " ").toUpperCase();
 }
 
-async function upsertPartyByName(partyName: string) {
-  const db = await getDb();
+// F08(a): master upserts run inside the caller's business transaction so a
+// failed sale/purchase never leaves a committed orphan Party/Vehicle row.
+async function upsertPartyByName(tx: Prisma.TransactionClient, partyName: string) {
   const name = partyName.trim();
   if (!name) return;
-  const existing = await db.party.findFirst({
+  const existing = await tx.party.findFirst({
     where: { partyName: { equals: name } },
     select: { id: true },
   });
   if (!existing) {
-    return await runTx(async (tx) => {
-      const row = await tx.party.create({ data: { partyName: name } });
-      try {
-        await writeAuditEvent(tx, { entityName: "Party", entityId: row.id, action: "create", role: "system", after: row });
-      } catch {
-        console.warn("Failed to write audit event for party upsert");
-      }
-      return row;
-    });
+    const row = await tx.party.create({ data: { partyName: name } });
+    try {
+      await writeAuditEvent(tx, { entityName: "Party", entityId: row.id, action: "create", role: "system", after: row });
+    } catch {
+      console.warn("Failed to write audit event for party upsert");
+    }
+    return row;
   }
   return existing;
 }
 
-async function upsertVehicleByNumber(vehicleNumber: string, partyName?: string, partyId?: string | null, qty?: number | null) {
-  const db = await getDb();
+async function upsertVehicleByNumber(tx: Prisma.TransactionClient, vehicleNumber: string, partyName?: string, partyId?: string | null, qty?: number | null) {
   const normalized = normalizeVehicleNumber(vehicleNumber);
   if (!normalized) return null;
 
-  let existing = await db.vehicle.findUnique({
+  let existing = await tx.vehicle.findUnique({
     where: { vehicleNumber: normalized },
   });
 
   if (!existing) {
-    existing = await runTx(async (tx) => {
-      const row = await tx.vehicle.create({
-        data: {
-          vehicleNumber: normalized,
-          partyName: partyName || null,
-          partyId: partyId || null,
-          companyBodyQty: qty || null,
-        },
-      });
-      try {
-        await writeAuditEvent(tx, { entityName: "Vehicle", entityId: row.id, action: "create", role: "system", after: row });
-      } catch {
-        console.warn("Failed to write audit event for vehicle create");
-      }
-      return row;
+    existing = await tx.vehicle.create({
+      data: {
+        vehicleNumber: normalized,
+        partyName: partyName || null,
+        partyId: partyId || null,
+        companyBodyQty: qty || null,
+      },
     });
+    try {
+      await writeAuditEvent(tx, { entityName: "Vehicle", entityId: existing.id, action: "create", role: "system", after: existing });
+    } catch {
+      console.warn("Failed to write audit event for vehicle create");
+    }
   } else {
     const updateData: any = {};
     if (partyName && !existing.partyName) updateData.partyName = partyName;
@@ -80,19 +75,16 @@ async function upsertVehicleByNumber(vehicleNumber: string, partyName?: string, 
     if (qty && !existing.companyBodyQty && !existing.extraBodyQty) updateData.companyBodyQty = qty;
 
     if (Object.keys(updateData).length > 0) {
-      existing = await runTx(async (tx) => {
-        const before = existing;
-        const row = await tx.vehicle.update({
-          where: { id: existing!.id },
-          data: updateData,
-        });
-        try {
-          await writeAuditEvent(tx, { entityName: "Vehicle", entityId: row.id, action: "update", role: "system", before, after: row });
-        } catch {
-          console.warn("Failed to write audit event for vehicle update");
-        }
-        return row;
+      const before = existing;
+      existing = await tx.vehicle.update({
+        where: { id: existing.id },
+        data: updateData,
       });
+      try {
+        await writeAuditEvent(tx, { entityName: "Vehicle", entityId: existing.id, action: "update", role: "system", before, after: existing });
+      } catch {
+        console.warn("Failed to write audit event for vehicle update");
+      }
     }
   }
   return existing;
@@ -172,26 +164,43 @@ export async function checkDuplicateSaleBookNumber(bookNo: number, pageNo: numbe
 
 
 
-export async function saveSale(input: SaleInput, pin?: string) {
+export async function saveSale(input: SaleInput, pin?: string, sessionToken?: string) {
   try {
+    // Fail closed BEFORE any transactional work: once enrollment is complete a
+    // valid session is mandatory, and the refusal returns as a normal failure
+    // instead of an uncaught throw.
+    const actor = await requireActor(sessionToken);
+    const actorName = actor?.name ?? "system";
     const validated = validateWithSchema(SaleInputSchema, input);
     const db = await getDb();
     const material = await db.material.findUnique({ where: { id: validated.materialId } });
     if (!material) throw new Error("Material is required.");
-    const normalizedVehicleNumber = normalizeVehicleNumber(validated.vehicleNumber);
-    
-    let partyId = null;
-    if (validated.partyName) {
-      const party = await upsertPartyByName(validated.partyName);
-      partyId = party?.id || null;
+    // F08(a): an edit attempt is authorized BEFORE any committed master,
+    // financial, or audit write (previously the PIN was checked inside the
+    // transaction, after the party/vehicle upserts had already committed).
+    if (validated.id) {
+      if (!pin) {
+        throw new Error("Admin PIN is required to edit records.");
+      }
+      const isAuth = await verifyEditPassword(pin);
+      if (!isAuth) {
+        throw new Error("Invalid Admin PIN");
+      }
     }
-    
-    const parsedQty = validated.qty;
-    const vehicle = await upsertVehicleByNumber(normalizedVehicleNumber, validated.partyName ?? "", partyId, parsedQty);
-    if (vehicle && !partyId) partyId = vehicle.partyId;
+    const normalizedVehicleNumber = normalizeVehicleNumber(validated.vehicleNumber);
 
     return { success: true, data: serialize(
       await runTx(async (tx) => {
+        let partyId = null;
+        if (validated.partyName) {
+          const party = await upsertPartyByName(tx, validated.partyName);
+          partyId = party?.id || null;
+        }
+
+        const parsedQty = validated.qty;
+        const vehicle = await upsertVehicleByNumber(tx, normalizedVehicleNumber, validated.partyName ?? "", partyId, parsedQty);
+        if (vehicle && !partyId) partyId = vehicle.partyId;
+
         const existing = validated.id ? await tx.outgoingSale.findUnique({ where: { id: validated.id } }) : null;
         const engine = deriveSalesEngine(
           { ...validated, partyId } as SalesDraft,
@@ -199,14 +208,15 @@ export async function saveSale(input: SaleInput, pin?: string) {
         );
 
         if (existing) {
-          if (!pin) {
-            throw new Error("Admin PIN is required to edit records.");
-          }
-          const isAuth = await verifyEditPassword(pin);
-          if (!isAuth) {
-            throw new Error("Invalid Admin PIN");
-          }
 
+          // FULL60: the FULL56 no-bypass rule now covers EVERY direct edit.
+          // Once enrollment is complete, changing any field of an existing
+          // sale requires the request-approval trail; the legacy edit action
+          // and its shared PIN no longer authorize edits at all. Unenrolled
+          // installs keep the previous PIN-gated behavior.
+          if (await isEnrollmentComplete()) {
+            throw new Error("Sale edits require an approved change request. File a request from the sales list instead.");
+          }
           if (existing.vehicleId) {
             await decrementVehicleTrips(tx, existing.vehicleId, existing.tripDelta ?? 1);
           }
@@ -251,7 +261,7 @@ export async function saveSale(input: SaleInput, pin?: string) {
             entityName: "Sale",
             entityId: sale.id,
             action: "update",
-            role: "system",
+            role: actorName,
             before: existing,
             after: sale,
             reason: engine.qtyChanged ? engine.quantityReason : null,
@@ -349,7 +359,7 @@ export async function saveSale(input: SaleInput, pin?: string) {
           entityName: "Sale",
           entityId: sale.id,
           action: "create",
-          role: "system",
+          role: actorName,
           after: sale,
           reason: engine.qtyChanged ? engine.quantityReason : null,
         });
@@ -366,9 +376,21 @@ export async function saveSale(input: SaleInput, pin?: string) {
 }
 
 
-export async function deleteSale(id: string, pin?: string) {
+export async function deleteSale(id: string, pin?: string, sessionToken?: string) {
   try {
+    // Fail closed BEFORE any transactional work: once enrollment is complete a
+    // valid session is mandatory, and the refusal returns as a normal failure
+    // instead of an uncaught throw.
+    const actor = await requireActor(sessionToken);
+    const actorName = actor?.name ?? "system";
     validateWithSchema(DeleteSaleSchema, { id, pin });
+    // FULL60: once enrollment is complete, deletes require the request-approval
+    // trail; the shared legacy delete PIN no longer authorizes deletion.
+    // Checked BEFORE the PIN so a post-enrollment refusal never reveals PIN
+    // validity. Unenrolled installs keep the previous PIN-gated behavior.
+    if (await isEnrollmentComplete()) {
+      throw new Error("Deleting a sale requires an approved change request. File a delete request from the sales list instead.");
+    }
     if (!pin || !(await verifyEditPassword(pin, "delete"))) {
       throw new Error("Invalid delete PIN");
     }
@@ -382,17 +404,17 @@ export async function deleteSale(id: string, pin?: string) {
           if (v) await decrementVehicleTrips(tx, existing.vehicleId, existing.tripDelta ?? 1);
         }
         
-        try {
-          await writeAuditEvent(tx, {
-            entityName: "Sale",
-            entityId: id,
-            action: "delete",
-            role: "system",
-            before: existing,
-          });
-        } catch {
-          console.warn(`[Audit Log Warning] Failed to write audit event for Sale deletion (ID: ${id})`);
-        }
+        // FULL60: the deletion trail is fail-closed like every other approved
+        // mutation - if the audit event cannot be written the transaction
+        // rolls back and nothing is deleted. A delete must never commit
+        // without its trail.
+        await writeAuditEvent(tx, {
+          entityName: "Sale",
+          entityId: id,
+          action: "delete",
+          role: actorName,
+          before: existing,
+        });
 
         if (existing.partyId) {
           const p = await tx.party.findUnique({ where: { id: existing.partyId } });
@@ -425,78 +447,15 @@ export async function deleteSale(id: string, pin?: string) {
 }
 
 
-export async function purgeNonGstSales(pin?: string) {
-  try {
-    if (!pin || !(await verifyEditPassword(pin, "delete"))) {
-      return { success: false, error: "Invalid delete PIN" };
-    }
-    const count = await runTx(async (tx) => {
-      const nonGstSales = await tx.outgoingSale.findMany({
-        where: { gstEnabled: false },
-      });
-      if (nonGstSales.length === 0) return 0;
-
-      const affectedPartyIds = new Set<string>();
-      const affectedDates = new Set<string>();
-      
-      for (const sale of nonGstSales) {
-        if (sale.vehicleId) {
-          const v = await tx.vehicle.findUnique({ where: { id: sale.vehicleId } });
-          if (v) await decrementVehicleTrips(tx, sale.vehicleId, sale.tripDelta ?? 1);
-        }
-        if (sale.partyId) {
-          const p = await tx.party.findUnique({ where: { id: sale.partyId } });
-          if (p) affectedPartyIds.add(sale.partyId);
-        }
-        affectedDates.add(sale.saleDate.toISOString());
-        
-        // Restore inventory per item!
-        const m = await tx.material.findFirst({ where: { materialName: sale.materialName } });
-        if (m) {
-          await txAdjustInventoryStock(tx, sale.materialName, sale.qty, 'SALE_OUT', sale.id, `Sale Purged: ${sale.vehicleNumber}`);
-        }
-        
-        // Write individual audit entries instead of BULK_PURGE
-        try {
-          await writeAuditEvent(tx, {
-            entityName: "Sale",
-            entityId: sale.id,
-            action: "delete",
-            role: "system",
-            before: sale,
-          });
-        } catch {
-          console.warn(`[Audit Log Warning] Failed to write audit event for Purged Sale (ID: ${sale.id})`);
-        }
-      }
-
-      const saleIds = nonGstSales.map((s: any) => s.id);
-      const events = await tx.financialEvent.findMany({ where: { entityId: { in: saleIds } } });
-      const eventIds = events.map((e: any) => e.eventId);
-      if (eventIds.length > 0) {
-        await tx.ledgerEntry.deleteMany({ where: { financialEventId: { in: eventIds } } });
-        await tx.financialEvent.deleteMany({ where: { eventId: { in: eventIds } } });
-      }
-
-      const deleteResult = await tx.outgoingSale.deleteMany({
-        where: { gstEnabled: false },
-      });
-
-      for (const partyId of Array.from(affectedPartyIds)) {
-        await recalculatePartyLedger(tx, partyId);
-      }
-      
-      for (const d of Array.from(affectedDates)) {
-        const dayBook = await getOrCreateDayBook(tx, d);
-        await recalculateDayBook(tx, dayBook);
-      }
-
-      return deleteResult.count;
-    });
-    return { success: true, count };
-  } catch (error) {
-    return { success: false, error: sanitizeError(error) };
-  }
+// FULL74: the bulk non-GST purge is RETIRED. Deleting many sales in one
+// action destroys the record trail the owner requires (10 Nov: additions,
+// edits and removals stay recorded and accountable). No PIN or session
+// re-enables it. FULL75 wording honesty: corrections go one at a time
+// through the request-approval trail; removing a sale record is NOT
+// implemented yet, and this message must not imply it is. This function
+// never deletes anything.
+export async function purgeNonGstSales(_pin?: string, _sessionToken?: string) {
+  return { success: false as const, error: "Bulk purge of sales has been retired. Sales are corrected one record at a time through the request-approval trail, so every change stays recorded. Removing a sale record is not supported yet, so the record stays in the books." };
 }
 
 

@@ -13,6 +13,7 @@ import {
   retryOutboxDelivery,
   exportSyncDiagnostics,
 } from "@/app/actions/sync";
+import { getSessionToken } from "@/lib/session-client";
 import TableDiffViewer from "@/components/sync/TableDiffViewer";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -115,7 +116,7 @@ export default function SyncDashboardPage() {
   const handleCompareData = async () => {
     setDiffPhase('loading');
     try {
-      const result = await fetchRestoreDiffSummary();
+      const result = await fetchRestoreDiffSummary(getSessionToken());
       setDiffSummaries(result);
       setDiffPhase('summary');
     } catch (error) {
@@ -128,7 +129,7 @@ export default function SyncDashboardPage() {
   const handleCheckRestore = async () => {
     setRestorePhase('checking');
     try {
-      const result = await checkRestoreEligibility();
+      const result = await checkRestoreEligibility(getSessionToken());
       setEligibilityData(result);
       setRestorePhase('preview');
     } catch (error) {
@@ -142,7 +143,7 @@ export default function SyncDashboardPage() {
     if (!eligibilityData) return;
     setRestorePhase('restoring');
     try {
-      const result = await performFullRestore({ force: eligibilityData.hasExistingData });
+      const result = await performFullRestore({ force: eligibilityData.hasExistingData }, getSessionToken());
       setRestoreResult(result);
       if (result.success) {
         setRestorePhase('success');
@@ -548,29 +549,32 @@ export default function SyncDashboardPage() {
             </CardTitle>
           </CardHeader>
           <CardContent>
+            <p className="text-xs text-muted-foreground mb-3">
+              {data.overall.totalPendingOutbox} active outbox deliveries; {data.overall.parkedOutboxCount} events parked while legacy/shadow delivery is selected. Parked events are preserved, not counted as active pending work.
+            </p>
             <div className="grid gap-4 grid-cols-2 sm:grid-cols-4 lg:grid-cols-6">
               <div>
                 <p className="text-xs text-muted-foreground">Total Events</p>
                 <p className="text-lg font-semibold">{data.outbox.total}</p>
               </div>
               <div>
-                <p className="text-xs text-muted-foreground">Pending</p>
+                <p className="text-xs text-muted-foreground">Raw Pending Events</p>
                 <p className={`text-lg font-semibold ${data.outbox.pending > 0 ? "text-amber-600" : ""}`}>{data.outbox.pending}</p>
               </div>
               <div>
-                <p className="text-xs text-muted-foreground">Sending</p>
+                <p className="text-xs text-muted-foreground">Raw Sending Events</p>
                 <p className={`text-lg font-semibold ${data.outbox.sending > 0 ? "text-blue-600" : ""}`}>{data.outbox.sending}</p>
               </div>
               <div>
-                <p className="text-xs text-muted-foreground">Acknowledged</p>
+                <p className="text-xs text-muted-foreground">Raw Acknowledged Events</p>
                 <p className="text-lg font-semibold text-green-600">{data.outbox.acked}</p>
               </div>
               <div>
-                <p className="text-xs text-muted-foreground">Oldest Pending</p>
+                <p className="text-xs text-muted-foreground">Oldest Raw Pending</p>
                 <p className="text-lg font-semibold">{formatDuration(data.outbox.oldestPendingAgeMs)}</p>
               </div>
               <div>
-                <p className="text-xs text-muted-foreground">Last Delivered</p>
+                <p className="text-xs text-muted-foreground">Last Outbox ACK</p>
                 <p className="text-sm font-medium">{formatRelativeTime(data.outbox.lastDeliveredAt)}</p>
               </div>
             </div>
@@ -599,7 +603,7 @@ export default function SyncDashboardPage() {
         </Button>
         <Button
           variant="secondary"
-          onClick={() => handleAction("push", forcePushSync)}
+          onClick={() => handleAction("push", () => forcePushSync(getSessionToken()))}
           disabled={isBusy || !isOnline}
         >
           {actionLoading === "push" && <RefreshCw className="mr-2 h-4 w-4 animate-spin" />}
@@ -607,7 +611,7 @@ export default function SyncDashboardPage() {
         </Button>
         <Button
           variant="secondary"
-          onClick={() => handleAction("pull", forcePullSync)}
+          onClick={() => handleAction("pull", () => forcePullSync(getSessionToken()))}
           disabled={isBusy || !isOnline}
         >
           {actionLoading === "pull" && <RefreshCw className="mr-2 h-4 w-4 animate-spin" />}
@@ -678,7 +682,8 @@ export default function SyncDashboardPage() {
                     </div>
                   </div>
                   <div className="text-sm font-medium">
-                    {model.pendingCount} pending
+                    <div>{model.pendingCount} active pending</div>
+                    {model.parkedOutboxCount > 0 && <div className="text-xs text-muted-foreground">{model.parkedOutboxCount} parked events</div>}
                   </div>
                 </div>
               ))}

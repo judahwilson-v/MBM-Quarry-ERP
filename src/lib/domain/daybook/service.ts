@@ -2,6 +2,8 @@ import type { Prisma } from "@prisma/client";
 import { emitFinancialEvent } from "@/lib/domain/financial-events";
 import { projectDayBookExpense } from "./projector";
 import type { DayBookExpenseInput, DayBookOpeningBalanceInput } from "./types";
+import { paymentCashBook } from "./payment-summary";
+import { businessDateKey, businessDayBounds } from "./business-date";
 
 type DayBookRecord = {
   id: string;
@@ -10,36 +12,41 @@ type DayBookRecord = {
   openingBankBalance: number;
 };
 
-function startOfBusinessDay(value: string) {
-  const dateStr = value.includes("T") ? value.split("T")[0] : value;
-  const date = new Date(`${dateStr}T00:00:00`);
-  if (Number.isNaN(date.getTime())) throw new Error("Business date is invalid.");
-  return date;
-}
-
-
-export async function getOrCreateDayBook(tx: Prisma.TransactionClient, businessDate: string) {
-  const day = startOfBusinessDay(businessDate);
+export async function getOrCreateDayBook(tx: Prisma.TransactionClient, businessDate: string | Date) {
+  const day = businessDateKey(businessDate);
   const existing = await tx.dayBook.findUnique({ where: { businessDate: day } });
   if (existing) return existing;
+  // Match the reader's exact-previous-day default only at first creation.
+  // An existing explicit opening is never recomputed or cascaded.
+  const previousDay = new Date(day);
+  previousDay.setUTCDate(previousDay.getUTCDate() - 1);
+  const previous = await tx.dayBook.findUnique({ where: { businessDate: previousDay } });
+  const openingCashBalance = previous?.closingCashBalance ?? 0;
+  const openingBankBalance = previous?.closingBankBalance ?? 0;
   return tx.dayBook.create({
     data: {
       businessDate: day,
-      openingCashBalance: 0,
-      openingBankBalance: 0,
+      openingCashBalance,
+      openingBankBalance,
       cashSalesTotal: 0,
       bankSalesTotal: 0,
       gPaySalesTotal: 0,
       expenseTotal: 0,
-      closingCashBalance: 0,
-      closingBankBalance: 0,
+      closingCashBalance: openingCashBalance,
+      closingBankBalance: openingBankBalance,
     },
   });
 }
 
 export async function recalculateDayBook(tx: Prisma.TransactionClient, dayBook: DayBookRecord) {
+  const label = dayBook.businessDate.toISOString().slice(0, 10);
+  const { start, endExclusive } = businessDayBounds(label);
+  // Do not reinterpret legacy noncanonical stored keys as a data migration.
+  const canonical = dayBook.businessDate.getUTCHours() === 0 &&
+    dayBook.businessDate.getUTCMinutes() === 0 && dayBook.businessDate.getUTCSeconds() === 0 &&
+    dayBook.businessDate.getUTCMilliseconds() === 0;
   const sales = await tx.ledgerEntry.findMany({
-    where: { entryDate: dayBook.businessDate, eventType: "SALE_CREATED" },
+    where: { entryDate: canonical ? { gte: start, lt: endExclusive } : dayBook.businessDate, eventType: "SALE_CREATED" },
   });
   const expenses = await tx.dayBookExpenseEntry.findMany({
     where: { dayBookId: dayBook.id },
@@ -49,8 +56,10 @@ export async function recalculateDayBook(tx: Prisma.TransactionClient, dayBook: 
   const bankSalesTotal = sales.reduce((sum, entry) => sum + entry.bankAmount, 0);
   const gPaySalesTotal = sales.reduce((sum, entry) => sum + entry.gPayAmount, 0);
   const expenseTotal = expenses.reduce((sum, entry) => sum + entry.amount, 0);
-  const closingCashBalance = dayBook.openingCashBalance + cashSalesTotal - expenseTotal;
-  const closingBankBalance = dayBook.openingBankBalance + bankSalesTotal + gPaySalesTotal;
+  const summary = await paymentCashBook(tx, label, dayBook.openingCashBalance, dayBook.openingBankBalance, dayBook.id, cashSalesTotal, bankSalesTotal + gPaySalesTotal);
+  if (!summary.available) throw new Error(summary.unresolved.join("; "));
+  const closingCashBalance = summary.closingCash;
+  const closingBankBalance = summary.closingBank;
 
   return tx.dayBook.update({
     where: { id: dayBook.id },
@@ -69,7 +78,7 @@ export async function setDayBookOpeningBalances(
   tx: Prisma.TransactionClient,
   input: DayBookOpeningBalanceInput,
 ) {
-  const day = startOfBusinessDay(input.businessDate);
+  const day = businessDateKey(input.businessDate);
   const dayBook = await tx.dayBook.upsert({
     where: { businessDate: day },
     update: {
@@ -107,6 +116,10 @@ export async function addDayBookExpense(
       expenseType: input.expenseType,
       amount: input.amount,
       description: input.description ?? null,
+      ...(input.sourceKind ? { sourceKind: input.sourceKind } : {}),
+      ...(input.sourceEntityId ? { sourceEntityId: input.sourceEntityId } : {}),
+      ...(input.paymentMode ? { paymentMode: input.paymentMode } : {}),
+      ...(input.paymentBreakdown ? { paymentBreakdown: input.paymentBreakdown } : {}),
     },
   });
   const projected = projectDayBookExpense(financialEvent);
@@ -119,7 +132,7 @@ export async function addDayBookExpense(
 }
 
 export async function rebuildDayBook(tx: Prisma.TransactionClient, businessDate?: string) {
-  const where = businessDate ? { businessDate: startOfBusinessDay(businessDate) } : {};
+  const where = businessDate ? { businessDate: businessDateKey(businessDate) } : {};
   const dayBooks = await tx.dayBook.findMany({ where });
   for (const dayBook of dayBooks) {
     await recalculateDayBook(tx, dayBook);

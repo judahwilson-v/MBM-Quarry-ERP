@@ -1,11 +1,12 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { HardDrive, RefreshCw, Trash2, Database, AlertTriangle, CheckCircle2 } from "lucide-react";
+import { HardDrive, RefreshCw, Database, AlertTriangle, CheckCircle2 } from "lucide-react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
-import { getSupabaseStorageUsage, triggerSupabaseDataPurge } from "@/app/actions/admin";
+import { getSupabaseStorageUsage } from "@/app/actions/admin";
+import { getSessionToken } from "@/lib/session-client";
 
 interface StorageStats {
   tables: { table: string; totalSize: string; rowCount: number }[];
@@ -17,14 +18,12 @@ interface StorageStats {
 export function StorageIndicator({ className }: { className?: string }) {
   const [stats, setStats] = useState<StorageStats | null>(null);
   const [loading, setLoading] = useState(false);
-  const [purging, setPurging] = useState(false);
   const [expanded, setExpanded] = useState(false);
-  const [message, setMessage] = useState<string | null>(null);
 
   const fetchUsage = async () => {
     setLoading(true);
     try {
-      const res = await getSupabaseStorageUsage();
+      const res = await getSupabaseStorageUsage(getSessionToken());
       if (res.success && res.data) {
         setStats(res.data);
       }
@@ -38,27 +37,6 @@ export function StorageIndicator({ className }: { className?: string }) {
   useEffect(() => {
     fetchUsage();
   }, []);
-
-  const handlePurge = async () => {
-    setPurging(true);
-    setMessage(null);
-    try {
-      const res = await triggerSupabaseDataPurge();
-      if (res.success && res.data) {
-        const purgedDetails = Object.entries(res.data.purged)
-          .map(([t, count]) => `${t}: ${count} rows`)
-          .join(", ");
-        setMessage(`Purged old logs successfully (${purgedDetails})`);
-        fetchUsage();
-      } else {
-        setMessage(`Purge error: ${res.message}`);
-      }
-    } catch (e: any) {
-      setMessage(`Purge failed: ${e.message}`);
-    } finally {
-      setPurging(false);
-    }
-  };
 
   const usagePercent = stats ? Math.min(stats.usagePercent, 100) : 0;
   const totalDiskMB = stats ? stats.totalDiskMB : 0;
@@ -128,7 +106,7 @@ export function StorageIndicator({ className }: { className?: string }) {
         <div className="flex flex-wrap items-center justify-between gap-2 text-xs text-muted-foreground pt-1">
           <span className="flex items-center gap-1">
             <Database className="h-3.5 w-3.5" />
-            Audit logs: 3-day retention | Financial logs: 30-day
+            Age-based cleanup paused; sync keeps cloud history.
           </span>
           <div className="flex items-center gap-2">
             <Button
@@ -139,30 +117,21 @@ export function StorageIndicator({ className }: { className?: string }) {
             >
               {expanded ? "Hide Details" : "Table Breakdown"}
             </Button>
-            <Button
-              variant="outline"
-              size="sm"
-              onClick={handlePurge}
-              disabled={purging}
-              className="text-xs h-7 px-2 border-amber-500/50 text-amber-600 hover:bg-amber-50 dark:hover:bg-amber-950/30"
-            >
-              <Trash2 className={`h-3 w-3 mr-1 ${purging ? "animate-spin" : ""}`} />
-              Purge Old Logs
+            <Button variant="outline" size="sm" disabled className="text-xs h-7 px-2">
+              Cleanup Paused
             </Button>
           </div>
         </div>
 
-        {message && (
-          <div className="text-xs p-2 rounded bg-muted/60 text-foreground">
-            {message}
-          </div>
-        )}
+        <p className="text-xs text-muted-foreground">
+          No age-based records are deleted by sync. Cleanup needs a reviewed retention and recovery policy; this does not guarantee a complete cloud backup.
+        </p>
 
         {expanded && stats && (
           <div className="mt-3 pt-3 border-t text-xs space-y-2 max-h-48 overflow-y-auto">
             <div className="font-semibold text-foreground flex justify-between">
               <span>Top Tables (Row Count / Est Size)</span>
-              <span>Local DB keeps 100% data</span>
+              <span>Current cloud table counts</span>
             </div>
             <div className="grid grid-cols-2 gap-x-4 gap-y-1">
               {stats.tables.slice(0, 10).map((t) => (

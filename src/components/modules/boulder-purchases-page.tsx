@@ -18,6 +18,7 @@ import { listVehicles } from "@/app/actions/vehicles";
 import { verifyEditPassword } from "@/app/actions/auth";
 import { cn, formatCurrency, formatDate, formatQty, todayInputValue } from "@/lib/utils";
 import { exportToExcel } from "@/lib/export";
+import { getSessionToken } from "@/lib/session-client";
 
 type BoulderRow = {
   id: string;
@@ -100,7 +101,16 @@ export function BoulderPurchasesPage() {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
-  const [activeCell, setActiveCell] = useState<{rowId: string, colKey: string} | null>(null);
+  const [activeCell, setActiveCellState] = useState<{rowId: string, colKey: string} | null>(null);
+  // A retained draft (save refused or still in flight) blocks switching to
+  // another cell so typed text is never silently discarded. Closing (null)
+  // stays allowed: Escape remains a deliberate discard and successful commits
+  // still navigate or close.
+  const retentionRef = useRef(false);
+  const setActiveCell = (cell: {rowId: string, colKey: string} | null) => {
+    if (cell !== null && retentionRef.current) return;
+    setActiveCellState(cell);
+  };
   const [pinCache, setPinCache] = useState<{pin: string, expires: number} | null>(null);
 
   async function requestEditPin(): Promise<string | null> {
@@ -119,7 +129,13 @@ export function BoulderPurchasesPage() {
 
   async function handleInlineSave(row: BoulderRow, field: keyof BoulderRow, newValue: string) {
     if (String(row[field] ?? "") === newValue) return true;
-    
+
+    // A new inline edit attempt supersedes any earlier form success message;
+    // the old green must not imply this latest edit succeeded.
+    setMessage("");
+    // Likewise the previous red must not outlive a successful retry; a new
+    // attempt supersedes the earlier error either way.
+    setError("");
     const pin = await requestEditPin();
     if (!pin) return false;
 
@@ -144,7 +160,7 @@ export function BoulderPurchasesPage() {
     input[field] = numFields.includes(field) ? Number(newValue) : newValue;
 
     try {
-      const res = await saveIncomingBoulder(input, pin);
+      const res = await saveIncomingBoulder(input, pin, getSessionToken() ?? undefined);
       // saveIncomingBoulder returns the row directly on success, or { success: false, error: ... } on failure
       if ('error' in res && res.error) {
         setError(res.error || "Failed to update cell.");
@@ -261,7 +277,18 @@ export function BoulderPurchasesPage() {
         }
       }
 
-      await saveIncomingBoulder(form);
+      // Edits require the verified edit PIN (server is the auth boundary), and
+      // the returned refusal must be honored: never announce success on failure.
+      let pin: string | null = null;
+      if (form.id) {
+        pin = await requestEditPin();
+        if (!pin) return;
+      }
+      const res = await saveIncomingBoulder(form, pin ?? undefined, getSessionToken() ?? undefined);
+      if (res && 'error' in res && res.error) {
+        setError(res.error || "Save failed.");
+        return;
+      }
       setMessage(form.id ? "Boulder entry updated." : "Boulder entry saved.");
       setForm(blankForm());
       await load();
@@ -306,7 +333,7 @@ export function BoulderPurchasesPage() {
     if (!(await confirmAction("Delete this boulder entry?"))) return;
     setError("");
     try {
-      const __res = await deleteIncomingBoulder(id, password);
+      const __res = await deleteIncomingBoulder(id, password, getSessionToken() ?? undefined);
       if (__res && !__res.success) throw new Error(__res.error || "Delete failed");
       if (form.id === id) setForm(blankForm());
       await load();
@@ -614,38 +641,38 @@ export function BoulderPurchasesPage() {
               {visibleRows.map((row) => (
                 <TableRow key={row.id} className="print:border-b print:border-gray-200 group bg-background hover:bg-muted">
                   <TableCell className="sm:sticky sm:left-0 z-10 bg-inherit w-[110px] min-w-[110px] max-w-[110px] sm:border-r border-border print:static print:w-auto print:border-none">
-                    <InlineEditableCell rowId={row.id} colKey="date" value={row.date} displayValue={formatDate(row.date)} type="date" activeCell={activeCell} setActiveCell={setActiveCell} onSave={(val) => handleInlineSave(row, "date", val)} onNavigate={(dir) => handleNavigate(dir, row.id, "date")} />
+                    <InlineEditableCell rowId={row.id} colKey="date" value={row.date} displayValue={formatDate(row.date)} type="date" activeCell={activeCell} setActiveCell={setActiveCell} retentionRef={retentionRef} onSave={(val) => handleInlineSave(row, "date", val)} onNavigate={(dir) => handleNavigate(dir, row.id, "date")} />
                   </TableCell>
                   <TableCell>
                     {row.bookNumber && row.pageNumber ? `${row.bookNumber}/${row.pageNumber}` : row.bookNumber || row.pageNumber || "-"}
                   </TableCell>
                   <TableCell>
-                    <InlineEditableCell rowId={row.id} colKey="vehicleNumber" value={row.vehicleNumber} activeCell={activeCell} setActiveCell={setActiveCell} onSave={(val) => handleInlineSave(row, "vehicleNumber", val)} onNavigate={(dir) => handleNavigate(dir, row.id, "vehicleNumber")} />
+                    <InlineEditableCell rowId={row.id} colKey="vehicleNumber" value={row.vehicleNumber} activeCell={activeCell} setActiveCell={setActiveCell} retentionRef={retentionRef} onSave={(val) => handleInlineSave(row, "vehicleNumber", val)} onNavigate={(dir) => handleNavigate(dir, row.id, "vehicleNumber")} />
                   </TableCell>
                   <TableCell className="truncate max-w-[150px]" title={row.partyName}>
-                    <InlineEditableCell rowId={row.id} colKey="partyName" value={row.partyName} activeCell={activeCell} setActiveCell={setActiveCell} onSave={(val) => handleInlineSave(row, "partyName", val)} onNavigate={(dir) => handleNavigate(dir, row.id, "partyName")} />
+                    <InlineEditableCell rowId={row.id} colKey="partyName" value={row.partyName} activeCell={activeCell} setActiveCell={setActiveCell} retentionRef={retentionRef} onSave={(val) => handleInlineSave(row, "partyName", val)} onNavigate={(dir) => handleNavigate(dir, row.id, "partyName")} />
                   </TableCell>
                   <TableCell className="number-cell font-medium">
-                    <InlineEditableCell rowId={row.id} colKey="qty" value={row.qty} displayValue={formatQty(row.qty, "")} type="number" activeCell={activeCell} setActiveCell={setActiveCell} onSave={(val) => handleInlineSave(row, "qty", val)} onNavigate={(dir) => handleNavigate(dir, row.id, "qty")} />
+                    <InlineEditableCell rowId={row.id} colKey="qty" value={row.qty} displayValue={formatQty(row.qty, "")} type="number" activeCell={activeCell} setActiveCell={setActiveCell} retentionRef={retentionRef} onSave={(val) => handleInlineSave(row, "qty", val)} onNavigate={(dir) => handleNavigate(dir, row.id, "qty")} />
                   </TableCell>
                   <TableCell className="number-cell text-muted-foreground">
-                    <InlineEditableCell rowId={row.id} colKey="rockRate" value={row.rockRate} displayValue={formatCurrency(row.rockRate)} type="number" activeCell={activeCell} setActiveCell={setActiveCell} onSave={(val) => handleInlineSave(row, "rockRate", val)} onNavigate={(dir) => handleNavigate(dir, row.id, "rockRate")} />
+                    <InlineEditableCell rowId={row.id} colKey="rockRate" value={row.rockRate} displayValue={formatCurrency(row.rockRate)} type="number" activeCell={activeCell} setActiveCell={setActiveCell} retentionRef={retentionRef} onSave={(val) => handleInlineSave(row, "rockRate", val)} onNavigate={(dir) => handleNavigate(dir, row.id, "rockRate")} />
                   </TableCell>
                   <TableCell className="number-cell font-medium">{formatCurrency(row.amount)}</TableCell>
                   <TableCell className="number-cell">
-                    <InlineEditableCell rowId={row.id} colKey="cashPaid" value={row.cashPaid ?? 0} displayValue={(row.cashPaid ?? 0) > 0 ? formatCurrency(row.cashPaid ?? 0) : <span className="text-muted-foreground">—</span>} type="number" activeCell={activeCell} setActiveCell={setActiveCell} onSave={(val) => handleInlineSave(row, "cashPaid", val)} onNavigate={(dir) => handleNavigate(dir, row.id, "cashPaid")} />
+                    <InlineEditableCell rowId={row.id} colKey="cashPaid" value={row.cashPaid ?? 0} displayValue={(row.cashPaid ?? 0) > 0 ? formatCurrency(row.cashPaid ?? 0) : <span className="text-muted-foreground">—</span>} type="number" activeCell={activeCell} setActiveCell={setActiveCell} retentionRef={retentionRef} onSave={(val) => handleInlineSave(row, "cashPaid", val)} onNavigate={(dir) => handleNavigate(dir, row.id, "cashPaid")} />
                   </TableCell>
                   <TableCell className="number-cell">
-                    <InlineEditableCell rowId={row.id} colKey="bankPaid" value={row.bankPaid ?? 0} displayValue={((row.bankPaid ?? 0) + (row.gPayPaid ?? 0)) > 0 ? formatCurrency((row.bankPaid ?? 0) + (row.gPayPaid ?? 0)) : <span className="text-muted-foreground">—</span>} type="number" activeCell={activeCell} setActiveCell={setActiveCell} onSave={(val) => handleInlineSave(row, "bankPaid", val)} onNavigate={(dir) => handleNavigate(dir, row.id, "bankPaid")} />
+                    <InlineEditableCell rowId={row.id} colKey="bankPaid" value={row.bankPaid ?? 0} displayValue={((row.bankPaid ?? 0) + (row.gPayPaid ?? 0)) > 0 ? formatCurrency((row.bankPaid ?? 0) + (row.gPayPaid ?? 0)) : <span className="text-muted-foreground">—</span>} type="number" activeCell={activeCell} setActiveCell={setActiveCell} retentionRef={retentionRef} onSave={(val) => handleInlineSave(row, "bankPaid", val)} onNavigate={(dir) => handleNavigate(dir, row.id, "bankPaid")} />
                   </TableCell>
                   <TableCell className="number-cell">
-                    <InlineEditableCell rowId={row.id} colKey="vehicleRent" value={row.vehicleRent ?? 0} displayValue={(row.vehicleRent ?? 0) > 0 ? formatCurrency(row.vehicleRent ?? 0) : <span className="text-muted-foreground">—</span>} type="number" activeCell={activeCell} setActiveCell={setActiveCell} onSave={(val) => handleInlineSave(row, "vehicleRent", val)} onNavigate={(dir) => handleNavigate(dir, row.id, "vehicleRent")} />
+                    <InlineEditableCell rowId={row.id} colKey="vehicleRent" value={row.vehicleRent ?? 0} displayValue={(row.vehicleRent ?? 0) > 0 ? formatCurrency(row.vehicleRent ?? 0) : <span className="text-muted-foreground">—</span>} type="number" activeCell={activeCell} setActiveCell={setActiveCell} retentionRef={retentionRef} onSave={(val) => handleInlineSave(row, "vehicleRent", val)} onNavigate={(dir) => handleNavigate(dir, row.id, "vehicleRent")} />
                   </TableCell>
                   <TableCell className="number-cell text-emerald-600 font-medium">{(row.paidTotal ?? 0) > 0 ? formatCurrency(row.paidTotal ?? 0) : <span className="text-muted-foreground">—</span>}</TableCell>
                   <TableCell className={cn("number-cell", (row.remainingCredit ?? 0) > 0 && "text-destructive font-semibold")}>{(row.remainingCredit ?? 0) > 0 ? formatCurrency(row.remainingCredit ?? 0) : <span className="text-muted-foreground">—</span>}</TableCell>
                   <TableCell className="text-center">{row.settled ? <span className="text-emerald-600 font-bold">✓</span> : <span className="text-muted-foreground">—</span>}</TableCell>
                   <TableCell className="max-w-40 truncate print:whitespace-normal" title={row.remarks || ""}>
-                    <InlineEditableCell rowId={row.id} colKey="remarks" value={row.remarks || ""} activeCell={activeCell} setActiveCell={setActiveCell} onSave={(val) => handleInlineSave(row, "remarks", val)} onNavigate={(dir) => handleNavigate(dir, row.id, "remarks")} />
+                    <InlineEditableCell rowId={row.id} colKey="remarks" value={row.remarks || ""} activeCell={activeCell} setActiveCell={setActiveCell} retentionRef={retentionRef} onSave={(val) => handleInlineSave(row, "remarks", val)} onNavigate={(dir) => handleNavigate(dir, row.id, "remarks")} />
                   </TableCell>
                   <TableCell className="text-right print:hidden">
                     <div className="inline-flex gap-1">

@@ -4,7 +4,9 @@ import fs from "fs";
 import path from "path";
 import { Client } from "pg";
 
-export async function initializeSupabaseSchema() {
+export async function initializeSupabaseSchema(sessionToken?: string | null) {
+  const { requireControlActor } = await import("@/lib/identity/control");
+  await requireControlActor(sessionToken);
   const directUrl = process.env.SUPABASE_DIRECT_URL || process.env.DATABASE_URL;
   
   if (!directUrl || !directUrl.startsWith("postgres")) {

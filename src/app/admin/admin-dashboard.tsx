@@ -5,18 +5,20 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { useToast } from "@/components/ui/use-toast";
 import { forceSync, getDatabaseInfo } from "@/app/actions/admin";
+import { verifyAdminPin } from "@/app/actions/auth";
+import { getSessionToken } from "@/lib/session-client";
 import { Database, RefreshCw, AlertTriangle } from "lucide-react";
 
-export function AdminDashboard({ expectedPin }: { expectedPin: string }) {
+export function AdminDashboard() {
   const [isAuthenticated, setIsAuthenticated] = useState(false);
   const [pin, setPin] = useState("");
   const [dbInfo, setDbInfo] = useState<any>(null);
   const [isLoading, setIsLoading] = useState(false);
   const { toast } = useToast();
 
-  const handleLogin = (e: React.FormEvent) => {
+  const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (pin === expectedPin) {
+    if (await verifyAdminPin(pin)) {
       setIsAuthenticated(true);
       loadDbInfo();
     } else {
@@ -30,15 +32,21 @@ export function AdminDashboard({ expectedPin }: { expectedPin: string }) {
   };
 
   const loadDbInfo = async () => {
-    const res = await getDatabaseInfo();
+    const res = await getDatabaseInfo(getSessionToken());
     if (res.success) {
       setDbInfo(res.data);
+    } else {
+      toast({
+        title: "Database info unavailable",
+        description: res.message,
+        variant: "destructive"
+      });
     }
   };
 
   const handleForceSync = async () => {
     setIsLoading(true);
-    const res = await forceSync();
+    const res = await forceSync(getSessionToken());
     setIsLoading(false);
     toast({
       title: res.success ? "Sync Complete" : "Sync Failed",

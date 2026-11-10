@@ -2,6 +2,9 @@ const fs = require('fs');
 const path = require('path');
 
 const schemaPath = path.join(__dirname, '../prisma/schema.prisma');
+
+// Models that stay on this device only: no sync-map entry, no remote DDL.
+const LOCAL_ONLY_MODELS = ['AppUser', 'AuthSession', 'AppMeta', 'ChangeRequest']; // request-trail table is local-only
 const outputPath = path.join(__dirname, '../src/lib/sync/sync-map.json');
 
 function generateSyncMap() {
@@ -19,8 +22,9 @@ function generateSyncMap() {
     // Match 'model ModelName {'
     const modelMatch = line.match(/^model\s+([a-zA-Z0-9_]+)\s*\{/);
     if (modelMatch) {
-      currentModel = modelMatch[1];
-      syncMap[currentModel] = {};
+      // LOCAL-ONLY: credentials/sessions/meta must never sync (worker identity).
+      currentModel = LOCAL_ONLY_MODELS.includes(modelMatch[1]) ? null : modelMatch[1];
+      if (currentModel) syncMap[currentModel] = {};
       continue;
     }
 

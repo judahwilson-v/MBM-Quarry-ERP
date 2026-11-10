@@ -1,0 +1,10 @@
+import {beforeEach,afterEach,it,expect,vi} from 'vitest';import {PrismaClient} from '@prisma/client';import {copyFileSync} from 'node:fs';
+const state=vi.hoisted(()=>({db:null as any}));vi.mock('@/lib/prisma',()=>({getDb:async()=>state.db}));vi.mock('@/lib/sync/auto-sync',()=>({triggerAutoSync:vi.fn()}));vi.mock('@/app/actions/auth',()=>({verifyEditPassword:async()=>true,requireActor:async()=>null,isEnrollmentComplete:async()=>false}));
+import {saveExpense} from '../../src/app/actions/expenses';import {saveDayBookOpeningBalances} from '../../src/app/actions/daybook_offline';import {fetchDayBookData} from '../../src/lib/daybook-actions';
+let n=0;beforeEach(async()=>{const root=process.env.MBM_TEST_ROOT;if(!root)throw Error('isolated fixture required');const f=`${root}/payment-${++n}.db`;copyFileSync(`${root}/fixture.db`,f);state.db=new PrismaClient({datasources:{db:{url:`file:${f}`}}});vi.useFakeTimers({toFake:['setTimeout','clearTimeout']});});afterEach(async()=>{vi.clearAllTimers();vi.useRealTimers();await state.db.$disconnect();});
+it.each([['CASH',900,500],['BANK',1000,400],['GPAY',1000,400],['CREDIT',1000,500]])('F07 desired explicit %s expense100 closing contract',async(mode,cash,bank)=>{
+ await saveDayBookOpeningBalances({businessDate:'2026-11-09',openingCashBalance:1000,openingBankBalance:500});expect((await saveExpense({expenseDate:'2026-11-09',expenseType:'LABOUR',amount:100,paymentMode:mode})).success).toBe(true);
+ const view=await fetchDayBookData('2026-11-09');const stored=await state.db.dayBook.findFirst();const event=await state.db.financialEvent.findFirst();const source=await state.db.expense.findFirst();
+ console.log('EXPLICIT_MODE_ACTUAL',JSON.stringify({mode,sourceMode:source.paymentMode,eventPayload:event.payload,projection:await state.db.dayBookExpenseEntry.findFirst(),view,stored}));
+ expect(view.closingCash).toBe(cash);expect(view.closingBank).toBe(bank);expect(stored.closingCashBalance).toBe(cash);expect(stored.closingBankBalance).toBe(bank);
+});

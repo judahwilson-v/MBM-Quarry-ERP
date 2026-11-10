@@ -7,8 +7,8 @@ import { getDb } from "@/lib/prisma";
 import { triggerAutoSync } from "@/lib/sync/auto-sync";
 import { writeAuditEvent } from "@/lib/domain";
 import { emitFinancialEvent } from "@/lib/domain/financial-events";
-import { projectDayBookExpense, recalculateDayBook } from "@/lib/domain/daybook";
-import { verifyEditPassword } from "@/app/actions/auth";
+import { projectDayBookExpense, recalculateDayBook, getOrCreateDayBook } from "@/lib/domain/daybook";
+import { verifyEditPassword, requireActor } from "@/app/actions/auth";
 import { sanitizeError } from "@/lib/utils/sanitize-error";
 
 const dateTimeKeys = new Set(["createdAt", "updatedAt", "saleDate", "date", "expectedDueDate"]);
@@ -65,7 +65,16 @@ export async function listFuelPurchases() {
 }
 
 
-export async function saveFuelPurchase(input: any) {
+export async function saveFuelPurchase(input: any, pin?: string, sessionToken?: string) {
+  const actor = await requireActor(sessionToken);
+  const actorName = actor?.name ?? "system";
+  // An edit moves Day Book money through the mirrored expense, so it needs the
+  // same server-side PIN boundary as sale, boulder and expense edits. A
+  // client-side check alone is not an access boundary.
+  if (input?.id) {
+    if (!pin) throw new Error("Admin PIN is required to edit records.");
+    if (!(await verifyEditPassword(pin))) throw new Error("Invalid Admin PIN");
+  }
   const amount = parseNumber(input.amount, "Amount") || 0;
   const paidAmount = parseNumber(input.paidAmount, "Paid Amount", false) || 0;
   const creditAmount = amount - paidAmount;
@@ -92,7 +101,7 @@ export async function saveFuelPurchase(input: any) {
     if (input.id) {
       const before = await tx.fuelPurchase.findUnique({ where: { id: input.id } });
       row = await tx.fuelPurchase.update({ where: { id: input.id }, data });
-      await writeAuditEvent(tx, { entityName: "FuelPurchase", entityId: row.id, action: "update", role: "system", before, after: row });
+      await writeAuditEvent(tx, { entityName: "FuelPurchase", entityId: row.id, action: "update", role: actorName, before, after: row });
       
       const expense = await tx.expense.findUnique({ where: { sourceEventId: before!.sourceEventId } });
       if (expense) {
@@ -106,21 +115,18 @@ export async function saveFuelPurchase(input: any) {
           }
         });
         
-        const businessDateStr = date.toISOString().split("T")[0];
-        const day = new Date(`${businessDateStr}T00:00:00`);
-        const dayBook = await tx.dayBook.findUnique({ where: { businessDate: day } });
-        if (dayBook) {
-          const financialEvent = await tx.financialEvent.findFirst({ where: { entityId: expense.id } });
-          if (financialEvent) {
-             const newPayload = { ...financialEvent.payload as any, amount: paidAmount > 0 ? paidAmount : amount, expenseDate: date.toISOString() };
-             await tx.financialEvent.update({ where: { id: financialEvent.id }, data: { payload: newPayload } });
-             const projected = projectDayBookExpense({ ...financialEvent, payload: newPayload }, dayBook.id);
-             await tx.dayBookExpenseEntry.upsert({
-               where: { sourceEventId: projected.sourceEventId },
-               update: projected,
-               create: projected,
-             });
-             await recalculateDayBook(tx, dayBook);
+        const financialEvent = await tx.financialEvent.findFirst({ where: { entityId: expense.id } });
+        if (financialEvent) {
+          const previousProjection = await tx.dayBookExpenseEntry.findUnique({ where: { sourceEventId: financialEvent.eventId } });
+          const dayBook = await getOrCreateDayBook(tx, input.date || date.toISOString());
+          const newPayload = { ...financialEvent.payload as any, amount: paidAmount > 0 ? paidAmount : amount, expenseDate: date.toISOString() };
+          const updatedEvent = await tx.financialEvent.update({ where: { id: financialEvent.id }, data: { payload: newPayload } });
+          const projected = projectDayBookExpense(updatedEvent, dayBook.id);
+          await tx.dayBookExpenseEntry.upsert({ where: { sourceEventId: projected.sourceEventId }, update: projected, create: projected });
+          await recalculateDayBook(tx, dayBook);
+          if (previousProjection && previousProjection.dayBookId !== dayBook.id) {
+            const previousBook = await tx.dayBook.findUnique({ where: { id: previousProjection.dayBookId } });
+            if (previousBook) await recalculateDayBook(tx, previousBook);
           }
         }
       }
@@ -129,7 +135,7 @@ export async function saveFuelPurchase(input: any) {
       row = await tx.fuelPurchase.create({
         data: { ...data, sourceEventId: eventId }
       });
-      await writeAuditEvent(tx, { entityName: "FuelPurchase", entityId: row.id, action: "create", role: "system", before: null, after: row });
+      await writeAuditEvent(tx, { entityName: "FuelPurchase", entityId: row.id, action: "create", role: actorName, before: null, after: row });
 
       // Automatically push to Expense
       const expenseAmount = paidAmount > 0 ? paidAmount : amount;
@@ -154,24 +160,7 @@ export async function saveFuelPurchase(input: any) {
         payload: { ...expenseRow, expenseDate: date.toISOString() }
       });
 
-      const businessDateStr = date.toISOString().split("T")[0];
-      const day = new Date(`${businessDateStr}T00:00:00`);
-      let dayBook = await tx.dayBook.findUnique({ where: { businessDate: day } });
-      if (!dayBook) {
-        dayBook = await tx.dayBook.create({
-          data: {
-            businessDate: day,
-            openingCashBalance: 0,
-            openingBankBalance: 0,
-            cashSalesTotal: 0,
-            bankSalesTotal: 0,
-            gPaySalesTotal: 0,
-            expenseTotal: 0,
-            closingCashBalance: 0,
-            closingBankBalance: 0,
-          },
-        });
-      }
+      const dayBook = await getOrCreateDayBook(tx, input.date || date.toISOString());
 
       const projected = projectDayBookExpense(financialEvent, dayBook.id);
       await tx.dayBookExpenseEntry.upsert({
@@ -187,8 +176,13 @@ export async function saveFuelPurchase(input: any) {
 }
 
 
-export async function deleteFuelPurchase(id: string, pin?: string) {
+export async function deleteFuelPurchase(id: string, pin?: string, sessionToken?: string) {
   try {
+    // Fail closed BEFORE any transactional work: once enrollment is complete a
+    // valid session is mandatory, and the refusal returns as a normal failure
+    // instead of an uncaught throw.
+    const actor = await requireActor(sessionToken);
+    const actorName = actor?.name ?? "system";
     if (!pin || !(await verifyEditPassword(pin, "delete"))) {
       throw new Error("Invalid delete PIN");
     }
@@ -199,23 +193,21 @@ export async function deleteFuelPurchase(id: string, pin?: string) {
       const expense = await tx.expense.findUnique({ where: { sourceEventId: row.sourceEventId } });
       if (expense) {
         const financialEvent = await tx.financialEvent.findFirst({ where: { entityId: expense.id } });
+        const projections = financialEvent ? await tx.dayBookExpenseEntry.findMany({ where: { sourceEventId: financialEvent.eventId } }) : [];
         if (financialEvent) {
           await tx.financialEvent.delete({ where: { id: financialEvent.id } });
           await tx.dayBookExpenseEntry.deleteMany({ where: { sourceEventId: financialEvent.eventId } });
         }
         await tx.expense.delete({ where: { id: expense.id } });
-
-        const businessDateStr = expense.expenseDate.toISOString().split("T")[0];
-        const day = new Date(`${businessDateStr}T00:00:00`);
-        const dayBook = await tx.dayBook.findUnique({ where: { businessDate: day } });
-        if (dayBook) {
-          await recalculateDayBook(tx, dayBook);
-        }
+        const affectedBooks = await tx.dayBook.findMany({
+          where: { id: { in: [...new Set(projections.map((entry) => entry.dayBookId))] } },
+        });
+        for (const dayBook of affectedBooks) await recalculateDayBook(tx, dayBook);
       }
       
       await tx.fuelPurchase.delete({ where: { id } });
       try {
-        await writeAuditEvent(tx, { entityName: "FuelPurchase", entityId: id, action: "delete", role: "system", before: row, after: null });
+        await writeAuditEvent(tx, { entityName: "FuelPurchase", entityId: id, action: "delete", role: actorName, before: row, after: null });
       } catch {
         console.warn(`[Audit Log Warning] Failed to write audit event for FuelPurchase deletion (ID: ${id})`);
       }

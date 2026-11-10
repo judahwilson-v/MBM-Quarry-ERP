@@ -8,6 +8,7 @@ import { getDb } from "@/lib/prisma";
 import { triggerAutoSync } from "@/lib/sync/auto-sync";
 import { enqueueOutboxEvent } from "@/lib/sync/outbox";
 import { writeAuditEvent } from "@/lib/domain";
+import { verifyEditPassword } from "@/app/actions/auth";
 
 function parseNumber(value: string | number | null | undefined, label: string, required = true) {
   if (value === null || value === undefined || value === "") {
@@ -43,7 +44,11 @@ export async function listMaterials(search = "") {
 }
 
 
-export async function updateMaterialRate(id: string, ratePerCft: string | number) {
+export async function updateMaterialRate(id: string, ratePerCft: string | number, pin?: string) {
+  // Rate changes move future sale valuations. The UI already asks for the edit
+  // password; enforce it on the server too, because a client check alone is
+  // not an access boundary.
+  if (!pin || !(await verifyEditPassword(pin))) throw new Error("Invalid edit PIN");
   const rate = parseNumber(ratePerCft, "Rate");
   if (rate === null || rate < 0) throw new Error("Rate must be zero or greater.");
   return serialize(await runTx(async (tx) => {

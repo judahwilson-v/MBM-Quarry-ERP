@@ -3,6 +3,7 @@
 import { useState, useEffect, useRef, useCallback } from "react";
 import { triggerSync, fetchSyncStatus, fetchOnlineStatus } from "@/app/actions/sync";
 import Link from "next/link";
+import { deliverPendingOnPoll } from "@/lib/sync/reconnect-delivery";
 import { usePathname, useRouter } from "next/navigation";
 import {
   Banknote,
@@ -16,6 +17,7 @@ import {
   X, Cloud, CloudOff, LayoutDashboard, Settings, BookOpen, Fuel, Wallet, Package
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
+import { WorkerLogin } from "@/components/worker-login";
 import { cn } from "@/lib/utils";
 import { ThemeToggle } from "./theme-toggle";
 
@@ -70,8 +72,8 @@ export function AppShell({ children }: { children: React.ReactNode }) {
 
   useEffect(() => {
     // Fetch global settings to determine feature flags
-    import("@/app/actions/settings").then(({ getGlobalSettings }) => {
-      getGlobalSettings().then((settings) => {
+    import("@/app/actions/settings").then(({ getPublicSettings }) => {
+      getPublicSettings().then((settings) => {
         setFeatures(settings);
         const filtered = navItems.filter((item) => {
           if (item.href === "/fleet" && !settings.enableFleetMaintenance) return false;
@@ -159,6 +161,7 @@ export function AppShell({ children }: { children: React.ReactNode }) {
             </div>
           </div>
           <div className="flex items-center gap-2">
+            <WorkerLogin />
             <ThemeToggle />
           </div>
         </header>
@@ -227,17 +230,28 @@ function ShellSync() {
   const [isOnline, setIsOnline] = useState<boolean | null>(null);
   const [, setConsecutiveErrors] = useState(0);
   const timerRef = useRef<NodeJS.Timeout | null>(null);
+  const syncBusy = useRef(false);
 
   const runPoll = useCallback(async () => {
     let hasError = false;
     try {
-      const [status, online] = await Promise.all([
+      let [status, online] = await Promise.all([
         fetchSyncStatus(),
         fetchOnlineStatus(),
       ]);
+      // The existing status poll also retries work saved while offline.
+      // Failure follows the same bounded-backoff cadence, not a second timer.
+      await deliverPendingOnPoll(status, online, syncBusy, async () => {
+        setIsSyncing(true);
+        try {
+          const result = await triggerSync();
+          if (result.status === "ERROR" || result.status === "PARTIAL_SUCCESS") hasError = true;
+        } finally { setIsSyncing(false); }
+      });
+      status = await fetchSyncStatus();
       setSyncStatus(status);
       setIsOnline(online);
-      if (status?.status === "ERROR" || !online) {
+      if (status?.status === "ERROR" || status?.status === "PARTIAL_SUCCESS" || !online) {
         hasError = true;
       }
     } catch (e) {
@@ -266,7 +280,8 @@ function ShellSync() {
   }, [runPoll]);
 
   const handleSync = async () => {
-    if (isSyncing) return;
+    if (syncBusy.current) return;
+    syncBusy.current = true;
     setIsSyncing(true);
     try {
       const syncRes = await triggerSync();
@@ -277,7 +292,7 @@ function ShellSync() {
       setSyncStatus(newStatus);
       setIsOnline(online);
 
-      if (syncRes?.status === "ERROR" || newStatus?.status === "ERROR" || !online) {
+      if (syncRes?.status === "ERROR" || syncRes?.status === "PARTIAL_SUCCESS" || newStatus?.status === "ERROR" || newStatus?.status === "PARTIAL_SUCCESS" || !online) {
         setConsecutiveErrors((prev) => prev + 1);
       } else {
         setConsecutiveErrors(0);
@@ -288,6 +303,7 @@ function ShellSync() {
       console.error("[Sync UI] Sync failed:", e);
       setConsecutiveErrors((prev) => prev + 1);
     } finally {
+      syncBusy.current = false;
       setIsSyncing(false);
     }
   };

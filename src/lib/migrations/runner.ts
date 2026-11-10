@@ -62,93 +62,64 @@ async function ensureMigrationTable(prisma: PrismaClient): Promise<void> {
   }
 }
 
-/**
- * Get the set of already-applied migration versions.
- */
-async function getAppliedVersions(prisma: PrismaClient): Promise<Set<number>> {
-  const rows = await prisma.$queryRawUnsafe<Array<{ version: number }>>(
-    `SELECT version FROM schema_migrations ORDER BY version`
-  );
-  return new Set(rows.map((r) => r.version));
+function isDatabaseBusy(error: unknown): boolean {
+  const text = String((error as any)?.message || error).toLowerCase();
+  return text.includes("database is locked") || text.includes("database is busy") || (error as any)?.code === "P2034";
 }
 
-/**
- * Run all pending migrations in version order.
- * Returns the number of migrations applied.
- */
+async function retryDatabaseBusy<T>(work: () => Promise<T>): Promise<T> {
+  for (let attempt = 0; ; attempt++) {
+    try { return await work(); }
+    catch (error) {
+      if (attempt >= 3 || !isDatabaseBusy(error)) throw error;
+      await new Promise(resolve => setTimeout(resolve, 50 * (2 ** attempt)));
+    }
+  }
+}
+
 export async function runMigrations(
   prisma: PrismaClient,
   migrations: Migration[]
 ): Promise<{ applied: number; errors: string[] }> {
-  await ensureMigrationTable(prisma);
-  const applied = await getAppliedVersions(prisma);
   const errors: string[] = [];
   let appliedCount = 0;
+  try {
+    await retryDatabaseBusy(() => ensureMigrationTable(prisma));
+  } catch (err: any) {
+    return { applied: 0, errors: [`[Migration] Tracking table unavailable: ${err?.message || err}`] };
+  }
 
-  // Sort migrations by version (ascending)
-  const sorted = [...migrations].sort((a, b) => a.version - b.version);
-
-  for (const migration of sorted) {
-    if (applied.has(migration.version)) {
-      continue; // Already applied — skip
-    }
-
-    console.log(
-      `[Migration] Applying v${migration.version}: ${migration.id} — ${migration.description}`
-    );
-
-    let inTransaction = false;
+  for (const migration of [...migrations].sort((a, b) => a.version - b.version)) {
     try {
-      const statements = await migration.up(prisma);
-      const checksum = checksumStatements(statements);
-
-      if (statements.length > 0) {
-        await prisma.$executeRawUnsafe("BEGIN IMMEDIATE");
-        inTransaction = true;
-
+      // The interactive transaction pins introspection, DDL and the applied
+      // marker to one connection. Bare BEGIN/COMMIT raw calls do not own a
+      // Prisma pooled connection and can strand a transaction on another one.
+      const didApply = await retryDatabaseBusy(() => prisma.$transaction(async tx => {
+        const rows = await tx.$queryRawUnsafe<Array<{ version: number }>>(
+          "SELECT version FROM schema_migrations WHERE version = ?", migration.version
+        );
+        if (rows.length > 0) return false;
+        const statements = await migration.up(tx as unknown as PrismaClient);
+        const checksum = checksumStatements(statements);
         for (const sql of statements) {
-          if (sql.trim().length === 0) continue;
-          await prisma.$executeRawUnsafe(sql);
+          if (sql.trim().length > 0) await tx.$executeRawUnsafe(sql);
         }
-
-        // Record the migration as applied inside the transaction
-        await prisma.$executeRawUnsafe(
-          `INSERT OR IGNORE INTO schema_migrations (id, version, checksum) VALUES (?, ?, ?)`,
-          migration.id,
-          migration.version,
-          checksum
+        await tx.$executeRawUnsafe(
+          "INSERT INTO schema_migrations (id, version, checksum) VALUES (?, ?, ?)",
+          migration.id, migration.version, checksum
         );
-
-        await prisma.$executeRawUnsafe("COMMIT");
-        inTransaction = false;
-      } else {
-        // No SQL statements to execute (e.g. State B no-op), record version directly
-        await prisma.$executeRawUnsafe(
-          `INSERT OR IGNORE INTO schema_migrations (id, version, checksum) VALUES (?, ?, ?)`,
-          migration.id,
-          migration.version,
-          checksum
-        );
+        return true;
+      }, { maxWait: 10000, timeout: 20000 }));
+      if (didApply) {
+        appliedCount++;
+        console.log(`[Migration] v${migration.version}: ${migration.id} applied successfully`);
       }
-
-      console.log(`[Migration] ✅ v${migration.version}: ${migration.id} applied successfully`);
-      appliedCount++;
     } catch (err: any) {
-      if (inTransaction) {
-        try {
-          await prisma.$executeRawUnsafe("ROLLBACK");
-        } catch (rollbackErr: any) {
-          console.error(`[Migration] Failed to rollback transaction:`, rollbackErr?.message);
-        }
-      }
-
-      const msg = `[Migration] ❌ v${migration.version}: ${migration.id} FAILED — ${err?.message || err}`;
+      const msg = `[Migration] v${migration.version}: ${migration.id} FAILED - ${err?.message || err}`;
       console.error(msg);
       errors.push(msg);
-      // STOP — do not apply further migrations after a failure
       break;
     }
   }
-
   return { applied: appliedCount, errors };
 }

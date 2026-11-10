@@ -1,0 +1,7 @@
+import {vi,it,expect,beforeAll,afterAll} from 'vitest';import {PrismaClient} from '@prisma/client';import {copyFileSync} from 'node:fs';
+const state=vi.hoisted(()=>({db:null as any,calls:[] as any[],retention:[] as string[]}));vi.mock('@/lib/prisma',()=>({getDb:async()=>state.db}));vi.mock('@/lib/supabase/client-sync',()=>({createSyncClient:()=>({from:(table:string)=>({delete:()=>({lt:async()=>{state.retention.push(table);return {error:null};}}),upsert:async(row:any)=>{state.calls.push({table,id:row.id});return {error:null};}})})}));
+import {pushSync} from '@/lib/sync/sync-service';beforeAll(()=>{if(!process.env.MBM_TEST_ROOT)throw Error('isolated runner required');const file=`${process.env.MBM_TEST_ROOT}/text-replay.db`;copyFileSync(`${process.env.MBM_TEST_ROOT}/fixture.db`,file);state.db=new PrismaClient({datasources:{db:{url:`file:${file}`}}});});afterAll(async()=>state.db.$disconnect());
+it('second push sends zero replayed business upserts after TEXT seed acknowledgement',async()=>{
+ await state.db.$executeRawUnsafe(`INSERT INTO materials (id,material_name,rate_per_cft,created_at,updated_at) VALUES ('seed','Synthetic TEXT replay',1,'2026-11-09 10:00:00','2026-11-09 10:00:00')`);
+ await pushSync();expect(state.calls).toEqual([{table:'materials',id:'seed'}]);state.calls=[];await pushSync();expect(state.calls).toEqual([]);await new Promise(r=>setTimeout(r,0));expect(state.retention).toEqual([]);
+});
