@@ -1,5 +1,47 @@
 # MBM development log
 
+## 2026-11-10 - Phase 2.1: ERP cloud-login session reuse, not installed
+
+### Change prepared
+
+The private ERP candidate now reuses one authenticated cloud session per
+server process instead of signing in on every sync check. Concurrent callers
+share the same login. The server verifies the expected technical account at
+login and at most 60 seconds later on the next use. A configuration change,
+failed verification or explicit shutdown stops the old refresh loop and
+clears its local session. Repeated failures have a 30-second retry delay.
+There is no administrative-key or anonymous fallback.
+
+### Checks passed
+
+- Independent review verified the complete source overlay and preservation
+  of the earlier private identity and restore changes, except the intended
+  login factory change.
+- Twenty focused checks and 42 retained/adapted bridge-test executions passed.
+  These counts overlap with earlier work and are not 62 unique new cases.
+- Two added independent checks covered an unresolved concurrent login,
+  queued cleanup/replacement, module reload and account-ID replacement.
+  The extended focused suite passed 22 checks. Type checks passed.
+- An actual ordinary-authentication probe used 20 concurrent calls and six
+  sequential reuses. All returned the same client, with one login request
+  and one server user-verification request. Initial login took about
+  1.55 seconds; the immediate reuses took less than 0.06 milliseconds each.
+  The probe then stopped refresh and cleared its local session.
+
+### Still untested or unfinished
+
+This is a private source checkpoint, not an installed update or a completed
+Phase 2. It has not proved long-duration token refresh, installed-device
+behavior, business-data synchronization or the full approval round trip.
+A reused client reference is not forcibly revoked; provider access rules
+remain authoritative. The Data API remains disabled while HTTP access
+verification is unfinished.
+
+Next: provision the approved logins privately, connect the ERP and owner
+clients, verify allowed and denied access, and test a full sale, correction,
+owner decision and ERP update with balances and offline/reconnect checks.
+Installation, public source updates and deployment need separate approval.
+
 ## 2026-11-10 - Review candidate, not a release
 
 This branch records source changes and their evidence while the existing
