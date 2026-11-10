@@ -1,5 +1,14 @@
 # MBM development log
 
+## 2026-11-10 18:59 IST - Private login work and recovery checkpoint
+
+- Prepared private website and Android owner-login changes using ordinary authentication, active membership checks, encrypted mobile session tokens and unavailable states instead of invented figures.
+- The unpublished candidate was lost during an execution outage. Earlier reviewed source, backend work and both published review branches were preserved.
+- Recovered the authored login slice over pinned baselines and saved a private, hash-verified source checkpoint before resuming builds. This is recovery source, not independent acceptance or an installed release.
+- After recovery, the website passed 14 login checks, 14 retained approval checks, 25 read-contract checks, TypeScript and a production build. These are local checks, not a live client roundtrip.
+- Android verification, fresh UI checks and independent review remain pending. No deployment, installation, real-person login setup or new code publication is claimed.
+
+
 ## 2026-11-10 - Phase 2.1: ERP cloud-login session reuse, not installed
 
 ### Change prepared
