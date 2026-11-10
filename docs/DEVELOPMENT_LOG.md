@@ -1,5 +1,14 @@
 # MBM development log
 
+## 2026-11-10 19:59 IST - Private owner-login checkpoint complete within local limits
+
+- Fixed the actual website sign-out caller and per-device session cleanup. Cookie pages and bearer endpoints now share configured-owner and matching active-principal checks. Focused independent web review accepted these changes.
+- Fresh website checks passed: 19 authentication/logout cases, 15 approval/cookie-gate cases, TypeScript and production build. The existing 25 read-contract checks also passed before the final gate-only change. An additional independent bearer-denial probe is separate from these authored counts.
+- The current Android source compiled and passed eight unit tests. Token preferences are excluded from cloud backup, device transfer and legacy backup; undecryptable or partial token state clears to signed out in tests. Current login and unavailable-dashboard images were inspected. These are local tests, not installed-device or live-login proof.
+- Saved and verified a coherent private source/evidence checkpoint and archived completed focused reviews. No new code, deployment, installer or real-person account setup was published in this hour.
+- Integration remains blocked on approved human identity setup, deployment/install scope, provider HTTP and business-roundtrip proof, and a faithful coherent source-publication route. No speculative features or repeated provider probes were added while these conditions remain unresolved.
+
+
 ## 2026-11-10 18:59 IST - Private login work and recovery checkpoint
 
 - Prepared private website and Android owner-login changes using ordinary authentication, active membership checks, encrypted mobile session tokens and unavailable states instead of invented figures.
