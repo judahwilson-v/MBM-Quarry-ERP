@@ -311,3 +311,11 @@ No implementation, tests or live effects changed this hour. Private source and b
 Restores the previously tested restricted ordinary-auth sync client lifecycle, credential-safe settings restore/read projections, and approval-bridge identity checks. The complete source overlay matches the preserved P3 checkpoint. Historical checks: 20 focused executions, 42 retained/adapted bridge executions and strict types; actual ordinary Auth session-reuse probe only. No new test run is claimed by this publication.
 
 This is source publication to the existing review branch, not deployment, installation, provider activation or readiness approval. Review-branch deployment remains disabled. Private runtime credentials, human provisioning, actual desktop/device tests and full live sale-to-approval roundtrip remain outside this publication. Native source remains private.
+
+## 2026-11-12 07:13 IST - functional UI checkpoint and inventory refresh fix
+
+Actual browser entry, Save and reload persistence exercised on an isolated synthetic Linux fixture for sales, expenses, fuel, employee directory and inventory. This is not Windows installer, production cloud sync, recovery or cross-client acceptance. Other modules remain untested. Offline/pending sync is not a cloud pass.
+
+Fixed a reproduced inventory display defect: after adding material, refreshed server props now update the visible stock state; a successful Save closes/resets its form. Existing failure retention is preserved. Added an isolated browser regression covering blocked Save field retention, retry, refreshed40CFT card without main-frame navigation, closed form and reload persistence. The final regression and strict TypeScript check passed. No stock service, unit policy or existing record changed. A separate sale/inventory unit mismatch remains unresolved.
+
+The API schema-cache failure persists after one documented reload attempt. No claim of service recovery. This bounded source/test change is for the existing review branch only, with deployment disabled; no installer, deployment or real data publication.

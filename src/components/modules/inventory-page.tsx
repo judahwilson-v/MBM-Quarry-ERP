@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
@@ -14,6 +14,9 @@ type InventoryStock = Awaited<ReturnType<typeof getInventoryStock>>[0];
 export function InventoryPage({ initialStock }: { initialStock: InventoryStock[] }) {
   const router = useRouter();
   const [stock, setStock] = useState(initialStock);
+  // router.refresh supplies the saved server rows without remounting this client.
+  // Keep the displayed ledger in step with those rows after a successful save.
+  useEffect(() => { setStock(initialStock); }, [initialStock]);
   const [isAdjusting, setIsAdjusting] = useState<string | null>(null);
   const [adjustAmount, setAdjustAmount] = useState("");
   const [adjustReason, setAdjustReason] = useState("");
@@ -70,6 +73,9 @@ export function InventoryPage({ initialStock }: { initialStock: InventoryStock[]
               const unit = (document.getElementById('new-material-unit') as HTMLInputElement).value;
               if (name) {
                 adjustInventoryStock(name, Number(adjustAmount), 'MANUAL_ADJUST', 'Initial Stock', unit).then(() => {
+                  setIsAdjusting(null);
+                  setAdjustAmount("");
+                  setAdjustReason("");
                   router.refresh();
                 });
               }
