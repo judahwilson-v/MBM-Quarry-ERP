@@ -10,12 +10,13 @@ let worker: string, owner: string, uncle: string, wt: string, ot: string;
 let material: string;
 async function user(name: string) { return db.appUser.create({ data: { name, pinHash: randomUUID(), pinSalt: randomUUID(), role: 'worker' } }); }
 async function session(id: string) { const token = newSessionToken(); await db.authSession.create({ data: { userId: id, token, expiresAt: new Date(Date.now()+3600000) } }); return token; }
+async function mapping(id:string,active=true) { const u=await db.appUser.findUniqueOrThrow({where:{id}}); return JSON.stringify({version:1,id,name:u.name,active}); }
 async function meta(key:string,value:string) { await db.appMeta.upsert({where:{key},create:{key,value},update:{value}}); }
 beforeAll(async () => {
  worker=(await user('Synthetic Worker')).id; owner=(await user('Synthetic Owner')).id; uncle=(await user('Synthetic Second Approver')).id;
  wt=await session(worker); ot=await session(owner);
  await meta(ENROLLMENT_KEY,'true'); await meta(CONTROL_PRINCIPAL_KEY,owner);
- await meta(WEBSITE_MAPPING_PREFIX+'cloud-owner',owner); await meta(WEBSITE_MAPPING_PREFIX+'cloud-second',uncle);
+ await meta(WEBSITE_MAPPING_PREFIX+'cloud-owner',await mapping(owner)); await meta(WEBSITE_MAPPING_PREFIX+'cloud-second',await mapping(uncle));
  material=(await db.material.create({data:{materialName:'Synthetic bridge material',ratePerCft:50}})).id;
 });
 async function req(requester=wt) {
@@ -75,9 +76,9 @@ it('full local round trip mirrors pending, consumes website intent, mirrors actu
 });
 
 it('a revoked local approver mapping refuses queued commands before apply',async()=>{
- const r=await req();await db.appUser.update({where:{id:uncle},data:{active:false}});
+ const r=await req();await meta(WEBSITE_MAPPING_PREFIX+'cloud-second',await mapping(uncle,false));
  const q=new Queue();q.add(r.requestId,'cloud-second');
- try{expect((await processWebsiteDecisions({db,transport:q}))[0].status).toBe('REFUSED');expect((await db.changeRequest.findUniqueOrThrow({where:{id:r.requestId}})).status).toBe('PENDING');}finally{await db.appUser.update({where:{id:uncle},data:{active:true}});}
+ try{expect((await processWebsiteDecisions({db,transport:q}))[0].status).toBe('REFUSED');expect((await db.changeRequest.findUniqueOrThrow({where:{id:r.requestId}})).status).toBe('PENDING');}finally{await meta(WEBSITE_MAPPING_PREFIX+'cloud-second',await mapping(uncle,true));}
 });
 it('mirror contains readable sale context but no login/session/credential fields',async()=>{
  const {approvalMirrorRows}=await import('@/lib/website/mirror');const r=await req();const mirror=(await approvalMirrorRows(db)).find(x=>x.id===r.requestId)!;
@@ -98,7 +99,7 @@ it('unverifiable current cloud membership halts before local apply and leaves AC
 it('independent reject then opposite intent reports actual terminal outcome no apply',async()=>{const r=await req();const q=new Queue();q.add(r.requestId,'cloud-owner',false);q.add(r.requestId,'cloud-second',true);q.rows[0].createdAt='2026-01-01T00:00:00Z';q.rows[1].createdAt='2026-01-02T00:00:00Z';const rr=await processWebsiteDecisions({db,transport:q});expect(rr.map(x=>x.status)).toEqual(['REJECTED','REJECTED']);expect((await db.outgoingSale.findUniqueOrThrow({where:{id:r.saleId}})).remarks).toBe('before');expect((await db.changeRequest.findUniqueOrThrow({where:{id:r.requestId}})).decidedById).toBe(owner)});
 it('independent approve then opposite reject truthfully stays APPLIED once',async()=>{const r=await req();const q=new Queue();q.add(r.requestId,'cloud-owner',true);q.add(r.requestId,'cloud-second',false);q.rows[0].createdAt='2026-01-01T00:00:00Z';q.rows[1].createdAt='2026-01-02T00:00:00Z';const a=await db.auditLog.count({where:{entityName:'Sale',entityId:r.saleId}});expect((await processWebsiteDecisions({db,transport:q})).map(x=>x.status)).toEqual(['APPLIED','APPLIED']);expect(await db.auditLog.count({where:{entityName:'Sale',entityId:r.saleId}})).toBe(a+1)});
 it('independent stale sale fingerprint produces CONFLICT and mirrored actual state',async()=>{const r=await req();await db.outgoingSale.update({where:{id:r.saleId},data:{qty:11}});const q=new Queue();q.add(r.requestId);expect((await processWebsiteDecisions({db,transport:q}))[0].status).toBe('CONFLICT');expect((await db.outgoingSale.findUniqueOrThrow({where:{id:r.saleId}})).remarks).toBe('before');const {approvalMirrorRows}=await import('@/lib/website/mirror');expect((await approvalMirrorRows(db)).find(x=>x.id===r.requestId)?.status).toBe('CONFLICT')});
-it('independent same-name different stable-id mapping cannot bypass self rejection',async()=>{const r=await req();await meta(WEBSITE_MAPPING_PREFIX+'cloud-spoof',worker);const q=new Queue();q.add(r.requestId,'cloud-spoof');expect((await processWebsiteDecisions({db,transport:q}))[0].status).toBe('REFUSED');expect((await db.changeRequest.findUniqueOrThrow({where:{id:r.requestId}})).status).toBe('PENDING')});
+it('independent same-name different stable-id mapping cannot bypass self rejection',async()=>{const r=await req();await meta(WEBSITE_MAPPING_PREFIX+'cloud-spoof',await mapping(worker));const q=new Queue();q.add(r.requestId,'cloud-spoof');expect((await processWebsiteDecisions({db,transport:q}))[0].status).toBe('REFUSED');expect((await db.changeRequest.findUniqueOrThrow({where:{id:r.requestId}})).status).toBe('PENDING')});
 it('independent malformed head prevents later processing, active claim blocks FIFO',async()=>{const r=await req(),r2=await req();const q=new Queue();const a=q.add(r.requestId);q.add(r2.requestId);a.approve='true' as any;await expect(processWebsiteDecisions({db,transport:q})).rejects.toThrow('invalid command');expect(q.receipts.length).toBe(0);a.approve=true;await q.claim(a.id);expect(await processWebsiteDecisions({db,transport:q})).toEqual([]);expect((await db.changeRequest.findUniqueOrThrow({where:{id:r2.requestId}})).status).toBe('PENDING')});
 it('independent mirror failure after apply retry returns truthful state no double write',async()=>{const {websiteApprovalRoundTrip}=await import('@/lib/website/round-trip');const r=await req();const q=new Queue();q.add(r.requestId);let calls=0;const transport=Object.assign(q,{mirror:async()=>{if(++calls===2)throw Error('synthetic mirror outage')}});await expect(websiteApprovalRoundTrip(db,transport)).rejects.toThrow('mirror outage');const a=await db.auditLog.count({where:{entityName:'Sale',entityId:r.saleId}});await websiteApprovalRoundTrip(db,transport);expect(await db.auditLog.count({where:{entityName:'Sale',entityId:r.saleId}})).toBe(a);expect((await db.changeRequest.findUniqueOrThrow({where:{id:r.requestId}})).status).toBe('APPLIED')});
 

@@ -3,7 +3,7 @@ import type { approvalMirrorRows } from './mirror';
 
 // Proposed provider adapter, explicitly constructed by a future approved
 // desktop wiring step. This file creates no client and is not in auto-sync.
-// Its caller must own a trusted service client. An anon/website client is NOT
+// Its caller must own the verified restricted desktop sync client. An anon/website client is NOT
 // equivalent and the proposed RPC grants must enforce that on the provider.
 export function websiteProviderTransport(client: any): DecisionTransport & {
   mirror(rows: Awaited<ReturnType<typeof approvalMirrorRows>>): Promise<void>;

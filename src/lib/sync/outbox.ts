@@ -97,7 +97,7 @@ export async function deliverPendingOutbox(
 ): Promise<OutboxDeliveryResult> {
   return withSyncLease("outbox_delivery", async () => {
     const db = dependencies.db ?? await getDb();
-    const remote = dependencies.remote ?? createSyncClient();
+    const remote = dependencies.remote ?? await createSyncClient();
     const errors: string[] = [];
     let attempted = 0;
     let delivered = 0;

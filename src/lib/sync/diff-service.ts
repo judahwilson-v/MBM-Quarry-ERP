@@ -1,3 +1,4 @@
+import { syncReadProjection, syncResponseRows } from './read-projection';
 import { getDb } from "@/lib/prisma";
 import { createSyncClient } from "@/lib/supabase/client-sync";
 import { SYNC_MODEL_CONFIG, PULL_ORDER } from "./sync-config";
@@ -19,7 +20,7 @@ export interface DiffSummary {
  */
 export async function generateRestoreDiffSummary(): Promise<DiffSummary[]> {
   const db = await getDb();
-  const supabase = createSyncClient();
+  const supabase = await createSyncClient();
   const summaries: DiffSummary[] = [];
 
   for (const modelName of PULL_ORDER) {
@@ -106,7 +107,7 @@ export interface DetailedDiff {
  */
 export async function getDetailedTableDiff(tableName: string): Promise<DetailedDiff[]> {
   const db = await getDb();
-  const supabase = createSyncClient();
+  const supabase = await createSyncClient();
 
   // Find the model config for this table name
   const config = Object.values(SYNC_MODEL_CONFIG).find((cfg) => cfg.table === tableName);
@@ -126,13 +127,13 @@ export async function getDetailedTableDiff(tableName: string): Promise<DetailedD
   }
 
   // Fetch full server records
-  const { data: serverRecords, error } = await supabase.from(tableName).select("*");
+  const { data: serverRecords, error } = await supabase.from(tableName).select(syncReadProjection(tableName));
   if (error) {
     throw new Error(`Failed to fetch server data for ${tableName}: ${error.message}`);
   }
 
   const serverMap = new Map<string, any>();
-  for (const rec of serverRecords || []) {
+  for (const rec of syncResponseRows(serverRecords)) {
     serverMap.set(rec.id, rec);
   }
 

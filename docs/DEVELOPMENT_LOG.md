@@ -305,3 +305,9 @@ No code, tests or live effects changed this hour. Private source and bounded evi
 ## 2026-11-12 06:10 IST - hourly checkpoint
 
 No implementation, tests or live effects changed this hour. Private source and bounded evidence remain preserved. Human setup, authorized live fixtures/access, deployment/install targets and coherent source publication remain gated. No repeated tests or provider probes. This checkpoint changes only the log and adds no live-readiness claim.
+
+## 2026-11-12 06:46 IST - Publish previously tested P3 restricted sync source
+
+Restores the previously tested restricted ordinary-auth sync client lifecycle, credential-safe settings restore/read projections, and approval-bridge identity checks. The complete source overlay matches the preserved P3 checkpoint. Historical checks: 20 focused executions, 42 retained/adapted bridge executions and strict types; actual ordinary Auth session-reuse probe only. No new test run is claimed by this publication.
+
+This is source publication to the existing review branch, not deployment, installation, provider activation or readiness approval. Review-branch deployment remains disabled. Private runtime credentials, human provisioning, actual desktop/device tests and full live sale-to-approval roundtrip remain outside this publication. Native source remains private.

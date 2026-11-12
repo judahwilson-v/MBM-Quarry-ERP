@@ -4,6 +4,7 @@
  * Server owns the provider adapter and local membership. No Server Action
  * accepts this dependency set or a client-supplied actor as authority.
  */
+import { parseWebsiteOwnerMapping } from './owner-mapping';
 import type { PrismaClient } from '@prisma/client';
 import { decideChangeRequestAsVerifiedActor } from '@/lib/domain/change-requests/decision-service';
 
@@ -32,8 +33,9 @@ export interface DecisionTransport {
   acknowledge(id: string, fence: string, receipt: DecisionReceipt): Promise<void>;
 }
 
-// Local owner-provisioned mapping only. No client, website display name or
-// remotely writable directory may create/update this value.
+// Local owner-provisioned attribution mapping only. Owners have no desktop
+// login, PIN, AppUser or session requirement. No browser or remote directory
+// may create/update this value; fresh provider principal membership still binds it.
 export const WEBSITE_MAPPING_PREFIX = 'website_approver_user:';
 
 export async function processWebsiteDecisions(deps: {
@@ -53,8 +55,8 @@ export async function processWebsiteDecisions(deps: {
     if (!fence) break; // FIFO: an earlier active claimant may still be deciding
     const mapping = await deps.db.appMeta.findUnique({ where: { key: WEBSITE_MAPPING_PREFIX + intent.issuerUserId } });
     let receipt: DecisionReceipt;
-    const actor = mapping?.value ? await deps.db.appUser.findUnique({ where: { id: mapping.value } }) : null;
-    if (!actor?.active || !(await deps.transport.issuerActive(intent.issuerUserId, actor.id))) {
+    const actor = parseWebsiteOwnerMapping(mapping?.value);
+    if (!actor || !(await deps.transport.issuerActive(intent.issuerUserId, actor.id))) {
       receipt = { intentId: intent.id, requestId: intent.requestId, status: 'REFUSED', message: 'This website login is not mapped to an active owner-provisioned approver.' };
     } else {
       const request = await deps.db.changeRequest.findUnique({ where: { id: intent.requestId } });

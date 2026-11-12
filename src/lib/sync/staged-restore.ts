@@ -1,3 +1,5 @@
+import { preserveLocalSettingsSecrets, safeCloudRestoreError } from './local-settings-restore';
+import { syncReadProjection, syncResponseRows } from './read-projection';
 import fs from "fs";
 import path from "path";
 import { randomUUID } from "crypto";
@@ -49,6 +51,7 @@ function timestampForFileName() {
 }
 
 function toCamelCase(value: unknown): unknown {
+  if (value instanceof Date) return value;
   if (typeof value === "string" && /^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}(\.\d+)?(Z|[+-]\d{2}:\d{2})?$/i.test(value)) {
     const withTimezone = /Z|[+-]\d{2}:\d{2}$/i.test(value) ? value : `${value}Z`;
     const date = new Date(withTimezone);
@@ -65,15 +68,15 @@ function toCamelCase(value: unknown): unknown {
 }
 
 async function fetchAllRows(
-  supabase: ReturnType<typeof createSyncClient>,
+  supabase: Awaited<ReturnType<typeof createSyncClient>>,
   table: string,
   timeColumn: string,
 ): Promise<{ rows: Record<string, unknown>[]; error?: string }> {
   const rows: Record<string, unknown>[] = [];
   for (let offset = 0; ; offset += PAGE_SIZE) {
-    const { data, error } = await supabase.from(table).select("*").order(timeColumn, { ascending: true }).range(offset, offset + PAGE_SIZE - 1);
+    const { data, error } = await supabase.from(table).select(syncReadProjection(table)).order(timeColumn, { ascending: true }).range(offset, offset + PAGE_SIZE - 1);
     if (error) return { rows, error: `Fetch failed at offset ${offset}: ${error.message}` };
-    rows.push(...((data ?? []) as Record<string, unknown>[]));
+    rows.push(...syncResponseRows(data));
     if (!data || data.length < PAGE_SIZE) return { rows };
   }
 }
@@ -172,11 +175,11 @@ export async function stagedRestoreFromSupabase(
       if (localData > 0) throw new Error("Restore refused: local data exists. Use force=true only after reviewing the backup that will be created.");
     }
 
-    stage = new PrismaClient({ datasources: { db: { url: sqliteUrl(stagePath) } } });
+    stage = new PrismaClient({ log: [], datasources: { db: { url: sqliteUrl(stagePath) } } });
     const migrations = await runMigrations(stage, ALL_MIGRATIONS);
     if (migrations.errors.length) throw new Error(migrations.errors.join("; "));
 
-    const supabase = dependencies.fetchRows ? undefined : createSyncClient();
+    const supabase = dependencies.fetchRows ? undefined : await createSyncClient();
     const expectedCounts = new Map<string, number>();
     for (const modelName of PULL_ORDER) {
       const config = SYNC_MODEL_CONFIG[modelName];
@@ -185,7 +188,13 @@ export async function stagedRestoreFromSupabase(
         ? await dependencies.fetchRows(config.table, config.timeColumn)
         : await fetchAllRows(supabase!, config.table, config.timeColumn);
       if (fetched.error) throw new Error(`${config.table}: ${fetched.error}`);
-      const rows = fetched.rows.map((row) => scalarPayload(modelName, row));
+      let sourceRows = fetched.rows;
+      if (modelName === 'GlobalSettings') {
+        const localSettings = await internalDb.globalSettings.findMany();
+        // A cloud without settings must not erase local security settings.
+        sourceRows = preserveLocalSettingsSecrets(sourceRows.length ? sourceRows : localSettings, localSettings);
+      }
+      const rows = sourceRows.map((row) => scalarPayload(modelName, row));
       assertNoDuplicateUniqueValues(modelName, rows);
       const delegate = (stage as any)[config.delegate];
       for (const row of rows) await delegate.create({ data: row });
@@ -261,7 +270,7 @@ export async function stagedRestoreFromSupabase(
     // Errors after the intent was persisted and NOT covered by a completed
     // rollback keep the marker in place: fail closed until restart rather
     // than risk queries against an uncertain database-file state.
-    errors.push({ table: "global", error: error instanceof Error ? error.message : String(error) });
+    errors.push({ table: "global", error: safeCloudRestoreError(error) });
     return { success: false, tablesRestored, totalRows, errors, backupPath };
   } finally {
     if (stage) await stage.$disconnect().catch(() => undefined);

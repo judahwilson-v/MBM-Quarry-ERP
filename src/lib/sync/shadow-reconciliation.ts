@@ -1,3 +1,4 @@
+import { syncReadProjection, syncResponseRows } from './read-projection';
 /**
  * Shadow Reconciliation — Phase 6 Checkpoint 4
  *
@@ -95,7 +96,7 @@ export async function runShadowReconciliation(
   dbParam?: PrismaClient,
 ): Promise<ReconciliationReport> {
   const db = dbParam ?? (await getDb());
-  const supabase = createSyncClient();
+  const supabase = await createSyncClient();
 
   const cutoverReadyModels = Object.values(CUTOVER_MODEL_MANIFEST).filter(
     (m): m is ModelCutoverEntry & { cutoverReady: true } => m.cutoverReady && m.outboxStatus === "MIGRATED"
@@ -134,12 +135,12 @@ export async function runShadowReconciliation(
     try {
       const { data, error } = await supabase
         .from(config.table)
-        .select("*")
+        .select(syncReadProjection(config.table))
         .order("id", { ascending: true });
       if (error) {
         mismatches.push({ entityId: "*", category: "DEFECT", detail: `Failed to read cloud table ${config.table}: ${error.message}` });
       } else {
-        cloudRows = data ?? [];
+        cloudRows = syncResponseRows(data);
       }
     } catch (err: any) {
       mismatches.push({ entityId: "*", category: "DEFECT", detail: `Cloud fetch exception for ${config.table}: ${err?.message}` });

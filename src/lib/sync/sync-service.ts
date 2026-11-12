@@ -1,3 +1,4 @@
+import { syncReadProjection, syncResponseRows } from './read-projection';
 import { projectSyncRecord } from "./credential-hygiene";
 import { findLegacyRowsAfter, isActiveOutboxEntity } from './legacy-pending';
 import { getDb } from "@/lib/prisma";
@@ -98,7 +99,7 @@ export async function pushSync(): Promise<SyncResult> {
     const errorsList: SyncErrorItem[] = [];
 
     const db = await getDb();
-    const supabase = createSyncClient();
+    const supabase = await createSyncClient();
 
     try {
       // 1. Get sync state
@@ -452,7 +453,7 @@ export async function pullSync(): Promise<SyncResult> {
     const errorsList: SyncErrorItem[] = [];
 
     const db = await getDb();
-    const supabase = createSyncClient();
+    const supabase = await createSyncClient();
 
     try {
       // 1. Get pull state
@@ -529,7 +530,7 @@ export async function pullSync(): Promise<SyncResult> {
         try {
           const { data: rows, error: rowsError } = await supabase
             .from(config.table)
-            .select('*')
+            .select(syncReadProjection(config.table))
             .gt(config.timeColumn, pullState.lastSyncedAt.toISOString())
             .order(config.timeColumn, { ascending: true });
 
@@ -542,7 +543,7 @@ export async function pullSync(): Promise<SyncResult> {
 
           if (rows && rows.length > 0) {
             console.log(`[Sync Pull] Fetched ${rows.length} rows for ${config.table}`);
-            for (const row of rows) {
+            for (const row of syncResponseRows(rows)) {
               try {
                 const camelRow = toCamelCase(row);
                 const delegate = (db as any)[config.delegate];
@@ -803,7 +804,7 @@ export interface SupabaseStorageStats {
 }
 
 export async function getSupabaseStorageStats(): Promise<SupabaseStorageStats> {
-  const supabase = createSyncClient();
+  const supabase = await createSyncClient();
   const FREE_TIER_LIMIT_MB = 500;
 
   const { data: rpcData, error: rpcError } = await supabase.rpc("get_table_sizes");
@@ -847,7 +848,7 @@ export async function getSupabaseStorageStats(): Promise<SupabaseStorageStats> {
     try {
       const { count, error } = await supabase
         .from(table as any)
-        .select("*", { count: "exact", head: true });
+        .select(syncReadProjection(table), { count: "exact", head: true });
 
       const rowCount = error ? 0 : (count ?? 0);
       const rowSize = ROW_SIZE_ESTIMATES[table] ?? DEFAULT_ROW_SIZE;
@@ -912,7 +913,7 @@ export async function checkRestoreEligibility(): Promise<{
   warnings: string[];
 }> {
   const db = await getDb();
-  const supabase = createSyncClient();
+  const supabase = await createSyncClient();
 
   let localRecordCount = 0;
   const keyDelegates: (keyof typeof SYNC_MODEL_CONFIG)[] = [
@@ -938,7 +939,7 @@ export async function checkRestoreEligibility(): Promise<{
     try {
       const { count, error } = await supabase
         .from(config.table)
-        .select("*", { count: "exact", head: true });
+        .select(syncReadProjection(config.table), { count: "exact", head: true });
 
       if (error) {
         warnings.push(`Could not check ${config.table}: ${error.message}`);
@@ -975,7 +976,7 @@ export async function checkRestoreEligibility(): Promise<{
 }
 
 async function fetchAllRows(
-  supabase: ReturnType<typeof createSyncClient>,
+  supabase: Awaited<ReturnType<typeof createSyncClient>>,
   table: string,
   timeColumn: string
 ): Promise<{ rows: any[]; error: string | null }> {
@@ -987,7 +988,7 @@ async function fetchAllRows(
   while (hasMore) {
     const { data, error } = await supabase
       .from(table)
-      .select("*")
+      .select(syncReadProjection(table))
       .order(timeColumn, { ascending: true })
       .range(offset, offset + PAGE_SIZE - 1);
 

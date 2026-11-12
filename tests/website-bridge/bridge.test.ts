@@ -10,12 +10,13 @@ let worker: string, owner: string, uncle: string, wt: string, ot: string;
 let material: string;
 async function user(name: string) { return db.appUser.create({ data: { name, pinHash: randomUUID(), pinSalt: randomUUID(), role: 'worker' } }); }
 async function session(id: string) { const token = newSessionToken(); await db.authSession.create({ data: { userId: id, token, expiresAt: new Date(Date.now()+3600000) } }); return token; }
+async function mapping(id:string,active=true) { const u=await db.appUser.findUniqueOrThrow({where:{id}}); return JSON.stringify({version:1,id,name:u.name,active}); }
 async function meta(key:string,value:string) { await db.appMeta.upsert({where:{key},create:{key,value},update:{value}}); }
 beforeAll(async () => {
  worker=(await user('Synthetic Worker')).id; owner=(await user('Synthetic Owner')).id; uncle=(await user('Synthetic Second Approver')).id;
  wt=await session(worker); ot=await session(owner);
  await meta(ENROLLMENT_KEY,'true'); await meta(CONTROL_PRINCIPAL_KEY,owner);
- await meta(WEBSITE_MAPPING_PREFIX+'cloud-owner',owner); await meta(WEBSITE_MAPPING_PREFIX+'cloud-second',uncle);
+ await meta(WEBSITE_MAPPING_PREFIX+'cloud-owner',await mapping(owner)); await meta(WEBSITE_MAPPING_PREFIX+'cloud-second',await mapping(uncle));
  material=(await db.material.create({data:{materialName:'Synthetic bridge material',ratePerCft:50}})).id;
 });
 async function req(requester=wt) {
@@ -75,9 +76,9 @@ it('full local round trip mirrors pending, consumes website intent, mirrors actu
 });
 
 it('a revoked local approver mapping refuses queued commands before apply',async()=>{
- const r=await req();await db.appUser.update({where:{id:uncle},data:{active:false}});
+ const r=await req();await meta(WEBSITE_MAPPING_PREFIX+'cloud-second',await mapping(uncle,false));
  const q=new Queue();q.add(r.requestId,'cloud-second');
- try{expect((await processWebsiteDecisions({db,transport:q}))[0].status).toBe('REFUSED');expect((await db.changeRequest.findUniqueOrThrow({where:{id:r.requestId}})).status).toBe('PENDING');}finally{await db.appUser.update({where:{id:uncle},data:{active:true}});}
+ try{expect((await processWebsiteDecisions({db,transport:q}))[0].status).toBe('REFUSED');expect((await db.changeRequest.findUniqueOrThrow({where:{id:r.requestId}})).status).toBe('PENDING');}finally{await meta(WEBSITE_MAPPING_PREFIX+'cloud-second',await mapping(uncle,true));}
 });
 it('mirror contains readable sale context but no login/session/credential fields',async()=>{
  const {approvalMirrorRows}=await import('@/lib/website/mirror');const r=await req();const mirror=(await approvalMirrorRows(db)).find(x=>x.id===r.requestId)!;
@@ -94,4 +95,16 @@ it('unverifiable current cloud membership halts before local apply and leaves AC
  const r=await req();const q=new Queue();q.add(r.requestId);q.issuerActive=async()=>{throw Error('Synthetic membership outage')};
  await expect(processWebsiteDecisions({db,transport:q})).rejects.toThrow('membership outage');
  expect(q.receipts).toHaveLength(0);expect((await db.changeRequest.findUniqueOrThrow({where:{id:r.requestId}})).status).toBe('PENDING');
+});
+
+it('website-only owner without any AppUser or desktop session can approve with stable audit identity',async()=>{
+ const id=randomUUID();expect(await db.appUser.findUnique({where:{id}})).toBeNull();
+ await meta(WEBSITE_MAPPING_PREFIX+'cloud-website-only',JSON.stringify({version:1,id,name:'Synthetic Website Only',active:true}));
+ const r=await req();const q=new Queue();q.add(r.requestId,'cloud-website-only');q.issuerActive=async(issuer,principal)=>issuer==='cloud-website-only'&&principal===id;
+ expect((await processWebsiteDecisions({db,transport:q}))[0].status).toBe('APPLIED');const row=await db.changeRequest.findUniqueOrThrow({where:{id:r.requestId}});expect(row.decidedById).toBe(id);expect(row.decidedByName).toBe('Synthetic Website Only');expect(await db.appUser.findUnique({where:{id}})).toBeNull();
+});
+it('malformed, credential-bearing and legacy local mapping refuses without manufacturing an actor',async()=>{
+ const {parseWebsiteOwnerMapping}=await import('@/lib/website/owner-mapping');
+ for(const value of ['not-json',owner,'null','[]',JSON.stringify({version:1,id:'actor',name:'Owner',active:false}),JSON.stringify({version:1,id:'actor',name:'Owner',active:true,password:'synthetic-should-not-be-read'})])expect(parseWebsiteOwnerMapping(value)).toBeNull();
+ const r=await req();await meta(WEBSITE_MAPPING_PREFIX+'cloud-invalid',owner);const q=new Queue();q.add(r.requestId,'cloud-invalid');expect((await processWebsiteDecisions({db,transport:q}))[0].status).toBe('REFUSED');expect((await db.changeRequest.findUniqueOrThrow({where:{id:r.requestId}})).status).toBe('PENDING');
 });
