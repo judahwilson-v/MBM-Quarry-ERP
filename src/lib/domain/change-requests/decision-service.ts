@@ -190,7 +190,7 @@ async function applySaleFieldEdit(
   }
   const qtyDiff = sale.qty - updated.qty;
   if (qtyDiff !== 0) {
-    await txAdjustInventoryStock(tx, updated.materialName, qtyDiff, "SALE_OUT", sale.id, `Sale correction (approved change request ${req.id})`);
+    await txAdjustInventoryStock(tx, updated.materialName, qtyDiff, "SALE_OUT", sale.id, `Sale correction (approved change request ${req.id})`, "CFT");
   }
   if (updated.partyId) await recalculatePartyLedger(tx, updated.partyId);
 

@@ -36,6 +36,12 @@ export async function adjustInventoryStock(
     where: { materialName: normalizedMaterialName },
   });
 
+  // Never add volume to weight or silently relabel historical balances.
+  // Callers with a known unit must pass it; conversion needs a separate policy.
+  if (stock && stock.unit !== unit) {
+    throw new Error("Inventory unit mismatch. This stock uses " + stock.unit + "; the entry uses " + unit + ". No stock was changed.");
+  }
+
   if (!stock) {
     stock = await db.inventoryStock.create({
       data: {
@@ -87,6 +93,12 @@ export async function txAdjustInventoryStock(
   let stock = await tx.inventoryStock.findUnique({
     where: { materialName: normalizedMaterialName },
   });
+
+  // Never add volume to weight or silently relabel historical balances.
+  // Callers with a known unit must pass it; conversion needs a separate policy.
+  if (stock && stock.unit !== unit) {
+    throw new Error("Inventory unit mismatch. This stock uses " + stock.unit + "; the entry uses " + unit + ". No stock was changed.");
+  }
 
   if (!stock) {
     stock = await tx.inventoryStock.create({

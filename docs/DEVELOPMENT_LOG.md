@@ -319,3 +319,24 @@ Actual browser entry, Save and reload persistence exercised on an isolated synth
 Fixed a reproduced inventory display defect: after adding material, refreshed server props now update the visible stock state; a successful Save closes/resets its form. Existing failure retention is preserved. Added an isolated browser regression covering blocked Save field retention, retry, refreshed40CFT card without main-frame navigation, closed form and reload persistence. The final regression and strict TypeScript check passed. No stock service, unit policy or existing record changed. A separate sale/inventory unit mismatch remains unresolved.
 
 The API schema-cache failure persists after one documented reload attempt. No claim of service recovery. This bounded source/test change is for the existing review branch only, with deployment disabled; no installer, deployment or real data publication.
+
+## 2026-11-13 12:58 IST - current completed local checkpoint
+
+Work was paused on12November and resumed today for isolated preparation. This checkpoint records work already done, not future work or rollout approval. The ongoing log cadence is now every2hours. No running quarry app, provider configuration or business records changed.
+
+### Changed
+
+- Sales create/edit/material-change/delete and approved-sale-correction inventory callers now pass CFT explicitly, matching the sales form/rate units. New sales no longer silently initialize volume stock as TONS.
+- Inventory adjustments reject a mismatch with an existing stock unit before changing its balance/history. They do not convert volume to weight or relabel historical records. Transactional sale failures roll back the sale and related records.
+- Existing-stock manual UI adjustments pass the stock row's own unit instead of defaulting to TONS.
+- Added focused isolated SQLite unit/rollback tests and a dedicated test config.
+
+### Passed before this checkpoint
+
+Five focused tests cover CFT sale create/quantity edit/delete restoration, mismatched-unit create rollback across stock/sale/master/financial/audit/daybook records, material-change rollback/success, manual mismatch retention/matching adjustment, and transactional mismatch retention. Seven existing transaction-atomicity tests pass. Strict TypeScript passes. Tests ran on fresh synthetic SQLite with application-network calls blocked by the local test preload; a separate network namespace was unavailable, so no OS-level network-isolation claim is made.
+
+Actual isolated Linux browser flow: a CFT sale against the old synthetic TONS row is visibly refused and retains typed fields; a new synthetic material's10CFT sale creates a visible-10CFT inventory card that survives reload. The old synthetic-10TONS row stays unchanged as evidence, not silently repaired. This is local browser proof, not live cloud or Windows proof.
+
+### Still unfinished
+
+Historical wrong-unit balances need a separately grounded repair policy; no conversion is guessed. Purchase quantities have no explicit source-grounded unit contract yet, so their existing behavior is not changed here. The approved-correction caller forwards CFT, but its complete approval workflow has not been rerun in this checkpoint. Full manual UI stock adjustment coverage remains incomplete. The last cloud check is still12November:503/PGRST002 despite one reload, not a current health check. Windows install/update/reinstall, cloud restore, all-module coverage and app/website matching remain unverified. No deployment or readiness claim.

@@ -270,13 +270,13 @@ export async function saveSale(input: SaleInput, pin?: string, sessionToken?: st
           // Sync inventory
           if (existing.materialName !== sale.materialName) {
              // Restore old material
-             await txAdjustInventoryStock(tx, existing.materialName, existing.qty, 'SALE_OUT', sale.id, `Sale Updated (Material Changed): ${sale.vehicleNumber}`);
+             await txAdjustInventoryStock(tx, existing.materialName, existing.qty, 'SALE_OUT', sale.id, `Sale Updated (Material Changed): ${sale.vehicleNumber}`, "CFT");
              // Deduct new material
-             await txAdjustInventoryStock(tx, sale.materialName, -sale.qty, 'SALE_OUT', sale.id, `Sale Updated (New Material): ${sale.vehicleNumber}`);
+             await txAdjustInventoryStock(tx, sale.materialName, -sale.qty, 'SALE_OUT', sale.id, `Sale Updated (New Material): ${sale.vehicleNumber}`, "CFT");
           } else {
              const qtyDiff = existing.qty - sale.qty; // if old was 10, new is 12, diff is -2
              if (qtyDiff !== 0) {
-               await txAdjustInventoryStock(tx, sale.materialName, qtyDiff, 'SALE_OUT', sale.id, `Sale Updated: ${sale.vehicleNumber}`);
+               await txAdjustInventoryStock(tx, sale.materialName, qtyDiff, 'SALE_OUT', sale.id, `Sale Updated: ${sale.vehicleNumber}`, "CFT");
              }
           }
 
@@ -365,7 +365,7 @@ export async function saveSale(input: SaleInput, pin?: string, sessionToken?: st
         });
 
         // Deduct inventory
-        await txAdjustInventoryStock(tx, sale.materialName, -sale.qty, 'SALE_OUT', sale.id, `Sale: ${sale.vehicleNumber}`);
+        await txAdjustInventoryStock(tx, sale.materialName, -sale.qty, 'SALE_OUT', sale.id, `Sale: ${sale.vehicleNumber}`, "CFT");
 
         return sale;
       }),
@@ -424,7 +424,7 @@ export async function deleteSale(id: string, pin?: string, sessionToken?: string
         // Restore inventory
         const m = await tx.material.findFirst({ where: { materialName: existing.materialName } });
         if (m) {
-          await txAdjustInventoryStock(tx, existing.materialName, existing.qty, 'SALE_OUT', id, `Sale Deleted: ${existing.vehicleNumber}`);
+          await txAdjustInventoryStock(tx, existing.materialName, existing.qty, 'SALE_OUT', id, `Sale Deleted: ${existing.vehicleNumber}`, "CFT");
         }
         
         // Cascade delete financial events and ledger entries

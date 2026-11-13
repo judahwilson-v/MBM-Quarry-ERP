@@ -27,7 +27,9 @@ export function InventoryPage({ initialStock }: { initialStock: InventoryStock[]
     const amount = type === 'SALE_OUT' ? -Math.abs(Number(adjustAmount)) : Math.abs(Number(adjustAmount));
     
     try {
-      await adjustInventoryStock(materialName, amount, type, adjustReason);
+      const row = stock.find(item => item.materialName === materialName);
+      if (!row) throw new Error("Stock row not found");
+      await adjustInventoryStock(materialName, amount, type, adjustReason, row.unit);
       // Optimistic update
       setStock(stock.map(s => {
         if (s.materialName === materialName) {
