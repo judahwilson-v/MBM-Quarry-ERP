@@ -340,3 +340,11 @@ Actual isolated Linux browser flow: a CFT sale against the old synthetic TONS ro
 ### Still unfinished
 
 Historical wrong-unit balances need a separately grounded repair policy; no conversion is guessed. Purchase quantities have no explicit source-grounded unit contract yet, so their existing behavior is not changed here. The approved-correction caller forwards CFT, but its complete approval workflow has not been rerun in this checkpoint. Full manual UI stock adjustment coverage remains incomplete. The last cloud check is still12November:503/PGRST002 despite one reload, not a current health check. Windows install/update/reinstall, cloud restore, all-module coverage and app/website matching remain unverified. No deployment or readiness claim.
+
+## 2026-11-13 14:07 IST - two-hour progress checkpoint
+
+Since the12:58 source checkpoint, actual isolated local browser coverage passed for manual inventory Stock In5CFT changing-10CFT to-5CFT without double counting, with reload persistence. Vehicles master entry/Create/reload passed with synthetic100/20CFT capacities. Parties master entry/Create/reload passed with a synthetic BUYER/address and no real contact details. Together with prior sales, expenses, fuel, employee directory and inventory, seven modules have local entry/save evidence. This does not establish production cloud sync or Windows acceptance.
+
+The request-approval regression run returned56passes and1failure. The failing foundation tripwire expects conflict/self-decision implementation text in the old action facade; that text is now in the decision service. Existing behavioral approval/conflict tests passed, including quantity correction. The tripwire has not been changed, and the full suite is not claimed passing. Additional explicit approval-unit rollback coverage remains to do.
+
+No further source changes, deployment, installation, provider checks or historical stock repair since the12:58 checkpoint. Last provider evidence remains12November503/PGRST002, not current health. Purchase unit policy, historical wrong-unit balances, remaining modules, Windows install/recovery and app/website matching are still unresolved. This commit changes only this log.
