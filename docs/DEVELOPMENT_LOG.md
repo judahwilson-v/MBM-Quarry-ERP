@@ -495,3 +495,12 @@ The newest grouped-source reader now has read-only local UI and export checks. C
 The first combined script timed out awaiting a report download immediately after navigation. A later run waited for network idle and changed Print View before exporting successfully, without an application change. The earlier timeout remains inconclusive harness timing, not a classified app failure. Inspected report pixels still show raw JSON and offline/pending status. Workbook data checks are not workbook-layout, operating-system print or live-sync acceptance.
 
 Eleven intended source/test files remain unpublished. Source-snapshot consistency under concurrent writes, the separate Party Credit consumer, name-only/renamed history and print layout remain open. No provider mutation, deployment, release, installation or cloud/native acceptance; November13 Drive handover is unchanged. Only this log is published.
+
+
+## 2026-11-15 02:23 IST - two-hour progress checkpoint
+
+A summary transaction trial was rejected and restored, not accepted as a fix. SQL events showed Prisma SQLite opening BEGIN IMMEDIATE for five SELECTs, reserving the writer lock. Given earlier allocation-starvation evidence, that cannot be treated as a harmless read wrapper without contention checks. Strict TypeScript also failed on array-transaction/groupBy inference. Trial source and logs were preserved outside proposed files.
+
+The earlier grouped-source helper was restored byte-for-byte and trial test hooks removed. Strict TypeScript and the scoped unit check passed again (4ms). Eleven intended local files remain unpublished with no accepted new application change this interval. Atomic summary snapshot consistency remains unresolved. The trial ran only on synthetic fixtures/disposable copy, with no business INSERT/UPDATE/DELETE observed.
+
+A single-statement read is the next bounded alternative to investigate, not a proven fix. The separate Party Credit consumer, legacy reconciliation and raw-JSON print layout remain open. No cloud/native acceptance, provider mutation, deployment, release or installation. The November13 Drive handover remains unchanged. Only this log is published.
