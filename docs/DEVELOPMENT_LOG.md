@@ -486,3 +486,12 @@ The local summary candidate was revised within the same eleven intended unpublis
 The unit check passed in3ms for mixed-party net109.50/credit150/collected17.50, supplier negative50, empty party zero, excluded null IDs/negative credit, and five read calls. Strict TypeScript passed. Actual SQLite report data remained132.50. In a separate disposable backup with all ledger rows removed, the reader still returned buyer132.50 and supplier negative43 in18ms; original fixture history was untouched. Earlier candidate source was preserved.
 
 This newest source version has not yet had its UI/export rerun. Multiple read calls are not a proved atomic snapshot under concurrent writes. Name-only/renamed history, the separate Party Credit list and raw-JSON print layout remain open. No application publication, provider mutation, cloud/native acceptance, deployment or installation. November13 Drive handover remains unchanged. Only this log is published.
+
+
+## 2026-11-15 00:22 IST - two-hour progress checkpoint
+
+The newest grouped-source reader now has read-only local UI and export checks. Collection pixels and downloaded workbook show buyer outstanding132.50, collected17.50 and total credit150. A fresh report-only browser run verified the fourteen-sheet downloaded report workbook and parsed print data also contain buyer outstanding132.50. No record was resubmitted.
+
+The first combined script timed out awaiting a report download immediately after navigation. A later run waited for network idle and changed Print View before exporting successfully, without an application change. The earlier timeout remains inconclusive harness timing, not a classified app failure. Inspected report pixels still show raw JSON and offline/pending status. Workbook data checks are not workbook-layout, operating-system print or live-sync acceptance.
+
+Eleven intended source/test files remain unpublished. Source-snapshot consistency under concurrent writes, the separate Party Credit consumer, name-only/renamed history and print layout remain open. No provider mutation, deployment, release, installation or cloud/native acceptance; November13 Drive handover is unchanged. Only this log is published.
