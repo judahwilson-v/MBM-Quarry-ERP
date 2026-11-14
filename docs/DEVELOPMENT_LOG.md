@@ -504,3 +504,12 @@ A summary transaction trial was rejected and restored, not accepted as a fix. SQ
 The earlier grouped-source helper was restored byte-for-byte and trial test hooks removed. Strict TypeScript and the scoped unit check passed again (4ms). Eleven intended local files remain unpublished with no accepted new application change this interval. Atomic summary snapshot consistency remains unresolved. The trial ran only on synthetic fixtures/disposable copy, with no business INSERT/UPDATE/DELETE observed.
 
 A single-statement read is the next bounded alternative to investigate, not a proven fix. The separate Party Credit consumer, legacy reconciliation and raw-JSON print layout remain open. No cloud/native acceptance, provider mutation, deployment, release or installation. The November13 Drive handover remains unchanged. Only this log is published.
+
+
+## 2026-11-15 04:24 IST - two-hour progress checkpoint
+
+A new local single-statement summary candidate replaces the five-query reader within the same eleven intended unpublished files. One static parameterized WITH/SELECT pre-aggregates the four sources before ID joins and preserves existing ledger-rebuild filters/signs. SQL events show one statement with no explicit BEGIN or business DML. Existing synthetic report/print data and disposable no-ledger fixtures return buyer132.50 and supplier negative43; strict TypeScript passes.
+
+Initial actual integration failed because SQLite/Prisma inferred integer result metadata and tried to parse132.50 as BigInt. Explicit REAL casts on monetary output expressions fixed that observed failure; final three integration checks passed in24/15/15ms. Failed source/logs remain preserved. An archived old mock accidentally matched the diagnostic glob and was renamed out, not counted as a pass.
+
+Unit checks cover SQL shape, call count and rounding, not full mixed-source SQL arithmetic. This revision still needs actual mixed/null-ID/join-multiplication fixtures and UI/export checks. Earlier UI evidence belongs to the previous reader. No application publication, cloud/native acceptance, provider mutation, backfill, deployment or installation. Separate credit-list/legacy reconciliation/print-layout issues remain open. November13 Drive handover is unchanged. Only this log is published.
