@@ -477,3 +477,12 @@ Actual read-only browser downloads verified the local candidate export data: the
 Actual Report Print View pixels confirmed unfinished presentation: Daily Closing Report and Party Statement contain identical full-report raw JSON rather than a finished statement layout. Parsed print data has the corrected132.50, but data correctness does not establish printable layout. No operating-system Print/PDF dialog was exercised.
 
 No application code changed in this interval and no new money record was saved. Eleven intended files remain unpublished. The separate Party Credit consumer, missing/stale-ledger handling, null-ID reconciliation and query scaling remain open. No cloud/native acceptance, provider mutation, deployment, release or installation. The dated November13 Drive handover remains unchanged. This checkpoint publishes only the log.
+
+
+## 2026-11-14 22:21 IST - two-hour progress checkpoint
+
+The local summary candidate was revised within the same eleven intended unpublished files. Five grouped source reads now mirror existing ledger-rebuild signs and filters: positive sale credit minus positive purchase credit minus collections plus supplier payments. The reader no longer depends on a missing/stale materialized ledger or performs per-party query fan-out. Null-ID records are excluded, not linked by guess; no history is written or rebuilt.
+
+The unit check passed in3ms for mixed-party net109.50/credit150/collected17.50, supplier negative50, empty party zero, excluded null IDs/negative credit, and five read calls. Strict TypeScript passed. Actual SQLite report data remained132.50. In a separate disposable backup with all ledger rows removed, the reader still returned buyer132.50 and supplier negative43 in18ms; original fixture history was untouched. Earlier candidate source was preserved.
+
+This newest source version has not yet had its UI/export rerun. Multiple read calls are not a proved atomic snapshot under concurrent writes. Name-only/renamed history, the separate Party Credit list and raw-JSON print layout remain open. No application publication, provider mutation, cloud/native acceptance, deployment or installation. November13 Drive handover remains unchanged. Only this log is published.
