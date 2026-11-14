@@ -450,3 +450,12 @@ Credit Collections has a bounded synthetic local save/reload result: an existing
 A reporting defect was also reproduced: Collected and Total Credit summary cells still showed zero before/after/reload. listPartyCollectionSummary returns only partyName/outstanding while the UI and export expect collected/totalCredit; missing values are displayed as zero. Outstanding132.50 is supported, but those two summary/export fields are not trustworthy. No repair was prepared yet; existing ledger/report semantics must be traced before selecting a total-credit calculation.
 
 Seven intended earlier source/test changes remain unpublished. No application source changed during this interval. Fleet remains unfinished, the November13 Drive handover remains dated and unchanged, and local offline/pending status is not cloud acceptance. No provider mutation, deployment, release, installation or running-quarry change. This checkpoint publishes only the development log.
+
+
+## 2026-11-14 16:18 IST - two-hour progress checkpoint
+
+Read-only report-source characterization confirmed a wider monetary sign defect. For the saved synthetic buyer, sale credit150 minus collection17.50 and the rebuilt ledger support132.50 owed to the quarry. Current getReportData returns negative17.50 in both monthly.partyOutstanding and print.partyStatements. The diagnostic asserts this existing defect, not a successful repair. Report UI pixels have not yet been checked.
+
+The synthetic fixture has two saved sales with remainingCredit150 each and valid party IDs but zero PartyCredit rows. Current credit summary/report code reads PartyCredit, while ledger rebuild reads sale remainingCredit directly. Source search found PartyCredit read/sync/migration code but no create/upsert path. Copying the old aggregate would retain false zero figures. The ledger also includes supplier purchases/payments, so outstanding plus collected is not a safe universal total-credit formula.
+
+No application repair, historical backfill or credit-policy change was applied. Mixed supplier/customer and legacy null-ID cases need explicit coverage before source alignment. Seven earlier prepared source/test files remain unpublished. No live provider, native Windows or device acceptance, deployment, release, installation or running-quarry change. This checkpoint publishes only the development log.
