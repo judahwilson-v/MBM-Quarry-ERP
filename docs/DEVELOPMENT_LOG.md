@@ -459,3 +459,12 @@ Read-only report-source characterization confirmed a wider monetary sign defect.
 The synthetic fixture has two saved sales with remainingCredit150 each and valid party IDs but zero PartyCredit rows. Current credit summary/report code reads PartyCredit, while ledger rebuild reads sale remainingCredit directly. Source search found PartyCredit read/sync/migration code but no create/upsert path. Copying the old aggregate would retain false zero figures. The ledger also includes supplier purchases/payments, so outstanding plus collected is not a safe universal total-credit formula.
 
 No application repair, historical backfill or credit-policy change was applied. Mixed supplier/customer and legacy null-ID cases need explicit coverage before source alignment. Seven earlier prepared source/test files remain unpublished. No live provider, native Windows or device acceptance, deployment, release, installation or running-quarry change. This checkpoint publishes only the development log.
+
+
+## 2026-11-14 18:19 IST - two-hour progress checkpoint
+
+A local read-only source-alignment candidate was prepared in four additional files, bringing intended unpublished source/test files to eleven. A shared reader supplies existing ID-linked ledger net balance, SALE debit totals and linked collection sums to collection summary and report outstanding. It does not create PartyCredit rows, rebuild history or guess links for name-only legacy records.
+
+A mixed-party mocked test with sale150, purchase43, supplier payment20 and collection17.50 returns net109.50, customer credit150 and collected17.50; empty-party and null-ID isolation cases pass. Unit check3ms and strict TypeScript pass. Existing synthetic SQLite integration76ms now returns132.50 for monthly outstanding and print-statement data, matching persisted ledger rather than negative17.50. Original defect characterization is preserved separately.
+
+Actual read-only collection UI pixels show132.50 outstanding,17.50 collected and150 credit with unchanged history and supplier negative43 preserved. No collection was resubmitted. Export download and report/print visual paths remain unchecked. The separate Party Credit list still uses its old source; missing/stale ledger, legacy reconciliation and query-count limits remain open. No code publication, backfill, migration, provider mutation, cloud/native acceptance, deployment or installation. The dated November13 Drive handover remains unchanged. Only this log is published.
