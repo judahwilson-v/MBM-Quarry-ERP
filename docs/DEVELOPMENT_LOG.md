@@ -441,3 +441,12 @@ An uncovered local workflow was characterized: Fleet Maintenance is a placeholde
 No maintenance record was submitted and no new fleet subsystem was built. This does not increase the eleven distinct local entry/save-module count. The unfinished workflow is preserved as a finding for later prioritization, not silently treated as completed. The dated November13 Drive handover has not been refreshed to include this later finding.
 
 Seven intended prepared source/test files remain unpublished; no application source changed in this interval. Earlier bounded weighbridge checks do not establish universal concurrency, live sync or native acceptance. No provider mutation, deployment, release, installation or running-quarry change. This checkpoint publishes only the development log.
+
+
+## 2026-11-14 14:17 IST - two-hour progress checkpoint
+
+Credit Collections has a bounded synthetic local save/reload result: an existing buyer with150 outstanding received cash10, bank5 and GPay2.50, total17.50. Exactly one marked collection/source event was verified in SQLite, with PAYMENT_RECEIVED17.50 and resulting ledger balance132.50. Reloaded browser history showed the correct split and total, and pixels were inspected. This is the twelfth distinct local entry/save module checked, not full module acceptance.
+
+A reporting defect was also reproduced: Collected and Total Credit summary cells still showed zero before/after/reload. listPartyCollectionSummary returns only partyName/outstanding while the UI and export expect collected/totalCredit; missing values are displayed as zero. Outstanding132.50 is supported, but those two summary/export fields are not trustworthy. No repair was prepared yet; existing ledger/report semantics must be traced before selecting a total-credit calculation.
+
+Seven intended earlier source/test changes remain unpublished. No application source changed during this interval. Fleet remains unfinished, the November13 Drive handover remains dated and unchanged, and local offline/pending status is not cloud acceptance. No provider mutation, deployment, release, installation or running-quarry change. This checkpoint publishes only the development log.
