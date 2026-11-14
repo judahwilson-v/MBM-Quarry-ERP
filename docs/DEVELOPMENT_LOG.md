@@ -423,3 +423,12 @@ The newest prepared allocation-queue candidate now has a bounded local browser r
 A separate fresh-database diagnostic forced a non-retriable transaction failure while a second caller waited. Instrumentation confirmed the queued caller had read an active session before synthetic-worker revocation. Releasing the first transaction left both calls refused and zero ticket rows; after reactivation a later valid caller saved exactly one row. The final diagnostic passed in34ms. This supports queue release after failure and a post-wait session recheck only, not real external-lock or cross-process correctness.
 
 No application source changed in this interval; seven intended prepared source/test files remain unpublished. Earlier failed eight-caller allocation evidence remains preserved. External-writer/cross-process behavior, queue-growth bounds, read/audit and native/provider acceptance remain open. No provider mutation, deployment, release, installation or running-quarry change. This checkpoint publishes only the development log.
+
+
+## 2026-11-14 10:15 IST - two-hour progress checkpoint
+
+Two bounded external-writer diagnostics were completed against separate fresh synthetic SQLite databases. An independent Python process held BEGIN IMMEDIATE for1second in the first case and6seconds in the second. After each release, two queued application allocations succeeded with two distinct ticket numbers and exactly two rows. Observed allocation elapsed times were1040ms and6018ms respectively. No application code or database settings were changed.
+
+These checks support recovery after those two bounded external lock releases only. Retry count was not instrumented; exhaustion, simultaneous independent application processes and queue-growth bounds remain unproved. The earlier failed eight-caller stress remains preserved, separate from the prepared same-process serialization candidate.
+
+Seven intended prepared source/test files remain unpublished. No fresh UI, cloud, Windows or device check this interval, and no provider mutation, deployment, release, installation or running-quarry change. Read/audit, historical unit policy and native/provider acceptance remain open. This checkpoint publishes only the development log.
