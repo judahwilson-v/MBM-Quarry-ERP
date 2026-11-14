@@ -468,3 +468,12 @@ A local read-only source-alignment candidate was prepared in four additional fil
 A mixed-party mocked test with sale150, purchase43, supplier payment20 and collection17.50 returns net109.50, customer credit150 and collected17.50; empty-party and null-ID isolation cases pass. Unit check3ms and strict TypeScript pass. Existing synthetic SQLite integration76ms now returns132.50 for monthly outstanding and print-statement data, matching persisted ledger rather than negative17.50. Original defect characterization is preserved separately.
 
 Actual read-only collection UI pixels show132.50 outstanding,17.50 collected and150 credit with unchanged history and supplier negative43 preserved. No collection was resubmitted. Export download and report/print visual paths remain unchecked. The separate Party Credit list still uses its old source; missing/stale ledger, legacy reconciliation and query-count limits remain open. No code publication, backfill, migration, provider mutation, cloud/native acceptance, deployment or installation. The dated November13 Drive handover remains unchanged. Only this log is published.
+
+
+## 2026-11-14 20:20 IST - two-hour progress checkpoint
+
+Actual read-only browser downloads verified the local candidate export data: the collection workbook contains buyer outstanding132.50, collected17.50 and total credit150; the report workbook contains outstanding132.50 on its Party Outstanding sheet across fourteen exported sheets. These values were parsed from downloaded workbooks, not inferred from the UI. Workbook layout has not been visually accepted.
+
+Actual Report Print View pixels confirmed unfinished presentation: Daily Closing Report and Party Statement contain identical full-report raw JSON rather than a finished statement layout. Parsed print data has the corrected132.50, but data correctness does not establish printable layout. No operating-system Print/PDF dialog was exercised.
+
+No application code changed in this interval and no new money record was saved. Eleven intended files remain unpublished. The separate Party Credit consumer, missing/stale-ledger handling, null-ID reconciliation and query scaling remain open. No cloud/native acceptance, provider mutation, deployment, release or installation. The dated November13 Drive handover remains unchanged. This checkpoint publishes only the log.
