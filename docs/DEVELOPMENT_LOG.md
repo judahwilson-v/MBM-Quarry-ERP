@@ -414,3 +414,12 @@ Following the earlier failed eight-caller allocation stress, a local SQL diagnos
 A prepared local allocation-serialization candidate preserves the database transaction and unique-number guard and checks the session again after queue wait. Eight diagnostic callers then completed successfully in49ms. The expanded normal-journal regression passed in85ms, checking eight distinct ticket numbers/eight rows plus prior session, direction and conditional completion/void checks. Strict TypeScript passed after an explicit create-result type annotation. Failed earlier stress evidence remains preserved.
 
 Seven intended source/test files remain unpublished. The newest queue candidate has not yet had its local UI rerun; cross-process/external-writer contention and queue-growth limits remain unproved. No fresh cloud, native Windows or device acceptance, no provider mutation/deployment/release/install, and no rollout-readiness claim. Only this development log is published by this checkpoint.
+
+
+## 2026-11-14 08:15 IST - two-hour progress checkpoint
+
+The newest prepared allocation-queue candidate now has a bounded local browser regression: one fresh synthetic outgoing ticket saved first weight5MT; final weight3 was refused with the typed3 retained; correction to8 succeeded. Pixels were inspected and a fresh SQLite read confirmed exactly one marked ticket with tare5, gross8, net3 and SECOND_WEIGHT. This is not sale-linked completion, native Windows testing or cloud sync acceptance; the offline/pending indicator remained visible.
+
+A separate fresh-database diagnostic forced a non-retriable transaction failure while a second caller waited. Instrumentation confirmed the queued caller had read an active session before synthetic-worker revocation. Releasing the first transaction left both calls refused and zero ticket rows; after reactivation a later valid caller saved exactly one row. The final diagnostic passed in34ms. This supports queue release after failure and a post-wait session recheck only, not real external-lock or cross-process correctness.
+
+No application source changed in this interval; seven intended prepared source/test files remain unpublished. Earlier failed eight-caller allocation evidence remains preserved. External-writer/cross-process behavior, queue-growth bounds, read/audit and native/provider acceptance remain open. No provider mutation, deployment, release, installation or running-quarry change. This checkpoint publishes only the development log.
