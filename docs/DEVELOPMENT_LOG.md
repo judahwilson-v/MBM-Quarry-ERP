@@ -405,3 +405,12 @@ Actual local UI on the final prepared source again refused gross3 below tare5, r
 Expanded local allocation stress did NOT pass: eight simultaneous ticket-create calls timed out at10seconds, then a fresh-database repeat timed out at60seconds with only one marked allocation row committed. Earlier session/direction/complete-void assertions completed first. This is an unresolved allocation concurrency/liveness finding, not an accepted fix or eight successful tickets. Failing characterization and result logs are preserved separately from the proposed bounded regression.
 
 The scoped session/direction/conditional-state regression was restored, extended with inactive-user create refusal, and passed again on fresh SQLite; strict TypeScript passes. No application change was made to allocation in this interval. Seven intended prepared source/test files remain unpublished. No fresh UI, cloud, Windows or device result, no provider mutation/deployment/release/install, and no rollout claim. Next technical step is to isolate where concurrent allocation stalls and verify bounded failure/no duplicates before proposing a correction. This checkpoint changes only the log.
+
+
+## 2026-11-14 06:14 IST - two-hour progress checkpoint
+
+Following the earlier failed eight-caller allocation stress, a local SQL diagnostic found competing transaction starts waiting while the first transaction could not progress. Two callers passed; eight still timed out with diagnostic WAL/busy-timeout settings. Those settings were not applied to application code. The evidence supports a same-process transaction-pool starvation hypothesis, not a proved cross-process diagnosis.
+
+A prepared local allocation-serialization candidate preserves the database transaction and unique-number guard and checks the session again after queue wait. Eight diagnostic callers then completed successfully in49ms. The expanded normal-journal regression passed in85ms, checking eight distinct ticket numbers/eight rows plus prior session, direction and conditional completion/void checks. Strict TypeScript passed after an explicit create-result type annotation. Failed earlier stress evidence remains preserved.
+
+Seven intended source/test files remain unpublished. The newest queue candidate has not yet had its local UI rerun; cross-process/external-writer contention and queue-growth limits remain unproved. No fresh cloud, native Windows or device acceptance, no provider mutation/deployment/release/install, and no rollout-readiness claim. Only this development log is published by this checkpoint.
