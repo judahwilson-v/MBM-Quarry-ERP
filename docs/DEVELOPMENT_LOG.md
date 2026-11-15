@@ -522,3 +522,14 @@ The current local single-SQL summary candidate now has actual mixed-source SQLit
 Fresh read-only local UI checks on this revision show buyer outstanding132.50, collected17.50 and credit150, with the original17.50 collection history intact. Collection XLSX values agree. Report14-sheet XLSX Party Outstanding and parsed print data both show132.50. No collection was resubmitted. Screens were inspected. Workbook values were parsed, but workbook layout was not inspected. Print View still displays unfinished raw JSON rather than an accepted print/PDF layout.
 
 These are bounded local checks, not full report cross-section snapshot, native Windows/Android acceptance or live cloud roundtrip proof. Offline96pending remains visible. Independent Party Credit source and legacy reconciliation remain open. Eleven intended application/test files remain unpublished; November13 Drive handover is unchanged. No business-data backfill, deployment, installation or provider mutation. Only this log is published.
+
+
+## 2026-11-15 08:25 IST - two-hour progress checkpoint
+
+A disposable-database diagnostic now demonstrates the full-report consistency limit. A deliberately gated second Prisma client commits a synthetic collection10 between the report collection-row read and the single-SQL party summary. The actual report then includes collection history17.50 while outstanding122.50 reflects collections27.50. This deterministic interleaving check passed in29ms; it is not a measurement of natural race frequency. The first diagnostic used the wrong assertion field; that log was retained and the corrected check reran from a fresh disposable backup. No application source or original synthetic UI data changed.
+
+The one-statement summary protects its own source aggregation, not all eight parallel report reads. Full-report cross-section consistency remains unresolved; the earlier writer-reserving transaction trial remains rejected. Current bounded summary/UI/export results stand, without native/cloud/print-layout acceptance.
+
+Source reachability also narrows a prior concern: PartyCreditPage is exported but no importing route was found. Its legacy list actions still read PartyCredit and no application create/upsert was found. This is an unmounted legacy component/action mismatch, not a demonstrated current user-facing screen defect. No historical backfill or repair was attempted.
+
+Eleven intended application/test files remain unpublished. No deployment, installation, provider mutation or Drive handover update. Only this log is published.
