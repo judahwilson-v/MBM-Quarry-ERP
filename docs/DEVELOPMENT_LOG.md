@@ -567,3 +567,12 @@ No additional fix or acceptance is claimed. Full-report cross-section consistenc
 Source review confirms that the local allocation queue has no queue-length cap, caller cancellation or queue wait deadline. Five transaction retries do not bound time spent behind earlier callers. Session validation is repeated after waiting, but this is not a latency/capacity guarantee. No queue policy has been invented or patched.
 
 No additional race run, repair or acceptance is claimed in this checkpoint. Prior bounded SQL, UI/export and injected/multiprocess results keep their documented limits. Full-report cross-section consistency, unfinished print layout, native Windows/Android acceptance and live cloud roundtrip remain open. Eleven intended application/test files remain unpublished. No deployment, installation, provider mutation, business-data backfill or Drive handover update. Only this log is published.
+
+
+## 2026-11-15 18:30 IST - two-hour progress checkpoint
+
+The existing intended party-summary test file now includes a portable real Prisma/SQLite regression. It creates and cleans its own temporary minimal schema instead of depending on the long-lived synthetic fixture. It checks mixed credit210/collected20/net167, supplier negative43, empty party0, negative-credit filtering, null-ID/orphan-ID exclusion and exactly one WITH SELECT with no BEGIN or business DML during the read. The prior SQL-shape/rounding unit remains. Two tests passed in182ms and strict TypeScript passed.
+
+This is regression packaging, not new production acceptance, a new arithmetic result or migration/full-schema proof. Tests ran through a scoped configuration; default Vitest includes only schema/sync suites, so default npm-test coverage is not claimed. Application source is unchanged and the same eleven intended files remain unpublished.
+
+Full-report cross-section consistency, queue wait bounds, unfinished print layout, native Windows/Android and live cloud roundtrip remain open. No deployment, installation, provider mutation, backfill or Drive handover update. Only this log is published.
