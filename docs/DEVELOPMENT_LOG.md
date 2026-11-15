@@ -608,3 +608,10 @@ The external isolated runner now includes request-approval as its own fresh-data
 Bootstrap runs its actual migration test. Units, weighbridge and approval each use separate fresh schema-only db-push databases, so these groups are not full migration acceptance. No shared UI database was used. Source/tests are unchanged; the runner is outside the eleven intended application/test files and is not integrated into CI/default npm test. This packages bounded regressions, not new native/cloud acceptance.
 
 Full-report cross-section consistency, allocation queue wait bounds and unfinished print layout remain open. The eleven intended files remain unpublished. No deployment, installation, provider mutation, backfill or Drive handover update. Only this log is published.
+
+
+## 2026-11-16 04:34 IST - two-hour progress checkpoint
+
+The isolated review slice is unchanged. No new source/test edit, repeated regression run or additional acceptance is claimed since the preceding checkpoint. The external67-test runner remains a scoped prototype outside the eleven intended application/test files, not automatic CI/default npm-test coverage or rollout readiness.
+
+Full-report cross-section consistency, allocation queue wait bounds, unfinished print layout, native Windows/Android acceptance and live cloud roundtrip remain open. Eleven intended files remain unpublished. No deployment, installation, provider mutation, backfill or Drive handover update. Only this log is published.
