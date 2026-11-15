@@ -513,3 +513,12 @@ A new local single-statement summary candidate replaces the five-query reader wi
 Initial actual integration failed because SQLite/Prisma inferred integer result metadata and tried to parse132.50 as BigInt. Explicit REAL casts on monetary output expressions fixed that observed failure; final three integration checks passed in24/15/15ms. Failed source/logs remain preserved. An archived old mock accidentally matched the diagnostic glob and was renamed out, not counted as a pass.
 
 Unit checks cover SQL shape, call count and rounding, not full mixed-source SQL arithmetic. This revision still needs actual mixed/null-ID/join-multiplication fixtures and UI/export checks. Earlier UI evidence belongs to the previous reader. No application publication, cloud/native acceptance, provider mutation, backfill, deployment or installation. Separate credit-list/legacy reconciliation/print-layout issues remain open. November13 Drive handover is unchanged. Only this log is published.
+
+
+## 2026-11-15 06:24 IST - two-hour progress checkpoint
+
+The current local single-SQL summary candidate now has actual mixed-source SQLite coverage on a disposable database copy. Multiple sales, purchases, collections and supplier payments produce credit210, collected20 and net167. The fixture checks positive-credit filtering, pre-aggregation against join multiplication, and exclusion of name-only/null-ID sale999 and collection888. This passed in35ms; the original synthetic fixture was not modified by that test.
+
+Fresh read-only local UI checks on this revision show buyer outstanding132.50, collected17.50 and credit150, with the original17.50 collection history intact. Collection XLSX values agree. Report14-sheet XLSX Party Outstanding and parsed print data both show132.50. No collection was resubmitted. Screens were inspected. Workbook values were parsed, but workbook layout was not inspected. Print View still displays unfinished raw JSON rather than an accepted print/PDF layout.
+
+These are bounded local checks, not full report cross-section snapshot, native Windows/Android acceptance or live cloud roundtrip proof. Offline96pending remains visible. Independent Party Credit source and legacy reconciliation remain open. Eleven intended application/test files remain unpublished; November13 Drive handover is unchanged. No business-data backfill, deployment, installation or provider mutation. Only this log is published.
