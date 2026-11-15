@@ -583,3 +583,10 @@ Full-report cross-section consistency, queue wait bounds, unfinished print layou
 The test-entrypoint audit confirms CI calls npm test, while its Vitest include selects only schema-consistency and sync-completeness. The locally scoped inventory/summary and request-approval checks are not automatically run by that entrypoint. No workflow or broad default-test configuration was changed. A committed scoped regression entrypoint remains follow-up work before eventual application publication; existing scoped passes are not described as CI coverage.
 
 No new implementation, repeated race run or additional acceptance is claimed in this checkpoint. The same eleven intended application/test files remain local and unpublished. Full-report cross-section consistency, allocation queue wait bounds, unfinished print layout, native Windows/Android and live cloud roundtrip remain open. No deployment, installation, provider mutation, business-data backfill or Drive handover update. Only this log is published.
+
+
+## 2026-11-15 22:32 IST - two-hour progress checkpoint
+
+No additional implementation or acceptance is claimed since the preceding checkpoint. Regression entrypoint work must keep state-creating bootstrap/weighbridge suites on fresh isolated databases, with the portable summary test separate. Running the inventory glob against a shared UI fixture would not be a safe shortcut. Default npm-test/CI coverage remains unchanged and no new runner pass is claimed yet.
+
+Eleven intended application/test files remain local and unpublished. Existing bounded results retain their stated limits. Full-report cross-section consistency, allocation queue wait bounds, print layout, native Windows/Android and live cloud roundtrip remain open. No deployment, installation, provider mutation, backfill or Drive handover update. Only this log is published.
