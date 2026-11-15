@@ -599,3 +599,12 @@ The external isolated regression runner prototype passed9 tests across4 files: b
 This is one-command scoped replay packaging, not new feature acceptance or migration acceptance for the db-push groups. The runner remains outside the proposed application changes. Request-approval suites are not included, and CI/default npm-test behavior is unchanged. Source/tests have not changed since the portable summary regression addition.
 
 Eleven intended application/test files remain local and unpublished. Full-report cross-section consistency, queue wait bounds, print layout, native Windows/Android and live cloud roundtrip remain open. No deployment, installation, provider mutation, backfill or Drive handover update. Only this log is published.
+
+
+## 2026-11-16 02:33 IST - two-hour progress checkpoint
+
+The external isolated runner now includes request-approval as its own fresh-database group. All67 tests across6 files passed: bootstrap/portable summary3, units5, weighbridge guards1 and request-approval58. Seven runner steps exited0; approval took6.79s including the concurrent-approval check5.118s. Expected fault-injection and unique-constraint diagnostic logs remain visible.
+
+Bootstrap runs its actual migration test. Units, weighbridge and approval each use separate fresh schema-only db-push databases, so these groups are not full migration acceptance. No shared UI database was used. Source/tests are unchanged; the runner is outside the eleven intended application/test files and is not integrated into CI/default npm test. This packages bounded regressions, not new native/cloud acceptance.
+
+Full-report cross-section consistency, allocation queue wait bounds and unfinished print layout remain open. The eleven intended files remain unpublished. No deployment, installation, provider mutation, backfill or Drive handover update. Only this log is published.
