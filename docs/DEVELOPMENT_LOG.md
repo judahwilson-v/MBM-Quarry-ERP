@@ -551,3 +551,12 @@ One bounded cross-process complete-versus-void diagnostic passed on a fresh disp
 This confirms one observed guarded contention outcome, not both possible winners, simultaneous SQL execution or broad native/multiprocess acceptance. The existing synthetic session was refreshed only in the disposable copy. No candidate source or original UI fixture changed.
 
 No further repair is claimed in this checkpoint. Full-report cross-section snapshot consistency, unfinished print layout, native Windows/Android acceptance and live cloud roundtrip remain unresolved. The eleven intended application/test files remain unpublished. No deployment, installation, provider mutation, business-data backfill or Drive handover update. Only this log is published.
+
+
+## 2026-11-15 14:28 IST - two-hour progress checkpoint
+
+Injected retry-exhaustion coverage passed on a disposable database. A transaction proxy injected P1008 for exactly five first-caller attempts. That caller returned only the fixed high-concurrency retry message and created zero tickets. A queued second caller then succeeded on transaction attempt6, with exactly one new persisted ticket. The test took554ms and the action pair540ms. An internal marker/path did not appear in the returned failure object; the expected internal console error was captured by the test.
+
+This checks injected retry/error/queue-release control flow, not natural SQLite timeout duration or load capacity. It does not establish a bounded queue, cancellation or a maximum user-visible wait. No candidate source or original UI data changed.
+
+No additional fix or acceptance is claimed. Full-report cross-section consistency, print layout, native Windows/Android and live cloud roundtrip limits remain open. Eleven intended application/test files remain unpublished. No deployment, installation, provider mutation, backfill or Drive handover update. Only this log is published.
