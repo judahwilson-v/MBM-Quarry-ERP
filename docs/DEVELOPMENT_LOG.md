@@ -576,3 +576,10 @@ The existing intended party-summary test file now includes a portable real Prism
 This is regression packaging, not new production acceptance, a new arithmetic result or migration/full-schema proof. Tests ran through a scoped configuration; default Vitest includes only schema/sync suites, so default npm-test coverage is not claimed. Application source is unchanged and the same eleven intended files remain unpublished.
 
 Full-report cross-section consistency, queue wait bounds, unfinished print layout, native Windows/Android and live cloud roundtrip remain open. No deployment, installation, provider mutation, backfill or Drive handover update. Only this log is published.
+
+
+## 2026-11-15 20:31 IST - two-hour progress checkpoint
+
+The test-entrypoint audit confirms CI calls npm test, while its Vitest include selects only schema-consistency and sync-completeness. The locally scoped inventory/summary and request-approval checks are not automatically run by that entrypoint. No workflow or broad default-test configuration was changed. A committed scoped regression entrypoint remains follow-up work before eventual application publication; existing scoped passes are not described as CI coverage.
+
+No new implementation, repeated race run or additional acceptance is claimed in this checkpoint. The same eleven intended application/test files remain local and unpublished. Full-report cross-section consistency, allocation queue wait bounds, unfinished print layout, native Windows/Android and live cloud roundtrip remain open. No deployment, installation, provider mutation, business-data backfill or Drive handover update. Only this log is published.
