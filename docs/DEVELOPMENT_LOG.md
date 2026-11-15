@@ -542,3 +542,12 @@ A bounded allocation diagnostic used two separate Node/Vitest processes with ind
 This is one two-process start-barrier run. It does not establish simultaneous SQL execution, saturation, retry exhaustion or broad multiprocess acceptance. No candidate application source or original UI fixture changed. Cross-process complete-versus-void contention remains a separate check.
 
 The previously demonstrated full-report cross-section snapshot limit remains unresolved. Current single-summary SQL and local UI/export checks remain bounded as documented above; unfinished print layout and native/cloud acceptance are unchanged. Eleven intended application/test files remain unpublished. No deployment, installation, provider mutation, business-data backfill or Drive handover update. Only this log is published.
+
+
+## 2026-11-15 12:27 IST - two-hour progress checkpoint
+
+One bounded cross-process complete-versus-void diagnostic passed on a fresh disposable SQLite backup. Separate Node processes and Prisma clients targeted the same synthetic FIRST_WEIGHT ticket after a start barrier. Void won; completion returned the changed-ticket refusal. Exactly one VOID target persisted, with tare5, null gross/net and the expected void remark. No partial completion was observed.
+
+This confirms one observed guarded contention outcome, not both possible winners, simultaneous SQL execution or broad native/multiprocess acceptance. The existing synthetic session was refreshed only in the disposable copy. No candidate source or original UI fixture changed.
+
+No further repair is claimed in this checkpoint. Full-report cross-section snapshot consistency, unfinished print layout, native Windows/Android acceptance and live cloud roundtrip remain unresolved. The eleven intended application/test files remain unpublished. No deployment, installation, provider mutation, business-data backfill or Drive handover update. Only this log is published.
