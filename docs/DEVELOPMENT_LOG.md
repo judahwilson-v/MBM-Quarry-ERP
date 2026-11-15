@@ -560,3 +560,10 @@ Injected retry-exhaustion coverage passed on a disposable database. A transactio
 This checks injected retry/error/queue-release control flow, not natural SQLite timeout duration or load capacity. It does not establish a bounded queue, cancellation or a maximum user-visible wait. No candidate source or original UI data changed.
 
 No additional fix or acceptance is claimed. Full-report cross-section consistency, print layout, native Windows/Android and live cloud roundtrip limits remain open. Eleven intended application/test files remain unpublished. No deployment, installation, provider mutation, backfill or Drive handover update. Only this log is published.
+
+
+## 2026-11-15 16:29 IST - two-hour progress checkpoint
+
+Source review confirms that the local allocation queue has no queue-length cap, caller cancellation or queue wait deadline. Five transaction retries do not bound time spent behind earlier callers. Session validation is repeated after waiting, but this is not a latency/capacity guarantee. No queue policy has been invented or patched.
+
+No additional race run, repair or acceptance is claimed in this checkpoint. Prior bounded SQL, UI/export and injected/multiprocess results keep their documented limits. Full-report cross-section consistency, unfinished print layout, native Windows/Android acceptance and live cloud roundtrip remain open. Eleven intended application/test files remain unpublished. No deployment, installation, provider mutation, business-data backfill or Drive handover update. Only this log is published.
