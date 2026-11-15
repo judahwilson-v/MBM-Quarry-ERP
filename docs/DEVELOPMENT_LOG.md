@@ -590,3 +590,12 @@ No new implementation, repeated race run or additional acceptance is claimed in 
 No additional implementation or acceptance is claimed since the preceding checkpoint. Regression entrypoint work must keep state-creating bootstrap/weighbridge suites on fresh isolated databases, with the portable summary test separate. Running the inventory glob against a shared UI fixture would not be a safe shortcut. Default npm-test/CI coverage remains unchanged and no new runner pass is claimed yet.
 
 Eleven intended application/test files remain local and unpublished. Existing bounded results retain their stated limits. Full-report cross-section consistency, allocation queue wait bounds, print layout, native Windows/Android and live cloud roundtrip remain open. No deployment, installation, provider mutation, backfill or Drive handover update. Only this log is published.
+
+
+## 2026-11-16 00:32 IST - two-hour progress checkpoint
+
+The external isolated regression runner prototype passed9 tests across4 files: bootstrap plus portable summary3, units5 and weighbridge guards1. Units and weighbridge each receive a fresh schema-only Prisma db-push database; bootstrap and summary create their own temporary databases. No shared UI database or real account was used. All five runner step exits were0; units tests took237ms and weighbridge guard90ms.
+
+This is one-command scoped replay packaging, not new feature acceptance or migration acceptance for the db-push groups. The runner remains outside the proposed application changes. Request-approval suites are not included, and CI/default npm-test behavior is unchanged. Source/tests have not changed since the portable summary regression addition.
+
+Eleven intended application/test files remain local and unpublished. Full-report cross-section consistency, queue wait bounds, print layout, native Windows/Android and live cloud roundtrip remain open. No deployment, installation, provider mutation, backfill or Drive handover update. Only this log is published.
