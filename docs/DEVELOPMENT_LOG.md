@@ -533,3 +533,12 @@ The one-statement summary protects its own source aggregation, not all eight par
 Source reachability also narrows a prior concern: PartyCreditPage is exported but no importing route was found. Its legacy list actions still read PartyCredit and no application create/upsert was found. This is an unmounted legacy component/action mismatch, not a demonstrated current user-facing screen defect. No historical backfill or repair was attempted.
 
 Eleven intended application/test files remain unpublished. No deployment, installation, provider mutation or Drive handover update. Only this log is published.
+
+
+## 2026-11-15 10:26 IST - two-hour progress checkpoint
+
+A bounded allocation diagnostic used two separate Node/Vitest processes with independent Prisma clients and independent module queues, sharing one disposable SQLite database copy. After a filesystem start barrier, both processes called the actual createWeighbridgeTicket action using an existing synthetic worker session refreshed only inside the copy. Both succeeded and exactly two FIRST_WEIGHT tickets persisted, with distinct numbers5 and6.
+
+This is one two-process start-barrier run. It does not establish simultaneous SQL execution, saturation, retry exhaustion or broad multiprocess acceptance. No candidate application source or original UI fixture changed. Cross-process complete-versus-void contention remains a separate check.
+
+The previously demonstrated full-report cross-section snapshot limit remains unresolved. Current single-summary SQL and local UI/export checks remain bounded as documented above; unfinished print layout and native/cloud acceptance are unchanged. Eleven intended application/test files remain unpublished. No deployment, installation, provider mutation, business-data backfill or Drive handover update. Only this log is published.
